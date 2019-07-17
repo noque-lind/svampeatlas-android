@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_view">
+    
+    <ImageView
+            android:id="@+id/mushroomView_imageView"
+            android:layout_width="100dp"
+            android:src="@mipmap/ic_launcher"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginStart="0dp"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"/>
+
+    <LinearLayout
+            android:id="@+id/mushroomView_linearLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:gravity="center_vertical"
+            app:layout_constraintStart_toEndOf="@id/mushroomView_imageView"
+            android:orientation="vertical">
+
+        <TextView
+                android:id="@+id/mushroomView_primaryLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                style="@style/AppPrimaryHighlighted"/>
+
+        <Space
+                android:layout_width="match_parent"
+                android:layout_height="2dp"/>
+        
+        <TextView
+                android:id="@+id/mushroomView_secondaryLabel"
+                android:layout_width="match_parent"
+                style="@style/AppPrimary"
+                android:layout_height="wrap_content"
+                android:gravity="center"/>
+
+        <Space
+                android:layout_width="match_parent"
+                android:layout_height="20dp"/>
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

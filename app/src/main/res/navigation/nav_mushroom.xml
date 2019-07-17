@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/mushroom_navigation"
+            app:startDestination="@id/listFragment">
+    <fragment
+            android:id="@+id/listFragment"
+            android:name="com.noque.svampeatlas.View.ListFragment"
+            android:label="fragment_list"
+            tools:layout="@layout/fragment_list"/>
+    <fragment
+            android:id="@+id/detailsFragment"
+            android:name="com.noque.svampeatlas.View.DetailsFragment"
+            android:label="fragment_details"
+            tools:layout="@layout/fragment_details">
+        <argument
+                android:name="images"
+                app:argType="com.noque.svampeatlas.Model.Image[]"/>
+    </fragment>
+    <action android:id="@+id/action_global_detailsFragment" app:destination="@id/detailsFragment"/>
+</navigation>
