@@ -75,41 +75,10 @@ class MushroomView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(c
             information.add(Pair("Seneste fund:", it.toString()))
         }
 
+        mushroomView_informationView.configure(information)
+
 //        mushroom.updatedAt?.let {
 //            information.add(Pair("Sidst opdateret d.:", it.toString()))
 //        }
-
-        createInformation(information)
-    }
-
-    private fun createInformation(information: List<Pair<String, String>>) {
-        fun addInformation(info: Pair<String, String>) {
-            val linearLayout = LinearLayout(context)
-            linearLayout.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-            linearLayout.orientation = LinearLayout.HORIZONTAL
-
-            val textViewLeft = TextView(context)
-            textViewLeft.setTextAppearance(context, R.style.AppPrimary)
-            textViewLeft.layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-            textViewLeft.text = info.first
-            textViewLeft.maxLines = 1
-
-            val textViewRight = TextView(context)
-            textViewRight.setTextAppearance(context, R.style.AppPrimary)
-            textViewRight.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-            textViewRight.text = info.second
-            textViewRight.gravity = Gravity.RIGHT
-            textViewRight.maxLines = 1
-
-            linearLayout.addView(textViewLeft)
-            linearLayout.addView(textViewRight)
-            informationLinearLayout.addView(linearLayout)
-        }
-
-        informationLinearLayout.removeAllViews()
-
-        information.forEach {
-            addInformation(it)
-        }
     }
 }

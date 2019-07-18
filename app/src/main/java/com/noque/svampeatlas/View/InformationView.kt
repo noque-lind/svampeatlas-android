@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import com.noque.svampeatlas.R
 import kotlinx.android.synthetic.main.information_view_layout.view.*
 
@@ -18,7 +19,7 @@ class InformationView(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         inflater.inflate(R.layout.information_view_layout, this)
     }
 
-    private fun configure(information: List<Pair<String, String>>) {
+    fun configure(information: List<Pair<String, String>>) {
         fun addInformation(info: Pair<String, String>) {
             val linearLayout = LinearLayout(context)
             linearLayout.layoutParams = ConstraintLayout.LayoutParams(
@@ -28,16 +29,17 @@ class InformationView(context: Context?, attrs: AttributeSet?) : LinearLayout(co
             linearLayout.orientation = LinearLayout.HORIZONTAL
 
             val textViewLeft = TextView(context)
-            textViewLeft.setTextAppearance(context, R.style.AppPrimary)
             textViewLeft.layoutParams = ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT
             )
+
+            textViewLeft.setTextColor(ContextCompat.getColor(context, R.color.colorWhite))
             textViewLeft.text = info.first
             textViewLeft.maxLines = 1
 
             val textViewRight = TextView(context)
-            textViewRight.setTextAppearance(context, R.style.AppPrimary)
+            textViewRight.setTextColor(ContextCompat.getColor(context, R.color.colorWhite))
             textViewRight.layoutParams = ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.MATCH_PARENT,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT

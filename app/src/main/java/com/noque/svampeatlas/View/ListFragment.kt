@@ -15,6 +15,7 @@ import com.noque.svampeatlas.Adapters.MushroomListAdapter
 import com.noque.svampeatlas.Model.Mushroom
 
 import com.noque.svampeatlas.R
+import com.noque.svampeatlas.ViewModel.DetailsViewModel
 import com.noque.svampeatlas.ViewModel.MushroomsViewModel
 import com.noque.svampeatlas.ViewModel.State
 import kotlinx.android.synthetic.main.fragment_list.*
@@ -22,10 +23,16 @@ import kotlinx.android.synthetic.main.fragment_list.*
 class ListFragment : Fragment() {
 
     lateinit var viewModel: MushroomsViewModel
-    private val listAdapter = MushroomListAdapter(arrayListOf(), {
+    private val listAdapter = MushroomListAdapter(arrayListOf(), { mushroom ->
                         val action = DetailsFragmentDirections
-                            .actionGlobalDetailsFragment(it.images.toTypedArray())
-                        findNavController().navigate(action)
+                            .actionGlobalDetailsFragment(mushroom.images.toTypedArray())
+
+            activity?.let {
+                val detailViewModel = ViewModelProviders.of(it).get(DetailsViewModel::class.java)
+                detailViewModel.select(mushroom)
+                findNavController().navigate(action)
+//                TODO("FIND OUT HOW TO DESTROY VIEWMODEL WHEN DETAILSSCREEN IS DESTROYED")
+            }
     })
 
     override fun onCreateView(
