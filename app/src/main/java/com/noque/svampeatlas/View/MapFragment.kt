@@ -1,17 +1,18 @@
 package com.noque.svampeatlas.View
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.TileOverlayOptions
 import com.google.maps.android.heatmaps.HeatmapTileProvider
+import com.noque.svampeatlas.Extensions.toRectanglePolygon
 import com.noque.svampeatlas.R
 import kotlinx.android.synthetic.main.fragment_map.*
 
@@ -22,8 +23,8 @@ class MapFragment: Fragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
         val sydney = LatLng(-34.0, 151.0)
-    this.googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-    this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+//    this.googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+//    this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
 
     }
 
@@ -40,9 +41,25 @@ class MapFragment: Fragment(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
     }
 
-    fun addHeatMap(fromCoordinates: List<String>) {
+    fun addHeatMap(coordinates: List<LatLng>) {
+        Log.d("Test", coordinates.toString())
         val provider = HeatmapTileProvider.Builder()
+        .data(coordinates)
+            .radius(50)
+            .opacity(1.0)
+        val test = googleMap.addTileOverlay(TileOverlayOptions().tileProvider(provider.build()))
+    }
 
+    fun setRegion(coordinate: LatLng, radius: Double) {
+        val builder = LatLngBounds.Builder()
+
+        coordinate.toRectanglePolygon(radius).forEach {
+            builder.include(it)
+        }
+
+        val bounds = builder.build()
+
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
     }
 
 }

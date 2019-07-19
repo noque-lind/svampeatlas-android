@@ -10,8 +10,11 @@ import com.google.gson.reflect.TypeToken
 import com.noque.svampeatlas.Model.Animal
 import com.noque.svampeatlas.Model.ApiKey
 import com.noque.svampeatlas.Model.Mushroom
+import com.noque.svampeatlas.Model.Observation
 import com.noque.svampeatlas.Utilities.API
 import com.noque.svampeatlas.Utilities.APIType
+import com.noque.svampeatlas.Utilities.Geometry
+import com.noque.svampeatlas.Utilities.ObservationQueries
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 import java.lang.reflect.Type
@@ -108,15 +111,44 @@ class DataService private constructor(context: Context) {
             api,
             null,
             Response.Listener {
-                it.forEach {
-                    Log.d("Dataserver", it.fullName)
-                }
                 completion(Result.success(it))
             },
             Response.ErrorListener {
                 completion(Result.failure(it))
             })
 
+        addToRequestQueue(request)
+    }
+
+    fun getObservationsWithin(geometry: Geometry, taxonID: Int? = null, ageInYear: Int? = null, completion: (Result<List<Observation>>) -> Unit) {
+        val api = API(APIType.Request.Observation(
+            geometry,
+            listOf(
+                ObservationQueries.Comments(),
+                ObservationQueries.Images(),
+                ObservationQueries.Locality(),
+                ObservationQueries.User(null),
+                ObservationQueries.DeterminationView(null)
+            ),
+            ageInYear,
+            null,
+            null
+            ))
+
+       val request = AppRequest<List<Observation>>(
+           object: TypeToken<List<Observation>>() {}.type,
+        api,
+         null,
+           Response.Listener {
+               Log.d("DetailsViewModel", it.toString())
+               completion(Result.success(it))
+           },
+           Response.ErrorListener {
+               Log.d("Dataservice", it.toString())
+               completion(Result.failure(it))
+           })
+
+        request.setRetryPolicy(DefaultRetryPolicy(50000, 2, 10F))
         addToRequestQueue(request)
     }
 

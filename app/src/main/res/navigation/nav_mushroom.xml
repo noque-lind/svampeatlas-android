@@ -13,10 +13,6 @@
             android:id="@+id/detailsFragment"
             android:name="com.noque.svampeatlas.View.DetailsFragment"
             android:label="fragment_details"
-            tools:layout="@layout/fragment_details">
-        <argument
-                android:name="images"
-                app:argType="com.noque.svampeatlas.Model.Image[]"/>
-    </fragment>
+            tools:layout="@layout/fragment_details"/>
     <action android:id="@+id/action_global_detailsFragment" app:destination="@id/detailsFragment"/>
 </navigation>

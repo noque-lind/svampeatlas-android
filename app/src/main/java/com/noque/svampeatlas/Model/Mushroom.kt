@@ -39,40 +39,7 @@ data class RedListData(
     @SerializedName("year") val year: Int?,
     @SerializedName("Udbredelse") val distribution: String?)
 
-data class Image(
-    @SerializedName("thumburi") private val _thumburi: String?,
-    @SerializedName("uri") private val _uri: String?,
-    @SerializedName("photographer") private val _photographer: String?): Parcelable {
 
-    val url: String? get() {return _uri}
-
-    constructor(parcel: Parcel) : this(
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString()
-    ) {
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(_thumburi)
-        parcel.writeString(_uri)
-        parcel.writeString(_photographer)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<Image> {
-        override fun createFromParcel(parcel: Parcel): Image {
-            return Image(parcel)
-        }
-
-        override fun newArray(size: Int): Array<Image?> {
-            return arrayOfNulls(size)
-        }
-    }
-}
 
 data class Attributes(@SerializedName("diagnose") val diagnosis: String?,
                       @SerializedName("forvekslingsmuligheder") val similarities: String?,

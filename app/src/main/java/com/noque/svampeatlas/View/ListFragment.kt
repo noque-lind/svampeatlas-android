@@ -24,8 +24,8 @@ class ListFragment : Fragment() {
 
     lateinit var viewModel: MushroomsViewModel
     private val listAdapter = MushroomListAdapter(arrayListOf(), { mushroom ->
-                        val action = DetailsFragmentDirections
-                            .actionGlobalDetailsFragment(mushroom.images.toTypedArray())
+                        val action = DetailsFragmentDirections.actionGlobalDetailsFragment()
+//                            .actionGlobalDetailsFragment(mushroom.images.toTypedArray())
 
             activity?.let {
                 val detailViewModel = ViewModelProviders.of(it).get(DetailsViewModel::class.java)
