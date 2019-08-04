@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.maps.model.LatLng
 import com.noque.svampeatlas.Model.Mushroom
+import com.noque.svampeatlas.Model.State
 import com.noque.svampeatlas.Services.DataService
 import com.noque.svampeatlas.Utilities.Geometry
 
@@ -35,8 +36,13 @@ class DetailsViewModel(application: Application) : AndroidViewModel(application)
             taxonID,
             null
         )  {
+
             it.onSuccess {
                 heatMapObservationCoordinates.value = State.Items(it.map { it.coordinate })
+            }
+
+            it.onError {
+                heatMapObservationCoordinates.value = State.Error(it)
             }
         }
     }

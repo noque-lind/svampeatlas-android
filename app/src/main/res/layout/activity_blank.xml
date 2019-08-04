@@ -44,6 +44,7 @@
             android:layout_gravity="start"
             android:fitsSystemWindows="true"
             app:headerLayout="@layout/nav_header"
+            android:background="@drawable/gradient_background"
             app:menu="@menu/activity_blank_drawer"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>

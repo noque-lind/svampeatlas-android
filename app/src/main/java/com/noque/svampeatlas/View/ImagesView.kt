@@ -7,15 +7,12 @@ import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.Adapters.ImagesAdapter
 import com.noque.svampeatlas.Model.Image
 import com.noque.svampeatlas.R
-import kotlinx.android.synthetic.main.fragment_list.*
-import kotlinx.android.synthetic.main.fragment_list.view.*
-import kotlinx.android.synthetic.main.images_view_layout.view.*
+import kotlinx.android.synthetic.main.view_images.view.*
 
 class ImagesView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(context, attrs) {
 
@@ -23,7 +20,7 @@ class ImagesView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(con
 
     init {
         val inflater = LayoutInflater.from(getContext())
-        inflater.inflate(R.layout.images_view_layout, this)
+        inflater.inflate(R.layout.view_images, this)
         initViews()
         setupView()
     }

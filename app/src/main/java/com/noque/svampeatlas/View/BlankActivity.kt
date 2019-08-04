@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -21,13 +22,13 @@ class BlankActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
 
     override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
 
-        when (menuItem.itemId) {
-            R.id.nav_home -> {
-                Toast.makeText(this, "NAV HOME", Toast.LENGTH_LONG).show()
-            }
-
-            else -> {}
-        }
+//        when (menuItem.itemId) {
+//            R.id.nav_home -> {
+//                Toast.makeText(this, "NAV HOME", Toast.LENGTH_LONG).show()
+//            }
+//
+//            else -> {}
+//        }
 
         return true
     }
@@ -46,13 +47,31 @@ class BlankActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
     private fun initViews() {
         drawerLayout = drawer_layout
         navController = findNavController(R.id.nav_host_fragment)
-        appBarConfiguration = AppBarConfiguration(navController.graph, drawerLayout)
+        appBarConfiguration = AppBarConfiguration(setOf(R.id.listFragment, R.id.nearbyFragment, R.id.addObservationFragment), drawerLayout)
     }
 
     private fun setupViews() {
         setSupportActionBar(toolbar)
         setupActionBarWithNavController(navController, appBarConfiguration)
         nav_view.setupWithNavController(navController)
+
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.listFragment -> {
+                    toolbar.visibility = View.VISIBLE
+                }
+
+                R.id.detailsFragment -> {
+                    toolbar.visibility = View.GONE
+                }
+
+                R.id.nearbyFragment -> {
+                    toolbar.visibility = View.VISIBLE
+                }
+            }
+        }
+
     }
 
     override fun onSupportNavigateUp(): Boolean {

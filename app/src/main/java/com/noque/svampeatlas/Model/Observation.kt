@@ -63,10 +63,6 @@ data class Profile(
     val facebook: String?
                    )
 
-data class Locality(
-    val name: String?,
-    @SerializedName("kommune") val municipality: String?
-)
 
 data class Forum(
     @SerializedName("_id") val id: Int?,

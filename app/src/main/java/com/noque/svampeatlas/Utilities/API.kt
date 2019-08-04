@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import com.android.volley.Request
 import com.google.android.gms.maps.model.LatLng
+import com.noque.svampeatlas.Extensions.toBounds
 import com.noque.svampeatlas.Extensions.toRectanglePolygon
 
 data class API(val apiType: APIType) {
@@ -32,13 +33,21 @@ data class API(val apiType: APIType) {
 
         when (request) {
             is APIType.Request.Mushroom -> {
-
                 builder.appendPath("taxa")
+
+                if (request.searchString != null) {
+                    builder.appendQueryParameter("where", searchQuery(request.searchString))
+                        .appendQueryParameter("nocount", "true")
+                } else {
+                    builder.appendQueryParameter("limit", request.limit.toString())
+                        .appendQueryParameter("offset", request.offset.toString())
+                }
+
                 .appendQueryParameter("_order", "[[\"FullName\"]]")
                     .appendQueryParameter("acceptedTaxaOnly", "true")
                 .appendQueryParameter("include", speciesIncludeQuery(request.requirePictures))
-                .appendQueryParameter("limit", request.limit.toString())
-                .appendQueryParameter("offset", request.offset.toString())
+
+
             }
 
             is APIType.Request.Observation -> {
@@ -57,6 +66,19 @@ data class API(val apiType: APIType) {
                     builder.appendQueryParameter("geometry", it.toGeoJson())
                 }
             }
+
+            is APIType.Request.Locality -> {
+                builder.appendPath("localities")
+                builder.appendQueryParameter("where", request.geometry.toBetween())
+            }
+
+            is APIType.Request.Substrate -> {
+                builder.appendPath("substrate")
+            }
+
+            is APIType.Request.VegetationType -> {
+                builder.appendPath("vegetationTypes")
+            }
         }
 
         val url = builder.build().toString()
@@ -70,6 +92,33 @@ data class API(val apiType: APIType) {
 //        return "%5B%7B%22model%22%3A%22TaxonRedListData%22%2C%22as%22%3A%22redlistdata%22%2C%22required%22%3Afalse%2C%22attributes%22%3A%5B%22status%22%5D%2C%22where%22%3A%22%7B%5C%22year%5C%22%3A2009%7D%22%7D%2C%7B%22model%22%3A%22Taxon%22%2C%22as%22%3A%22acceptedTaxon%22%7D%2C%7B%22model%22%3A%22TaxonAttributes%22%2C%22as%22%3A%22attributes%22%2C%22attributes%22%3A%5B%22PresentInDK%22%2C%20%22forvekslingsmuligheder%22%2C%20%22oekologi%22%2C%20%22diagnose%22%5D%2C%22where%22%3A%22%7B%5C%22PresentInDK%5C%22%3Atrue%7D%22%7D%2C%7B%22model%22%3A%22TaxonDKnames%22%2C%22as%22%3A%22Vernacularname_DK%22%2C%22required%22%3Afalse%7D%2C%7B%22model%22%3A%22TaxonStatistics%22%2C%22as%22%3A%22Statistics%22%2C%22required%22%3Afalse%7D%2C%7B%22model%22%3A%22TaxonImages%22%2C%22as%22%3A%22images%22%2C%22required%22%3A${imagesRequired}%7D%5D"
     }
 
+    private fun searchQuery(searchString: String): String {
+        var genus = ""
+        var fullSearchTerm = ""
+        var taxonName = ""
+
+        searchString.split(" ").toTypedArray().forEach {
+            if (it != "") {
+                if (fullSearchTerm == "") {
+                    fullSearchTerm = it
+                    genus = it
+                } else {
+                    fullSearchTerm += "+${it}"
+
+                    if (taxonName == "") {
+                        taxonName = it
+                    } else {
+                        taxonName += "+${it}"
+                    }
+                }
+            }
+        }
+
+        Log.d("Dataservice", "Search terms: FullSearchterm: ${fullSearchTerm}, genus: ${genus}, taxonName: ${taxonName}")
+
+        return "{\"\$or\":[{\"FullName\":{\"like\":\"%${fullSearchTerm}%\"}},{\"\$Vernacularname_DK.vernacularname_dk\$\":{\"like\":\"%${fullSearchTerm}%\"}},{\"FullName\":{\"like\":\"${genus}%\"},\"TaxonName\":{\"like\":\"${taxonName}%\"}}]}"
+        }
+
     private fun observationIncludeQuery(observationQueries: List<ObservationQueries>): String {
         var string = "["
 
@@ -79,7 +128,7 @@ data class API(val apiType: APIType) {
                 is ObservationQueries.Comments -> {string += "\"{\\\"model\\\":\\\"ObservationForum\\\",\\\"as\\\":\\\"Forum\\\",\\\"where\\\":{},\\\"required\\\":false}\""}
                 is ObservationQueries.DeterminationView -> {
                     if (it.taxonID != null) {
-                        string += "\"{\"model\":\"DeterminationView\",\"as\":\"DeterminationView\",\"attributes\":[\"taxon_id\",\\\"recorded_as_id\\\",\\\"taxon_FullName\\\",\\\"taxon_vernacularname_dk\\\",\\\"determination_validation\\\",\\\"recorded_as_FullName\\\",\\\"determination_user_id\\\",\\\"determination_score\\\",\\\"determination_validator_id\\\",\\\"determination_species_hypothesis\\\"],\\\"where\\\":{\\\"Taxon_id\\\":${it.taxonID}}}\""
+                        string += "\"{\\\"model\\\":\\\"DeterminationView\\\",\\\"as\\\":\\\"DeterminationView\\\",\\\"attributes\\\":[\\\"taxon_id\\\",\\\"recorded_as_id\\\",\\\"taxon_FullName\\\",\\\"taxon_vernacularname_dk\\\",\\\"determination_validation\\\",\\\"recorded_as_FullName\\\",\\\"determination_user_id\\\",\\\"determination_score\\\",\\\"determination_validator_id\\\",\\\"determination_species_hypothesis\\\"],\\\"where\\\":{\\\"Taxon_id\\\":${it.taxonID}}}\""
                     } else {
                         string += "\"{\\\"model\\\":\\\"DeterminationView\\\",\\\"as\\\":\\\"DeterminationView\\\",\\\"attributes\\\":[\\\"taxon_id\\\",\\\"recorded_as_id\\\",\\\"taxon_FullName\\\",\\\"taxon_vernacularname_dk\\\",\\\"determination_validation\\\",\\\"recorded_as_FullName\\\",\\\"determination_user_id\\\",\\\"determination_score\\\",\\\"determination_validator_id\\\",\\\"determination_species_hypothesis\\\"]}\""
                     }
@@ -133,12 +182,23 @@ data class Geometry(val coordinate: LatLng,
         Log.d("API", string)
         return string
     }
+
+
+    fun toBetween(): String {
+        val bounds = this.coordinate.toBounds(this.radius)
+        val northeast = bounds.northeast
+        val southwest = bounds.southwest
+        return "{\"decimalLongitude\":{\"\$between\":[${southwest.longitude},${northeast.longitude}]},\"decimalLatitude\":{\"\$between\":[${southwest.latitude},${northeast.latitude}]}}"
+    }
 }
 
 sealed class APIType {
      sealed class Request: APIType() {
        class Mushroom(val offset: Int, val limit: Int, val searchString: String?, val requirePictures: Boolean): Request()
          class Observation(val geometry: Geometry?, val observationQueries: List<ObservationQueries>, val ageInYear: Int?, val limit: Int?, val offset: Int?): Request()
+         class Locality(val geometry: Geometry): Request()
+         class Substrate(): Request()
+         class VegetationType(): Request()
     }
 
 }

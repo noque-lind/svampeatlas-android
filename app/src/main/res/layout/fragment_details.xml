@@ -64,18 +64,46 @@
                     android:layout_height="24dp"/>
 
             <LinearLayout
-                    android:id="@+id/fragmentDetails_descriptionViewLinearLayout"
+                    android:id="@+id/fragmentDetails_dynamicViewsLinearLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
-
-
             </LinearLayout>
+
+            <TextView
+                    android:id="@+id/fragmentDetails_informationViewHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/AppDivider.Light"
+            />
+
+            <com.noque.svampeatlas.View.Views.InformationView
+                    android:id="@+id/fragmentDetails_informationView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/AppPrimary.Light">
+            </com.noque.svampeatlas.View.Views.InformationView>
+
+
+            <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp"/>
+
+            <TextView
+                    android:id="@+id/fragmentDetails_mapFragmentHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/AppDivider.Light"
+            />
+
+            <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"/>
 
             <fragment
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
-                    android:name="com.noque.svampeatlas.View.MapFragment"
+                    android:name="com.noque.svampeatlas.View.Fragments.MapFragment"
                     android:id="@+id/fragmentDetails_mapFragment"/>
 
 

@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:id="@+id/contentView_linearLayout"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-
-
     <TextView
-            android:id="@+id/contentView_dividerTextView"
+            android:id="@+id/descriptionView_dividerTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorWhite"
+            style="@style/AppDivider.Light"
             />
 
     <Space
-            android:id="@+id/contentView_space"
             android:layout_width="match_parent"
             android:layout_height="2dp"/>
-
+    
+    <TextView
+            android:id="@+id/descriptionView_contentTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/AppPrimary.Light"
+            android:justificationMode="inter_word"/>
 </LinearLayout>

@@ -9,25 +9,34 @@ import com.noque.svampeatlas.R
 
 import kotlinx.android.synthetic.main.item_mushroom.view.*
 
-class MushroomListAdapter(private var mushroomList: List<Mushroom>, private val itemClick: ((Mushroom) -> Unit)?):
+class MushroomListAdapter():
     RecyclerView.Adapter<MushroomListAdapter.ViewHolder>() {
 
+
+    private var mushrooms: List<Mushroom> = listOf()
+    private var onClickListener: ((mushroom: Mushroom) -> Unit)? = null
+
+
     fun updateData(mushrooms: List<Mushroom>) {
-        mushroomList = mushrooms
+        this.mushrooms = mushrooms
         notifyDataSetChanged()
+    }
+
+    fun setOnClickListener(listener: (mushroom: Mushroom) -> Unit) {
+        onClickListener = listener
     }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.item_mushroom, parent, false)
-        return ViewHolder(itemClick, view)
+        return ViewHolder(onClickListener, view)
     }
 
-    override fun getItemCount(): Int = mushroomList.size
+    override fun getItemCount(): Int = mushrooms.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.configure(mushroomList[position])
+        holder.configure(mushrooms[position])
     }
 
 

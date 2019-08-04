@@ -4,22 +4,22 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
+
     <TextView
-            android:id="@+id/descriptionView_dividerTextView"
+            android:id="@+id/titlesView_titleTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorWhite"
-            />
+            style="@style/AppTitle.Light"/>
 
     <Space
+            android:id="@+id/titlesView_textViewSpacing"
             android:layout_width="match_parent"
-            android:layout_height="2dp"/>
-    
+            android:layout_height="4dp"/>
+
     <TextView
-            android:id="@+id/descriptionView_contentTextView"
+            android:id="@+id/titlesView_subtitleTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorWhite"
-            android:justificationMode="inter_word"/>
-
+            style="@style/AppPrimaryHighlighted.Light"
+            />
 </LinearLayout>

@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
+
+    <com.noque.svampeatlas.View.BackgroundView
+            android:id="@+id/fragmentMap_backgroundView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
     <fragment
             android:id="@+id/fragmentMap_mapView"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-</LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

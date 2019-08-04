@@ -1,5 +1,12 @@
 <resources>
 
+    
+    <declare-styleable name="AppTheme">
+        <attr name="AppPrimary.Light" format="reference"/>
+        <attr name="AppPrimary.Dark" format="reference"/>
+    </declare-styleable>
+    
+    
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
@@ -9,30 +16,84 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorSecondary</item>
         <item name="colorAccent">@color/colorThird</item>
+
+        <item name="AppPrimary.Light">@style/AppPrimary.Light</item>
+        <item name="AppPrimary.Dark">@style/AppPrimary.Dark</item>
+    </style>
+
+    <style name="Light">
+        <item name="android:textColor">@color/colorWhite</item>
+    </style>
+
+    <style name="Dark">
+        <item name="android:textColor">@color/colorPrimary</item>
     </style>
 
     <style name="AppTitle">
         <item name="android:textSize">20sp</item>
-        <item name="android:textStyle">normal</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/avenir_next</item>
     </style>
 
     <style name="AppPrimary">
-        <item name="android:textSize">15sp</item>
         <item name="android:textStyle">normal</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">@font/avenir_next</item>
     </style>
 
     <style name="AppPrimaryHighlighted">
-        <item name="android:textSize">15sp</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">@font/avenir_next</item>
     </style>
 
+    <style name="AppDivider">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">@font/avenir_next</item>
+    </style>
+
+    <style name="AppTitle.Light" parent="AppTitle">
+        <item name="android:textColor">@color/colorWhite</item>
+    </style>
+
+    <style name="AppTitle.Dark" parent="AppTitle">
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+
+    <style name="AppPrimary.Light" parent="AppPrimary">
+        <item name="android:textColor">@color/colorWhite</item>
+    </style>
+
+    <style name="AppPrimary.Dark" parent="AppPrimary">
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+
+    <style name="AppPrimaryHighlighted.Light" parent="AppPrimaryHighlighted">
+        <item name="android:textColor">@color/colorWhite</item>
+    </style>
+
+    <style name="AppPrimaryHighlighted.Dark" parent="AppPrimaryHighlighted">
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+
+    <style name="AppDivider.Light" parent="AppDivider">
+        <item name="android:textColor">@color/colorWhite</item>
+    </style>
+
+    
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+    <style name="AppSwitch" >
+        <item name="colorControlActivated">@color/colorPrimary</item>
+    </style>
 
 </resources>

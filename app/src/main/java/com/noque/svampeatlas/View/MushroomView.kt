@@ -4,18 +4,19 @@ import android.content.Context
 import android.graphics.Outline
 import android.util.AttributeSet
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewOutlineProvider
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.noque.svampeatlas.Extensions.downloadImage
+import com.noque.svampeatlas.Extensions.italized
+import com.noque.svampeatlas.Extensions.upperCased
 import com.noque.svampeatlas.Model.Mushroom
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.Services.DataService
-import kotlinx.android.synthetic.main.mushroom_view_layout.view.*
+import com.noque.svampeatlas.View.Views.InformationView
+import kotlinx.android.synthetic.main.view_mushroom.view.*
 
 class MushroomView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(context, attrs) {
 
@@ -23,7 +24,7 @@ class MushroomView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(c
 
     init {
         val inflater = LayoutInflater.from(getContext())
-        inflater.inflate(R.layout.mushroom_view_layout, this)
+        inflater.inflate(R.layout.view_mushroom, this)
         initViews()
         setupView()
     }
@@ -51,17 +52,16 @@ class MushroomView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(c
     }
 
     fun configure(mushroom: Mushroom) {
-        Log.d("MushroomView", mushroom.images.toString())
-        mushroomView_imageView.downloadImage(DataService.IMAGESIZE.MINI, mushroom.images.first().url)
-
-
+        if (mushroom.images.firstOrNull() != null) {
+            mushroomView_imageView.downloadImage(DataService.IMAGESIZE.MINI, mushroom.images.first().url)
+        }
 
         if (mushroom.danishName != null) {
-            mushroomView_primaryLabel.text = mushroom.danishName
+            mushroomView_primaryLabel.text = mushroom.danishName!!.upperCased()
             mushroomView_secondaryLabel.visibility = View.VISIBLE
-            mushroomView_secondaryLabel.text = mushroom.fullName
+            mushroomView_secondaryLabel.text = mushroom.fullName.italized(context)
         } else {
-            mushroomView_primaryLabel.text = mushroom.fullName
+            mushroomView_primaryLabel.text = mushroom.fullName.italized(context)
             mushroomView_secondaryLabel.visibility = View.GONE
         }
 
@@ -76,9 +76,5 @@ class MushroomView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(c
         }
 
         mushroomView_informationView.configure(information)
-
-//        mushroom.updatedAt?.let {
-//            information.add(Pair("Sidst opdateret d.:", it.toString()))
-//        }
     }
 }

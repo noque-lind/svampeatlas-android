@@ -3,16 +3,26 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/mushroom_navigation"
-            app:startDestination="@id/listFragment">
+            app:startDestination="@id/addObservationFragment">
+
     <fragment
             android:id="@+id/listFragment"
-            android:name="com.noque.svampeatlas.View.ListFragment"
+            android:name="com.noque.svampeatlas.View.Fragments.MushroomFragment"
             android:label="fragment_list"
             tools:layout="@layout/fragment_list"/>
+
     <fragment
             android:id="@+id/detailsFragment"
-            android:name="com.noque.svampeatlas.View.DetailsFragment"
+            android:name="com.noque.svampeatlas.View.Fragments.DetailsFragment"
             android:label="fragment_details"
             tools:layout="@layout/fragment_details"/>
     <action android:id="@+id/action_global_detailsFragment" app:destination="@id/detailsFragment"/>
+
+    <fragment android:id="@+id/nearbyFragment" android:name="com.noque.svampeatlas.View.Fragments.NearbyFragment"
+              android:label="fragment_nearby" tools:layout="@layout/fragment_nearby"/>
+    <action android:id="@+id/action_global_nearbyFragment" app:destination="@id/nearbyFragment"
+            app:launchSingleTop="true"/>
+    <fragment android:id="@+id/addObservationFragment"
+              android:name="com.noque.svampeatlas.View.Fragments.AddObservationFragment"
+              android:label="fragment_add_observation" tools:layout="@layout/fragment_add_observation"/>
 </navigation>

@@ -4,4 +4,5 @@
     <color name="colorSecondary">#607D8B</color>
     <color name="colorThird">#FF4081</color>
     <color name="colorWhite">#E9ECEE</color>
+    <color name="colorWhite_dimmed">#80E9ECEE</color>
 </resources>

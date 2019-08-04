@@ -7,10 +7,7 @@ import com.android.volley.toolbox.*
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
-import com.noque.svampeatlas.Model.Animal
-import com.noque.svampeatlas.Model.ApiKey
-import com.noque.svampeatlas.Model.Mushroom
-import com.noque.svampeatlas.Model.Observation
+import com.noque.svampeatlas.Model.*
 import com.noque.svampeatlas.Utilities.API
 import com.noque.svampeatlas.Utilities.APIType
 import com.noque.svampeatlas.Utilities.Geometry
@@ -19,7 +16,9 @@ import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 import java.lang.reflect.Type
 import java.nio.charset.Charset
-import kotlin.Result
+import java.util.function.Predicate
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 const val BASE_URL = "https://us-central1-apis-4674e.cloudfunctions.net"
 const val URL_REGISTER = "{$BASE_URL}account/register"
@@ -45,10 +44,6 @@ class AppRequest<T>(private val type: Type, private val endpoint: API,
         listener.onResponse(response)
     }
 
-    override fun deliverError(error: VolleyError?) {
-        super.deliverError(error)
-    }
-
     override fun parseNetworkResponse(response: NetworkResponse?): Response<T> {
         return try {
             val json = String(
@@ -67,7 +62,16 @@ class AppRequest<T>(private val type: Type, private val endpoint: API,
     }
 }
 
+
+
+
 class DataService private constructor(context: Context) {
+
+    sealed class DataServiceError(title: String, message: String): AppError(title, message) {
+        class NoInternetError(): DataServiceError("Ingen internet", "WTF")
+        class SearchResponseEmpty(): DataServiceError("Ugyldig søgning", "Det du søgte efter kunne ikke findes, prøv at søg efter noget andet")
+    }
+
 
     enum class IMAGESIZE(val value: String) {
         FULL(""), MINI("https://svampe.databasen.org/unsafe/175x175/")
@@ -92,16 +96,12 @@ class DataService private constructor(context: Context) {
         Volley.newRequestQueue(context.applicationContext)
     }
 
-
     private fun <RequestType> addToRequestQueue(request: Request<RequestType>) {
         requestQueue.add(request)
     }
 
-     class DataServiceError(message: String): Throwable(message) {
 
-    }
-
-    fun getMushrooms(offset: Int, completion: (Result<List<Mushroom>>) -> Unit)  {
+    fun getMushrooms(offset: Int, completion: (Result<List<Mushroom>, DataServiceError>) -> Unit)  {
         val api = API(APIType.Request.Mushroom(0,
             100,
             null,
@@ -111,16 +111,40 @@ class DataService private constructor(context: Context) {
             api,
             null,
             Response.Listener {
-                completion(Result.success(it))
+                completion(Result.Success(it))
             },
             Response.ErrorListener {
-                completion(Result.failure(it))
+                completion(Result.Error(DataServiceError.NoInternetError()))
             })
 
         addToRequestQueue(request)
     }
 
-    fun getObservationsWithin(geometry: Geometry, taxonID: Int? = null, ageInYear: Int? = null, completion: (Result<List<Observation>>) -> Unit) {
+    fun getMushrooms(searchString: String, completion: (Result<List<Mushroom>, DataServiceError>) -> Unit) {
+        val api = API(APIType.Request.Mushroom(0,
+            100,
+            searchString,
+            false))
+
+        val request = AppRequest<List<Mushroom>>(object: TypeToken<List<Mushroom>>(){}.type,
+            api,
+            null,
+            Response.Listener {
+                if (it.isEmpty()) {
+                    completion(Result.Error(DataServiceError.SearchResponseEmpty()))
+                } else {
+                    completion(Result.Success(it))
+                }
+            },
+
+            Response.ErrorListener {
+                completion(Result.Error(DataServiceError.NoInternetError()))
+            })
+
+        addToRequestQueue(request)
+    }
+
+    fun getObservationsWithin(geometry: Geometry, taxonID: Int? = null, ageInYear: Int? = null, completion: (Result<List<Observation>, AppError>) -> Unit) {
         val api = API(APIType.Request.Observation(
             geometry,
             listOf(
@@ -128,7 +152,7 @@ class DataService private constructor(context: Context) {
                 ObservationQueries.Images(),
                 ObservationQueries.Locality(),
                 ObservationQueries.User(null),
-                ObservationQueries.DeterminationView(null)
+                ObservationQueries.DeterminationView(taxonID)
             ),
             ageInYear,
             null,
@@ -141,14 +165,83 @@ class DataService private constructor(context: Context) {
          null,
            Response.Listener {
                Log.d("DetailsViewModel", it.toString())
-               completion(Result.success(it))
+               completion(Result.Success(it))
            },
            Response.ErrorListener {
                Log.d("Dataservice", it.toString())
-               completion(Result.failure(it))
+               completion(Result.Error(DataServiceError.NoInternetError()))
            })
 
         request.setRetryPolicy(DefaultRetryPolicy(50000, 2, 10F))
+        addToRequestQueue(request)
+    }
+
+    fun getLocalities(geometry: Geometry, completion: (Result<List<Locality>, DataServiceError>) -> Unit) {
+        val api = API(APIType.Request.Locality(geometry))
+
+        val request = AppRequest<List<Locality>>(
+            object: TypeToken<List<Locality>>() {}.type,
+            api,
+            null,
+            Response.Listener {
+                completion(Result.Success(it))
+            },
+            Response.ErrorListener {
+                Log.d("DataService", it.toString())
+                completion(Result.Error(DataServiceError.NoInternetError()))
+            }
+        )
+
+        addToRequestQueue(request)
+    }
+
+    fun getSubstrateGroups(completion: (Result<List<SubstrateGroup>, DataServiceError>) -> Unit) {
+        val api = API(APIType.Request.Substrate())
+
+        val request = AppRequest<List<Substrate>>(
+            object: TypeToken<List<Substrate>>() {}.type,
+            api,
+            null,
+            Response.Listener {
+                var substrateGroups = mutableListOf<SubstrateGroup>()
+
+                it.forEach { substrate ->
+                    val substrateGroup = substrateGroups.firstOrNull { it.dkName == substrate.groupDkName }
+
+                    if (substrateGroup != null) {
+                        substrateGroup.appendSubstrate(substrate)
+                    } else {
+                        substrateGroups.add(SubstrateGroup(substrate.groupDkName, substrate.groupEnName, mutableListOf(substrate)))
+                    }
+                }
+
+                Log.d("Dataserver", substrateGroups.toString())
+                completion(Result.Success(substrateGroups))
+
+            },
+            Response.ErrorListener {
+                completion(Result.Error(DataServiceError.NoInternetError()))
+            }
+        )
+
+        addToRequestQueue(request)
+    }
+
+    fun getVegetationTypes(completion: (Result<List<VegetationType>, DataServiceError>) -> Unit) {
+        val api = API(APIType.Request.VegetationType())
+        val request = AppRequest<List<VegetationType>>(
+            object: TypeToken<List<VegetationType>>() {}.type,
+            api,
+            null,
+            Response.Listener {
+                completion(Result.Success(it))
+            },
+
+            Response.ErrorListener {
+                completion(Result.Error(DataServiceError.NoInternetError()))
+            }
+        )
+
         addToRequestQueue(request)
     }
 

@@ -16,8 +16,6 @@ fun LatLng.toRectanglePolygon(radius: Double): List<LatLng> {
     val southWestCorner = SphericalUtil.computeOffset(this, radiusInMeters, 225.0)
     val northeast = SphericalUtil.computeOffset(this, radiusInMeters, 45.0)
 
-val bound = LatLngBounds(southWestCorner, northeast)
-
     val coordinates = mutableListOf(
         LatLng(northeast.latitude, southWestCorner.longitude),
         northeast,
@@ -27,4 +25,12 @@ val bound = LatLngBounds(southWestCorner, northeast)
 
     coordinates.add(coordinates.first())
     return coordinates
+}
+
+fun LatLng.toBounds(radius: Double): LatLngBounds {
+    val radiusInMeters = Math.sqrt(2.0) * radius
+
+    val southWestCorner = SphericalUtil.computeOffset(this, radiusInMeters, 225.0)
+    val northeast = SphericalUtil.computeOffset(this, radiusInMeters, 45.0)
+    return LatLngBounds(southWestCorner, northeast)
 }

@@ -37,7 +37,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                style="@style/AppPrimaryHighlighted"/>
+                style="@style/AppPrimaryHighlighted.Dark"
+                />
 
         <Space
                 android:layout_width="match_parent"
@@ -46,7 +47,7 @@
         <TextView
                 android:id="@+id/mushroomView_secondaryLabel"
                 android:layout_width="match_parent"
-                style="@style/AppPrimary"
+                style="@style/AppPrimary.Dark"
                 android:layout_height="wrap_content"
                 android:gravity="center"/>
 
@@ -54,11 +55,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="20dp"/>
 
-        <com.noque.svampeatlas.View.InformationView
+        <com.noque.svampeatlas.View.Views.InformationView
                 android:id="@+id/mushroomView_informationView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-        </com.noque.svampeatlas.View.InformationView>
+                android:layout_height="wrap_content"
+                android:theme="@style/AppPrimary.Dark">
+        </com.noque.svampeatlas.View.Views.InformationView>
 
     </LinearLayout>
 
