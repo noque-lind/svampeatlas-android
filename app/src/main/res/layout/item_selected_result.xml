@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+<com.noque.svampeatlas.View.Views.ResultView
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:id="@+id/selectedResultItem_resultView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+</com.noque.svampeatlas.View.Views.ResultView>
+
+    <TextView
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="64dp"
+        android:layout_width="wrap_content"
+        android:text="@string/species_confidence_title"
+        android:layout_height="wrap_content"
+        style="@style/AppPrimaryHighlighted"/>
+
+
+    <RadioGroup
+        android:id="@+id/selectedResultItem_confidenceRadioButtonGroup"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checkedButton="@id/selectedResultItem_radioButton_determined"
+        android:theme="@style/AppPrimary"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/selectedResultItem_radioButton_guessing"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorWhite"
+            android:text="@string/species_confidence_guessing" />
+
+        <RadioButton
+            android:id="@+id/selectedResultItem_radioButton_unsure"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorWhite"
+            android:text="@string/species_confidence_unsure" />
+
+        <RadioButton
+            android:id="@+id/selectedResultItem_radioButton_determined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorWhite"
+            android:text="@string/species_confidence_determined" />
+    </RadioGroup>
+
+
+</LinearLayout>

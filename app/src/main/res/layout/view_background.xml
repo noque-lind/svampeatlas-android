@@ -30,16 +30,24 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 style="@style/AppPrimary"/>
+
+        <Button
+            android:id="@+id/backgroundView_handlerButton"
+            style="@style/AppPrimaryHighlighted"
+            android:layout_marginTop="32dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:backgroundTint="@color/colorPrimary"
+            android:padding="16dp"
+            android:visibility="gone"
+            tools:visibility="visible" />
     </LinearLayout>
 
+    <com.noque.svampeatlas.View.Views.SpinnerView
+        android:id="@+id/backgroundView_spinnerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
-    <ProgressBar
-            android:id="@+id/backgroundView_progressBar"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent" app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

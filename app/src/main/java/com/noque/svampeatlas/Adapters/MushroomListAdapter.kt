@@ -6,11 +6,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.Model.Mushroom
 import com.noque.svampeatlas.R
+import com.noque.svampeatlas.View.Views.MushroomView
+import com.noque.svampeatlas.ViewHolders.MushroomViewHolder
 
 import kotlinx.android.synthetic.main.item_mushroom.view.*
 
 class MushroomListAdapter():
-    RecyclerView.Adapter<MushroomListAdapter.ViewHolder>() {
+    RecyclerView.Adapter<MushroomViewHolder>() {
 
 
     private var mushrooms: List<Mushroom> = listOf()
@@ -27,26 +29,15 @@ class MushroomListAdapter():
     }
 
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MushroomViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.item_mushroom, parent, false)
-        return ViewHolder(onClickListener, view)
+        return MushroomViewHolder(onClickListener, view)
     }
 
     override fun getItemCount(): Int = mushrooms.size
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MushroomViewHolder, position: Int) {
         holder.configure(mushrooms[position])
-    }
-
-
-    class ViewHolder(private val itemClick: ((Mushroom) -> Unit)?, var view: View): RecyclerView.ViewHolder(view) {
-
-        fun configure(mushroom: Mushroom) {
-                view.item_mushroom_mushroomView.configure(mushroom)
-                view.setOnClickListener {
-                    itemClick?.invoke(mushroom)
-                }
-        }
     }
 }

@@ -28,7 +28,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.util.toHalf
 
 
-interface SearchBarDelegate {
+interface SearchBarListener {
     fun newSearch(entry: String)
     fun clearedSearchEntry()
 }
@@ -37,7 +37,7 @@ class SearchBarView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(
 
     private var rootLayout = ConstraintSet()
     private var iconifiedLayout = ConstraintSet()
-    private var listener: SearchBarDelegate? = null
+    private var listener: SearchBarListener? = null
     private var isExpanded = true
     private var recentSearch: String? = null
     private val backgroundDrawable = PaintDrawable()
@@ -86,7 +86,7 @@ class SearchBarView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(
         backgroundDrawable.setCornerRadii(floatArrayOf((heightPX / 2).toFloat(), (heightPX / 2).toFloat(), 0F, 0F, 0F, 0F, (heightPX / 2).toFloat(), (heightPX / 2).toFloat()))
     }
 
-    fun setListener(listener: SearchBarDelegate) {
+    fun setListener(listener: SearchBarListener?) {
         this.listener = listener
     }
 
@@ -103,6 +103,10 @@ class SearchBarView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(
             resignFocus()
             applyLayout(iconifiedLayout)
         }
+    }
+
+    fun resetText() {
+        searchBar_editText.text = null
     }
 
     private fun applyLayout(layout: ConstraintSet) {

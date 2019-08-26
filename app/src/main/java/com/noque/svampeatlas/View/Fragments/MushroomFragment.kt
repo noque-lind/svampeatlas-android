@@ -13,30 +13,67 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.Adapters.MushroomListAdapter
-import com.noque.svampeatlas.Model.Mushroom
 
 import com.noque.svampeatlas.R
-import com.noque.svampeatlas.View.Fragments.DetailsFragment
-import com.noque.svampeatlas.ViewModel.DetailsViewModel
 import com.noque.svampeatlas.ViewModel.MushroomsViewModel
 import com.noque.svampeatlas.Model.State
-import kotlinx.android.synthetic.main.fragment_list.*
-import android.widget.Toast
-import androidx.lifecycle.ViewModel
+import kotlinx.android.synthetic.main.fragment_mushroom.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.tabs.TabLayout
-import com.noque.svampeatlas.View.Views.SearchBarDelegate
+import com.noque.svampeatlas.View.BackgroundView
+import com.noque.svampeatlas.View.BlankActivity
+import com.noque.svampeatlas.View.Views.SearchBarListener
+import com.noque.svampeatlas.View.Views.SearchBarView
 
 
 class MushroomFragment : Fragment() {
 
-    private val searchBarDelegate = object: SearchBarDelegate {
+    companion object {
+        val TAG = "MushroomFragment"
+    }
+
+    enum class Category {
+        FAVORITES,
+        SPECIES;
+
+        companion object {
+           val values = Category.values()
+        }
+    }
+
+    // Views
+
+    private var recyclerView: RecyclerView? = null
+    private var backgroundView: BackgroundView? = null
+    private var searchBarView: SearchBarView? = null
+    private var swipeRefreshLayout: SwipeRefreshLayout? = null
+    private var tabLayout: TabLayout? = null
+
+    // View models
+
+    private lateinit var mushroomsViewModel: MushroomsViewModel
+
+    // Adapters
+
+    private val mushroomListAdapter: MushroomListAdapter by lazy {
+        val adapter = MushroomListAdapter()
+
+        adapter.setOnClickListener { mushroom ->
+            val action = MushroomFragmentDirections.actionGlobalMushroomDetailsFragment(mushroom.id, DetailsFragment.TakesSelection.NO, DetailsFragment.Type.SPECIES)
+            findNavController().navigate(action)
+        }
+
+        adapter
+    }
+
+    // Listeners
+
+    private val searchBarListener = object: SearchBarListener {
         override fun newSearch(entry: String) {
-           viewModel.search(entry)
+           mushroomsViewModel.search(entry)
         }
 
         override fun clearedSearchEntry() {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
 
     }
@@ -46,110 +83,141 @@ class MushroomFragment : Fragment() {
             super.onScrolled(recyclerView, dx, dy)
 
             if(!recyclerView.canScrollVertically(-1)) {
-                fragmentList_searchBar.expand()
+                searchBarView?.expand()
             } else if (dy > 0) {
-                fragmentList_searchBar.collapse()
+                searchBarView?.collapse()
             }
         }
     }
 
     private val onRefreshListener = object: SwipeRefreshLayout.OnRefreshListener {
         override fun onRefresh() {
-            viewModel.start()
-            fragmentList_swipeRefreshLayout.isRefreshing = false
+            mushroomsViewModel.start()
+            swipeRefreshLayout?.isRefreshing = false
         }
 
     }
 
-    private val stateObserver = object: Observer<State<List<Mushroom>>> {
-        override fun onChanged(state: State<List<Mushroom>>) {
-            fragmentList_backgroundView.reset()
+    private val onTapSelectedListener = object: TabLayout.OnTabSelectedListener {
+        override fun onTabReselected(p0: TabLayout.Tab?) {}
 
-            when (state) {
-                is State.Loading -> {
-                    adapter.updateData(listOf())
-                    fragmentList_backgroundView.setLoading()
-                }
-                is State.Items -> {
-                    adapter.updateData(state.items)
-                }
-
-                is State.Error -> {
-                    fragmentList_backgroundView.setError(state.error)
-                }
-            }
-        }
-    }
-
-    private val onTapSelectedListner = object: TabLayout.OnTabSelectedListener {
-        override fun onTabReselected(p0: TabLayout.Tab?) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
-
-        override fun onTabUnselected(p0: TabLayout.Tab?) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
+        override fun onTabUnselected(p0: TabLayout.Tab?) {}
 
         override fun onTabSelected(tab: TabLayout.Tab) {
-        }
 
+        }
     }
 
-    lateinit var viewModel: MushroomsViewModel
-
-    private val adapter: MushroomListAdapter by lazy {
-        val adapter = MushroomListAdapter()
-        adapter.setOnClickListener { mushroom ->
-            val action = DetailsFragmentDirections.actionGlobalDetailsFragment()
-            findNavController().navigate(action)
-
-            activity?.let {
-                val detailViewModel = ViewModelProviders.of(it).get(DetailsViewModel::class.java)
-                detailViewModel.select(mushroom)
-            }
-        }
-
-        adapter
-    }
-
-//    private val listAdapter = MushroomListAdapter(arrayListOf(), { mushroom ->
-//                        val action = DetailsFragmentDirections.actionGlobalDetailsFragment()
-////                            .actionGlobalDetailsFragment(mushroom.images.toTypedArray())
-//
-//            activity?.let {
-//                val detailViewModel = ViewModelProviders.of(it).get(DetailsViewModel::class.java)
-//                detailViewModel.select(mushroom)
-//                findNavController().navigate(action)
-////                TODO("FIND OUT HOW TO DESTROY VIEWMODEL WHEN DETAILSSCREEN IS DESTROYED")
-//            }
-//    })
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_list, container, false)
+        return inflater.inflate(R.layout.fragment_mushroom, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(MushroomsViewModel::class.java)
+        initViews()
         setupView()
+        setupViewModels()
+    }
+
+
+    private fun initViews() {
+        recyclerView = mushroomFragment_recyclerView
+        backgroundView = mushroomFragment_backgroundView
+        searchBarView = mushroomFragment_searchBarView
+        swipeRefreshLayout = mushroomFragment_swipeRefreshLayout
+        tabLayout = mushroomFragment_tabLayout
     }
 
     private fun setupView() {
-        mushroom_recyclerview.addOnScrollListener(onScrollListener)
-        fragmentList_searchBar.setListener(searchBarDelegate)
-        fragmentList_swipeRefreshLayout.setOnRefreshListener(onRefreshListener)
-//        fragmentList_TabLayout.addOnTabSelectedListener()
+        (requireActivity() as BlankActivity).setSupportActionBar(mushroomFragment_toolbar)
 
 
-        mushroom_recyclerview.adapter = adapter
-        mushroom_recyclerview.layoutManager = LinearLayoutManager(context)
+        tabLayout?.apply {
+            Category.values.forEach {
+                val tab = this.newTab()
 
-        viewModel.state.observe(this, stateObserver)
-        viewModel.start()
+                when (it) {
+                    Category.FAVORITES -> {tab.text = resources.getText(R.string.mushroomCategory_favorites)}
+                    Category.SPECIES -> {tab.text = resources.getText(R.string.mushroomCategory_species)}
+                }
 
+                tab.tag = it
+                this.addTab(tab)
+            }
+            this.addOnTabSelectedListener(onTapSelectedListener)
+        }
 
+        recyclerView?.apply {
+            val layoutManager = LinearLayoutManager(context)
+            layoutManager.orientation = RecyclerView.VERTICAL
+            this.layoutManager = layoutManager
+            this.addOnScrollListener(onScrollListener)
+            this.adapter = mushroomListAdapter
+        }
+
+        swipeRefreshLayout?.apply {
+            setOnRefreshListener(onRefreshListener)
+        }
+
+        searchBarView?.apply {
+            setListener(searchBarListener)
+        }
+    }
+
+    private fun setupViewModels() {
+        activity?.let {
+            mushroomsViewModel = ViewModelProviders.of(it).get(MushroomsViewModel::class.java)
+            mushroomsViewModel.mushroomsState.observe(viewLifecycleOwner, Observer {
+                backgroundView?.reset()
+
+                when (it) {
+                    is State.Loading -> {
+                        mushroomListAdapter.updateData(listOf())
+                        backgroundView?.setLoading()
+                    }
+                    is State.Items -> {
+                        mushroomListAdapter.updateData(it.items)
+                    }
+
+                    is State.Error -> {
+                        backgroundView?.setError(it.error)
+                    }
+                }
+            })
+        }
+    }
+
+    override fun onPause() {
+        Log.d(TAG, "On Pause")
+        super.onPause()
+    }
+
+    override fun onStop() {
+        Log.d(TAG, "On Stop")
+        super.onStop()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        recyclerView = null
+        backgroundView = null
+        searchBarView = null
+        swipeRefreshLayout = null
+        swipeRefreshLayout = null
+        tabLayout = null
+    }
+
+    override fun onDestroy() {
+        Log.d(TAG, "On Destroy")
+        super.onDestroy()
+    }
+
+    override fun onDetach() {
+        Log.d(TAG, "On Detach")
+        super.onDetach()
     }
 }

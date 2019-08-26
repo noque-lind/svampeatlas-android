@@ -7,195 +7,160 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.Model.Mushroom
 import com.noque.svampeatlas.Model.Observation
+import com.noque.svampeatlas.Model.Section
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.ViewHolders.HeaderViewHolder
+import com.noque.svampeatlas.ViewHolders.ItemViewHolder
+import com.noque.svampeatlas.ViewHolders.ResultItemViewHolder
+import com.noque.svampeatlas.ViewHolders.SelectedResultItemViewHolder
+import com.noque.svampeatlas.ViewModel.NewObservationViewModel
 import kotlinx.android.synthetic.main.item_header.view.*
+import retrofit2.http.Header
 
-class AddObservationSpecieAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class SpeciesAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    sealed class Section(val title: String) {
-
-        enum class ViewType(val value: Int) {
-            UNKNOWNSPECIE(0),
-            SELECTEDSPECIE(1),
-            SELECTABLE(2),
-            HEADER(3);
+    data class Item(val viewType: Item.ViewType, val mushroom: Mushroom?, val confidence: NewObservationViewModel.DeterminationConfidence? = null) {
+        enum class ViewType {
+            UNKOWNSPECIE,
+            SELECTEDSPECIE,
+            SELECTABLE;
 
             companion object {
-                fun fromInt(int: Int): ViewType {
-                    when (int) {
-                        0 -> return UNKNOWNSPECIE
-                        1 -> return SELECTEDSPECIE
-                        2 -> return SELECTABLE
-                        else -> return HEADER
-                    }
-                }
+                val values = values()
             }
         }
-
-
-        fun getType(): ViewType {
-            when (this) {
-                is UnknownSpecie -> return ViewType.UNKNOWNSPECIE
-                is SelectedMushroom -> return ViewType.SELECTEDSPECIE
-                is SelectableMushroom -> return ViewType.SELECTABLE
-            }
-        }
-
-        fun getCount(): Int {
-            when (this) {
-                is UnknownSpecie -> return 2
-                is SelectableMushroom -> return this.mushrooms.count() + 1
-                is SelectedMushroom -> return 2
-            }
-        }
-
-        fun getMushroom(position: Int): Mushroom? {
-            when (this) {
-                is UnknownSpecie -> return null
-                is SelectableMushroom -> return this.mushrooms.getOrNull(position)
-                is SelectedMushroom -> return this.mushroom
-            }
-        }
-
-
-        class UnknownSpecie(title: String): Section(title)
-        class SelectableMushroom(title: String, val mushrooms: List<Mushroom>): Section(title)
-        class SelectedMushroom(title: String, val mushroom: Mushroom) : Section(title)
     }
 
 
+    var mushroomSelected: ((Mushroom) -> Unit)? = null
+    var confidenceSet: ((NewObservationViewModel.DeterminationConfidence) -> Unit)? = null
 
-    private var sections = listOf<Section>()
+    private var sections = listOf<Section<Item>>()
+    private val onClickListener = View.OnClickListener { view ->
+        (view.tag as? RecyclerView.ViewHolder)?.adapterPosition?.let {
+            getItem(it)?.let {
+                it.mushroom?.let {
+                    mushroomSelected?.invoke(it)
+                }
+            }
+        }
+    }
 
-    fun configure(sections: List<Section>) {
+
+    fun configure(sections: List<Section<Item>>) {
         this.sections = sections
         notifyDataSetChanged()
+
+        if (sections.firstOrNull()?.getItem(0)?.viewType != Item.ViewType.SELECTEDSPECIE) {
+
+        }
+    }
+
+    private fun getSection(position: Int): Section<Item>? {
+        var currentPosition = 0
+
+        sections.forEach {
+            if (position == currentPosition) {
+                return it
+            }
+            currentPosition += it.count()
+        }
+        return null
+    }
+
+    private fun getItem(position: Int): Item? {
+        var currentPosition = 0
+
+        sections.forEach {
+            if (position >= currentPosition && position <= (currentPosition + it.count() - 1)) {
+                return it.getItem(position - currentPosition)
+            }
+            currentPosition += it.count()
+        }
+        return null
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        var currentPosition = 0
+
+        sections.forEach {
+            if (position >= currentPosition && position <= (currentPosition + it.count() - 1)) {
+                val viewType = it.viewType(position - currentPosition)
+               return when (viewType) {
+                    Section.ViewType.HEADER -> {  viewType.ordinal }
+                    Section.ViewType.ITEM -> { (getItem(position)?.viewType?.ordinal)?.plus(1) ?: viewType.ordinal }
+                }
+            }
+            currentPosition += it.count()
+
+        }
+        return super.getItemViewType(position)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        var view: View
+        var viewHolder: RecyclerView.ViewHolder
+
+        if (viewType >= 1) {
+            when (Item.ViewType.values[viewType - 1]) {
+                Item.ViewType.UNKOWNSPECIE -> {
+                    Log.d("ADAPTEr", "UNKNOWN SPECIES")
+                    view = layoutInflater.inflate(R.layout.item_item, parent, false)
+                    viewHolder = ResultItemViewHolder(view)
+                }
+
+                Item.ViewType.SELECTABLE -> {
+                    Log.d("ADAPTEr", "SELECTABLE")
+                    view = layoutInflater.inflate(R.layout.item_result, parent, false)
+                    viewHolder = ResultItemViewHolder(view)
+                    viewHolder.itemView.tag = viewHolder
+                    viewHolder.itemView.setOnClickListener(onClickListener)
+                }
+
+                Item.ViewType.SELECTEDSPECIE -> {
+                    view = layoutInflater.inflate(R.layout.item_selected_result, parent, false)
+                    val selectedResultItemViewHolder = SelectedResultItemViewHolder(view)
+                    selectedResultItemViewHolder.confidenceSet = confidenceSet
+                    selectedResultItemViewHolder.setOnClickListener(onClickListener)
+                    viewHolder = selectedResultItemViewHolder
+                    viewHolder.itemView.setOnClickListener(onClickListener)
+                }
+            }
+        } else {
+            view = layoutInflater.inflate(R.layout.item_header, parent, false)
+            viewHolder = HeaderViewHolder(view)
+        }
+        return viewHolder
     }
 
     override fun getItemCount(): Int {
         var count = 0
 
         sections.forEach {
-            count += it.getCount()
+            count += it.count()
         }
 
         return count
     }
 
-
-    override fun getItemViewType(position: Int): Int {
-        var currentPosition = 0
-
-        sections.forEach {
-
-            if (position >= currentPosition && position <= (currentPosition + it.getCount() - 1)) {
-                if (position == currentPosition) {
-                    return Section.ViewType.HEADER.value
-                } else {
-                    return it.getType().value
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            if (holder.itemViewType == 0) {
+                (holder as? HeaderViewHolder)?.configure(getSection(position)?.title() ?: "")
+            } else {
+                getItem(position)?.let {
+                    when (it.viewType) {
+                        Item.ViewType.SELECTABLE -> { (holder as? ResultItemViewHolder)?.configure(it.mushroom!!) }
+                        Item.ViewType.SELECTEDSPECIE -> { (holder as? SelectedResultItemViewHolder)?.configure(it.mushroom!!, it.confidence) }
+                    }
+                    Log.d("Adapter", it.mushroom?.toString())
                 }
             }
-
-            currentPosition += it.getCount()
-        }
-
-
-        sections[position]
-        return super.getItemViewType(position)
     }
 
-    fun getSection(position: Int): Section? {
-        var currentPosition = 0
-
-        sections.forEach {
-            if (position == currentPosition && position <= (currentPosition + it.getCount() - 1)) {
-                return it
-            }
-            currentPosition += it.getCount()
-        }
-        return null
-    }
-
-    fun getItem(position: Int): Mushroom? {
-        var currentPosition = 0
-
-            sections.forEach {
-                if (position >= currentPosition && position <= (currentPosition + it.getCount() - 1)) {
-                    return it.getMushroom(currentPosition + position)
-                }
-                currentPosition += it.getCount()
-            }
-
-        return null
-    }
-
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-
-        val layoutInflater = LayoutInflater.from(parent.context)
-        var view: View
-        var viewHolder: RecyclerView.ViewHolder
-
-         val type =
-             Section.ViewType.fromInt(
-                 viewType
-             )
-
-        Log.d("AddObservat", type.toString())
-
-        when (type) {
-            Section.ViewType.HEADER -> {
-                view = layoutInflater.inflate(R.layout.item_header, parent, false)
-                viewHolder = HeaderViewHolder(view)
-            }
-
-            Section.ViewType.SELECTABLE -> {
-                view = layoutInflater.inflate(R.layout.view_result, parent, false)
-                viewHolder = ViewHolderSelectable(view)
-            }
-
-            else -> {
-                view = layoutInflater.inflate(R.layout.nav_header, parent, false)
-                viewHolder = throwAway(view)
-            }
-        }
-
-        return viewHolder
-    }
-
-
-
-
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (Section.ViewType.fromInt(
-            holder.itemViewType
-        )) {
-            Section.ViewType.SELECTABLE -> {
-                (holder as? ViewHolderSelectable)?.configure(getItem(position))
-            }
-
-            Section.ViewType.HEADER -> {
-                (holder as? HeaderViewHolder)?.configure(getSection(position)?.title ?: "Header")
-            }
-            else -> {
-            }
-        }
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        mushroomSelected = null
+        confidenceSet = null
+        super.onDetachedFromRecyclerView(recyclerView)
     }
 }
-
-
-class ViewHolderSelectable(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-    fun configure(mushroom: Mushroom?) {
-        Log.d("View holde", mushroom.toString())
-    }
-
-
-    fun configure(observation: Observation) {
-
-    }
-}
-
-
-class throwAway(itemView: View) : RecyclerView.ViewHolder(itemView)

@@ -5,28 +5,45 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.noque.svampeatlas.Extensions.upperCased
+import com.noque.svampeatlas.Model.Host
+import com.noque.svampeatlas.Model.Substrate
+import com.noque.svampeatlas.Model.VegetationType
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.View.Fragments.AddObservationFragments.DetailsFragment
+import com.noque.svampeatlas.ViewHolders.InputTypeViewHolder
 import com.noque.svampeatlas.ViewHolders.SettingsViewHolder
+import java.util.*
 
-class DetailsAdapter(private val categories: Array<DetailsFragment.Categories>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class DetailsAdapter(private val categories: Array<DetailsFragment.Categories>) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    interface Listener {
-        fun onViewClicked(view: View)
+    var date: Date? = null
+    var substrate: Pair<Substrate, Boolean>? = null
+    var vegetationType: Pair<VegetationType, Boolean>? = null
+    var hosts: Pair<List<Host>, Boolean>? = null
+    var notes: String? = null
+    var ecologyNotes: String? = null
+
+    fun updateCategory(category: DetailsFragment.Categories) {
+        notifyItemChanged(category.ordinal)
     }
 
-    private var listener: Listener? = null
-
-
+    var categoryClicked: ((category: DetailsFragment.Categories) -> Unit)? = null
+    var onTextInputChanged: ((category: DetailsFragment.Categories, text: String?) -> Unit)? = null
 
     private val onClickListener = object: View.OnClickListener {
         override fun onClick(view: View) {
-            listener?.onViewClicked(view)
+            (view.tag as? RecyclerView.ViewHolder)?.adapterPosition?.let {
+                categoryClicked?.invoke(categories[it])
+            }
         }
     }
 
-    fun setListener(listener: Listener) {
-        this.listener = listener
+    private val onInputTypeChanged: ((view: View, text: String?) -> Unit) = { view, text ->
+        (view.tag as? ViewHolder)?.adapterPosition?.let {
+            onTextInputChanged?.invoke(categories[it], text)
+        }
     }
 
 
@@ -50,8 +67,14 @@ class DetailsAdapter(private val categories: Array<DetailsFragment.Categories>) 
                 view.setOnClickListener(onClickListener)
                 viewHolder = SettingsViewHolder(view)
             }
+            DetailsFragment.Categories.NOTES,
+            DetailsFragment.Categories.ECOLOGYNOTES -> {
+                view = layoutInflater.inflate(R.layout.item_text_input, parent, false)
+                viewHolder = InputTypeViewHolder(onInputTypeChanged, view)
+            }
         }
 
+        viewHolder.itemView.tag = viewHolder
         return viewHolder
     }
 
@@ -61,10 +84,52 @@ class DetailsAdapter(private val categories: Array<DetailsFragment.Categories>) 
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         when (categories[position]) {
-            DetailsFragment.Categories.DATE -> (holder as? SettingsViewHolder)?.configure("Dato:", "")
-            DetailsFragment.Categories.SUBSTRATE -> (holder as? SettingsViewHolder)?.configure("Substrat::", "")
-            DetailsFragment.Categories.HOST -> (holder as? SettingsViewHolder)?.configure("Vært:", "")
-            DetailsFragment.Categories.VEGETATIONTYPE -> (holder as? SettingsViewHolder)?.configure("Vegetationstype:", "")
+            DetailsFragment.Categories.DATE -> (holder as? SettingsViewHolder)?.configure(
+                R.drawable.glyph_age,
+                "Dato:",
+                date.toString() ?: "-"
+            )
+            DetailsFragment.Categories.SUBSTRATE -> {
+                val string = if (substrate?.second == true) "\uD83D\uDD12 " else ""
+
+                (holder as? SettingsViewHolder)?.configure(
+                    R.drawable.glyph_substrate,
+                    "Substrat:", string.plus(substrate?.first?.dkName ?: "*")
+                )
+            }
+
+            DetailsFragment.Categories.VEGETATIONTYPE -> {
+                val string = if (vegetationType?.second == true) "\uD83D\uDD12 " else ""
+            (holder as? SettingsViewHolder)?.configure(
+                R.drawable.glyph_vegetation_type,
+                "Vegetationstype:",
+                string.plus(vegetationType?.first?.dkName ?: "*")
+            )
+
+        }
+
+            DetailsFragment.Categories.HOST -> {
+                var hostString = if (hosts?.second == true) "\uD83D\uDD12 " else ""
+                hosts?.let {
+                    it.first.forEach { hostString += "${it.dkName}, " }
+                    hostString = hostString.dropLast(2)
+                } ?: run {
+                    hostString = "-"
+                }
+
+                (holder as? SettingsViewHolder)?.configure(R.drawable.glyph_host,"Vært:", hostString)
+            }
+
+
+            DetailsFragment.Categories.ECOLOGYNOTES -> (holder as? InputTypeViewHolder)?.configure(
+                "Økologi noter",
+                ecologyNotes
+            )
+
+            DetailsFragment.Categories.NOTES -> (holder as? InputTypeViewHolder)?.configure(
+                "Andre noter",
+                notes
+            )
         }
     }
 }

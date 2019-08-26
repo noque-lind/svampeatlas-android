@@ -12,8 +12,7 @@ import com.noque.svampeatlas.Utilities.GlideApp
 
 
 fun ImageView.downloadImage(size: DataService.IMAGESIZE,
-                            url: String?) {
-
+                            url: String) {
     val circularProgressDrawable = CircularProgressDrawable(context)
     circularProgressDrawable.strokeWidth = 5F
     circularProgressDrawable.centerRadius = 30F
@@ -22,11 +21,12 @@ fun ImageView.downloadImage(size: DataService.IMAGESIZE,
 
     val options = RequestOptions()
         .placeholder(circularProgressDrawable)
-        .error(R.mipmap.ic_launcher_round)
+//        .error(R.mipmap.ic_launcher_round)
 
 
     GlideApp.with(context)
         .setDefaultRequestOptions(options)
         .load("${size.value}${url}")
+        .error(resources.getDrawable(R.drawable.circle_view, null))
         .into(this)
 }

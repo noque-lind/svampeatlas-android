@@ -2,14 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+                android:theme="@style/Light">
 
 
     <TextView
             android:id="@+id/titlesView_titleTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/AppTitle.Light"/>
+            style="@style/AppTitle"/>
 
     <Space
             android:id="@+id/titlesView_textViewSpacing"
@@ -20,6 +21,6 @@
             android:id="@+id/titlesView_subtitleTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/AppPrimaryHighlighted.Light"
+            style="@style/AppPrimaryHighlighted"
             />
 </LinearLayout>

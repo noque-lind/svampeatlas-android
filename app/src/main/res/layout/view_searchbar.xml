@@ -4,7 +4,8 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:theme="@style/Light">
 
 
         <EditText
@@ -13,8 +14,9 @@
                 android:layout_height="0dp"
                 android:visibility="visible"
                 android:inputType="text"
-                style="@style/AppPrimaryHighlighted.Light"
-                android:hint="Søg efter en art her.."
+                style="@style/AppPrimaryHighlighted"
+                android:textColor="@color/colorWhite"
+                android:hint="@string/searchBarView_hint"
                 android:textColorHint="@color/colorWhite_dimmed"
                 android:paddingStart="60dp"
                 android:maxLines="1"
@@ -26,16 +28,16 @@
                 app:layout_constraintBottom_toBottomOf="parent" android:autoText="false"/>
 
         <ImageButton
-                android:id="@+id/searchBar_button"
-                android:elevation="1dp"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintDimensionRatio="1:1"
-                android:background="@drawable/circle_view"
-                android:src="@android:drawable/ic_search_category_default"/>
+            android:id="@+id/searchBar_button"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/circle_view"
+            android:elevation="1dp"
+            android:src="@drawable/glyph_search"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

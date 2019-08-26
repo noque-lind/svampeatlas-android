@@ -12,41 +12,66 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.*
 import com.google.android.material.snackbar.Snackbar
+import com.noque.svampeatlas.Model.AppError
+import com.noque.svampeatlas.R
 import java.lang.Exception
 import java.lang.ref.WeakReference
 import java.util.logging.Handler
 
 
-interface LocationServiceDelegate {
-    fun locationRetrieved(location: Location)
-    fun locationRetrievalError(exception: Exception)
-}
 
 
-class LocationService(private val context: Context, private val activity: Activity) {
+
+class LocationService(private val context: Context?, private val activity: Activity?) {
+
+    companion object {
+        val TAG = "LocationService"
+        val REQUESTCODE = 210
+    }
+
+    sealed class Error(title: String, message: String): AppError(title, message) {
+        class PermissionDenied(context: Context): Error(context.getString(R.string.locationservice_error_permissions_title), context.getString(R.string.locationservice_error_permissions_message))
+    }
+
+    interface Listener {
+        fun locationRetrieved(location: Location)
+        fun locationRetrievalError(error: Error)
+        fun requestPermission(permissions: Array<out String>, requestCode: Int)
+    }
 
     private var locationClient: FusedLocationProviderClient? = null
     private var lastLocation: Location? = null
-
-    private var listener: LocationServiceDelegate? = null
+    private var listener: Listener? = null
 
     private val permissionGranted: Boolean get() {
-        if(ContextCompat.checkSelfPermission(
-                context,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-            return false
-        } else {
-            return true
+        return context?.let {
+            (ContextCompat.checkSelfPermission(it, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)} ?: false
+    }
+
+    private val locationCallback = object: LocationCallback() {
+        override fun onLocationResult(result: LocationResult?) {
+            result?.lastLocation?.let {
+                lastLocation = it
+
+                if (it.accuracy <= 60) {
+                    lastLocation = null
+                    listener?.locationRetrieved(it)
+                    locationClient?.removeLocationUpdates(this)
+                    locationClient = null
+                }
+
+            }
         }
     }
 
-    fun setListener(locationServiceDelegate: LocationServiceDelegate) {
+
+    fun setListener(locationServiceDelegate: Listener?) {
         listener = locationServiceDelegate
     }
 
-
     fun start() {
-        locationClient = LocationServices.getFusedLocationProviderClient(context)
+        Log.d(TAG, "Starting")
+        context?.let { locationClient = LocationServices.getFusedLocationProviderClient(context) }
 
         if (permissionGranted) {
             getLocation()
@@ -57,29 +82,10 @@ class LocationService(private val context: Context, private val activity: Activi
 
     @SuppressLint("MissingPermission")
     private fun getLocation() {
-
-        locationClient?.lastLocation
-
         val locationRequest = LocationRequest.create()
             locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
             locationRequest.interval = 10
 
-
-        val callBack = object: LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult?) {
-                if (locationResult == null) {
-                    return
-                }
-
-                lastLocation = locationResult.lastLocation
-
-
-                if (locationResult.lastLocation.hasAccuracy() && locationResult.lastLocation.accuracy <= 100) {
-                    listener?.locationRetrieved(locationResult.lastLocation)
-                    locationClient?.removeLocationUpdates(this)
-                }
-            }
-        }
 
         android.os.Handler().postDelayed(Runnable {
             if (listener != null) {
@@ -89,36 +95,26 @@ class LocationService(private val context: Context, private val activity: Activi
             }
         }, 100)
 
-        locationClient?.requestLocationUpdates(locationRequest, callBack, null)
+        locationClient?.requestLocationUpdates(locationRequest, locationCallback, null)
     }
 
 
     private fun requestPermissions() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, android.Manifest.permission.ACCESS_COARSE_LOCATION)) {
-//            Snackbar.make(view!!, "Rationale", Snackbar.LENGTH_SHORT).setAction("Vil du godkende?", View.OnClickListener { startLocationPermissionRequest() })
-        } else {
-            ActivityCompat.requestPermissions(activity, arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION), 21)
-        }
+            Log.d(TAG, "Requesting permissions")
+            listener?.requestPermission(arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION), REQUESTCODE)
     }
 
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (requestCode == 21) {
+        if (requestCode == REQUESTCODE) {
+            Log.d(TAG,"OnRequestPermissionsResult called")
+
             if ((grantResults.isNotEmpty() && grantResults.first() == PackageManager.PERMISSION_GRANTED)) {
+                Log.d(TAG,"Permission has now been granted")
                 getLocation()
             } else {
-
-//                View.OnClickListener {
-//                    // Build intent that displays the App settings screen.
-//                    val intent = Intent()
-//                    intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-//                    val uri = Uri.fromParts("package",
-//                        BuildConfig.APPLICATION_ID, null)
-//                    intent.data = uri
-//                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//                    startActivity(intent)
-//                })
-
-                // SHOW ERROR ON MAP
+                context?.let {
+                    listener?.locationRetrievalError(Error.PermissionDenied(context))
+                }
             }
         }
     }

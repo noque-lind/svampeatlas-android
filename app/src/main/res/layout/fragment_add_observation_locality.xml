@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+                                                   android:layout_height="match_parent">
+
+    <fragment
+            android:id="@+id/localityFragment_mapView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:name="com.noque.svampeatlas.View.Fragments.MapFragment"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/localityFragment_recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:theme="@style/Light"
+        android:layout_marginBottom="16dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:clipToPadding="false"
+        app:layout_constraintBottom_toBottomOf="@+id/localityFragment_mapView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <ImageButton
+        android:id="@+id/localityFragment_retryButton"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/shape_retry_button"
+        android:src="@drawable/glyph_reload" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

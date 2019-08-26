@@ -8,7 +8,7 @@
     
     
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat">
         <!-- Customize your theme here. -->
 
         <item name="windowActionBar">false</item>
@@ -16,9 +16,9 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorSecondary</item>
         <item name="colorAccent">@color/colorThird</item>
-
-        <item name="AppPrimary.Light">@style/AppPrimary.Light</item>
-        <item name="AppPrimary.Dark">@style/AppPrimary.Dark</item>
+    <item name="colorControlNormal">@color/colorWhite</item>
+        <!--<item name="AppPrimary.Light">@style/AppPrimary</item>-->
+        <!--<item name="AppPrimary.Dark">@style/AppPrimary.Dark</item>-->
     </style>
 
     <style name="Light">
@@ -53,33 +53,33 @@
         <item name="android:fontFamily">@font/avenir_next</item>
     </style>
 
-    <style name="AppTitle.Light" parent="AppTitle">
-        <item name="android:textColor">@color/colorWhite</item>
-    </style>
+    <!--<style name="AppTitle.Light" parent="AppTitle">-->
+        <!--<item name="android:textColor">@color/colorWhite</item>-->
+    <!--</style>-->
 
-    <style name="AppTitle.Dark" parent="AppTitle">
-        <item name="android:textColor">@color/colorPrimary</item>
-    </style>
+    <!--<style name="AppTitle.Dark" parent="AppTitle">-->
+        <!--<item name="android:textColor">@color/colorPrimary</item>-->
+    <!--</style>-->
 
-    <style name="AppPrimary.Light" parent="AppPrimary">
-        <item name="android:textColor">@color/colorWhite</item>
-    </style>
+    <!--<style name="AppPrimary.Light" parent="AppPrimary">-->
+        <!--<item name="android:textColor">@color/colorWhite</item>-->
+    <!--</style>-->
 
-    <style name="AppPrimary.Dark" parent="AppPrimary">
-        <item name="android:textColor">@color/colorPrimary</item>
-    </style>
+    <!--<style name="AppPrimary.Dark" parent="AppPrimary">-->
+        <!--<item name="android:textColor">@color/colorPrimary</item>-->
+    <!--</style>-->
 
-    <style name="AppPrimaryHighlighted.Light" parent="AppPrimaryHighlighted">
-        <item name="android:textColor">@color/colorWhite</item>
-    </style>
+    <!--<style name="AppPrimaryHighlighted.Light" parent="AppPrimaryHighlighted">-->
+        <!--<item name="android:textColor">@color/colorWhite</item>-->
+    <!--</style>-->
 
-    <style name="AppPrimaryHighlighted.Dark" parent="AppPrimaryHighlighted">
-        <item name="android:textColor">@color/colorPrimary</item>
-    </style>
+    <!--<style name="AppPrimaryHighlighted.Dark" parent="AppPrimaryHighlighted">-->
+        <!--<item name="android:textColor">@color/colorPrimary</item>-->
+    <!--</style>-->
 
-    <style name="AppDivider.Light" parent="AppDivider">
-        <item name="android:textColor">@color/colorWhite</item>
-    </style>
+    <!--<style name="AppDivider.Light" parent="AppDivider">-->
+        <!--<item name="android:textColor">@color/colorWhite</item>-->
+    <!--</style>-->
 
     
     <style name="AppTheme.NoActionBar">

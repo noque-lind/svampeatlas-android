@@ -14,13 +14,12 @@ import android.text.Spannable
 import android.text.SpannableString
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.noque.svampeatlas.Utilities.CustomTypefaceSpan
+
 import android.R
+import androidx.core.text.bold
 
 
-
-
-fun String.italized(context: Context): SpannableStringBuilder {
+fun String.italized(context: Context? = null): SpannableStringBuilder {
 
         val currentString = this
 
@@ -30,7 +29,7 @@ fun String.italized(context: Context): SpannableStringBuilder {
     }
 
 //    string.setSpan(StyleSpan(ResourcesCompat.getFont(context, R .avenir_next_italic)!!.style), 0, this.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-    Log.d("Extension", string.toString())
+//    Log.d("Extension", string.toString())
     return string
 
 
@@ -59,6 +58,15 @@ fun String.italized(context: Context): SpannableStringBuilder {
 //    val family = FontFamily.Builder(Font.Builder() Typeface.createFromAsset(context.assets, "fonts/avenir_next_regular.ttf")).build())
 
 
+}
+
+fun String.highlighted(): SpannableStringBuilder {
+    val currentString = this
+
+    val string = SpannableStringBuilder().bold {
+        append(currentString)
+    }
+    return string
 }
 
 fun String.upperCased(): SpannableStringBuilder {

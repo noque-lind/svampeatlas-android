@@ -4,47 +4,36 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/drawer_layout"
+        android:id="@+id/blankActitivy_drawerLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:openDrawer="end"
-        android:fitsSystemWindows="true">
+        android:theme="@style/AppTheme"
+    android:fitsSystemWindows="false"
+        tools:openDrawer="start">
 
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
-    <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
 
-        <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:popupTheme="@style/Widget.AppCompat.PopupMenu.Overflow"
-                android:elevation="4dp"/>
-
-        <fragment
-                android:name="androidx.navigation.fragment.NavHostFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:navGraph="@navigation/nav_mushroom"
-                app:defaultNavHost="true"
-                android:id="@+id/nav_host_fragment"/>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
+    <fragment
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:navGraph="@navigation/nav_mushroom"
+        app:defaultNavHost="true"
+        android:id="@+id/blankActivity_navHostFragment"/>
 
     <com.google.android.material.navigation.NavigationView
-            android:id="@+id/nav_view"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:fitsSystemWindows="true"
-            app:headerLayout="@layout/nav_header"
-            android:background="@drawable/gradient_background"
-            app:menu="@menu/activity_blank_drawer"/>
+        android:id="@+id/blankActivity_navigationView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@drawable/gradient_background"
+        android:theme="@style/Light"
+        app:insetForeground="@null"
+        app:headerLayout="@layout/navigation_header"
+        app:itemTextAppearance="@style/AppPrimaryHighlighted"
+        app:itemTextColor="@color/colorWhite" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

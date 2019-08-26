@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/myPageFragment"
+            android:icon="@drawable/icon_profile"
+            android:title="@string/menu_my_page"/>
+        <item
+            android:id="@+id/addObservationFragment"
+            android:icon="@drawable/icon_plus"
+            android:title="@string/menu_new_observation"/>
+
+        <item
+            android:checkable="false"
+            android:title=""/>
+
+        <item
+            android:id="@+id/nearbyFragment"
+            android:icon="@drawable/icon_location"
+            android:title="@string/menu_nearby"/>
+        <item
+            android:id="@+id/mushroomFragment"
+            android:icon="@drawable/icon_book"
+            android:title="@string/menu_mushrooms"/>
+        <item
+            android:id="@+id/menu_recognize"
+            android:enabled="false"
+            android:icon="@drawable/icon_camera"
+            android:title="@string/menu_recognize"
+            />
+    </group>
+</menu>

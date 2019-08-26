@@ -9,11 +9,27 @@ import com.noque.svampeatlas.Extensions.toRectanglePolygon
 
 data class API(val apiType: APIType) {
 
+    enum class Radius(val radius: Double) {
+        SMALLEST(800.0),
+        SMALLER(1000.0),
+        SMALL(1200.0),
+        MEDIUM(1400.0),
+        LARGE(1600.0),
+        LARGER(1800.0),
+        LARGEST(2000.0),
+        HUGE(2500.0),
+        HUGER(5000.0),
+        HUGEST(1000.0),
+        COUNTRY(0.0)
+    }
+
+
     private val BASE_URL_API = "https://" + "svampe.databasen.org" + "/api/"
 
     fun url(): String {
         when (apiType) {
-            is APIType.Request -> return createRequestURL(apiType)
+            is APIType.Request -> return createGetURL(apiType)
+            is APIType.Post -> return createPostURL(apiType)
             else -> return ""
         }
     }
@@ -21,11 +37,12 @@ data class API(val apiType: APIType) {
     fun volleyMethod(): Int {
         when (apiType) {
             is APIType.Request -> return Request.Method.GET
+            is APIType.Post -> return Request.Method.POST
             else -> return Request.Method.GET
         }
     }
 
-    private fun createRequestURL(request: APIType.Request): String {
+    private fun createGetURL(request: APIType.Request): String {
         val builder = Uri.Builder()
         builder.scheme("https")
             .authority("svampe.databasen.org")
@@ -43,16 +60,18 @@ data class API(val apiType: APIType) {
                         .appendQueryParameter("offset", request.offset.toString())
                 }
 
-                .appendQueryParameter("_order", "[[\"FullName\"]]")
+                    .appendQueryParameter("_order", "[[\"FullName\"]]")
                     .appendQueryParameter("acceptedTaxaOnly", "true")
-                .appendQueryParameter("include", speciesIncludeQuery(request.requirePictures))
+                    .appendQueryParameter("include", speciesIncludeQuery(request.requirePictures))
 
 
             }
 
             is APIType.Request.Observation -> {
                 builder.appendPath("observations")
-                    builder.appendQueryParameter("include", observationIncludeQuery(request.observationQueries))
+                builder.appendQueryParameter("_order", "[[\"observationDate\",\"DESC\",\"ASC\"],[\"_id\",\"DESC\"]]")
+
+                builder.appendQueryParameter("include", observationIncludeQuery(request.observationQueries))
 
                 request.limit?.let {
                     builder.appendQueryParameter("limit", it.toString())
@@ -79,11 +98,81 @@ data class API(val apiType: APIType) {
             is APIType.Request.VegetationType -> {
                 builder.appendPath("vegetationTypes")
             }
+
+            is APIType.Request.Host -> {
+                builder.appendEncodedPath("planttaxa?limit=30&order=probability+DESC")
+                request.searchString?.let {
+                    builder.appendQueryParameter("where", "{\"\$or\":[{\"DKname\":{\"like\":\"${it}%\"}},{\"LatinName\":{\"like\":\"${it}%\"}}]}")
+                }
+            }
+
+            is APIType.Request.User -> {
+                builder.appendPath("users")
+                builder.appendPath("me")
+            }
+
+            is APIType.Request.UserNotificationCount -> {
+                builder.appendPath("users")
+                builder.appendPath("me")
+                builder.appendPath("feed")
+                builder.appendPath("count")
+            }
+
+            is APIType.Request.UserNotifications -> {
+                builder.appendPath("users")
+                builder.appendPath("me")
+                builder.appendPath("feed")
+                builder.appendQueryParameter("limit", request.limit.toString())
+                builder.appendQueryParameter("offset", request.offset.toString())
+            }
+
+            is APIType.Request.SingleObservation -> {
+                builder.appendPath("observations")
+                builder.appendPath("${request.id}")
+            }
+
+            is APIType.Request.ObservationCountForUser -> {
+                builder.appendPath("users")
+                builder.appendPath(request.userId.toString())
+                builder.appendPath("observations")
+                builder.appendPath("count")
+            }
         }
 
         val url = builder.build().toString()
         Log.d("API", url)
         return url
+    }
+
+    private fun createPostURL(request: APIType.Post): String {
+        val builder = Uri.Builder()
+        builder.scheme("https")
+            .authority("svampe.databasen.org")
+            .appendPath("api")
+
+        when (request) {
+            is APIType.Post.Observation -> {
+                builder.appendPath("observations")
+            }
+
+            is APIType.Post.Image -> {
+                builder.appendPath("observations")
+                builder.appendPath(request.observationID.toString())
+                builder.appendPath("images")
+            }
+
+            is APIType.Post.Login -> {
+                builder.path("auth/local")
+            }
+
+            is APIType.Post.Comment -> {
+                builder.appendPath("observations")
+                builder.appendPath(request.taxonID.toString())
+                builder.appendPath("forum")
+            }
+        }
+
+        return builder.build().toString()
     }
 
     private fun speciesIncludeQuery(imagesRequired: Boolean): String {
@@ -114,18 +203,25 @@ data class API(val apiType: APIType) {
             }
         }
 
-        Log.d("Dataservice", "Search terms: FullSearchterm: ${fullSearchTerm}, genus: ${genus}, taxonName: ${taxonName}")
+        Log.d(
+            "Dataservice",
+            "Search terms: FullSearchterm: ${fullSearchTerm}, genus: ${genus}, taxonName: ${taxonName}"
+        )
 
         return "{\"\$or\":[{\"FullName\":{\"like\":\"%${fullSearchTerm}%\"}},{\"\$Vernacularname_DK.vernacularname_dk\$\":{\"like\":\"%${fullSearchTerm}%\"}},{\"FullName\":{\"like\":\"${genus}%\"},\"TaxonName\":{\"like\":\"${taxonName}%\"}}]}"
-        }
+    }
 
     private fun observationIncludeQuery(observationQueries: List<ObservationQueries>): String {
         var string = "["
 
         observationQueries.forEach {
             when (it) {
-                is ObservationQueries.Images -> {string += "\"{\\\"model\\\":\\\"ObservationImage\\\",\\\"as\\\":\\\"Images\\\",\\\"where\\\":{},\\\"required\\\":false}\""}
-                is ObservationQueries.Comments -> {string += "\"{\\\"model\\\":\\\"ObservationForum\\\",\\\"as\\\":\\\"Forum\\\",\\\"where\\\":{},\\\"required\\\":false}\""}
+                is ObservationQueries.Images -> {
+                    string += "\"{\\\"model\\\":\\\"ObservationImage\\\",\\\"as\\\":\\\"Images\\\",\\\"where\\\":{},\\\"required\\\":false}\""
+                }
+                is ObservationQueries.Comments -> {
+                    string += "\"{\\\"model\\\":\\\"ObservationForum\\\",\\\"as\\\":\\\"Forum\\\",\\\"where\\\":{},\\\"required\\\":false}\""
+                }
                 is ObservationQueries.DeterminationView -> {
                     if (it.taxonID != null) {
                         string += "\"{\\\"model\\\":\\\"DeterminationView\\\",\\\"as\\\":\\\"DeterminationView\\\",\\\"attributes\\\":[\\\"taxon_id\\\",\\\"recorded_as_id\\\",\\\"taxon_FullName\\\",\\\"taxon_vernacularname_dk\\\",\\\"determination_validation\\\",\\\"recorded_as_FullName\\\",\\\"determination_user_id\\\",\\\"determination_score\\\",\\\"determination_validator_id\\\",\\\"determination_species_hypothesis\\\"],\\\"where\\\":{\\\"Taxon_id\\\":${it.taxonID}}}\""
@@ -141,7 +237,13 @@ data class API(val apiType: APIType) {
                     }
                 }
 
-                is ObservationQueries.Locality -> {string += "\"{\\\"model\\\":\\\"Locality\\\",\\\"as\\\":\\\"Locality\\\",\\\"attributes\\\":[\\\"_id\\\",\\\"name\\\"]}\""}
+                is ObservationQueries.Locality -> {
+                    string += "\"{\\\"model\\\":\\\"Locality\\\",\\\"as\\\":\\\"Locality\\\",\\\"attributes\\\":[\\\"_id\\\",\\\"name\\\"]}\""
+                }
+
+                is ObservationQueries.GeomNames -> {
+                    string += "\"{\\\"model\\\":\\\"GeoNames\\\",\\\"as\\\":\\\"GeoNames\\\",\\\"where\\\":{},\\\"required\\\":false}\""
+                }
             }
 
             string += ","
@@ -149,22 +251,25 @@ data class API(val apiType: APIType) {
 
         string = string.dropLast(1)
         string += "]"
-return string
+        return string
     }
 
 }
 
-sealed class ObservationQueries: APIType() {
-    class Images(): ObservationQueries()
-    class Comments(): ObservationQueries()
-    class DeterminationView(val taxonID: Int?):ObservationQueries()
-    class User(val responseFilteredByUserID: Int?):ObservationQueries()
-    class Locality:ObservationQueries()
+sealed class ObservationQueries : APIType() {
+    class Images() : ObservationQueries()
+    class Comments() : ObservationQueries()
+    class DeterminationView(val taxonID: Int?) : ObservationQueries()
+    class User(val responseFilteredByUserID: Int?) : ObservationQueries()
+    class Locality : ObservationQueries()
+    class GeomNames: ObservationQueries()
 }
 
-data class Geometry(val coordinate: LatLng,
-                    val radius: Double,
-                    val type: Type) {
+data class Geometry(
+    val coordinate: LatLng,
+    val radius: Double,
+    val type: Type
+) {
 
     enum class Type {
         CIRCLE, RECTANGLE
@@ -174,7 +279,9 @@ data class Geometry(val coordinate: LatLng,
         var string = "{\"type\":\"Feature\",\"properties\":{},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[["
 
         when (type) {
-            Type.RECTANGLE -> {coordinate.toRectanglePolygon(radius).forEach { string += "[${it.longitude},${it.latitude}]," }}
+            Type.RECTANGLE -> {
+                coordinate.toRectanglePolygon(radius).forEach { string += "[${it.longitude},${it.latitude}]," }
+            }
         }
 
         string = string.dropLast(1)
@@ -193,12 +300,34 @@ data class Geometry(val coordinate: LatLng,
 }
 
 sealed class APIType {
-     sealed class Request: APIType() {
-       class Mushroom(val offset: Int, val limit: Int, val searchString: String?, val requirePictures: Boolean): Request()
-         class Observation(val geometry: Geometry?, val observationQueries: List<ObservationQueries>, val ageInYear: Int?, val limit: Int?, val offset: Int?): Request()
-         class Locality(val geometry: Geometry): Request()
-         class Substrate(): Request()
-         class VegetationType(): Request()
+    sealed class Request : APIType() {
+        class Mushroom(val offset: Int, val limit: Int, val searchString: String?, val requirePictures: Boolean) :
+            Request()
+
+        class Observation(
+            val geometry: Geometry?,
+            val observationQueries: List<ObservationQueries>,
+            val ageInYear: Int?,
+            val limit: Int?,
+            val offset: Int?
+        ) : Request()
+
+        class SingleObservation(val id: Int): Request()
+        class Locality(val geometry: Geometry) : Request()
+        class Substrate() : Request()
+        class VegetationType() : Request()
+        class Host(val searchString: String?) : Request()
+        class User: Request()
+        class UserNotificationCount(): Request()
+        class UserNotifications(val limit: Int, val offset: Int): Request()
+        class ObservationCountForUser(val userId: Int): Request()
     }
 
+
+    sealed class Post: APIType() {
+        class Observation(): Post()
+        class Image(val observationID: Int): Post()
+        class Login(): Post()
+        class Comment(val taxonID: Int): Post()
+    }
 }

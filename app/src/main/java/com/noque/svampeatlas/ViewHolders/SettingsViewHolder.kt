@@ -1,5 +1,6 @@
 package com.noque.svampeatlas.ViewHolders
 
+import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -19,7 +20,8 @@ class SettingsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 
 
-    fun configure(title: String, content: String?) {
+    fun configure(icon: Int, title: String, content: String?) {
+        iconImageView.setImageResource(icon)
         titleTextView.text = title
         contentTextView.text = content
     }

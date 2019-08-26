@@ -14,7 +14,7 @@ data class Mushroom(@SerializedName("_id") private val _id: Int = 0,
                     @SerializedName("probability") private val _probability: Int = 0,
                     @SerializedName("Vernacularname_DK") private val _vernacularNameDK: PrivateVernacularNameDK?,
                     @SerializedName("redlistdata") private val _redlistData: List<RedListData>?,
-                    @SerializedName("images") private val _images: List<Image>,
+                    @SerializedName("images") private val _images: List<Image>?,
                     @SerializedName("attributes") private val _attributes: Attributes?,
                     @SerializedName("Statistics") private val _statistics: PrivateStatistics?) {
 
@@ -27,7 +27,7 @@ data class Mushroom(@SerializedName("_id") private val _id: Int = 0,
     val lastAcceptedObservation: String? get() {return _statistics?._lastAcceptedRecord}
     val redlistData: RedListData? get() {return _redlistData?.firstOrNull()}
     val attributes: Attributes? get() {return _attributes}
-    val images: List<Image> get() {return _images}
+    val images: List<Image> get() {return _images ?: listOf()}
 }
 
 data class PrivateVernacularNameDK(

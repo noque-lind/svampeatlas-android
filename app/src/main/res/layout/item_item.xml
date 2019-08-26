@@ -3,8 +3,10 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-android:background="?android:attr/selectableItemBackground"
-android:clickable="true">
+              android:foreground="?android:attr/selectableItemBackground"
+              android:clickable="true"
+              android:background="@drawable/selectable_item"
+              android:theme="@style/Dark">
 
     <TextView
             android:layout_marginTop="16dp"
@@ -13,7 +15,7 @@ android:clickable="true">
             android:layout_marginEnd="16dp"
             android:id="@+id/itemItem_textView"
             android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-    style="@style/AppPrimary.Dark"/>
+            android:layout_height="wrap_content"
+            style="@style/AppPrimary"/>
 
 </LinearLayout>

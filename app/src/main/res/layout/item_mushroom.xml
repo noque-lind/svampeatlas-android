@@ -4,12 +4,16 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true">
 
-    <com.noque.svampeatlas.View.MushroomView
+    <com.noque.svampeatlas.View.Views.MushroomView
+            android:foreground="?android:attr/selectableItemBackground"
             android:id="@+id/item_mushroom_mushroomView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -20,7 +24,7 @@
             >
 
 
-    </com.noque.svampeatlas.View.MushroomView>
+    </com.noque.svampeatlas.View.Views.MushroomView>
 
 
     <!--<ImageView-->
