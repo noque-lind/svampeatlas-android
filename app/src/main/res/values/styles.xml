@@ -10,7 +10,6 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat">
         <!-- Customize your theme here. -->
-
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -53,47 +52,20 @@
         <item name="android:fontFamily">@font/avenir_next</item>
     </style>
 
-    <!--<style name="AppTitle.Light" parent="AppTitle">-->
-        <!--<item name="android:textColor">@color/colorWhite</item>-->
-    <!--</style>-->
-
-    <!--<style name="AppTitle.Dark" parent="AppTitle">-->
-        <!--<item name="android:textColor">@color/colorPrimary</item>-->
-    <!--</style>-->
-
-    <!--<style name="AppPrimary.Light" parent="AppPrimary">-->
-        <!--<item name="android:textColor">@color/colorWhite</item>-->
-    <!--</style>-->
-
-    <!--<style name="AppPrimary.Dark" parent="AppPrimary">-->
-        <!--<item name="android:textColor">@color/colorPrimary</item>-->
-    <!--</style>-->
-
-    <!--<style name="AppPrimaryHighlighted.Light" parent="AppPrimaryHighlighted">-->
-        <!--<item name="android:textColor">@color/colorWhite</item>-->
-    <!--</style>-->
-
-    <!--<style name="AppPrimaryHighlighted.Dark" parent="AppPrimaryHighlighted">-->
-        <!--<item name="android:textColor">@color/colorPrimary</item>-->
-    <!--</style>-->
-
-    <!--<style name="AppDivider.Light" parent="AppDivider">-->
-        <!--<item name="android:textColor">@color/colorWhite</item>-->
-    <!--</style>-->
-
-    
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
     <style name="AppSwitch" >
-        <item name="colorControlActivated">@color/colorPrimary</item>
+        <item name="android:colorControlNormal">@color/colorSecondary</item>
+        <item name="colorControlActivated">@color/colorGreen</item>
+    </style>
+
+    <style name="DatePicker" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+        <item name="colorControlActivated">@color/colorThird</item>
+        <item name="colorAccent">@color/colorPrimary</item>
+
     </style>
 
 </resources>

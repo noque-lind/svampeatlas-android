@@ -18,7 +18,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.noque.svampeatlas.View.Views.SearchBarView
+    <com.noque.svampeatlas.views.SearchBarView
             android:layout_width="0dp"
             android:layout_height="@dimen/searchbar_view_height"
             android:id="@+id/addObservationSpecieFragment_searchBarView"
@@ -28,5 +28,10 @@
             android:layout_marginEnd="0dp"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="8dp"/>
+
+    <com.noque.svampeatlas.views.BackgroundView
+        android:id="@+id/addObservationSpecieFragment_backgroundView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

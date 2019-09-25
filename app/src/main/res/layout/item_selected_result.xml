@@ -5,16 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-<com.noque.svampeatlas.View.Views.ResultView
+<com.noque.svampeatlas.views.ResultView
     android:clickable="true"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground"
     android:id="@+id/selectedResultItem_resultView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-</com.noque.svampeatlas.View.Views.ResultView>
+</com.noque.svampeatlas.views.ResultView>
 
     <TextView
+        android:id="@+id/selectedResultItem_confidenceTitleTextView"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:layout_marginTop="64dp"
@@ -40,22 +41,19 @@
             android:id="@+id/selectedResultItem_radioButton_guessing"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorWhite"
-            android:text="@string/species_confidence_guessing" />
+            android:textColor="@color/colorWhite" />
 
         <RadioButton
             android:id="@+id/selectedResultItem_radioButton_unsure"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorWhite"
-            android:text="@string/species_confidence_unsure" />
+            android:textColor="@color/colorWhite" />
 
         <RadioButton
             android:id="@+id/selectedResultItem_radioButton_determined"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorWhite"
-            android:text="@string/species_confidence_determined" />
+            android:textColor="@color/colorWhite"/>
     </RadioGroup>
 
 

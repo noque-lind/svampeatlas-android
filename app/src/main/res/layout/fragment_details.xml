@@ -8,15 +8,20 @@
     android:fitsSystemWindows="true">
 
     <LinearLayout
+        android:id="@+id/detailsFragment_linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:layout_weight="1"
-            android:id="@+id/coordinatorLayout"
+            android:id="@+id/detailsFragment_coordinatorLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_weight="1"
             android:fitsSystemWindows="false">
 
             <com.google.android.material.appbar.AppBarLayout
@@ -34,7 +39,8 @@
                     app:layout_scrollFlags="scroll|exitUntilCollapsed"
                     app:scrimAnimationDuration="100">
 
-                    <com.noque.svampeatlas.View.Views.ImagesView
+                    <com.noque.svampeatlas.views.ImagesView
+                        android:background="@color/colorPrimary"
                         android:id="@+id/detailsFragment_imagesView"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -42,20 +48,23 @@
                         app:layout_collapseMode="parallax" />
 
                     <androidx.appcompat.widget.Toolbar
-                        app:titleTextAppearance="@style/AppTitle"
-                        app:titleTextColor="@color/colorWhite"
                         android:id="@+id/detailsFragment_toolbar"
                         android:layout_width="match_parent"
                         android:layout_height="?attr/actionBarSize"
                         app:layout_collapseMode="pin"
+                        app:title=" "
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:navigationIcon="?attr/homeAsUpIndicator"/>
+                        app:navigationIcon="?attr/homeAsUpIndicator"
+                        app:titleTextAppearance="@style/AppTitle"
+                        app:titleTextColor="@color/colorWhite" />
 
                 </com.google.android.material.appbar.CollapsingToolbarLayout>
             </com.google.android.material.appbar.AppBarLayout>
 
+
             <androidx.core.widget.NestedScrollView
+                android:id="@+id/detailsFragment_nestedScrollView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginStart="16dp"
@@ -71,66 +80,56 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <com.noque.svampeatlas.View.TitlesView
+                    <com.noque.svampeatlas.views.TitlesView
                         android:id="@+id/detailsFragment_titlesView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <Space
-                        android:layout_width="match_parent"
-                        android:layout_height="24dp" />
-
-                    <LinearLayout
-                        android:id="@+id/detailsFragment_descriptionViewLinearLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"/>
-
-                    <TextView
-                        android:text="@string/header_informationView"
-                        style="@style/AppDivider"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
-                    <com.noque.svampeatlas.View.Views.InformationView
+                    <LinearLayout
+                        android:layout_marginTop="24dp"
+                        android:layout_marginBottom="24dp"
+                        android:id="@+id/detailsFragment_descriptionViewLinearLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+
+                    <TextView
+                        android:id="@+id/detailsFragment_informationViewHeader"
+                        style="@style/AppDivider"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="2dp"
+                        android:text="@string/header_informationView" />
+
+                    <com.noque.svampeatlas.views.InformationView
                         android:id="@+id/detailsFragment_informationView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:theme="@style/AppPrimary"/>
+                        android:theme="@style/AppPrimary"
+                        android:layout_marginBottom="24dp"/>
 
-                    <Space
-                        android:layout_width="match_parent"
-                        android:layout_height="24dp" />
 
                     <TextView
                         android:id="@+id/detailsFragment_mapFragmentHeader"
                         style="@style/AppDivider"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                    <Space
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp" />
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"/>
 
                     <fragment
                         android:id="@+id/detailsFragment_mapFragment"
-                        android:name="com.noque.svampeatlas.View.Fragments.MapFragment"
+                        android:name="com.noque.svampeatlas.fragments.MapFragment"
                         android:layout_width="match_parent"
-                        android:layout_height="300dp" />
+                        android:layout_height="300dp"
+                        android:layout_marginBottom="24dp"/>
 
-                    <Space
-                        android:layout_width="match_parent"
-                        android:layout_height="24dp" />
 
                     <TextView
                         android:id="@+id/detailsFragment_recyclerViewHeader"
                         style="@style/AppDivider"
+                        android:layout_marginBottom="2dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
-
-                    <Space
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/detailsFragment_recyclerView"
@@ -138,25 +137,31 @@
                         android:layout_height="wrap_content">
 
                     </androidx.recyclerview.widget.RecyclerView>
+
                 </LinearLayout>
             </androidx.core.widget.NestedScrollView>
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
+
         <Button
             android:id="@+id/detailsFragment_takesSelectionButton"
-            android:foreground="?android:attr/selectableItemBackground"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="match_parent"
             android:layout_height="75dp"
+            android:foreground="?android:attr/selectableItemBackground"
             android:textAppearance="@style/AppTitle"
             android:textColor="@color/colorWhite" />
 
     </LinearLayout>
 
-
-    <com.noque.svampeatlas.View.BackgroundView
+    <com.noque.svampeatlas.views.BackgroundView
         android:id="@+id/detailsFragment_backgroundView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="?attr/actionBarSize"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

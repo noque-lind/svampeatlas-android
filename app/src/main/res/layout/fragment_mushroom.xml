@@ -8,7 +8,7 @@
         android:background="@color/colorSecondary"
 
 android:orientation="vertical"
-    tools:context=".View.Fragments.MushroomFragment">
+    tools:context=".fragments.MushroomFragment">
 
     <androidx.appcompat.widget.Toolbar
         app:title="@string/fragment_mushroom"
@@ -48,17 +48,6 @@ android:orientation="vertical"
             android:layout_height="match_parent">
 
 
-            <com.noque.svampeatlas.View.BackgroundView
-                android:background="@drawable/gradient_background"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:id="@+id/mushroomFragment_backgroundView"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent">
-            </com.noque.svampeatlas.View.BackgroundView>
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/mushroomFragment_recyclerView"
                 android:layout_width="0dp"
@@ -71,7 +60,7 @@ android:orientation="vertical"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
 
-            <com.noque.svampeatlas.View.Views.SearchBarView
+            <com.noque.svampeatlas.views.SearchBarView
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:id="@+id/mushroomFragment_searchBarView"
@@ -80,10 +69,18 @@ android:orientation="vertical"
                 app:layout_constraintTop_toTopOf="parent"
                 android:layout_marginEnd="0dp"
                 app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="8dp"/>
+                android:layout_marginStart="8dp">
+
+            </com.noque.svampeatlas.views.SearchBarView>
+
+            <com.noque.svampeatlas.views.BackgroundView
+                android:id="@+id/mushroomFragment_backgroundView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/gradient_background"/>
 
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 

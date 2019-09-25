@@ -4,25 +4,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:clipChildren="false"
     android:theme="@style/Light">
 
-    <com.noque.svampeatlas.View.Views.ProfileImageView
+    <com.noque.svampeatlas.views.ProfileImageView
         android:id="@+id/userView_profileImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toTopOf="@id/userView_primaryTextView"
         app:layout_constraintDimensionRatio="1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@drawable/circle_view"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
         android:id="@+id/userView_primaryTextView"
         style="@style/AppTitle"
+        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"

@@ -7,4 +7,8 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="searchbar_view_height">50dp</dimen>
     <dimen name="searchbar_top_margin">8dp</dimen>
+    <dimen name="item_mushroom_top_margin">8dp</dimen>
+    <dimen name="item_mushroom_bottom_margin">8dp</dimen>
+    <dimen name="secondary_color_rounded">8dp</dimen>
+    <dimen name="app_elevation">10dp</dimen>
 </resources>

@@ -8,7 +8,7 @@
         android:clickable="true"
         android:focusable="true">
 
-    <com.noque.svampeatlas.View.Views.MushroomView
+    <com.noque.svampeatlas.views.MushroomView
             android:foreground="?android:attr/selectableItemBackground"
             android:id="@+id/item_mushroom_mushroomView"
             android:layout_width="match_parent"
@@ -18,13 +18,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="@dimen/item_mushroom_top_margin"
+            android:layout_marginBottom="@dimen/item_mushroom_bottom_margin"
             app:layout_constraintBottom_toBottomOf="parent"
             >
 
 
-    </com.noque.svampeatlas.View.Views.MushroomView>
+    </com.noque.svampeatlas.views.MushroomView>
 
 
     <!--<ImageView-->

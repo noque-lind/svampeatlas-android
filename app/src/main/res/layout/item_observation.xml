@@ -6,7 +6,7 @@
     android:focusable="true"
     android:layout_height="wrap_content">
 
-    <com.noque.svampeatlas.View.Views.ObservationView
+    <com.noque.svampeatlas.views.ObservationView
         android:foreground="?android:attr/selectableItemBackground"
         android:id="@+id/observationItem_observationView"
         android:layout_width="match_parent"

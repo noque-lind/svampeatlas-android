@@ -6,18 +6,36 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <EditText
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@id/searchBar_button"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:id="@+id/searchBar_editText"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:hint="@string/searchBarView_hint"
+            android:id="@+id/searchBarView_textInputLayout"
+            android:visibility="gone"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/searchBarView_button"
+            app:layout_constraintTop_toTopOf="parent"
+            app:endIconMode="clear_text"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/searchBarView_editText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="text"
+                    style="@style/AppPrimaryHighlighted"
+                    android:textColor="@color/colorWhite"
+                    android:textColorHint="@color/colorWhite_dimmed"
+                    android:paddingStart="@dimen/searchbar_view_height"
+                    android:maxLines="1"
+                    android:imeOptions="actionSearch"
+                    android:autoText="false"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <Button
-                android:id="@+id/searchBar_button"
+                android:id="@+id/searchBarView_button"
                 android:text="Button"
                 android:layout_width="0dp"
                 android:layout_height="0dp"

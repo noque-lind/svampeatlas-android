@@ -6,7 +6,7 @@
     android:layout_height="wrap_content">
 
 
-    <com.noque.svampeatlas.View.Views.ProfileImageView
+    <com.noque.svampeatlas.views.ProfileImageView
         android:id="@+id/commentItem_profileImageView"
         android:layout_width="45dp"
         android:layout_height="45dp"

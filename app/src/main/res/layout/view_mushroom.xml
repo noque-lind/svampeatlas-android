@@ -23,8 +23,8 @@ android:theme="@style/Dark">
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
-            android:layout_marginStart="6dp"
-            android:layout_marginEnd="6dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -37,30 +37,24 @@ android:theme="@style/Dark">
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+            android:layout_marginBottom="2dp"
                 style="@style/AppPrimaryHighlighted"
                 />
 
-        <Space
-                android:layout_width="match_parent"
-                android:layout_height="2dp"/>
-        
         <TextView
                 android:id="@+id/mushroomView_secondaryLabel"
                 android:layout_width="match_parent"
                 style="@style/AppPrimary"
+            android:layout_marginBottom="20dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"/>
 
-        <Space
-                android:layout_width="match_parent"
-                android:layout_height="20dp"/>
-
-        <com.noque.svampeatlas.View.Views.InformationView
+        <com.noque.svampeatlas.views.InformationView
                 android:id="@+id/mushroomView_informationView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:theme="@style/AppPrimary">
-        </com.noque.svampeatlas.View.Views.InformationView>
+        </com.noque.svampeatlas.views.InformationView>
 
     </LinearLayout>
 

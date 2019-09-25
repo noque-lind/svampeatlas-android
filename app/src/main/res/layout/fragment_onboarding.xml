@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".View.Fragments.OnboardingFragment">
+    tools:context=".fragments.OnboardingFragment">
 
-    <com.noque.svampeatlas.View.Views.SpinnerView
+    <com.noque.svampeatlas.views.SpinnerView
         android:id="@+id/onboardingFragment_spinnerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

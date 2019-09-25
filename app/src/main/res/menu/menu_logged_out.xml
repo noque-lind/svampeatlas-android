@@ -10,6 +10,8 @@
             android:title="@string/menu_log_in"/>
 
         <item
+            android:id="@+id/sectionDisabled"
+            android:enabled="false"
             android:checkable="false"
             android:title=""/>
 
@@ -24,9 +26,24 @@
             android:title="@string/menu_mushrooms"/>
 
         <item
-            android:id="@+id/menu_recognize"
-            android:enabled="false"
+            android:id="@+id/cameraFragment"
             android:icon="@drawable/icon_camera"
             android:title="@string/menu_recognize"/>
+
+        <item
+            android:id="@+id/sectionDisabled2"
+            android:enabled="false"
+            android:checkable="false"
+            android:title=""/>
+
+        <item
+            android:title="@string/aboutFragment"
+            android:id="@+id/aboutFragment"
+            android:icon="@drawable/icon_about"/>
+
+        <item
+            android:title="Facebook"
+            android:id="@+id/facebook"
+            android:icon="@drawable/icon_fb"/>
     </group>
 </menu>
