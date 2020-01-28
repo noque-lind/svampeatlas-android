@@ -12,11 +12,11 @@ import com.noque.svampeatlas.utilities.GlideApp
 
 
 fun ImageView.downloadImage(size: DataService.ImageSize,
-                            url: String, useThumbnail: Boolean = true, roundedCorners: Int? = null, circular: Boolean = false) {
-    val circularProgressDrawable = CircularProgressDrawable(context)
-    circularProgressDrawable.strokeWidth = 5F
-    circularProgressDrawable.centerRadius = 30F
-    circularProgressDrawable.start()
+                            url: String, useThumbnail: Boolean = true) {
+//    val circularProgressDrawable = CircularProgressDrawable(context)
+//    circularProgressDrawable.strokeWidth = 5F
+//    circularProgressDrawable.centerRadius = 30F
+//    circularProgressDrawable.start()
 
 
     if (size == DataService.ImageSize.FULL) {
@@ -35,24 +35,7 @@ fun ImageView.downloadImage(size: DataService.ImageSize,
                 .into(this)
         }
     } else {
-
-        val options: RequestOptions
-
-        if (circular) {
-            options = RequestOptions().circleCrop()
-            .placeholder(circularProgressDrawable)
-        } else if (roundedCorners != null) {
-            options = RequestOptions().centerCrop().dontTransform()
-            .placeholder(circularProgressDrawable)
-                .transform(CenterCrop(), RoundedCorners(roundedCorners))
-        } else {
-            options = RequestOptions().centerCrop().dontTransform()
-                .placeholder(circularProgressDrawable)
-        }
-
-
         GlideApp.with(context)
-            .applyDefaultRequestOptions(options)
             .load("${size.value}$url")
             .into(this)
     }

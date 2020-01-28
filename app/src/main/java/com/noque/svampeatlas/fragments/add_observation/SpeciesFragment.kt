@@ -16,10 +16,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.adapters.add_observation.SpeciesAdapter
 import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.R
-import com.noque.svampeatlas.views.BackgroundView
 import com.noque.svampeatlas.fragments.AddObservationFragmentDirections
 import com.noque.svampeatlas.fragments.DetailsFragment
 import com.noque.svampeatlas.models.Mushroom
+import com.noque.svampeatlas.models.PredictionResult
 import com.noque.svampeatlas.views.SearchBarListener
 import com.noque.svampeatlas.views.SearchBarView
 import com.noque.svampeatlas.view_models.MushroomsViewModel
@@ -35,19 +35,18 @@ class SpeciesFragment : Fragment() {
 
     // Objects
 
-    private var defaultState: Boolean = false
+    private var defaultState: Boolean = true
 
     // Views
     private var recyclerView: RecyclerView? = null
     private var searchBar: SearchBarView? = null
-    private var backgroundView: BackgroundView? = null
 
     // View models
     private val mushroomViewModel by lazy {
         ViewModelProviders.of(
             this,
             MushroomsViewModelFactory(
-                null,
+                MushroomsViewModel.Category.FAVORITES,
                 requireActivity().application
             )
         ).get(MushroomsViewModel::class.java)
@@ -131,14 +130,11 @@ class SpeciesFragment : Fragment() {
         initViews()
         setupView()
         setupViewModels()
-
-        defaultState()
     }
 
     private fun initViews() {
         recyclerView = addObservationSpecieFragment_recyclerView
         searchBar = addObservationSpecieFragment_searchBarView
-        backgroundView = addObservationSpecieFragment_backgroundView
     }
 
     private fun setupView() {
@@ -150,10 +146,6 @@ class SpeciesFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             adapter = speciesAdapter
             addOnScrollListener(onScrollListener)
-
-            val dividerItemDecoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
-            dividerItemDecoration.setDrawable(ColorDrawable(resources.getColor(R.color.colorPrimary)))
-            addItemDecoration(dividerItemDecoration)
         }
     }
 
@@ -163,7 +155,6 @@ class SpeciesFragment : Fragment() {
             if (it != null) {
                 recyclerView?.setPadding(0, 0, 0, 0)
                 searchBar?.visibility = View.GONE
-                searchBar?.resetText()
                 speciesAdapter.configureUpperSection(
                     State.Items(
                         listOf(
@@ -174,16 +165,14 @@ class SpeciesFragment : Fragment() {
                         )
                     ),
                     if (it.first.isGenus) getString(R.string.speciesFragment_section_choosen_genus) else getString(
-                        R.string.speciesFragment_section_choosen_species
-                    )
+                        R.string.speciesFragment_section_choosen_species)
                 )
-
-                speciesAdapter.configureMiddleSectionState(State.Empty(), null)
             } else {
                 recyclerView?.setPadding(0, (resources.getDimension(R.dimen.searchbar_view_height) + resources.getDimension(
                         R.dimen.searchbar_top_margin
                     )).toInt(), 0, 0)
                 searchBar?.visibility = View.VISIBLE
+                searchBar?.expand()
                 speciesAdapter.configureUpperSection(
                     State.Items(
                         listOf(
@@ -192,16 +181,15 @@ class SpeciesFragment : Fragment() {
                     ),
                     null
                 )
-
-                defaultState()
             }
+
+            recyclerView?.scrollToPosition(0)
         })
 
 
         newObservationViewModel.predictionResultsState.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is State.Items -> {
-                    val items =
                     speciesAdapter.configureSuggestionsSection(State.Items(it.items.map { SpeciesAdapter.Item.SelectableMushroom(it.mushroom, it.score) }), getString(R.string.speciesFragment_section_suggestions))
                 }
 
@@ -212,6 +200,10 @@ class SpeciesFragment : Fragment() {
                 is State.Loading -> {
                     speciesAdapter.configureSuggestionsSection(State.Loading(), getString(R.string.speciesFragment_section_suggestions))
                 }
+
+                is State.Empty -> {
+                    speciesAdapter.configureSuggestionsSection(State.Empty(), null)
+                }
             }
             })
 
@@ -219,40 +211,41 @@ class SpeciesFragment : Fragment() {
         mushroomViewModel.mushroomsState.observe(viewLifecycleOwner, Observer {
 
             // We only want the mushroomState to to anything to the UI if no mushroom has been selected
-            if (newObservationViewModel.mushroom.value == null) {
-                backgroundView?.reset()
-
                 when (it) {
                     is State.Items -> {
-
                       val items = it.items.map { SpeciesAdapter.Item.SelectableMushroom(it) }
 
                         if (defaultState) {
                             speciesAdapter.configureMiddleSectionState(State.Items(items), getString(R.string.speciesFragment_section_favorites))
                         } else {
-                            speciesAdapter.configureMiddleSectionState(State.Items(items), null)
+                            speciesAdapter.configureMiddleSectionState(State.Items(items), getString(R.string.speciesFragment_section_search_results))
                         }
                     }
 
                     is State.Loading -> {
-                        speciesAdapter.configureMiddleSectionState(State.Loading(), null)
+                        if (defaultState) {
+                            speciesAdapter.configureMiddleSectionState(State.Loading(), getString(R.string.speciesFragment_section_favorites))
+                        } else {
+                            speciesAdapter.configureMiddleSectionState(State.Loading(), getString(R.string.speciesFragment_section_search_results))
+                        }
                     }
 
                     is State.Error -> {
-                        speciesAdapter.configureMiddleSectionState(State.Empty(), null)
-                        backgroundView?.setError(it.error)
+                        if (defaultState) {
+                            speciesAdapter.configureMiddleSectionState(State.Empty(), null)
+                        } else {
+                            speciesAdapter.configureMiddleSectionState(State.Error(it.error), getString(R.string.speciesFragment_section_search_results))
+                        }
                     }
 
                     is State.Empty -> {
                         defaultState()
                     }
                 }
-            }
         })
     }
 
     private fun defaultState() {
-        backgroundView?.reset()
         defaultState = true
         mushroomViewModel.selectCategory(MushroomsViewModel.Category.FAVORITES, true)
     }

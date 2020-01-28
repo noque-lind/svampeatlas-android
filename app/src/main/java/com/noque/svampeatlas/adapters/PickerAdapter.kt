@@ -96,7 +96,9 @@ open class PickerAdapter<T>() : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
         return viewHolder
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {}
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        holder.itemView.isSelected = selectedPositions.contains(position)
+    }
 }
 
 

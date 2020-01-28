@@ -11,10 +11,9 @@ class SharedPreferencesHelper(context: Context) {
         private val LOCKED_SUBSTRATE_ID = "LOCKED_SUBSTRATE_ID"
         private val LOCKED_VEGETATIONTYPE_ID = "LOCKED_VEGETATIONTYPE_ID"
         private val LOCKED_HOSTS = "LOCKED_HOSTS"
+        private val HAS_ACCEPTED_IDENTIFCATION_TERMS = "HAS_ACCEPTED_IDENTIFCATION_TERMS"
     }
 
-
-    private val PREF_API_KEY = "Api key"
     private val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
 
     fun saveToken(token: String) {
@@ -65,5 +64,13 @@ class SharedPreferencesHelper(context: Context) {
     fun getHosts(): List<Int>? {
         val ids = prefs.getStringSet(LOCKED_HOSTS, null)
         return if (ids != null) ids.mapNotNull { it.toInt() } else null
+    }
+
+    fun hasAcceptedIdentificationTerms(): Boolean {
+        return prefs.getBoolean(HAS_ACCEPTED_IDENTIFCATION_TERMS, false)
+    }
+
+    fun setHasAcceptedIdentificationTerms(value: Boolean) {
+        prefs.edit().putBoolean(HAS_ACCEPTED_IDENTIFCATION_TERMS, value).apply()
     }
 }

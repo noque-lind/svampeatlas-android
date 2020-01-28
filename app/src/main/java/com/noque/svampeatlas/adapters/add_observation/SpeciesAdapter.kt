@@ -180,6 +180,10 @@ class SpeciesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     }
                 }
             }
+
+            is ErrorViewHolder -> {
+                sections.getError(position)?.let { holder.configure(it) }
+            }
         }
     }
 }

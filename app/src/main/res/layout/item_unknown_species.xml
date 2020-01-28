@@ -10,7 +10,8 @@
     <com.noque.svampeatlas.views.ResultView
         android:id="@+id/unknownSpeciesItem_resultView"
         android:clickable="false"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-
 </LinearLayout>

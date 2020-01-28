@@ -12,10 +12,11 @@
     tools:context=".fragments.LoginFragment">
 
     <ImageView
+        android:alpha="0.4"
+        android:id="@+id/loginFragment_bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitXY"
-        android:src="@drawable/login_fragment_bg" />
+        android:scaleType="center"/>
 
     <LinearLayout
         android:id="@+id/linearLayout2"
@@ -97,6 +98,15 @@
             android:text="@string/loginFragment_loginButton"
             android:textAppearance="@style/AppTitle" />
 
+        <Button
+            android:id="@+id/loginFragment_createAccountButton"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="match_parent"
+            android:textAppearance="@style/AppPrimary"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/loginFragment_createAccountButton" />
+
     </LinearLayout>
 
 
@@ -138,7 +148,7 @@
     <com.noque.svampeatlas.views.BackgroundView
         android:id="@+id/loginFragment_backgroundView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></com.noque.svampeatlas.views.BackgroundView>
+        android:layout_height="match_parent"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

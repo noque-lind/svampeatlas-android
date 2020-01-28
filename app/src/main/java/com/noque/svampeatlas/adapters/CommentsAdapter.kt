@@ -11,6 +11,11 @@ import com.noque.svampeatlas.view_holders.CommentViewHolder
 
 class CommentsAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    interface Listener {
+        fun sendComment(comment: String)
+    }
+
+
     enum class ViewType {
         COMMENT,
         ADDCOMMENT;
@@ -29,25 +34,32 @@ class CommentsAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var canComment: Boolean = false
     private var comments = mutableListOf<Comment>()
 
-    var sendCommentClicked: ((String) -> Unit)? = null
+    private var listener: Listener? = null
 
     private val sendCommentButtonClicked = View.OnClickListener {
         (it.tag as? AddCommentViewHolder)?.let {
             it.getComment()?.let {
-                sendCommentClicked?.invoke(it)
+                listener?.sendComment(it)
             }
         }
     }
 
-    fun configure(comments: List<Comment>, canComment: Boolean) {
-        this.canComment = canComment
-        this.comments = comments.toMutableList()
-        notifyDataSetChanged()
+    fun setListener(listener: Listener) {
+        this.listener = listener
+    }
+
+    fun configure(comments: List<Comment>?, canComment: Boolean) {
+        if (this.comments != comments || this.comments.isEmpty()) {
+            this.canComment = canComment
+            comments?.let { this.comments = it.toMutableList() }
+            notifyDataSetChanged()
+        }
     }
 
     fun addComment(comment: Comment) {
         this.comments.add(comment)
         notifyItemInserted(comments.lastIndex)
+        notifyItemChanged(comments.lastIndex + 1)
     }
 
     override fun getItemViewType(position: Int): Int {

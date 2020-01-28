@@ -23,8 +23,6 @@ class MyPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         fun logoutButtonSelected()
     }
 
-
-
     sealed class Item(viewType: ViewType) : com.noque.svampeatlas.models.Item<Item.ViewType>(viewType) {
 
         enum class ViewType : com.noque.svampeatlas.models.ViewType {
@@ -57,8 +55,8 @@ class MyPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var listener: Listener? = null
 
-    private var notifications = Section<Item>("Notifikationer")
-    private var observations = Section<Item>("Observationer")
+    private var notifications = Section<Item>(null)
+    private var observations = Section<Item>(null)
 
 
     private val onClickListener = View.OnClickListener { view ->
@@ -102,13 +100,13 @@ class MyPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     fun configureNotificationsState(state: State<List<Item>>, title: String? = null) {
-        if (title != null) this.notifications.setTitle(title)
+        this.notifications.setTitle(title)
         this.notifications.setState(state)
         notifyDataSetChanged()
     }
 
     fun configureObservationsState(state: State<List<Item>>, title: String? = null) {
-        if (title != null) this.notifications.setTitle(title)
+        this.observations.setTitle(title)
         this.observations.setState(state)
         notifyDataSetChanged()
     }
@@ -172,7 +170,7 @@ class MyPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         when (holder) {
             is HeaderViewHolder -> { sections.getTitle(position)?.let { holder.configure(it) } }
             is ObservationViewHolder -> { when (val item = sections.getItem(position)) {
-                is Item.Observation -> { holder.configure(item.observation) }
+                is Item.Observation -> { holder.configure(item.observation, true) }
             } }
 
             is NotificationViewHolder -> {when (val item = sections.getItem(position)) {
@@ -180,6 +178,8 @@ class MyPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             }}
 
             is ErrorViewHolder -> { sections.getError(position)?.let { holder.configure(it) } }
+
+            is ReloaderViewHolder -> { holder.configure(ReloaderViewHolder.Type.LOAD) }
         }
     }
 }

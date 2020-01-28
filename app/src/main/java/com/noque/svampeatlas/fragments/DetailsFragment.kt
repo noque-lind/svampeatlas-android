@@ -8,11 +8,11 @@ import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import android.util.Log
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -33,25 +33,18 @@ import com.noque.svampeatlas.BuildConfig
 import com.noque.svampeatlas.extensions.italized
 import com.noque.svampeatlas.extensions.toReadableDate
 import com.noque.svampeatlas.extensions.upperCased
-import com.noque.svampeatlas.models.Image
-import com.noque.svampeatlas.models.Mushroom
-import com.noque.svampeatlas.models.Observation
 import kotlinx.android.synthetic.main.fragment_details.*
 import com.noque.svampeatlas.R
+import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.services.LocationService
 import com.noque.svampeatlas.utilities.Geometry
-import com.noque.svampeatlas.views.DescriptionView
-import com.noque.svampeatlas.models.State
-import com.noque.svampeatlas.views.BackgroundView
-import com.noque.svampeatlas.views.BlankActivity
-import com.noque.svampeatlas.views.TitlesView
-import com.noque.svampeatlas.views.ImagesView
-import com.noque.svampeatlas.views.InformationView
 import com.noque.svampeatlas.view_models.*
 import com.noque.svampeatlas.view_models.factories.ObservationsViewModelFactory
 import com.noque.svampeatlas.view_models.factories.SpeciesViewModelFactory
+import com.noque.svampeatlas.views.*
 import java.io.File
 import java.util.*
+import kotlin.math.abs
 
 
 class DetailsFragment : Fragment() {
@@ -62,7 +55,7 @@ class DetailsFragment : Fragment() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        locationService?.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        locationService.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     companion object {
@@ -78,15 +71,58 @@ class DetailsFragment : Fragment() {
 
     enum class Type {
         SPECIES,
-        OBSERVATION
+        OBSERVATION,
+        OBSERVATIONWITHSPECIES
     }
 
     // Objects
+    private var title: CharSequence = ""
     private var hasExpanded = false
 
     private val args: DetailsFragmentArgs by navArgs()
 
-    private var locationService: LocationService? = null
+    private val locationService by lazy {
+        val service = LocationService(requireContext().applicationContext)
+        service.setListener(object : LocationService.Listener {
+
+            override fun requestPermission(permissions: Array<out String>, requestCode: Int) {
+                mapFragment?.setError(LocationService.Error.PermissionDenied(requireContext()), getString(R.string.util_givePermission)) {
+                    requestPermissions(permissions, requestCode)
+                }
+            }
+
+            override fun locationRetrievalError(error: LocationService.Error) {
+                mapFragment?.setError(error,
+                    resources.getString(R.string.locationservice_error_permissions_handler)
+                ) {
+                    val intent = Intent()
+                    intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                    val uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
+                    intent.data = uri
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    startActivity(intent)
+                }
+            }
+
+            override fun locationRetrieved(location: Location) {
+                val geometry = Geometry(
+                    LatLng(location.latitude, location.longitude),
+                    35000,
+                    Geometry.Type.RECTANGLE
+                )
+
+                when (args.type) {
+                    Type.SPECIES -> {
+                        speciesViewModel.getHeatMapObservations(geometry)
+                        mapFragment?.setRegion(geometry.coordinate, geometry.radius)
+                    }
+                    else -> {}
+                }
+            }
+    })
+
+        service
+    }
 
     // Views
 
@@ -101,6 +137,8 @@ class DetailsFragment : Fragment() {
     private var informationView: InformationView? = null
     private var mapFragmentHeader: TextView? = null
     private var mapFragment: MapFragment? = null
+    private var mushroomViewHeaderTextView: TextView? = null
+    private var mushroomView: MushroomView? = null
     private var recyclerViewHeader: TextView? = null
     private var recyclerView: RecyclerView? = null
     private var takesSelectionButton: Button? = null
@@ -108,11 +146,17 @@ class DetailsFragment : Fragment() {
 
     // View models
     private val speciesViewModel by lazy {
-        ViewModelProviders.of(this, SpeciesViewModelFactory(args.id, requireActivity().application)).get(SpeciesViewModel::class.java)
+        ViewModelProviders.of(this, SpeciesViewModelFactory(args.id, requireActivity().application))
+            .get(SpeciesViewModel::class.java)
     }
 
     private val observationViewModel by lazy {
-        ViewModelProviders.of(this, ObservationsViewModelFactory(args.id, requireActivity().application)).get(ObservationViewModel::class.java)
+        ViewModelProviders.of(
+            this, ObservationsViewModelFactory(
+                args.id,
+                args.type == Type.OBSERVATIONWITHSPECIES, requireActivity().application
+            )
+        ).get(ObservationViewModel::class.java)
     }
 
     private val sessionViewModel by lazy {
@@ -127,11 +171,26 @@ class DetailsFragment : Fragment() {
     private val commentsAdapter: CommentsAdapter by lazy {
         val adapter = CommentsAdapter()
 
-        adapter.sendCommentClicked = { comment ->
-            sessionViewModel.uploadComment(observationViewModel.id, comment)
-        }
-
+        adapter.setListener(object: CommentsAdapter.Listener {
+            override fun sendComment(comment: String) {
+                sessionViewModel.uploadComment(observationViewModel.id, comment)
+            }
+        })
         adapter
+    }
+
+    private val mushroomViewListener by lazy {
+        object : MushroomView.Listener {
+            override fun onClicked(mushroom: Mushroom) {
+                val action = DetailsFragmentDirections.actionGlobalMushroomDetailsFragment(
+                    mushroom.id,
+                    TakesSelection.NO, Type.SPECIES,
+                    null,
+                    null
+                )
+                findNavController().navigate(action)
+            }
+        }
     }
 
     private val observationsAdapter by lazy {
@@ -154,88 +213,73 @@ class DetailsFragment : Fragment() {
 
 
     // Listeners
-    private var locationServiceListener = object : LocationService.Listener {
-        override fun requestPermission(permissions: Array<out String>, requestCode: Int) {
-            requestPermissions(permissions, requestCode)
-        }
 
-        override fun locationRetrievalError(error: LocationService.Error) {
-            mapFragment?.setError(
-                error,
-                resources.getString(R.string.locationservice_error_permissions_handler)
-            ) {
-                val intent = Intent()
-                intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                val uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
-                intent.data = uri
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
-            }
-        }
-
-        override fun locationRetrieved(location: Location) {
-            val geometry = Geometry(
-                LatLng(location.latitude, location.longitude),
-                35000.0,
-                Geometry.Type.RECTANGLE
-            )
-
-            when (args.type) {
-                Type.SPECIES -> {
-                    speciesViewModel.getHeatMapObservations(geometry)
-                    mapFragment?.setRegion(geometry.coordinate, geometry.radius)
+    private val appBarLayoutOnOffsetChangedListener by lazy {
+        AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+            if (!hasExpanded) {
+                if (verticalOffset == 0)  {
+                    hasExpanded = true
+                    collapsibleToolBarLayout?.title = title
                 }
-                Type.OBSERVATION -> {
+            } else {
+                if (abs(verticalOffset) < appBarLayout.getTotalScrollRange() && imagesView?.visibility == View.GONE) {
+                    imagesView?.visibility = View.VISIBLE
                 }
             }
-
-            locationService?.setListener(null)
-            locationService = null
         }
     }
 
-    private val mapFragmentOnClick = View.OnClickListener {
-        when (args.type) {
-            Type.SPECIES -> {
-            }
-            Type.OBSERVATION -> {
-                (observationViewModel.observationState.value as? State.Items)?.items?.let {
-                    val action =
-                        DetailsFragmentDirections.actionMushroomDetailsFragmentToObservationLocationFragment(
-                            it.coordinate.latitude.toFloat(),
-                            it.coordinate.longitude.toFloat()
-                        )
-                    findNavController().navigate(action)
+    private val mapFragmentListener by lazy {
+        object : MapFragment.Listener {
+            override fun observationSelected(observation: Observation) {}
+            override fun localitySelected(locality: Locality) {}
+
+            override fun onClick() {
+                when (args.type) {
+                    Type.SPECIES -> {
+                    }
+                    Type.OBSERVATION, Type.OBSERVATIONWITHSPECIES -> {
+                        (observationViewModel.observationState.value as? State.Items)?.items?.let {
+                            val action =
+                                DetailsFragmentDirections.actionMushroomDetailsFragmentToObservationLocationFragment(
+                                    it.coordinate.latitude.toFloat(),
+                                    it.coordinate.longitude.toFloat()
+                                )
+                            findNavController().navigate(action)
+                        }
+                    }
                 }
             }
+
         }
     }
 
     private val takesSelectionButtonPressed = View.OnClickListener {
         when (args.takesSelection) {
             TakesSelection.SELECT -> {
-                    if (args.type == Type.SPECIES) {
-                        newObservationViewModel.setMushroom((speciesViewModel.mushroomState.value as? State.Items)?.items)
-                        args.predictionResults?.let { newObservationViewModel.setDeterminationNotes(it) }
-                        args.imageFilePath?.let { newObservationViewModel.appendImage(File(it)) }
+                if (args.type == Type.SPECIES) {
+                    newObservationViewModel.setMushroom((speciesViewModel.mushroomState.value as? State.Items)?.items)
 
-                        val action = DetailsFragmentDirections.actionMushroomDetailsFragmentToAddObservationFragment()
-                        findNavController().navigate(action)
+                    if (args.predictionResults != null && args.imageFilePath != null) {
+                        newObservationViewModel.setDeterminationNotes(args.predictionResults)
+                        speciesViewModel.saveObservationImage(File(args.imageFilePath))
+                    } else {
+                        findNavController().navigateUp()
                     }
+                }
             }
 
             TakesSelection.DESELECT -> {
-                    newObservationViewModel.setMushroom(null)
-                    findNavController().navigateUp()
+                newObservationViewModel.setMushroom(null)
+                findNavController().navigateUp()
             }
-            TakesSelection.NO -> {}
+            TakesSelection.NO -> {
+            }
         }
     }
 
     private val imagesViewOnClick = { index: Int ->
-        Log.d(TAG, "WHAAAT")
-
-        var images = mutableListOf<Image>()
+        val images = mutableListOf<Image>()
 
         when (args.type) {
             Type.SPECIES -> {
@@ -243,7 +287,7 @@ class DetailsFragment : Fragment() {
                     images.addAll(it)
                 }
             }
-            Type.OBSERVATION -> {
+            Type.OBSERVATION, Type.OBSERVATIONWITHSPECIES -> {
                 (observationViewModel.observationState.value as? State.Items)?.items?.images?.let {
                     images.addAll(it)
                 }
@@ -271,14 +315,44 @@ class DetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (args.type == Type.OBSERVATION || args.type == Type.OBSERVATIONWITHSPECIES) setHasOptionsMenu(true)
         initViews()
         setupViews()
         setupViewModels()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.details_fragment_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_detailsFragment_report -> {
+                reportOffensiveContent()
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun reportOffensiveContent() {
+        val dialog = ReportFragment(args.id)
+        dialog.show(childFragmentManager, null)
+    }
+
     override fun onStart() {
         super.onStart()
         fetchLocationIfNeeded()
+    }
+
+    override fun onResume() {
+        requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        super.onResume()
+    }
+
+    override fun onStop() {
+        requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+        super.onStop()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -299,6 +373,8 @@ class DetailsFragment : Fragment() {
         mapFragmentHeader = detailsFragment_mapFragmentHeader
         mapFragment =
             childFragmentManager.findFragmentById(R.id.detailsFragment_mapFragment) as MapFragment
+        mushroomViewHeaderTextView = detailsFragment_mushroomViewHeader
+        mushroomView = detailsFragment_mushroomView
         recyclerViewHeader = detailsFragment_recyclerViewHeader
         recyclerView = detailsFragment_recyclerView
         takesSelectionButton = detailsFragment_takesSelectionButton
@@ -319,39 +395,41 @@ class DetailsFragment : Fragment() {
         )
 
         appBarLayout?.setExpanded(false, false)
-
-
-
+        imagesView?.visibility = View.GONE
         imagesView?.setOnClickedAtIndex(imagesViewOnClick)
-        mapFragment?.setOnClickListener(mapFragmentOnClick)
+        mapFragment?.setListener(mapFragmentListener, true)
         nestedScrollView?.visibility = View.GONE
 
-
-        when (args.takesSelection) {
-            TakesSelection.SELECT -> {
-                takesSelectionButton?.setOnClickListener(takesSelectionButtonPressed)
-                takesSelectionButton?.setBackgroundColor(
-                    ContextCompat.getColor(
-                        context!!,
-                        R.color.colorGreen
+        if (sessionViewModel.isLoggedIn) {
+            when (args.takesSelection) {
+                TakesSelection.SELECT -> {
+                    takesSelectionButton?.setOnClickListener(takesSelectionButtonPressed)
+                    takesSelectionButton?.setBackgroundColor(
+                        ContextCompat.getColor(
+                            context!!,
+                            R.color.colorGreen
+                        )
                     )
-                )
-            }
+                }
 
-            TakesSelection.DESELECT -> {
-                takesSelectionButton?.setOnClickListener(takesSelectionButtonPressed)
-                takesSelectionButton?.setBackgroundColor(
-                    ContextCompat.getColor(
-                        context!!,
-                        R.color.colorRed
+                TakesSelection.DESELECT -> {
+                    takesSelectionButton?.setOnClickListener(takesSelectionButtonPressed)
+                    takesSelectionButton?.setBackgroundColor(
+                        ContextCompat.getColor(
+                            context!!,
+                            R.color.colorRed
+                        )
                     )
-                )
-            }
+                }
 
-            TakesSelection.NO -> {
-                takesSelectionButton?.visibility = View.GONE
+                TakesSelection.NO -> {
+                    takesSelectionButton?.visibility = View.GONE
+                }
             }
+        } else {
+            takesSelectionButton?.visibility = View.GONE
         }
+
 
         when (args.type) {
             Type.OBSERVATION -> {
@@ -359,8 +437,21 @@ class DetailsFragment : Fragment() {
                     adapter = commentsAdapter
                     layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
                 }
+            }
+
+            Type.OBSERVATIONWITHSPECIES -> {
+                mushroomViewHeaderTextView?.visibility = View.VISIBLE
+                mushroomView?.setListener(mushroomViewListener)
+                mushroomView?.round(true)
+                mushroomView?.visibility = View.VISIBLE
+
+                recyclerView?.apply {
+                    adapter = commentsAdapter
+                    layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+                }
 
             }
+
             Type.SPECIES -> {
                 recyclerView?.apply {
                     adapter = observationsAdapter
@@ -376,11 +467,10 @@ class DetailsFragment : Fragment() {
             when (it) {
                 is State.Items -> {
                     commentsAdapter.addComment(it.items)
+                    observationViewModel.addComment(it.items)
                 }
 
-                is State.Error -> {
-
-                }
+                is State.Error -> {}
 
                 is State.Loading -> {
                     backgroundView?.setLoading()
@@ -432,9 +522,26 @@ class DetailsFragment : Fragment() {
                         }
                     }
                 })
+
+                speciesViewModel.observationImageSaveState.observe(viewLifecycleOwner, Observer {
+                    backgroundView?.reset()
+
+                    when (it) {
+                        is State.Loading -> { backgroundView?.setLoading() }
+                        is State.Items -> {
+                            newObservationViewModel.appendImage(it.items)
+                            val action =
+                                DetailsFragmentDirections.actionMushroomDetailsFragmentToAddObservationFragment()
+                            action.type = AddObservationFragment.Type.IDENTIFYEDOBSERVATION
+                            findNavController().navigate(action)
+                        }
+
+                        is State.Error -> { }
+                    }
+                })
             }
 
-            Type.OBSERVATION -> {
+            Type.OBSERVATION, Type.OBSERVATIONWITHSPECIES -> {
                 observationViewModel.observationState.observe(viewLifecycleOwner, Observer {
                     backgroundView?.reset()
 
@@ -453,6 +560,14 @@ class DetailsFragment : Fragment() {
                         }
                     }
                 })
+
+                observationViewModel.mushroomState.observe(viewLifecycleOwner, Observer {
+                    when (it) {
+                        is State.Items -> {
+                            mushroomView?.configure(it.items)
+                        }
+                    }
+                })
             }
         }
     }
@@ -461,30 +576,14 @@ class DetailsFragment : Fragment() {
         nestedScrollView?.visibility = View.VISIBLE
     }
 
+
     private fun configureView(observation: Observation) {
         prepareViewsForContent()
         fetchLocationIfNeeded()
-
-        if (observation.images.isNotEmpty()) {
-            nestedScrollView?.isNestedScrollingEnabled = true
-            imagesView?.configure(observation.images)
-            if (!hasExpanded) {
-                appBarLayout?.setExpanded(true, true)
-                hasExpanded = true
-                appBarLayout?.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { _, i ->
-                    if (i == 0) collapsibleToolBarLayout?.title = observation.speciesProperties.name
-                })
-            } else {
-                collapsibleToolBarLayout?.title = observation.speciesProperties.name
-            }
-
-        }
-
-
-        if (observation.images.count() == 0) imagesView?.visibility = View.GONE
+        configureUpperLayout("Fund af: ${observation.speciesProperties.name.upperCased()}", observation.images)
 
         titlesView?.configure(
-            observation.speciesProperties.name.upperCased(),
+            "Fund af: ${observation.speciesProperties.name.upperCased()}".upperCased(),
             observation.observationBy?.upperCased()
         )
 
@@ -495,60 +594,62 @@ class DetailsFragment : Fragment() {
         addDescriptionView(resources.getString(R.string.detailsFragment_notes), observation.note)
 
 
-        var information = mutableListOf<Pair<String, String>>()
+        val information = mutableListOf<Pair<String, String>>()
         observation.date?.let {
             information.add(
                 Pair(
                     "Fundets dato:",
-                    it.toReadableDate(true, true)
+                    it.toReadableDate(recentFormatting = true, ignoreTime = true)
                 )
             )
         }
-        informationView?.configure(information)
 
-        observation.comments?.let {
-            commentsAdapter.configure(it, sessionViewModel.isLoggedIn)
+        when (observation.validationStatus) {
+            Observation.ValidationStatus.APPROVED -> {
+                information.add(Pair("Status", "Godkendt"))
+            }
+            Observation.ValidationStatus.VERIFYING -> {
+                information.add(Pair("Status", "Valideres"))
+            }
+            Observation.ValidationStatus.REJECTED -> {
+                information.add(Pair("Status", "Afvist"))
+            }
+            Observation.ValidationStatus.UNKNOWN -> {
+                information.add(Pair("Status", "Vides ikke"))
+            }
         }
 
-        mapFragment?.setOnClickListener(mapFragmentOnClick)
+        observation.location?.let {
+            information.add(Pair(getString(R.string.detailsFragment_observationLocation), it))
+        }
+
+        informationView?.configure(information)
+
+        recyclerViewHeader?.text = getString(R.string.detailsFragment_commentsHeader)
+        commentsAdapter.configure(observation.comments, sessionViewModel.isLoggedIn)
         mapFragmentHeader?.setText(R.string.detailsFragment_observationLocation)
         mapFragment?.addLocationMarker(observation.coordinate)
-        mapFragment?.setRegion(observation.coordinate)
+        mapFragment?.setRegion(observation.coordinate, 80000)
     }
 
     @SuppressLint("DefaultLocale")
     private fun configureView(mushroom: Mushroom) {
         prepareViewsForContent()
-
-        if (!mushroom.images.isNullOrEmpty()) {
-            nestedScrollView?.isNestedScrollingEnabled = true
-            imagesView?.configure(mushroom.images)
-
-            if (!hasExpanded) {
-                appBarLayout?.setExpanded(true, true)
-                hasExpanded = true
-                appBarLayout?.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { _, i ->
-                    if (i == 0) collapsibleToolBarLayout?.title =
-                        mushroom.danishName?.upperCased() ?: mushroom.fullName.italized()
-                })
-            } else {
-                collapsibleToolBarLayout?.title =
-                    mushroom.danishName?.upperCased() ?: mushroom.fullName.italized()
-            }
-        } else {
-            collapsibleToolBarLayout?.title =
-                mushroom.danishName?.upperCased() ?: mushroom.fullName.italized()
-        }
-
+        configureUpperLayout(mushroom.danishName?.upperCased() ?: mushroom.fullName.italized(), mushroom.images)
         if (mushroom.isGenus) {
             when (args.takesSelection) {
                 TakesSelection.NO -> {
                 }
                 TakesSelection.SELECT -> {
-                    takesSelectionButton?.setText(R.string.detailsFragment_select_genus)
+                    if (args.imageFilePath != null) {
+                        takesSelectionButton?.setText(R.string.menu_new_observation)
+                    } else {
+                            takesSelectionButton?.setText(R.string.detailsFragment_select_genus)
+                    }
                 }
                 TakesSelection.DESELECT -> {
-                    takesSelectionButton?.setText(R.string.detailsFragment_deselect_genus)
+                        takesSelectionButton?.setText(R.string.detailsFragment_deselect_genus)
+
                 }
             }
         } else {
@@ -556,7 +657,11 @@ class DetailsFragment : Fragment() {
                 TakesSelection.NO -> {
                 }
                 TakesSelection.SELECT -> {
-                    takesSelectionButton?.setText(R.string.detailsFragment_select_species)
+                    if (args.imageFilePath != null) {
+                        takesSelectionButton?.setText(R.string.menu_new_observation)
+                    } else {
+                        takesSelectionButton?.setText(R.string.detailsFragment_select_species)
+                    }
                 }
                 TakesSelection.DESELECT -> {
                     takesSelectionButton?.setText(R.string.detailsFragment_deselect_species)
@@ -573,6 +678,11 @@ class DetailsFragment : Fragment() {
             addDescriptionView(
                 getString(R.string.detailsFragment_diagnosis),
                 mushroom.attributes?.diagnosis?.capitalize()
+            )
+
+            addDescriptionView(
+                getString(R.string.detailsFragment_ecologyNotes),
+                    mushroom.attributes?.ecology?.capitalize()
             )
 
 
@@ -594,7 +704,7 @@ class DetailsFragment : Fragment() {
             )
         }
 
-        var information = mutableListOf<Pair<String, String>>()
+        val information = mutableListOf<Pair<String, String>>()
         mushroom.statistics?.acceptedObservationsCount?.let {
             information.add(
                 Pair(
@@ -607,7 +717,7 @@ class DetailsFragment : Fragment() {
             information.add(
                 Pair(
                     getString(R.string.detailsFragment_latestObservation),
-                    it.toReadableDate(true, true)
+                    it.toReadableDate(recentFormatting = true, ignoreTime = true)
                 )
             )
         }
@@ -615,7 +725,7 @@ class DetailsFragment : Fragment() {
             information.add(
                 Pair(
                     getString(R.string.detailsFragment_lastUpdate),
-                    it.toReadableDate(true, true)
+                    it.toReadableDate(recentFormatting = true, ignoreTime = true)
                 )
             )
         }
@@ -623,6 +733,22 @@ class DetailsFragment : Fragment() {
 
         mapFragmentHeader?.setText(R.string.detailsFragment_heatmap)
         recyclerViewHeader?.text = getString(R.string.detailsFragment_latest_observations)
+    }
+
+    private fun configureUpperLayout(title: CharSequence, images: List<Image>?) {
+        if (images.isNullOrEmpty()) return
+
+        this.title = title
+        nestedScrollView?.isNestedScrollingEnabled = true
+        imagesView?.configure(images)
+        appBarLayout?.addOnOffsetChangedListener(appBarLayoutOnOffsetChangedListener)
+
+        if (!hasExpanded) {
+            imagesView?.visibility = View.VISIBLE
+            appBarLayout?.setExpanded(true, true)
+        } else {
+            collapsibleToolBarLayout?.title = title
+        }
     }
 
     private fun addDescriptionView(title: String?, content: String?) {
@@ -644,13 +770,10 @@ class DetailsFragment : Fragment() {
         when (args.type) {
             Type.SPECIES -> {
                 if (speciesViewModel.heatMapObservationCoordinates.value == null) {
-                    locationService = LocationService(requireActivity().applicationContext)
-                    locationService?.setListener(locationServiceListener)
-                    locationService?.start()
+                    locationService.start()
                 }
             }
-            Type.OBSERVATION -> {
-            }
+            else -> {}
         }
     }
 
@@ -661,23 +784,23 @@ class DetailsFragment : Fragment() {
 
     override fun onDestroyView() {
         recyclerView?.adapter = null
-        locationService?.setListener(null)
-
-       nestedScrollView = null
-         appBarLayout = null
+        nestedScrollView = null
+        appBarLayout = null
         collapsibleToolBarLayout = null
         toolbar = null
         imagesView = null
         titlesView = null
-         descriptionViewLinearLayout = null
-         informationViewHeader= null
-        informationView= null
+        descriptionViewLinearLayout = null
+        informationViewHeader = null
+        informationView = null
         mapFragmentHeader = null
-         mapFragment = null
-         recyclerViewHeader = null
-         recyclerView = null
-        takesSelectionButton= null
-         backgroundView = null
+        mapFragment = null
+        mushroomViewHeaderTextView = null
+        mushroomView = null
+        recyclerViewHeader = null
+        recyclerView = null
+        takesSelectionButton = null
+        backgroundView = null
 
         super.onDestroyView()
     }

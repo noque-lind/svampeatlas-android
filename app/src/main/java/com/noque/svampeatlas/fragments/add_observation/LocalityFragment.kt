@@ -5,11 +5,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
+import android.view.*
 import android.widget.ImageButton
+import android.widget.ImageView
 import androidx.core.view.marginBottom
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -22,6 +20,9 @@ import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.services.LocationService
 import com.noque.svampeatlas.fragments.MapFragment
+import com.noque.svampeatlas.fragments.NearbyFragment
+import com.noque.svampeatlas.models.Locality
+import com.noque.svampeatlas.models.Observation
 import com.noque.svampeatlas.view_models.NewObservationViewModel
 import kotlinx.android.synthetic.main.fragment_add_observation_locality.*
 
@@ -35,6 +36,7 @@ class LocalityFragment: Fragment() {
     private var mapFragment: MapFragment? = null
     private var recyclerView: RecyclerView? = null
     private var retryButton: ImageButton? = null
+    private var markerImageView: ImageView? = null
 
     // View models
     private val newObservationViewModel by lazy {
@@ -58,6 +60,57 @@ class LocalityFragment: Fragment() {
         newObservationViewModel.resetLocationData()
     }
 
+
+    private val mapFragmentListener by lazy {
+        object: MapFragment.Listener {
+            override fun onClick() {}
+            override fun observationSelected(observation: Observation) {}
+            override fun localitySelected(locality: Locality) { newObservationViewModel.setLocality(locality) }
+        }
+    }
+
+    private val markerOnTouchListener by lazy {
+        object: View.OnTouchListener {
+
+            var originX: Float = 0F
+            var originY: Float = 0F
+
+            override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
+                val x = motionEvent.rawX
+                val y = motionEvent.rawY
+
+                when (motionEvent.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        val location: IntArray = IntArray(2)
+                        view.getLocationInWindow(location)
+                        originX = location.first().toFloat()
+                        originY = location.last().toFloat() + 250
+                    }
+
+                    MotionEvent.ACTION_MOVE -> {
+                        markerImageView?.translationX = x - originX
+                        markerImageView?.translationY = y - originY
+                    }
+
+                    MotionEvent.ACTION_UP -> {
+                        val location: IntArray = IntArray(2)
+                        view.getLocationInWindow(location)
+                        val finalX = location.first().toFloat()
+                        val finalY = location.last().toFloat()
+
+                        mapFragment?.getCoordinatesFor(finalX + (view.width / 2), finalY + view.height)?.let { newObservationViewModel.setCoordinate(it, 5F) }
+
+                        markerImageView?.translationX = 0F
+                        markerImageView?.translationY = 0F
+                    }
+                }
+
+                return true
+            }
+        }
+    }
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -76,6 +129,7 @@ class LocalityFragment: Fragment() {
         recyclerView = localityFragment_recyclerView
         mapFragment = childFragmentManager.findFragmentById(R.id.localityFragment_mapView) as MapFragment
         retryButton = localityFragment_retryButton
+        markerImageView = localityFragment_markerImageView
     }
 
     private fun setupViews() {
@@ -84,7 +138,7 @@ class LocalityFragment: Fragment() {
             this.viewTreeObserver.addOnGlobalLayoutListener(object: ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
                     mapFragment?.setPadding(0, 0, 0, this@apply.height + this@apply.marginBottom)
-                    mapFragment?.zoomToShowMarkers()
+                    mapFragment?.setRegionToShowMarkers()
                     this@apply.viewTreeObserver.removeOnGlobalLayoutListener(this)
                 }
             })
@@ -95,12 +149,10 @@ class LocalityFragment: Fragment() {
             layoutManager = linearLayoutManager
         }
 
-        mapFragment?.localitySelected = {
-            newObservationViewModel.setLocality(it)
-        }
-
+        mapFragment?.setListener(mapFragmentListener, false)
         mapFragment?.setType(MapFragment.Category.TOPOGRAPHY)
         retryButton?.setOnClickListener(retryButtonClicked)
+        markerImageView?.setOnTouchListener(markerOnTouchListener)
 
     }
 
@@ -110,7 +162,7 @@ class LocalityFragment: Fragment() {
                     is State.Items -> {
                         localityAdapter.configure(it.items)
                         mapFragment?.addLocalities(it.items)
-                        mapFragment?.zoomToShowMarkers()
+                        mapFragment?.setRegionToShowMarkers()
                     }
 
                     is State.Loading -> {
@@ -118,21 +170,22 @@ class LocalityFragment: Fragment() {
                     }
 
                     is State.Error -> {
-                        Log.d(TAG, it.error.toString())
-
-                        (it.error as? LocationService.Error)?.let {
-                            when (it) {
-                                is LocationService.Error.PermissionDenied -> {
-                                    mapFragment?.setError(it, resources.getString(R.string.locationservice_error_permissions_handler)) {
-                                        val intent = Intent()
-                                        intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                                        val uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
-                                        intent.data = uri
-                                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                        startActivity(intent)
-                                    }
+                        when (it.error) {
+                            is LocationService.Error.PermissionDenied -> {
+                                mapFragment?.setError(
+                                    it.error,
+                                    resources.getString(R.string.locationservice_error_permissions_handler)
+                                ) {
+                                    val intent = Intent()
+                                    intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                                    val uri =
+                                        Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
+                                    intent.data = uri
+                                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                    startActivity(intent)
                                 }
                             }
+                            else -> { mapFragment?.setError(it.error, null, null) }
                         }
                     }
 
@@ -145,7 +198,7 @@ class LocalityFragment: Fragment() {
             newObservationViewModel.locality.observe(viewLifecycleOwner, Observer {
                 it?.let {
                     recyclerView?.scrollToPosition(localityAdapter.setSelected(it))
-                    mapFragment?.selectAnnotationAtLocation(it.location)
+                    mapFragment?.setSelectedLocalityAnnotation(it.location)
                 }
             })
 
@@ -164,6 +217,7 @@ class LocalityFragment: Fragment() {
         mapFragment = null
         recyclerView = null
         retryButton = null
+        markerImageView = null
 
         super.onDestroyView()
     }

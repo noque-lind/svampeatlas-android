@@ -2,11 +2,13 @@ package com.noque.svampeatlas.views
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Outline
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewOutlineProvider
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -14,6 +16,7 @@ import com.noque.svampeatlas.extensions.downloadImage
 import com.noque.svampeatlas.extensions.italized
 import com.noque.svampeatlas.models.Mushroom
 import com.noque.svampeatlas.R
+import com.noque.svampeatlas.extensions.upperCased
 import com.noque.svampeatlas.services.DataService
 import kotlinx.android.synthetic.main.view_result.view.*
 
@@ -23,6 +26,7 @@ class ResultView(context: Context?, attrs: AttributeSet?) : LinearLayout(context
     private var primaryLabel: TextView
     private var secondaryLabel: TextView
     private var scoreLabel: TextView
+    private var toxicityView: LinearLayout
 
 
     init {
@@ -33,15 +37,30 @@ class ResultView(context: Context?, attrs: AttributeSet?) : LinearLayout(context
         primaryLabel = resultView_primaryLabel
         secondaryLabel = resultView_secondaryLabel
         scoreLabel = resultView_scoreLabel
+        toxicityView = resultView_toxicityView
+
+        setupView()
+    }
+
+    private fun setupView() {
+        imageView.clipToOutline = true
+        imageView.outlineProvider = object: ViewOutlineProvider() {
+            override fun getOutline(view: View?, outline: Outline?) {
+                view?.let {
+                    val radius = resources.getDimension(R.dimen.app_rounded_corners)
+                    outline?.setRoundRect(0,0,view.width, view.height, radius)
+                }
+            }
+        }
     }
 
     @SuppressLint("DefaultLocale")
     fun configure(mushroom: Mushroom) {
         if (mushroom.isGenus) {
             imageView.setImageResource(R.drawable.icon_genus)
-            val primaryText = mushroom.danishName?.capitalize() ?: mushroom.fullName.italized(context)
+            val primaryText = mushroom.danishName?.upperCased() ?: mushroom.fullName.italized()
             primaryLabel.text = resources.getString(R.string.util_genus, primaryText)
-            secondaryLabel.text = if (mushroom.danishName != null) mushroom.fullName.italized(context) else null
+            secondaryLabel.text = if (mushroom.danishName != null) mushroom.fullName.italized() else null
         } else {
             if (mushroom.images?.firstOrNull() != null) {
                 imageView.visibility = View.VISIBLE
@@ -50,17 +69,25 @@ class ResultView(context: Context?, attrs: AttributeSet?) : LinearLayout(context
                 imageView.visibility = View.GONE
             }
 
-            primaryLabel.text = mushroom.danishName ?: mushroom.fullName.italized(context)
-            secondaryLabel.text = if (mushroom.danishName != null) mushroom.fullName.italized(context) else null
+            primaryLabel.text = mushroom.danishName?.upperCased() ?: mushroom.fullName.italized()
+            secondaryLabel.text = if (mushroom.danishName != null) mushroom.fullName.italized() else null
+        }
+
+        if (mushroom.attributes?.edibility != null && mushroom.attributes.edibility.contains("giftig", true)) {
+            toxicityView.visibility = View.VISIBLE
+        } else {
+            toxicityView.visibility = View.GONE
         }
     }
 
     fun configure(mushroom: Mushroom, score: Double?) {
         configure(mushroom)
 
-        score?.let {
+        if (score != null) {
             scoreLabel.visibility = View.VISIBLE
-            scoreLabel.text = "${String.format("%.1f", it * 100)}%"
+            scoreLabel.text = "${String.format("%.1f", score * 100)}%"
+        } else {
+            scoreLabel.visibility = View.GONE
         }
     }
 

@@ -11,8 +11,8 @@ import kotlinx.android.synthetic.main.item_text_input.view.*
 class InputTypeViewHolder(private val onTextInputChanged: (view: View, text: String?) -> Unit, itemView: View) :
     RecyclerView.ViewHolder(itemView) {
 
-    private lateinit var editText: EditText
-    private lateinit var titleTextView: TextView
+    private var editText: EditText = itemView.textInputItem_editText
+    private var titleTextView: TextView
 
     private val textWatcher = object: TextWatcher {
         override fun afterTextChanged(p0: Editable?) {
@@ -25,7 +25,6 @@ class InputTypeViewHolder(private val onTextInputChanged: (view: View, text: Str
     }
 
     init {
-        editText = itemView.textInputItem_editText
         editText.addTextChangedListener(textWatcher)
         titleTextView = itemView.textInputItem_titleTextView
     }

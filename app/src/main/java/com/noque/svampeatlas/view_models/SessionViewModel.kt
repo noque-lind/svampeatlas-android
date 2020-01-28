@@ -11,7 +11,9 @@ import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.services.DataService
 import com.noque.svampeatlas.services.RoomService
 import com.noque.svampeatlas.utilities.SharedPreferencesHelper
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -108,15 +110,16 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
             it.onSuccess {
                 notificationsCount = it
                 lastUpdated = Date(System.currentTimeMillis())
-                DataService.getInstance(getApplication()).getNotifications(TAG, token, if (it >= 8) 8 else it, 0) {
-                    it.onSuccess {
-                        _notificationsState.value = State.Items(Pair(it, notificationsCount))
-                    }
+                DataService.getInstance(getApplication())
+                    .getNotifications(TAG, token, if (it >= 8) 8 else it, 0) {
+                        it.onSuccess {
+                            _notificationsState.value = State.Items(Pair(it, notificationsCount))
+                        }
 
-                    it.onError {
-                        _notificationsState.value = State.Error(it)
+                        it.onError {
+                            _notificationsState.value = State.Error(it)
+                        }
                     }
-                }
             }
 
             it.onError {
@@ -132,15 +135,16 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
             it.onSuccess {
                 lastUpdated = Date(System.currentTimeMillis())
                 observationsCount = it
-                DataService.getInstance(getApplication()).getObservationsForUser(TAG, user.id, 0, 16) {
-                    it.onSuccess {
-                        _observationsState.value = State.Items(Pair(it, observationsCount))
-                    }
+                DataService.getInstance(getApplication())
+                    .getObservationsForUser(TAG, user.id, 0, 16) {
+                        it.onSuccess {
+                            _observationsState.value = State.Items(Pair(it, observationsCount))
+                        }
 
-                    it.onError {
-                        _observationsState.value = State.Error(it)
+                        it.onError {
+                            _observationsState.value = State.Error(it)
+                        }
                     }
-                }
             }
 
             it.onError {
@@ -168,7 +172,12 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
         token?.let {
             _notificationsState.value = State.Loading()
 
-            DataService.getInstance(getApplication()).getNotifications(TAG, it, if (offset + 8 <= notificationsCount) offset + 8 else notificationsCount, 0) {
+            DataService.getInstance(getApplication()).getNotifications(
+                TAG,
+                it,
+                if (offset + 8 <= notificationsCount) offset + 8 else notificationsCount,
+                0
+            ) {
 
                 it.onSuccess {
                     _notificationsState.value = State.Items(Pair(it, notificationsCount))
@@ -204,7 +213,7 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
 
             token?.let { getNotifications(it) }
             user.value?.let { getObservations(it) }
-        } else  {
+        } else {
             val diff = Date(System.currentTimeMillis()).time - (lastUpdated.time)
             val hours = TimeUnit.MILLISECONDS.toHours(diff)
             Log.d(TAG, "Data is $hours old")
@@ -236,6 +245,24 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    fun markNotificationAsRead(notification: Notification) {
+        token?.let {
+            viewModelScope.launch {
+                DataService.getInstance(getApplication())
+                    .markNotificationAsRead(TAG, notification.observationID, it)
+                notificationsState.value?.let {
+                    (it as? State.Items)?.items?.let {
+                        val notifications = it.first.toMutableList()
+                        notifications.removeAll { it.observationID == notification.observationID }
+                        notificationsCount -= it.first.count() - notifications.count()
+                        _notificationsState.value =
+                            State.Items(Pair(notifications, notificationsCount))
+                    }
+                }
+            }
+        }
+    }
+
     fun uploadObservation(jsonObject: JSONObject, imageFiles: List<File>?) {
         val token = token
         val user = user.value
@@ -244,27 +271,55 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
             _observationUploadState.value = State.Loading()
 
             val usersArray = JSONArray()
-            listOf(user).forEach { usersArray.put(
-                JSONObject()
-                    .put("_id", it.id)
-                    .put("Initialer", it.initials)
-                    .put("facebook", it.facebookID)
-                    .put("name", it.name))}
+            listOf(user).forEach {
+                usersArray.put(
+                    JSONObject()
+                        .put("_id", it.id)
+                        .put("Initialer", it.initials)
+                        .put("facebook", it.facebookID)
+                        .put("name", it.name)
+                )
+            }
             jsonObject.put("users", usersArray)
 
-            DataService.getInstance(getApplication()).uploadObservation(TAG, token, jsonObject, imageFiles) {
-                it.onError {
-                    _observationUploadState.value = State.Error(it)
-                    _observationUploadState.value = State.Empty()
-                }
+            DataService.getInstance(getApplication())
+                .uploadObservation(TAG, token, jsonObject) {
+                    it.onError {
+                        _observationUploadState.value = State.Error(it)
+                    }
 
-                it.onSuccess {
-                    _observationUploadState.value = State.Items(it)
-                    _observationUploadState.value = State.Empty()
-                    lastUpdated = Date(0)
+                    it.onSuccess { id ->
+                        if (imageFiles != null && imageFiles.isNotEmpty()) {
+                            viewModelScope.launch {
+                                DataService.getInstance(getApplication())
+                                    .uploadImages(TAG, id, imageFiles, token) {
+                                        it.onSuccess {
+                                            _observationUploadState.value =
+                                                State.Items(Pair(id, it))
+                                        }
+                                    }
+                            }
+                        } else {
+                            _observationUploadState.value = State.Items(Pair(id, 0))
+                        }
+                        lastUpdated = Date(0)
+                    }
                 }
-            }
         }
+    }
+
+    fun postOffensiveContentComment(observationID: Int, comment: String?) {
+        val json = JSONObject()
+        json.put("message", comment ?: "")
+        token?.let {
+            DataService.getInstance(getApplication()).postOffensiveComment(TAG, observationID, json, it)
+        }
+    }
+
+
+
+    fun resetObservationUploadState() {
+        _observationUploadState.value = State.Empty()
     }
 
     fun logout() {

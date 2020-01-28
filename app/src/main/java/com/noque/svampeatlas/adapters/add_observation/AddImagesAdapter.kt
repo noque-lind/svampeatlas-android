@@ -29,7 +29,7 @@ class AddImagesAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var addImageButtonClicked: (() -> Unit)? = null
 
-    private var images = mutableListOf<File>()
+    private var images = listOf<File>()
 
     private val onClickListener = object: View.OnClickListener {
         override fun onClick(view: View?) {
@@ -37,17 +37,11 @@ class AddImagesAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 
-    fun configure(images: List<File>) {
-        this.images = images.toMutableList()
+    fun configure(images: List<File>?) {
+        this.images = images ?: listOf()
         notifyDataSetChanged()
     }
 
-    fun removeImageAt(position: Int) {
-        if (images.lastIndex <= position) {
-            images.removeAt(position)
-            notifyItemRemoved(position)
-        }
-    }
 
     override fun getItemViewType(position: Int): Int {
         if (position < images.count()) {

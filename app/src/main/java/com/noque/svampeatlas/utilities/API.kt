@@ -7,27 +7,33 @@ import com.google.android.gms.maps.model.LatLng
 import com.noque.svampeatlas.extensions.toBounds
 import com.noque.svampeatlas.extensions.toCircularPolygon
 import com.noque.svampeatlas.extensions.toRectanglePolygon
+import com.noque.svampeatlas.extensions.toSimpleString
+import java.net.URLEncoder
+import java.sql.Date
+import java.time.LocalDateTime
+import java.util.*
 
 data class API(val apiType: APIType) {
 
-    enum class Radius(val radius: Double) {
-        SMALLEST(800.0),
-        SMALLER(1000.0),
-        SMALL(1200.0),
-        MEDIUM(1400.0),
-        LARGE(1600.0),
-        LARGER(1800.0),
-        LARGEST(2000.0),
-        HUGE(2500.0),
-        HUGER(5000.0),
-        HUGEST(1000.0),
-        COUNTRY(0.0)
+    enum class Radius(val radius: Int) {
+        SMALLEST(800),
+        SMALLER(1000),
+        SMALL(1200),
+        MEDIUM(1400),
+        LARGE(1600),
+        LARGER(1800),
+        LARGEST(2000),
+        HUGE(2500),
+        HUGER(5000),
+        HUGEST(1000),
+        COUNTRY(0)
     }
 
     fun url(): String {
         when (apiType) {
             is APIType.Request -> return createGetURL(apiType)
             is APIType.Post -> return createPostURL(apiType)
+            is APIType.Put -> return createPutURL(apiType)
             else -> return ""
         }
     }
@@ -36,6 +42,7 @@ data class API(val apiType: APIType) {
         when (apiType) {
             is APIType.Request -> return Request.Method.GET
             is APIType.Post -> return Request.Method.POST
+            is APIType.Put -> return Request.Method.PUT
             else -> return Request.Method.GET
         }
     }
@@ -94,6 +101,13 @@ data class API(val apiType: APIType) {
                     observationIncludeQuery(request.observationQueries)
                 )
 
+                request.ageInYear?.let {
+                    val calendar = Calendar.getInstance()
+                    calendar.add(Calendar.MONTH, -it * 12)
+                    val dateString = calendar.time.toSimpleString()
+                    builder.appendQueryParameter("where", "{\"observationDate\":{\"\$gte\":\"$dateString\"}}")
+                }
+
                 request.limit?.let {
                     builder.appendQueryParameter("limit", it.toString())
                 }
@@ -110,6 +124,13 @@ data class API(val apiType: APIType) {
             is APIType.Request.Locality -> {
                 builder.appendPath("localities")
                 builder.appendQueryParameter("where", request.geometry.toBetween())
+            }
+
+            is APIType.Request.GeomNames -> {
+                builder.appendPath("geonames")
+                builder.appendPath("findnearby")
+                builder.appendQueryParameter("lat", "${request.coordinate.latitude}")
+                builder.appendQueryParameter("lng", "${request.coordinate.longitude}")
             }
 
             is APIType.Request.Substrate -> {
@@ -197,7 +218,32 @@ data class API(val apiType: APIType) {
 
             is APIType.Post.ImagePrediction -> {
                 builder.appendPath("imagevision")
-                builder.appendQueryParameter("include", speciesIncludeQuery(listOf(SpeciesQueries.AcceptedTaxon(), SpeciesQueries.Images(false), SpeciesQueries.DanishNames())))
+                builder.appendQueryParameter("include", speciesIncludeQuery(listOf(SpeciesQueries.AcceptedTaxon(), SpeciesQueries.Images(false), SpeciesQueries.DanishNames(), SpeciesQueries.Attributes(null))))
+            }
+
+            is APIType.Post.OffensiveContentComment -> {
+                builder.appendPath("observations")
+                builder.appendPath("${request.observationID}")
+                builder.appendPath("notifications")
+            }
+        }
+
+        return builder.build().toString()
+    }
+
+    private fun createPutURL(request: APIType.Put): String {
+        val builder = Uri.Builder()
+        builder.scheme("https")
+            .authority("svampe.databasen.org")
+            .appendPath("api")
+
+        when (request) {
+            is APIType.Put.NotificationLastRead -> {
+                builder.appendPath("users")
+                builder.appendPath("me")
+                builder.appendPath("feed")
+                builder.appendPath(request.notificationID.toString())
+                builder.appendPath("lastread")
             }
         }
 
@@ -261,12 +307,12 @@ data class API(val apiType: APIType) {
                     fullSearchTerm = it
                     genus = it
                 } else {
-                    fullSearchTerm += "+${it}"
+                    fullSearchTerm += " ${it}"
 
                     if (taxonName == "") {
                         taxonName = it
                     } else {
-                        taxonName += "+${it}"
+                        taxonName += " ${it}"
                     }
                 }
             }
@@ -341,7 +387,7 @@ sealed class ObservationQueries : APIType() {
 
 data class Geometry(
     val coordinate: LatLng,
-    val radius: Double,
+    val radius: Int,
     val type: Type
 ) {
 
@@ -359,7 +405,7 @@ data class Geometry(
                     .forEach { string += "[${it.longitude},${it.latitude}]," }
             }
             Type.CIRCLE -> {
-                coordinate.toCircularPolygon(radius).forEach { string += "[${it.longitude},${it.longitude}]," }
+                coordinate.toCircularPolygon(radius).forEach { string += "[${it.longitude},${it.latitude}]," }
             }
         }
 
@@ -399,6 +445,7 @@ sealed class APIType {
 
         class SingleObservation(val id: Int) : Request()
         class Locality(val geometry: Geometry) : Request()
+        class GeomNames(val coordinate: LatLng): Request()
         class Substrate() : Request()
         class VegetationType() : Request()
         class Host(val searchString: String?) : Request()
@@ -414,5 +461,10 @@ sealed class APIType {
         class Login() : Post()
         class Comment(val taxonID: Int) : Post()
         class ImagePrediction: Post()
+        class OffensiveContentComment(val observationID: Int): Post()
+    }
+
+    sealed class Put: APIType() {
+        class NotificationLastRead(val notificationID: Int): Put()
     }
 }

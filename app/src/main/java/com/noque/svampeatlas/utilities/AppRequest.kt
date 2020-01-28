@@ -14,11 +14,11 @@ import java.io.UnsupportedEncodingException
 import java.lang.reflect.Type
 import java.nio.charset.Charset
 
-class AppGetRequest<T>(private val type: Type, private val endpoint: API,
-                       private val token: String?,
-                       private val jsonObject: JSONObject? = null,
-                       private val listener: Response.Listener<T>,
-                       errorListener: Response.ErrorListener): Request<T>(endpoint.volleyMethod(), endpoint.url(), errorListener) {
+class AppRequest<T>(private val type: Type, private val endpoint: API,
+                    private val token: String?,
+                    private val jsonObject: JSONObject? = null,
+                    private val listener: Response.Listener<T>,
+                    errorListener: Response.ErrorListener): Request<T>(endpoint.volleyMethod(), endpoint.url(), errorListener) {
 
     override fun getBody(): ByteArray {
         return jsonObject.toString().toByteArray()

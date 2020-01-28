@@ -1,8 +1,11 @@
 package com.noque.svampeatlas.models
 
+import com.noque.svampeatlas.extensions.Date
+import java.util.*
+
 data class Comment(
     val id: Int,
-    val date: String,
+    private val _date: String,
     val content: String,
     val commenterName: String,
     val initials: String?,
@@ -15,4 +18,6 @@ data class Comment(
             return null
         }
     }
+
+    val date: Date? get() { return Date(_date) }
 }

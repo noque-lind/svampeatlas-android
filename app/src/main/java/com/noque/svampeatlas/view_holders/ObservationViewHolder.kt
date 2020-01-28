@@ -9,8 +9,7 @@ class ObservationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
 
     private val observationView = itemView.observationItem_observationView
 
-    fun configure(observation: Observation) {
-        observationView.configure(observation)
+    fun configure(observation: Observation, showValidationStatus: Boolean = false) {
+        observationView.configure(observation, showValidationStatus)
     }
-
 }

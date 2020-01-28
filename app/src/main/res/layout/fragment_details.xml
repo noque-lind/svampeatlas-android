@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorSecondary"
-    android:fitsSystemWindows="true">
+    android:background="@color/colorSecondary">
 
     <LinearLayout
         android:id="@+id/detailsFragment_linearLayout"
@@ -22,7 +21,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:fitsSystemWindows="false">
+            android:clipChildren="false"
+            android:clipToPadding="false">
 
             <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/detailsFragment_appBarLayout"
@@ -62,7 +62,6 @@
                 </com.google.android.material.appbar.CollapsingToolbarLayout>
             </com.google.android.material.appbar.AppBarLayout>
 
-
             <androidx.core.widget.NestedScrollView
                 android:id="@+id/detailsFragment_nestedScrollView"
                 android:layout_width="match_parent"
@@ -70,6 +69,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:clipToPadding="false"
+                android:clipChildren="false"
                 android:paddingTop="16dp"
                 android:paddingBottom="16dp"
                 android:theme="@style/Light"
@@ -78,6 +78,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
                     android:orientation="vertical">
 
                     <com.noque.svampeatlas.views.TitlesView
@@ -123,10 +125,27 @@
                         android:layout_height="300dp"
                         android:layout_marginBottom="24dp"/>
 
+                    <TextView
+                        android:id="@+id/detailsFragment_mushroomViewHeader"
+                        style="@style/AppDivider"
+                        android:visibility="gone"
+                        android:text="Art"
+                        android:layout_marginBottom="2dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <com.noque.svampeatlas.views.MushroomView
+                        android:foreground="?android:attr/selectableItemBackground"
+                        android:visibility="gone"
+                        android:id="@+id/detailsFragment_mushroomView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
 
                     <TextView
                         android:id="@+id/detailsFragment_recyclerViewHeader"
                         style="@style/AppDivider"
+                        android:layout_marginTop="24dp"
                         android:layout_marginBottom="2dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
@@ -134,8 +153,10 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/detailsFragment_recyclerView"
                         android:layout_width="match_parent"
+                        android:clipToPadding="false"
+                        android:clipChildren="false"
+                        android:nestedScrollingEnabled="false"
                         android:layout_height="wrap_content">
-
                     </androidx.recyclerview.widget.RecyclerView>
 
                 </LinearLayout>

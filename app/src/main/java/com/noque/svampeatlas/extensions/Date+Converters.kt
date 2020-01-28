@@ -27,6 +27,12 @@ fun Date.toSimpleString(): String {
     return sf.format(this)
 }
 
+fun Date.toISO8601(): String {
+    val cm = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+    cm.timeZone = TimeZone.getTimeZone("UTC")
+   return cm.format(this)
+}
+
 
 
 fun Date.toReadableDate(recentFormatting: Boolean = true, ignoreTime: Boolean = false): String {

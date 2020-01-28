@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -54,7 +55,15 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     companion object {
         val TAG = "AddObservationFragment"
         val KEY_LOCALITY_ID_SHOWN = "KEY_LOCALITY_ID_SHOWN"
+        val KEY_ADDIMAGE_SHOWN = "KEY_ADDIMAGE_SHOWN"
         val DEFAULT_LOCALITY_ID = 0
+        val LOCALITY_ID_FOR_ERROR = 1921
+
+    }
+
+    enum class Type {
+        NEWOBSERVATION,
+        IDENTIFYEDOBSERVATION
     }
 
     enum class Category {
@@ -68,13 +77,15 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     }
 
     // Objects
+    private val args: AddObservationFragmentArgs by navArgs()
 
     private var localityIdShown = DEFAULT_LOCALITY_ID
+    private var addImageShown = false
+
     private val locationService by lazy {
         LocationService(requireActivity().applicationContext)
     }
 
-    private val dispatchGroup = DispatchGroup()
     private var toast: Toast? = null
 
     // Views
@@ -129,8 +140,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         }
 
         override fun locationRetrieved(location: Location) {
-            newObservationViewModel.setCoordinate(LatLng(location.latitude, location.longitude))
-            newObservationViewModel.getLocalities(LatLng(location.latitude, location.longitude))
+            newObservationViewModel.setCoordinate(LatLng(location.latitude, location.longitude), location.accuracy)
         }
 
     }
@@ -193,12 +203,25 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
                 newObservationViewModel.removeImageAt(position)
+                addImagesAdapter.notifyItemRemoved(viewHolder.adapterPosition)
             }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(TAG, "On create")
+        addImageShown = savedInstanceState?.getBoolean(KEY_ADDIMAGE_SHOWN) ?: false
+        localityIdShown = savedInstanceState?.getInt(KEY_LOCALITY_ID_SHOWN) ?: DEFAULT_LOCALITY_ID
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        if (!addImageShown && args.type == Type.NEWOBSERVATION) {
+            addImageShown = true
+            val action =
+                AddObservationFragmentDirections.actionAddObservationFragmentToCameraFragment()
+            action.type = CameraFragment.Type.NEWOBSERVATION
+            findNavController().navigate(action)
+        }
     }
 
     override fun onCreateView(
@@ -206,11 +229,6 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
-        val localityIdShown = savedInstanceState?.getInt(KEY_LOCALITY_ID_SHOWN)
-        if (localityIdShown != null) {
-            this.localityIdShown = localityIdShown
-        }
-
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         return inflater.inflate(R.layout.fragment_add_observation, container, false)
     }
@@ -222,18 +240,9 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         setupView()
         setupViewModels()
 
-
         // Figure out if only activity is needed
         locationService.setListener(locationServiceListener)
     }
-
-    override fun onStart() {
-        if (newObservationViewModel.locality.value == null) {
-            locationService.start()
-        }
-        super.onStart()
-    }
-
 
     override fun onPause() {
         super.onPause()
@@ -260,6 +269,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putInt(KEY_LOCALITY_ID_SHOWN, localityIdShown)
+        outState.putBoolean(KEY_ADDIMAGE_SHOWN, addImageShown)
         super.onSaveInstanceState(outState)
     }
 
@@ -336,13 +346,15 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                             )
                         )
                     )
+
+                    sessionViewModel.resetObservationUploadState()
                 }
             }
         })
 
 
         newObservationViewModel.images.observe(viewLifecycleOwner, Observer {
-            addImagesAdapter.configure(it.toList())
+            addImagesAdapter.configure(it)
         })
 
         newObservationViewModel.coordinate.observe(viewLifecycleOwner, Observer {
@@ -381,8 +393,8 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
 
             when (state) {
                 is State.Error -> {
-                    if (localityIdShown != -1) {
-                        localityIdShown = -1
+                    if (localityIdShown != LOCALITY_ID_FOR_ERROR) {
+                        localityIdShown = LOCALITY_ID_FOR_ERROR
                         val bitmap =
                             BitmapFactory.decodeResource(resources, R.drawable.icon_locality_pin)
                         createToast(
@@ -403,8 +415,6 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
 }
 
     private fun uploadButtonPressed() {
-        sessionViewModel
-
         val result = newObservationViewModel.prepareForUpload(sessionViewModel.user.value?.id ?: 0)
 
         result.onError {
@@ -437,9 +447,9 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     }
 
     private fun createToast(title: String, message: String, bitmap: Bitmap) {
+       toast?.cancel()
+        toast = null
 
-        dispatchGroup.notify {
-            dispatchGroup.enter()
 
             val container = custom_toast_container
             val layout = layoutInflater.inflate(R.layout.custom_toast, container)
@@ -447,35 +457,23 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
             layout.customToast_titleTextView.text = title
             layout.customToast_messageTextView.text = message
             layout.customToast_imageView.setImageBitmap(bitmap)
-
-            requireActivity().runOnUiThread {
-                with (Toast(context)) {
-
+            with (Toast(context)) {
                     setGravity(Gravity.BOTTOM, 0, 16.pxToDp(context))
-                    duration = Toast.LENGTH_LONG
+                    duration = Toast.LENGTH_SHORT
                     view = layout
                     show()
-
-
-                    Timer().schedule(timerTask {
-                        dispatchGroup.leave()
-                    }, 3500
-                    )
                     toast = this
                 }
             }
-        }
-    }
 
     private fun reset() {
         viewPager?.currentItem = Category.SPECIES.ordinal
-        localityIdShown = 0
+        if (localityIdShown == LOCALITY_ID_FOR_ERROR) localityIdShown = DEFAULT_LOCALITY_ID
         newObservationViewModel.reset()
+        sessionViewModel.resetObservationUploadState()
     }
 
     override fun onDestroyView() {
-        Log.d(TAG, "On destory view")
-
         locationService.setListener(null)
         addImagesRecyclerView?.adapter = null
         viewPager?.adapter = null
@@ -486,15 +484,5 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         spinnerView = null
 
         super.onDestroyView()
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        Log.d(TAG, "On detach")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d(TAG, "on destory")
     }
 }

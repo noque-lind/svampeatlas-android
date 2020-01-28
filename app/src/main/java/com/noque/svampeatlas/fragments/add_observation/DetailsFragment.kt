@@ -59,6 +59,7 @@ class DetailsFragment : Fragment() {
                 Categories.SUBSTRATE -> showPicker(DetailsPickerFragment.Type.SUBSTRATEPICKER)
                 Categories.VEGETATIONTYPE -> showPicker(DetailsPickerFragment.Type.VEGETATIONTYPEPICKER)
                 Categories.HOST -> showPicker(DetailsPickerFragment.Type.HOSTPICKER)
+                else -> {}
             }
         }
 
@@ -170,12 +171,12 @@ class DetailsFragment : Fragment() {
     }
 
     override fun onPause() {
-        Log.d(DetailsFragment.TAG, "On Pause")
+        Log.d(TAG, "On Pause")
         super.onPause()
     }
 
     override fun onStop() {
-        Log.d(DetailsFragment.TAG, "On Stop")
+        Log.d(TAG, "On Stop")
         super.onStop()
     }
 

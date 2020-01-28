@@ -4,8 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:theme="@style/Light"
+    android:clipToPadding="false"
+    android:clipChildren="false"
+    android:layout_marginTop="8dp"
     android:orientation="vertical">
-
 
     <TextView
         android:text="@string/addCommentItem_title"
@@ -13,36 +15,41 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/AppPrimaryHighlighted"
-        android:layout_marginBottom="4dp"
-
-        />
+        android:layout_marginBottom="4dp"/>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:layout_height="wrap_content">
 
         <EditText
-            android:background="@color/colorPrimary"
             android:layout_weight="1"
-            android:gravity="bottom"
+            android:gravity="top"
+            android:background="@color/colorSecondary"
             android:id="@+id/addComment_editText"
             style="@style/AppPrimary"
+            android:elevation="@dimen/app_elevation"
             android:textColorHint="@color/colorWhite_dimmed"
             android:textColor="@color/colorWhite"
             android:layout_width="0dp"
+            android:paddingStart="4dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="16dp"
+            android:paddingEnd="4dp"
+            android:inputType="textCapSentences|textAutoComplete|textMultiLine"
             android:layout_height="wrap_content"
-            android:minHeight="150dp"/>
+            android:minHeight="100dp"/>
 
         <ImageButton
             android:id="@+id/addComment_sendButton"
             android:layout_marginStart="8dp"
             android:layout_width="50dp"
+            android:elevation="@dimen/app_elevation"
             android:layout_height="match_parent"
             android:background="@color/colorGreen"
             android:src="@drawable/glyph_disclosure_button" />
-
-
     </LinearLayout>
 
 

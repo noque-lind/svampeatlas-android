@@ -1,6 +1,7 @@
 package com.noque.svampeatlas.view_models
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -167,6 +168,7 @@ class MushroomsViewModel(category: Category?, application: Application) :
     }
 
     override fun onCleared() {
+        Log.d(TAG, "Cleared")
         super.onCleared()
         DataService.getInstance(getApplication()).clearRequestsWithTag(TAG)
     }

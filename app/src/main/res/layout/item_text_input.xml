@@ -21,6 +21,7 @@ android:orientation="vertical">
             android:gravity="top"
             android:id="@+id/textInputItem_editText"
             style="@style/AppPrimary"
+        android:inputType="textCapSentences|textAutoComplete|textMultiLine"
             android:textColorHint="@color/colorWhite_dimmed"
             android:textColor="@color/colorWhite"
             android:layout_width="match_parent"

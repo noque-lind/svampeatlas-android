@@ -30,6 +30,8 @@ import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.net.Uri
 import android.util.Log
 import java.lang.Exception
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class BlankActivity : AppCompatActivity() {
@@ -38,7 +40,7 @@ class BlankActivity : AppCompatActivity() {
         val TAG = "BlankActivity"
         val KEY_IS_LOGGED_IN = "IsLoggedIn"
 
-        fun getOutputDirectory(context: Context): File {
+        private fun getOutputDirectory(context: Context): File {
             val appContext = context.applicationContext
             val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
                 File(it, appContext.resources.getString(R.string.app_name)).apply { mkdirs() }
@@ -47,15 +49,19 @@ class BlankActivity : AppCompatActivity() {
             return if (mediaDir != null && mediaDir.exists()) mediaDir else appContext.filesDir
         }
 
-        fun getCacheDir(context: Context): File {
+        private fun getCacheDir(context: Context): File {
             val appContext = context.applicationContext
             val cacheDir = context.externalCacheDirs.firstOrNull()
             return if (cacheDir != null && cacheDir.exists()) cacheDir else appContext.cacheDir
         }
+
+        fun createTempFile(context: Context): File = File.createTempFile(SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.getDefault()).format(System.currentTimeMillis()), ".jpg", BlankActivity.getCacheDir(context))
+        fun createFile(context: Context): File = File(BlankActivity.getOutputDirectory(context), SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.getDefault()).format(System.currentTimeMillis()) + ".jpg")
     }
 
 
     // Objects
+
     private lateinit var navController: NavController
     private var isLoggedIn: Boolean? = null
 
@@ -71,71 +77,58 @@ class BlankActivity : AppCompatActivity() {
 
     // Listeners
 
-    private val onDestinationChangedListener =
+    private val onDestinationChangedListener by lazy {
         NavController.OnDestinationChangedListener { _, destination, _ ->
-//            toolbar.setupWithNavController(navController, appBarConfiguration)
-//            setSupportActionBar(toolbar)
-//            drawerLayout.fitsSystemWindows = true
-
-//            when (destination.id) {
-//                R.id.onboardingFragment -> {
-//                    toolbar.visibility = View.GONE
-//                }
-//
-//                R.id.mushroomDetailsFragment -> {
-//                    toolbar.visibility = View.GONE
-//                }
-//
-//                R.id.myPageFragment -> {
-//                    toolbar.visibility = View.GONE
-//                }
-//
-//                R.id.cameraFragment -> {
-//                    hideSystemBars()
-//                    drawerLayout.fitsSystemWindows = false
-//                    toolbar.visibility = View.GONE
-//                }
-//
-//
-//                else -> {
-//                    toolbar.visibility = View.VISIBLE
-//                    showSystemBars()
-//                }
-//            }
+            navigationView.setCheckedItem(destination.id)
         }
+    }
 
-    private val onNavigationItemSelectedListener = NavigationView.OnNavigationItemSelectedListener {
-        var setCheckedItem = true
-        var closeDrawer = true
-        var id: Int? = it.itemId
+    private val onNavigationItemSelectedListener by lazy {
+        NavigationView.OnNavigationItemSelectedListener {
+            var setCheckedItem = true
+            var closeDrawer = true
+            var destinationID: Int? = it.itemId
 
+                when (it.itemId) {
+                    R.id.facebook -> {
+                        setCheckedItem = false
+                        closeDrawer = false
+                        destinationID = null
 
-        if (it.itemId != navController.currentDestination?.id) {
-            when (it.itemId) {
-                R.id.facebook -> {
-                    setCheckedItem = false
-                    closeDrawer = false
-                    id = null
+                        val intent = try {
+                            packageManager.getPackageInfo("com.facebook.katana", 0)
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("fb://facewebmodal/f?href=https://www.facebook.com/groups/svampeatlas")
+                            )
+                        } catch (e: Exception) {
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://www.facebook.com/groups/svampeatlas/")
+                            )
+                        }
 
-                    val intent = try {
-                        packageManager.getPackageInfo("com.facebook.katana", 0)
-                        Intent(Intent.ACTION_VIEW, Uri.parse("fb://facewebmodal/f?href=https://www.facebook.com/groups/svampeatlas"))
-                    } catch (e: Exception) {
-                        Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/groups/svampeatlas/"))
+                        try {
+                            startActivity(intent)
+                        } catch (e: Exception) {
+                            Log.d(TAG, e.toString())
+                        }
                     }
+                }
 
-                    try {
-                        startActivity(intent)
-                    } catch (e: Exception) { Log.d(TAG, e.toString()) }
+            if (closeDrawer) drawerLayout.closeDrawer(navigationView, true)
+            if (setCheckedItem) navigationView.setCheckedItem(it.itemId)
+            if (destinationID != null && destinationID != navController.currentDestination?.id) {
+                destinationID?.let {
+                    navController.navigate(
+                        it,
+                        null,
+                        NavOptions.Builder().setPopUpTo(navController.graph.startDestination, false).build()
+                    )
                 }
             }
+            false
         }
-
-
-        if (closeDrawer) drawerLayout.closeDrawer(navigationView, true)
-        if (setCheckedItem) navigationView.setCheckedItem(it.itemId)
-        if (id != null)  navController.navigate(id, null, NavOptions.Builder().setPopUpTo(navController.graph.startDestination, false).build())
-        false
     }
 
 
@@ -150,7 +143,6 @@ class BlankActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-
         drawerLayout = blankActitivy_drawerLayout
         navController = findNavController(R.id.blankActivity_navHostFragment)
         navigationView = blankActivity_navigationView
@@ -160,7 +152,7 @@ class BlankActivity : AppCompatActivity() {
     private fun setupView() {
         window.statusBarColor = Color.TRANSPARENT
         navigationView.itemIconTintList = null
-//        navigationView.setupWithNavController(navController)
+        navController.addOnDestinationChangedListener(onDestinationChangedListener)
         navigationView.setNavigationItemSelectedListener(onNavigationItemSelectedListener)
     }
 

@@ -13,41 +13,18 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 
-fun Image.toBitmap(): Bitmap {
-    val yBuffer = planes[0].buffer // Y
-    val uBuffer = planes[1].buffer // U
-    val vBuffer = planes[2].buffer // V
-
-    val ySize = yBuffer.remaining()
-    val uSize = uBuffer.remaining()
-    val vSize = vBuffer.remaining()
-
-    val nv21 = ByteArray(ySize + uSize + vSize)
-
-    //U and V are swapped
-    yBuffer.get(nv21, 0, ySize)
-    vBuffer.get(nv21, ySize, vSize)
-    uBuffer.get(nv21, ySize + vSize, uSize)
-
-    val yuvImage = YuvImage(nv21, ImageFormat.NV21, this.width, this.height, null)
-    val out = ByteArrayOutputStream()
-    yuvImage.compressToJpeg(Rect(0, 0, yuvImage.width, yuvImage.height), 50, out)
-    val imageBytes = out.toByteArray()
-    return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+suspend fun Bitmap.toBase64(): String {
+   return Base64.encodeToString(this.toJPEG(0.1), Base64.DEFAULT)
 }
 
-fun Bitmap.toBase64(): String {
-   return Base64.encodeToString(this.toJPEG(0.2), Base64.DEFAULT)
-}
-
-fun Bitmap.toJPEG(megabyteSize: Double, megabyteDelta: Double = 0.2): ByteArray {
+suspend fun Bitmap.toJPEG(megabyteSize: Double, megabyteDelta: Double = 0.2): ByteArray = withContext(Dispatchers.Default) {
     val allowedSizeInBytes = (megabyteSize * 1024 * 1024).toInt()
     val deltaInBytes = (megabyteDelta * 1024 * 1024)
     val outputStream = ByteArrayOutputStream()
-    this.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+    this@toJPEG.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
 
     if (outputStream.size() < deltaInBytes + allowedSizeInBytes) {
-        return outputStream.toByteArray()
+        return@withContext outputStream.toByteArray()
     } else {
         outputStream.reset()
 
@@ -56,7 +33,7 @@ fun Bitmap.toJPEG(megabyteSize: Double, megabyteDelta: Double = 0.2): ByteArray 
         var mid = (left + right) / 2
         var index = 0
 
-        this.compress(Bitmap.CompressFormat.JPEG, mid, outputStream)
+        this@toJPEG.compress(Bitmap.CompressFormat.JPEG, mid, outputStream)
 
         while (index <= 7) {
             index += 1
@@ -66,18 +43,18 @@ fun Bitmap.toJPEG(megabyteSize: Double, megabyteDelta: Double = 0.2): ByteArray 
             } else if (outputStream.size() > (allowedSizeInBytes + deltaInBytes)) {
                 right = mid
             } else {
-                Log.d("Extension", "Compression ran $index times")
-                return outputStream.toByteArray()
+                Log.d("Extension", "Compression ran $index times, size is: ${outputStream.size()}")
+                return@withContext outputStream.toByteArray()
             }
 
             mid = (left + right) / 2
             outputStream.reset()
-            this.compress(Bitmap.CompressFormat.JPEG, mid, outputStream)
+            this@toJPEG.compress(Bitmap.CompressFormat.JPEG, mid, outputStream)
         }
 
-        Log.d("Extension", "Compression ran too many times")
-        this.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
-        return outputStream.toByteArray()
+        Log.d("Extension", "Compression ran too many times using compression level: $mid")
+        this@toJPEG.compress(Bitmap.CompressFormat.JPEG, mid, outputStream)
+        return@withContext outputStream.toByteArray()
     }
 }
 

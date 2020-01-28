@@ -19,7 +19,15 @@ import kotlinx.android.synthetic.main.view_mushroom.view.*
 
 class MushroomView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(context, attrs) {
 
-    lateinit var informationLinearLayout: LinearLayout
+    interface Listener {
+        fun onClicked(mushroom: Mushroom)
+    }
+
+
+    private var mushroom: Mushroom? = null
+    private var listener: Listener? = null
+
+    private lateinit var informationLinearLayout: LinearLayout
 
     init {
         val inflater = LayoutInflater.from(getContext())
@@ -35,22 +43,36 @@ class MushroomView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(c
     }
 
     private fun setupView() {
+        mushroomView_linearLayout.addView(informationLinearLayout)
+        clipToOutline = true
+    }
+
+    fun setListener(listener: Listener?) {
+        this.listener = listener
+        this.setOnClickListener {
+            mushroom?.let { listener?.onClicked(it) }
+        }
+    }
+
+    fun round(fully: Boolean) {
         outlineProvider = object: ViewOutlineProvider() {
             override fun getOutline(view: View?, outline: Outline?) {
                 val radius = 45F
 
                 view?.let {
-                    outline?.setRoundRect(0, 0, (view.width + radius).toInt(), view.height, radius)
+                    if (fully) {
+                        outline?.setRoundRect(0,0,view.width, view.height, radius)
+                    } else {
+                        outline?.setRoundRect(0, 0, (view.width + radius).toInt(), view.height, radius)
+                    }
                 }
             }
         }
-
-        mushroomView_linearLayout.addView(informationLinearLayout)
-
-        clipToOutline = true
     }
 
     fun configure(mushroom: Mushroom) {
+        this.mushroom = mushroom
+
         if (!mushroom.images.isNullOrEmpty()) {
             mushroomView_imageView.visibility = View.VISIBLE
             mushroomView_imageView.downloadImage(DataService.ImageSize.MINI, mushroom.images.first().url)
@@ -61,9 +83,9 @@ class MushroomView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(c
         if (mushroom.danishName != null) {
             mushroomView_primaryLabel.text = mushroom.danishName!!.upperCased()
             mushroomView_secondaryLabel.visibility = View.VISIBLE
-            mushroomView_secondaryLabel.text = mushroom.fullName.italized(context)
+            mushroomView_secondaryLabel.text = mushroom.fullName.italized()
         } else {
-            mushroomView_primaryLabel.text = mushroom.fullName.italized(context)
+            mushroomView_primaryLabel.text = mushroom.fullName.italized()
             mushroomView_secondaryLabel.visibility = View.GONE
         }
 

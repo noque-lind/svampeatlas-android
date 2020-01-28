@@ -7,9 +7,15 @@ import kotlinx.android.synthetic.main.item_mushroom.view.*
 
 class MushroomViewHolder(private val itemClick: ((Mushroom) -> Unit)?, var view: View): RecyclerView.ViewHolder(view) {
 
+    private val mushroomView = itemView.item_mushroom_mushroomView
+
+    init {
+        mushroomView.round(false)
+    }
+
     fun configure(mushroom: Mushroom) {
-        view.item_mushroom_mushroomView.configure(mushroom)
-        view.setOnClickListener {
+        mushroomView.configure(mushroom)
+        mushroomView.setOnClickListener {
             itemClick?.invoke(mushroom)
         }
     }

@@ -102,8 +102,27 @@ class DetailsPickerFragment() : DialogFragment() {
 
     // View models
 
-    private lateinit var newObservationViewModel: NewObservationViewModel
-    private lateinit var observationDetailsPickerViewModel: DetailsPickerViewModel
+    private val newObservationViewModel by lazy {
+        ViewModelProviders.of(requireActivity()).get(NewObservationViewModel::class.java)
+    }
+
+    private val observationDetailsPickerViewModel by lazy {
+            ViewModelProviders.of(this, DetailsPickerViewModelFactory(type, requireActivity().application)).get(DetailsPickerViewModel::class.java)
+    }
+
+
+    private val onExitButtonPressed by lazy {
+        View.OnClickListener {
+            when (type) {
+                Type.HOSTPICKER -> {
+                    newObservationViewModel.setHostsLockedState(switch.isChecked)
+                }
+                else -> {}
+            }
+
+            dismiss()
+        }
+    }
 
 
     override fun onCreateView(
@@ -140,16 +159,11 @@ class DetailsPickerFragment() : DialogFragment() {
 
     private fun setupViews() {
         cancelButton.apply {
-            setOnClickListener {
-                dismiss()
-            }
+            setOnClickListener(onExitButtonPressed)
         }
 
         recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
-            val dividerItemDecoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
-            dividerItemDecoration.setDrawable(ColorDrawable(resources.getColor(R.color.colorPrimary)))
-            addItemDecoration(dividerItemDecoration)
         }
 
 
@@ -165,6 +179,7 @@ class DetailsPickerFragment() : DialogFragment() {
             }
 
             Type.HOSTPICKER -> {
+                cancelButton.setImageResource(R.drawable.glyph_checkmark)
                 recyclerView.adapter = hostsAdapter
                 titleTextView.text = resources.getString(R.string.detailsPickerFragment_hostsPicker)
             }
@@ -173,9 +188,6 @@ class DetailsPickerFragment() : DialogFragment() {
 
 
     private fun setupViewModels() {
-        newObservationViewModel =
-            ViewModelProviders.of(requireActivity()).get(NewObservationViewModel::class.java)
-
         when (type) {
             Type.VEGETATIONTYPEPICKER -> {
                 switch.isChecked = newObservationViewModel.vegetationType.value?.second ?: false
@@ -188,11 +200,12 @@ class DetailsPickerFragment() : DialogFragment() {
             }
         }
 
-        observationDetailsPickerViewModel =
-            ViewModelProviders.of(this, DetailsPickerViewModelFactory(type, requireActivity().application)).get(DetailsPickerViewModel::class.java)
+
 
         observationDetailsPickerViewModel.hostsState.observe(viewLifecycleOwner, Observer { state ->
+            backgroundView.reset()
             when (state) {
+                is State.Loading -> { backgroundView.setLoading() }
                 is State.Error -> backgroundView.setError(state.error)
                 is State.Items -> {
                     val selectedPositions = mutableListOf<Int>()
@@ -210,7 +223,9 @@ class DetailsPickerFragment() : DialogFragment() {
         observationDetailsPickerViewModel.substrateGroupsState.observe(
             viewLifecycleOwner,
             Observer { state ->
+                backgroundView.reset()
                 when (state) {
+                    is State.Loading -> { backgroundView.setLoading() }
                     is State.Error -> backgroundView.setError(state.error)
                     is State.Items -> {
                         val sections = state.items.map {
@@ -225,7 +240,9 @@ class DetailsPickerFragment() : DialogFragment() {
         observationDetailsPickerViewModel.vegetationTypesState.observe(
             viewLifecycleOwner,
             Observer { state ->
+                backgroundView.reset()
                 when (state) {
+                    is State.Loading -> { backgroundView.setLoading() }
                     is State.Error -> backgroundView.setError(state.error)
                     is State.Items -> {
                         vegetationTypesAdapter.configure(

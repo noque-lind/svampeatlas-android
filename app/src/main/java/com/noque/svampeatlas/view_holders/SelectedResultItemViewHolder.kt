@@ -58,7 +58,7 @@ class SelectedResultItemViewHolder(itemView: View) : RecyclerView.ViewHolder(ite
                 NewObservationViewModel.DeterminationConfidence.POSSIBLE -> { radioGroup.check(R.id.selectedResultItem_radioButton_guessing) }
             }
 
-            radioGroup.setOnCheckedChangeListener { radioGroup, i ->
+            radioGroup.setOnCheckedChangeListener { _, i ->
                 when (i) {
                     R.id.selectedResultItem_radioButton_guessing -> {confidenceSet?.invoke(NewObservationViewModel.DeterminationConfidence.POSSIBLE)}
                     R.id.selectedResultItem_radioButton_unsure -> {confidenceSet?.invoke(NewObservationViewModel.DeterminationConfidence.LIKELY)}

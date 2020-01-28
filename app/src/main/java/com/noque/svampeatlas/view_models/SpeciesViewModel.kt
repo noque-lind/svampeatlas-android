@@ -12,10 +12,14 @@ import com.noque.svampeatlas.models.Mushroom
 import com.noque.svampeatlas.models.Observation
 import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.R
+import com.noque.svampeatlas.extensions.copyTo
+import com.noque.svampeatlas.models.Result
 import com.noque.svampeatlas.services.DataService
 import com.noque.svampeatlas.services.RoomService
 import com.noque.svampeatlas.utilities.Geometry
+import com.noque.svampeatlas.views.BlankActivity
 import kotlinx.coroutines.launch
+import java.io.File
 
 class SpeciesViewModel(val id: Int, application: Application) : AndroidViewModel(application) {
 
@@ -36,6 +40,9 @@ class SpeciesViewModel(val id: Int, application: Application) : AndroidViewModel
 
     private val _recentObservationsState by lazy { MutableLiveData<State<List<Observation>>>() }
     val recentObservationsState: LiveData<State<List<Observation>>> get() = _recentObservationsState
+
+    private val _observationImageSaveState by lazy { MutableLiveData<State<File>>() }
+    val observationImageSaveState: LiveData<State<File>> get() = _observationImageSaveState
 
     init {
         getMushroom(id)
@@ -107,6 +114,21 @@ class SpeciesViewModel(val id: Int, application: Application) : AndroidViewModel
 
                 it.onError {
                     _heatMapObservationCoordinates.value = State.Error(it)
+                }
+            }
+        }
+    }
+
+    fun saveObservationImage(imageFile: File) {
+        _observationImageSaveState.value = State.Loading()
+
+        viewModelScope.launch {
+            when (val result = imageFile.copyTo(BlankActivity.createFile(getApplication()))) {
+                is Result.Success -> {
+                    _observationImageSaveState.value = State.Items(result.value)
+                }
+                is Result.Error -> {
+                    _observationImageSaveState.value = State.Error(result.error)
                 }
             }
         }

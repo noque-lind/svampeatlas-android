@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorSecondary"
+    android:theme="@style/Light"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/mapSettingsFragment_headerLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:divider="@color/colorWhite_dimmed"
+        android:orientation="vertical"
+        android:showDividers="middle"
+        android:theme="@style/Light"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RelativeLayout
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                style="@style/AppTitle"
+                android:text="@string/mapSettingsFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@id/mapSettingsFragment_cancelButton"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="2dp" />
+
+            <ImageButton
+                android:layout_alignParentEnd="true"
+                android:id="@+id/mapSettingsFragment_cancelButton"
+                android:layout_gravity="center_vertical"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/glyph_cancel" />
+        </RelativeLayout>
+
+        <Switch
+            android:id="@+id/mapSettingsFragment_switch"
+            style="@style/AppPrimary"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:layout_weight="0"
+            android:text="@string/mapSettingsFragment_clearOldResults"
+            android:textColor="@color/colorWhite"
+            android:theme="@style/AppSwitch" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/mapSettingsFragment_relativeLayout"
+        app:layout_constraintTop_toBottomOf="@id/mapSettingsFragment_headerLinearLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="32dp"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            style="@style/AppPrimary"
+            android:layout_height="wrap_content"
+            android:text="@string/mapSearchFragment_radiusTitle"
+            android:id="@+id/mapSettingsFragment_radiusTitle" />
+
+        <TextView
+            android:id="@+id/mapSettingFragment_radiusLabel"
+            android:layout_toEndOf="@id/mapSettingsFragment_radiusTitle"
+            android:layout_marginStart="4dp"
+            style="@style/AppPrimaryHighlighted"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <SeekBar
+            android:id="@+id/mapSettingsFragment_radiusSlider"
+            style="@style/Widget.AppCompat.SeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/mapSettingsFragment_radiusTitle"
+            android:layout_marginTop="8dp"
+            android:max="4000" />
+
+        <TextView
+            android:layout_below="@id/mapSettingsFragment_radiusSlider"
+            android:id="@+id/mapSettingsFragment_ageTitle"
+            android:layout_width="wrap_content"
+            style="@style/AppPrimary"
+            android:layout_height="wrap_content"
+            android:text="@string/mapSearchFragment_ageTitle"
+            android:layout_marginTop="32dp"
+            />
+
+        <TextView
+            android:layout_marginTop="32dp"
+            android:id="@+id/mapSettingFragment_ageLabel"
+            android:layout_below="@id/mapSettingsFragment_radiusSlider"
+            android:layout_toEndOf="@id/mapSettingsFragment_ageTitle"
+            android:layout_marginStart="4dp"
+            style="@style/AppPrimaryHighlighted"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <SeekBar
+            android:layout_below="@id/mapSettingsFragment_ageTitle"
+            android:id="@+id/mapSettingsFragment_ageSlider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:max="7"/>
+
+    </RelativeLayout>
+
+    <Button
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp"
+        android:layout_height="55dp"
+        android:textAppearance="@style/AppPrimaryHighlighted"
+        android:textColor="@color/colorWhite"
+        android:text="@string/mapSearchFragment_search"
+        android:id="@+id/mapSettingsFragment_searchButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mapSettingsFragment_relativeLayout"
+        android:background="@color/colorGreen" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

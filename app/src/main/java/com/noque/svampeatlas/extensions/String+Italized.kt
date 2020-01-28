@@ -1,13 +1,16 @@
 package com.noque.svampeatlas.extensions
 
 import android.content.Context
+import android.graphics.Color
 import android.text.SpannableStringBuilder
 import androidx.core.text.italic
 
 import androidx.core.text.bold
+import androidx.core.text.color
+import com.noque.svampeatlas.R
 
 
-fun String.italized(context: Context? = null): SpannableStringBuilder {
+fun String.italized(): SpannableStringBuilder {
 
         val currentString = this
 
@@ -59,4 +62,14 @@ fun String.highlighted(): SpannableStringBuilder {
 
 fun String.upperCased(): SpannableStringBuilder {
     return SpannableStringBuilder().append(this.capitalize())
+}
+
+fun String.red(): SpannableStringBuilder {
+    val currentString = this
+
+    val string = SpannableStringBuilder().color(Color.RED){
+        append(currentString)
+    }
+
+    return string
 }

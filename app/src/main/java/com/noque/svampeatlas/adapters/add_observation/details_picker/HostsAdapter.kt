@@ -16,5 +16,6 @@ class HostsAdapter() : PickerAdapter<Host>() {
                     .item.let { holder.configure("- ${it.dkName} (${it.latinName})") }
             }
         }
+        super.onBindViewHolder(holder, position)
     }
 }

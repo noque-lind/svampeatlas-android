@@ -10,12 +10,9 @@
     <item
             android:state_selected="false"
             android:state_pressed="false"
-            android:drawable="@color/colorWhite">
+            android:drawable="@android:color/transparent">
 
     </item>
-
-
-
 
     <item
         android:state_selected="true"

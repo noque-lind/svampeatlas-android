@@ -3,12 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:clipToPadding="false"
+    android:clipChildren="false"
     android:layout_height="wrap_content">
 
 
     <com.noque.svampeatlas.views.ProfileImageView
         android:id="@+id/commentItem_profileImageView"
         android:layout_width="45dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:layout_height="45dp"
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"

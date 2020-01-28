@@ -20,8 +20,7 @@ class NotificationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
 
     fun configure(notification: Notification) {
-        var s: SpannableStringBuilder
-        s = notification.triggerName.highlighted()
+        var s: SpannableStringBuilder = notification.triggerName.highlighted()
 
         when (notification.eventType) {
             "COMMENT_ADDED" -> {
@@ -33,7 +32,7 @@ class NotificationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
             "DETERMINATION_ADDED" -> {
                 profileImageView.configure(notification.triggerInitials, notification.triggerImageURL, DataService.ImageSize.FULL)
-                s.append("har tilføjet bestemmelsen: ")
+                s.append(" har tilføjet bestemmelsen: ")
                 s.bold { append(notification.observationFullName.italized()) }
                 s.append(" til et fund som du følger.")
             }

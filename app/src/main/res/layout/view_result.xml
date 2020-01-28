@@ -45,6 +45,31 @@
             android:layout_height="wrap_content"
             android:gravity="start"/>
 
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/resultView_toxicityView"
+            android:background="@drawable/rounded_view_color_red"
+            android:padding="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+        <ImageView
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/glyphs_poisonous"/>
+
+        <TextView
+            android:layout_marginStart="8dp"
+            style="@style/AppPrimary"
+            android:text="@string/resultView_poisounous"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+
     </LinearLayout>
 
     <TextView

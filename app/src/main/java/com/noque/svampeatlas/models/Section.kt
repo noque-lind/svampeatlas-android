@@ -120,7 +120,6 @@ class Section<T>(private var title: String?) {
     }
 
     fun setTitle(title: String?) {
-        Log.d("Section", "setting title to: $title")
         this.title = title
     }
 

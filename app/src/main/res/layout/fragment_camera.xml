@@ -48,7 +48,7 @@
         android:id="@+id/cameraFragment_cameraViewConstraintLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="#80000000"
+        android:background="#B3000000"
         android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@id/cameraFragment_textureView"
         app:layout_constraintBottom_toBottomOf="@+id/cameraFragment_backgroundView"

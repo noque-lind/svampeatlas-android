@@ -3,10 +3,14 @@ package com.noque.svampeatlas.views
 import android.content.Context
 import android.graphics.drawable.*
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.Parcelable
+import android.text.Editable
+import android.text.TextWatcher
 import android.transition.AutoTransition
 import android.transition.TransitionManager
 import android.util.AttributeSet
+import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -17,9 +21,12 @@ import kotlinx.android.synthetic.main.view_searchbar.view.*
 import androidx.core.content.ContextCompat.getSystemService
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageButton
+import android.widget.ProgressBar
+import androidx.core.view.marginStart
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.noque.svampeatlas.extensions.dpToPx
+import kotlinx.android.synthetic.main.item_log_out.view.*
 
 
 interface SearchBarListener {
@@ -30,6 +37,7 @@ interface SearchBarListener {
 class SearchBarView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(context, attrs) {
 
     companion object {
+        val TAG = "SearchBarView"
         val KEY_IS_EXPANDED = "KEY_IS_EXPANDED"
         val KEY_RECENT_SEARCH = "KEY_RECENT_SEARCH"
         val KEY_SUPER_STATE = "KEY_SUPER_STATE"
@@ -40,7 +48,7 @@ class SearchBarView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(
     private val backgroundDrawable = PaintDrawable()
     private var isExpanded = true
     private var recentSearch: String? = null
-
+    private var countDownTimer: CountDownTimer? = null
 
     // Views
     private var rootLayout = ConstraintSet()
@@ -49,15 +57,30 @@ class SearchBarView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(
     lateinit var editText: TextInputEditText
     lateinit var textInputLayout: TextInputLayout
     lateinit var searchButton: ImageButton
+    lateinit var progressBar: ProgressBar
 
     // Listeners
 
     private var listener: SearchBarListener? = null
 
+    private val textWatcher = object: TextWatcher {
+        override fun afterTextChanged(p0: Editable) {
+            if (editText.hasFocus() && p0.count() > 4 && !p0.last().isWhitespace()) {
+                startCountdown()
+            } else {
+                resetProgressbar()
+            }
+        }
+
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+    }
+
     private val onKeyListener = object: OnKeyListener {
         override fun onKey(view: View?, keyCode: Int, keyEvent: KeyEvent?): Boolean {
             if (keyEvent?.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
                 onSearch()
+                resignFocus()
                 return true
             } else {
                 return false
@@ -66,10 +89,12 @@ class SearchBarView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(
     }
 
     private val onClickListener = OnClickListener { searchIconPressed() }
+
     private val onEndIconClickListener = OnClickListener {
         listener?.clearedSearchEntry()
         editText.text = null
         recentSearch = null
+        resetProgressbar()
     }
 
     init {
@@ -99,10 +124,19 @@ class SearchBarView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(
         }
     }
 
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        val heightPX = MeasureSpec.getSize(heightMeasureSpec)
+        progressBar.setPadding(heightPX / 2, 0, 0, 0)
+        textInputLayout.setPadding(heightPX + 8.dpToPx(context), 0, 8.dpToPx(context), 0)
+        backgroundDrawable.setCornerRadii(floatArrayOf((heightPX / 2).toFloat(), (heightPX / 2).toFloat(), 0F, 0F, 0F, 0F, (heightPX / 2).toFloat(), (heightPX / 2).toFloat()))
+    }
+
     private fun initViews() {
         editText = searchBarView_editText
         textInputLayout = searchBarView_textInputLayout
         searchButton = searchBarView_button
+        progressBar = searchBarView_progressBar
     }
 
     private fun setupViews() {
@@ -110,6 +144,7 @@ class SearchBarView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(
         iconifiedLayout.clone(context, R.layout.view_searchbar_iconified)
 
         editText.setOnKeyListener(onKeyListener)
+        editText.addTextChangedListener(textWatcher)
         searchButton.setOnClickListener(onClickListener)
         textInputLayout.setEndIconOnClickListener(onEndIconClickListener)
 
@@ -118,12 +153,28 @@ class SearchBarView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(
     }
 
 
+    private fun startCountdown() {
+        val milis = 1700L
+        progressBar.visibility = View.VISIBLE
+        countDownTimer?.cancel()
+        countDownTimer = object: CountDownTimer(milis, 10) {
+            override fun onFinish() {
+                onSearch()
+            }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        val heightPX = MeasureSpec.getSize(heightMeasureSpec)
-        textInputLayout.setPadding(heightPX + 8.dpToPx(context), 0, 8.dpToPx(context), 0)
-        backgroundDrawable.setCornerRadii(floatArrayOf((heightPX / 2).toFloat(), (heightPX / 2).toFloat(), 0F, 0F, 0F, 0F, (heightPX / 2).toFloat(), (heightPX / 2).toFloat()))
+            override fun onTick(p0: Long) {
+                progressBar.progress = 100 - ((p0.toDouble() / milis.toDouble()) * 100).toInt()
+            }
+        }
+
+        countDownTimer?.start()
+    }
+
+    private fun resetProgressbar() {
+        countDownTimer?.cancel()
+        countDownTimer = null
+        progressBar.visibility = View.GONE
+        progressBar.progress = 0
     }
 
     fun setListener(listener: SearchBarListener?) {
@@ -141,6 +192,7 @@ class SearchBarView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(
         if (isExpanded) {
             isExpanded = false
             setExpanded(false)
+            resetProgressbar()
         }
     }
 
@@ -165,12 +217,12 @@ class SearchBarView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(
     }
 
     private fun searchIconPressed() {
-         if(isExpanded) {
-             collapse()
-             listener?.clearedSearchEntry()
-         } else {
+         if(!isExpanded) {
              expand()
              becomeFocus()
+         } else {
+             onSearch()
+             resignFocus()
          }
         }
 
@@ -187,8 +239,6 @@ class SearchBarView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(
     }
 
     private fun onSearch() {
-        resignFocus()
-
         val searchString = editText.text.toString()
 
         if (searchString != "" && searchString != recentSearch) {
@@ -196,19 +246,6 @@ class SearchBarView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(
             listener?.newSearch(searchString)
         }
 
-        // MAKE ANIMATION TO BECOME BIGGER
-
-
-//
-//        guard let entry = text, entry != recentSearch else {return}
-//        searchBarDelegate?.newSearchEntry(entry: entry)
-//        recentSearch = entry
-//
-//        UIView.animate(withDuration: 0.1, animations: {
-//            self.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
-//        }) { (_) in
-//                UIView.animate(withDuration: 0.1, animations: {
-//            self.transform = CGAffineTransform.identity
-//        })
+        resetProgressbar()
     }
 }

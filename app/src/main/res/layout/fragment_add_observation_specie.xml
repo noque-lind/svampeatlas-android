@@ -2,6 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                                    android:layout_width="match_parent"
                                                    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:clipChildren="false"
                                                    xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
@@ -13,6 +15,7 @@
             android:paddingBottom="16dp"
             android:paddingTop="66dp"
             android:clipToPadding="false"
+        android:clipChildren="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -26,12 +29,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginEnd="0dp"
+        android:clipToPadding="false"
+        android:clipChildren="false"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="8dp"/>
-
-    <com.noque.svampeatlas.views.BackgroundView
-        android:id="@+id/addObservationSpecieFragment_backgroundView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

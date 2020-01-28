@@ -44,7 +44,7 @@ class ObservationLocationFragment : Fragment() {
 
         val latLng = LatLng(args.latitude.toDouble(), args.longitude.toDouble())
         mapFragment.addLocationMarker(latLng, getString(R.string.localityFragment_sightingLocation))
-        mapFragment.setRegion(latLng)
+        mapFragment.setRegion(latLng, 8000)
     }
 
     private fun initViews() {

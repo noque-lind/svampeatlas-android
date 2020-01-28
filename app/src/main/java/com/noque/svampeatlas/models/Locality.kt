@@ -8,6 +8,8 @@ data class Locality(
     @SerializedName("name") val name: String,
     @SerializedName("kommune") val municipality: String?,
     @SerializedName("decimalLatitude") private val latitude: Double,
-    @SerializedName("decimalLongitude") private val longitude: Double) {
+    @SerializedName("decimalLongitude") private val longitude: Double,
+    val geoName: GeoName?)
+{
     val location: LatLng get() {return LatLng(latitude, longitude)}
 }

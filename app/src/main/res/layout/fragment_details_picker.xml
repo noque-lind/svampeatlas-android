@@ -3,9 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:theme="@style/Light"
-    android:orientation="vertical">
+    android:background="@color/colorWhite"
+    android:theme="@style/Light">
 
 
     <LinearLayout
@@ -80,6 +79,8 @@
         android:id="@+id/detailsPickerFragment_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:clipChildren="false"
         android:theme="@style/Dark"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/detailsPickerFragment_headerLinearLayout">

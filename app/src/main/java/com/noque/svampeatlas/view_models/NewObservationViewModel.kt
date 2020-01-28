@@ -6,7 +6,9 @@ import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.*
 import com.google.android.gms.maps.model.LatLng
+import com.google.gson.JsonObject
 import com.google.maps.android.SphericalUtil
+import com.noque.svampeatlas.R
 import com.noque.svampeatlas.extensions.getBitmap
 import com.noque.svampeatlas.extensions.toSimpleString
 import com.noque.svampeatlas.models.*
@@ -15,7 +17,9 @@ import com.noque.svampeatlas.services.LocationService
 import com.noque.svampeatlas.services.RoomService
 import com.noque.svampeatlas.utilities.Geometry
 import com.noque.svampeatlas.utilities.SharedPreferencesHelper
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -24,10 +28,11 @@ import java.util.*
 class NewObservationViewModel(application: Application) : AndroidViewModel(application) {
 
     sealed class Error(title: String, message: String): AppError(title, message) {
-        class NoMushroomError(context: Context): Error("Du mangler at specificere en art", "For at uploade en observation, skal du enten tilføje billeder, eller identificere en art.")
-        class NoSubstrateError(context: Context): Error("Manglende information", "Du skal opgive en substrat til din observation")
-        class NoVegetationTypeError(context: Context): Error("Manglende information", "Du skal opgive en vegetationtype til din observation")
-        class NoLocationDataError(context: Context): Error("Hvor er du?", "Du skal hjælpe med at fortælle hvad du er i nærheden af")
+        class NoMushroomError(context: Context): Error(context.getString(R.string.newObservationViewModelError_noMushroom_title), context.getString(R.string.newObservationViewModelError_noMushroom_message))
+        class NoSubstrateError(context: Context): Error(context.getString(R.string.newObservationViewModelError_noSubstrate_title), context.getString(R.string.newObservationViewModelError_noSubstrate_message))
+        class NoVegetationTypeError(context: Context): Error(context.getString(R.string.newObservationViewModelError_noVegetationType_title), context.getString(R.string.newObservationViewModelError_noVegetationType_message))
+        class NoLocationDataError(context: Context): Error(context.getString(R.string.newObservationViewModelError_noLocation_title), context.getString(R.string.newObservationViewModelError_noLocation_message))
+        class LocalityFetchError(context: Context): Error(context.getString(R.string.newObservationViewModelError_localityFetch_title), context.getString(R.string.newObservationViewModelError_localityFetch_message))
     }
 
 
@@ -45,16 +50,16 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         }
     }
 
-
     private val _date by lazy {MutableLiveData<Date>()}
     private val _locality by lazy {MutableLiveData<Locality?>()}
     private val _coordinate by lazy {MutableLiveData<LatLng?>()}
     private val _substrate by lazy {MutableLiveData<Pair<Substrate, Boolean>?>()}
     private val _vegetationType by lazy {MutableLiveData<Pair<VegetationType, Boolean>?>()}
     private val _hosts by lazy { MutableLiveData<Pair<MutableList<Host>, Boolean>?>()}
-    private val _images by lazy {MutableLiveData<MutableList<File>>()}
+    private val _images by lazy {MutableLiveData<MutableList<File>?>()}
     private val _mushroom by lazy {MutableLiveData<Pair<Mushroom, DeterminationConfidence>?>()}
 
+    private var coordinateAccuracy: Float = 60F
     private var _notes: String? = null
     private var _ecologyNotes: String? = null
     private var _determinationNotes: String? = null
@@ -75,12 +80,19 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
     val coordinate: LiveData<LatLng?> get() = _coordinate
     val notes get() = _notes
     val ecologyNotes get() = _ecologyNotes
-    val images: LiveData<MutableList<File>> get() = _images
+    val images: LiveData<MutableList<File>?> get() = _images
     val mushroom: LiveData<Pair<Mushroom, DeterminationConfidence>?> get() = _mushroom
 
     init {
-        _mushroom.value = null
+        setup()
+    }
+
+    private fun setup() {
         _date.value = Calendar.getInstance().time
+        _coordinate.value = null
+        _mushroom.value = null
+        _localityState.value = State.Empty()
+        _predictionResultsState.value = State.Empty()
 
         viewModelScope.launch {
             SharedPreferencesHelper(getApplication()).getSubstrateID()?.let {
@@ -108,15 +120,17 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
     }
 
     fun setLocality(locality: Locality) {
-        Log.d(TAG, "Locality set to ${locality.toString()}")
         _locality.value = locality
     }
 
-    fun setCoordinate(coordinate: LatLng) {
+    fun setCoordinate(coordinate: LatLng, accuracy: Float) {
         _coordinate.value = coordinate
+        this.coordinateAccuracy = accuracy
+        getLocalities(coordinate)
     }
 
     fun setSubstrate(substrate: Substrate, isLocked: Boolean) {
+
         _substrate.value = Pair(substrate, isLocked)
 
         SharedPreferencesHelper(getApplication()).saveSubstrateID(if (isLocked) substrate.id else null)
@@ -131,6 +145,7 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         _vegetationType.value = Pair(vegetationType, isLocked)
 
         SharedPreferencesHelper(getApplication()).saveVegetationTypeID(if (isLocked) vegetationType.id else null)
+
         if (isLocked) {
             viewModelScope.launch {
                 RoomService.getInstance(getApplication()).saveVegetationType(vegetationType)
@@ -158,12 +173,61 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         }
     }
 
+    fun setHostsLockedState(value: Boolean) {
+        if (hosts.value?.second != value)
+        _hosts.value = Pair(hosts.value?.first ?: mutableListOf(), value)
+    }
+
     fun removeHost(host: Host, isLocked: Boolean) {
         _hosts.value?.let {
             if (it.first.remove(host)) _hosts.value = Pair(it.first, isLocked)
         }
 
         SharedPreferencesHelper(getApplication()).saveHostsID(hosts.value?.first?.map { it.id })
+    }
+
+    fun appendImage(imageFile: File) {
+        var images = images.value
+
+        if (images == null) {
+            images = mutableListOf(imageFile)
+            if (mushroom.value?.first == null) getPredictions(imageFile)
+        } else {
+            images.add(imageFile)
+        }
+
+        _images.value = images
+    }
+
+    fun removeImageAt(position: Int) {
+        if (_images.value != null && _images.value!!.lastIndex >= position) {
+            _images.value?.removeAt(position)
+
+            if (_images.value?.count() == 0) {
+                _images.value = null
+                _predictionResultsState.value = State.Empty()
+            }
+        }
+    }
+
+    fun setMushroom(mushroom: Mushroom?) {
+        if (this.mushroom.value?.first != mushroom) {
+            if (mushroom != null) {
+                _mushroom.value = Pair(mushroom, DeterminationConfidence.CONFIDENT)
+            } else {
+                _mushroom.value = null
+            }
+        }
+    }
+
+    fun setConfidence(confidence: DeterminationConfidence) {
+        mushroom.value?.let {
+            _mushroom.value = Pair(it.first, confidence)
+        }
+    }
+
+    fun setDeterminationNotes(notes: String?) {
+        _determinationNotes = notes
     }
 
     fun setNotes(notes: String?) {
@@ -174,53 +238,9 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         _ecologyNotes = ecologyNotes
     }
 
-    fun appendImage(imageFile: File) {
-        _images.value?.let {
-            it.add(imageFile)
-            _images.value = it
-            return
-        }
-
-        if (mushroom.value == null) {
-            getPredictions(imageFile)
-        }
-
-        _images.value = mutableListOf(imageFile)
-    }
-
-    fun removeImageAt(position: Int) {
-        _images.value?.let {
-            if (position <= it.lastIndex) it.removeAt(position)
-            _images.value = it
-        }
-    }
-
 
     fun setLocationError(error: LocationService.Error) {
         _localityState.value = State.Error(error)
-    }
-
-    fun setMushroom(mushroom: Mushroom?) {
-        Log.d(TAG, "Setting Mushrooms to: ${mushroom?.fullName} if its value is not the same as it already is.")
-
-        if (this.mushroom.value?.first != mushroom) {
-            if (mushroom != null) {
-                _mushroom.value = Pair(mushroom, DeterminationConfidence.CONFIDENT)
-            } else {
-                _mushroom.value = null
-            }
-        }
-    }
-
-    fun setDeterminationNotes(notes: String) {
-        _determinationNotes = notes
-    }
-
-    fun setConfidence(confidence: DeterminationConfidence) {
-        mushroom.value?.let {
-            _mushroom.value = Pair(it.first, confidence)
-            Log.d(TAG, "Setting Confidence to ${confidence.toString()}")
-        }
     }
 
     fun resetLocationData() {
@@ -229,66 +249,68 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         _locality.value = null
     }
 
+    fun reset() {
+        _date.value = null
+        _locality.value = null
+        _coordinate.value = null
+        coordinateAccuracy = 60F
+        _substrate.value = null
+        _vegetationType.value = null
+        _hosts.value = null
+        _images.value = null
+        _mushroom.value = null
+        _notes = null
+        _ecologyNotes = null
+        _determinationNotes = null
 
-    fun getLocalities(latLng: LatLng) {
+        setup()
+    }
+
+    private fun getLocalities(latLng: LatLng) {
         _localityState.value = State.Loading()
 
-        viewModelScope.launch {
             DataService.getInstance(getApplication()).getLocalities(TAG, latLng) { result ->
                 result.onSuccess {
-                    Log.d(TAG, it.toString())
-                    _localityState.value = State.Items(it)
-                    assignClosestLocality(latLng, it)
+                    if (it.isNotEmpty()) {
+                        _localityState.value = State.Items(it)
+                        assignClosestLocality(latLng, it)
+                    } else {
+                        _localityState.value = State.Error(Error.LocalityFetchError(getApplication()))
+                    }
                 }
 
                 result.onError {
                     _localityState.value = State.Error(it)
                 }
             }
-        }
     }
 
-    fun reset() {
-        _localityState.value = State.Empty()
+    private fun assignClosestLocality(location: LatLng, localities: List<Locality>) {
+        viewModelScope.launch {
+            withContext(Dispatchers.Default) {
+                var closest = localities.first()
 
-        _date.value = Calendar.getInstance().time
-        _locality.value = null
-        _coordinate.value = null
-        _substrate.value = null
-        _vegetationType.value = null
-        _hosts.value = null
-        _images.value = mutableListOf()
-        _mushroom.value = null
-        _determinationNotes = null
-        _notes = null
-        _ecologyNotes = null
+                localities.forEach {
+                    if (SphericalUtil.computeDistanceBetween(location, it.location) < SphericalUtil.computeDistanceBetween(location, closest.location)) { closest = it }
+                }
+
+                _locality.postValue(closest)
+            }
+        }
     }
 
     private fun getPredictions(imageFile: File) {
         _predictionResultsState.value = State.Loading()
 
         viewModelScope.launch {
-            val bitmap = imageFile.getBitmap()
-            DataService.getInstance(getApplication()).getPredictions(bitmap) {
+            DataService.getInstance(getApplication()).getPredictions(imageFile) { it ->
                 it.onError { _predictionResultsState.value = State.Error(it) }
                 it.onSuccess { _predictionResultsState.value = State.Items(it) }
             }
         }
     }
 
-    private fun assignClosestLocality(location: LatLng, localities: List<Locality>) {
-        var closest = localities.first()
-
-        localities.forEach {
-            if (SphericalUtil.computeDistanceBetween(location, it.location) < SphericalUtil.computeDistanceBetween(location, closest.location)) { closest = it }
-        }
-
-        _locality.value = closest
-    }
-
-
     fun prepareForUpload(userID: Int): Result<Pair<JSONObject, List<File>?>, Error> {
-
         val date = date.value
         val mushroom = mushroom.value
         val substrate = substrate.value?.first
@@ -317,6 +339,12 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
             return Result.Error(Error.NoLocationDataError(getApplication()))
         }
 
+        if (predictionResultsState.value is State.Items && _determinationNotes == null) {
+            val predictionResults = predictionResultsState.value as State.Items
+            val selectedPrediction = predictionResults.items.firstOrNull { it.mushroom.id == mushroom.first.id }
+            _determinationNotes = PredictionResult.getNotes(selectedPrediction, predictionResults.items)
+        }
+
        val jsonObject = JSONObject()
         jsonObject.put("observationDate", (date?.toSimpleString()) ?: Calendar.getInstance().time.toSimpleString())
         jsonObject.put("os", "Android")
@@ -332,25 +360,39 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         jsonObject.put("note", notes)
         jsonObject.put("decimalLatitude", coordinate.latitude)
         jsonObject.put("decimalLongitude", coordinate.longitude)
+        jsonObject.put("accuracy", coordinateAccuracy)
 
-        // FIIIX
-        jsonObject.put("accuracy", 60)
-        jsonObject.put("locality_id", locality.id)
+        if (locality.geoName != null) {
+            jsonObject.put("geonameId", locality.geoName.geonameId)
+            jsonObject.put("geoname", JSONObject()
+                .put("geonameId", locality.geoName.geonameId)
+                .put("name", locality.geoName.name)
+                .put("adminName1", locality.geoName.adminName1)
+                .put("lat", locality.geoName.lat)
+                .put("lng", locality.geoName.lng)
+                .put("countryName", locality.geoName.countryName)
+                .put("countryCode", locality.geoName.countryCode)
+                .put("fcodeName", locality.geoName.fcodeName)
+                .put("fclName", locality.geoName.fclName)
+                )
+        } else {
+            jsonObject.put("locality_id", locality.id)
+        }
+
 
         jsonObject.put("determination",
             JSONObject()
                 .put("confidence", mushroom.second.databaseName)
                 .put("taxon_id", mushroom.first.id)
-                .put("user_id", userID))
-                .put("notes", _determinationNotes ?: "")
+                .put("user_id", userID)
+                .put("notes", _determinationNotes ?: ""))
 
         return Result.Success(Pair(jsonObject, images.value?.toList()))
     }
 
 
     override fun onCleared() {
-        super.onCleared()
-        Log.d(TAG, "NEwObser cleared")
         DataService.getInstance(getApplication()).clearRequestsWithTag(TAG)
+        super.onCleared()
     }
 }

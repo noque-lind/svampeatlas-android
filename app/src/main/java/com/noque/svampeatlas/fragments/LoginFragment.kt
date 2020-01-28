@@ -30,8 +30,14 @@ import androidx.core.content.ContextCompat.getSystemService
 import android.content.Context
 import android.view.inputmethod.InputMethodManager
 import android.app.Activity
-
-
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
+import android.widget.ImageView
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.noque.svampeatlas.utilities.GlideApp
+import java.lang.Exception
 
 
 class LoginFragment : Fragment() {
@@ -41,10 +47,12 @@ class LoginFragment : Fragment() {
     }
 
     // Views
-    lateinit var backgroundView: BackgroundView
-    lateinit var initialsEditText: EditText
-    lateinit var passwordEditText: EditText
-    lateinit var loginButton: Button
+    private lateinit var backgroundView: BackgroundView
+    private lateinit var initialsEditText: EditText
+    private lateinit var passwordEditText: EditText
+    private lateinit var loginButton: Button
+    private lateinit var createAccountButton: Button
+    private lateinit var bg: ImageView
 
     // View models
 
@@ -71,6 +79,14 @@ class LoginFragment : Fragment() {
         view?.requestFocus()
     }
 
+    private val createAccountButtonPressed = View.OnClickListener {
+        try {
+            val intent =
+                Intent(Intent.ACTION_VIEW, Uri.parse("https://svampe.databasen.org/signup"))
+            startActivity(intent)
+        } catch (exception: ActivityNotFoundException) {}
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -91,12 +107,17 @@ class LoginFragment : Fragment() {
         initialsEditText = loginFragment_initialsEditText
         passwordEditText = loginFragment_passwordEditText
         loginButton = loginFragment_loginButton
+        createAccountButton = loginFragment_createAccountButton
+        bg = loginFragment_bg
     }
 
     private fun setupViews() {
         (requireActivity() as BlankActivity).setSupportActionBar(loginFragment_toolbar)
 
         loginButton.setOnClickListener(loginButtonClickListener)
+        createAccountButton.setOnClickListener(createAccountButtonPressed)
+
+        GlideApp.with(requireContext()).load(R.drawable.background).transition(DrawableTransitionOptions.withCrossFade()).into(bg)
     }
 
     private fun setupViewModels() {

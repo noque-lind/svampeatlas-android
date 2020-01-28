@@ -17,14 +17,14 @@ import com.noque.svampeatlas.view_holders.SettingsViewHolder
 import java.util.*
 
 class DetailsAdapter(private val resources: Resources, private val categories: Array<DetailsFragment.Categories>) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    RecyclerView.Adapter<ViewHolder>() {
 
     var date: Date? = null
     var substrate: Pair<Substrate, Boolean>? = null
     var vegetationType: Pair<VegetationType, Boolean>? = null
     var hosts: Pair<List<Host>, Boolean>? = null
-    var notes: String? = null
-    var ecologyNotes: String? = null
+    private var notes: String? = null
+    private var ecologyNotes: String? = null
 
     fun updateCategory(category: DetailsFragment.Categories) {
         notifyItemChanged(category.ordinal)
@@ -33,11 +33,9 @@ class DetailsAdapter(private val resources: Resources, private val categories: A
     var categoryClicked: ((category: DetailsFragment.Categories) -> Unit)? = null
     var onTextInputChanged: ((category: DetailsFragment.Categories, text: String?) -> Unit)? = null
 
-    private val onClickListener = object: View.OnClickListener {
-        override fun onClick(view: View) {
-            (view.tag as? RecyclerView.ViewHolder)?.adapterPosition?.let {
-                categoryClicked?.invoke(categories[it])
-            }
+    private val onClickListener = View.OnClickListener { view ->
+        (view.tag as? ViewHolder)?.adapterPosition?.let {
+            categoryClicked?.invoke(categories[it])
         }
     }
 
@@ -52,10 +50,10 @@ class DetailsAdapter(private val resources: Resources, private val categories: A
         return categories[position].ordinal
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 
-        var view: View
-        var viewHolder: RecyclerView.ViewHolder
+        val view: View
+        val viewHolder: ViewHolder
         val layoutInflater = LayoutInflater.from(parent.context)
 
 
@@ -88,7 +86,7 @@ class DetailsAdapter(private val resources: Resources, private val categories: A
             DetailsFragment.Categories.DATE -> (holder as? SettingsViewHolder)?.configure(
                 R.drawable.glyph_age,
                 resources.getString(R.string.detailsFragment_observationDate),
-                date?.toReadableDate(false, true) ?: "-"
+                date?.toReadableDate(recentFormatting = false, ignoreTime = true) ?: "-"
             )
             DetailsFragment.Categories.SUBSTRATE -> {
                 val string = if (substrate?.second == true) "\uD83D\uDD12 " else ""
@@ -110,15 +108,21 @@ class DetailsAdapter(private val resources: Resources, private val categories: A
         }
 
             DetailsFragment.Categories.HOST -> {
-                var hostString = if (hosts?.second == true) "\uD83D\uDD12 " else ""
-                hosts?.let {
-                    it.first.forEach { hostString += "${it.dkName}, " }
-                    hostString = hostString.dropLast(2)
-                } ?: run {
-                    hostString = "-"
+                var hostsString: String
+
+
+                if (hosts?.first.isNullOrEmpty()) {
+                    hostsString = "-"
+                } else {
+                    hostsString = if (hosts?.second == true) "\uD83D\uDD12 " else ""
+                    hosts?.first?.forEach {
+                        hostsString += "${it.dkName}, "
+                    }
+                   hostsString = hostsString.dropLast(2)
+
                 }
 
-                (holder as? SettingsViewHolder)?.configure(R.drawable.glyph_host,resources.getString(R.string.detailsFragment_hosts), hostString)
+                (holder as? SettingsViewHolder)?.configure(R.drawable.glyph_host,resources.getString(R.string.detailsFragment_hosts), hostsString)
             }
 
 

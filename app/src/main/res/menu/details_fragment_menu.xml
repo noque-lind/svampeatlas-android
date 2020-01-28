@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/empty"
+        android:icon="@drawable/ic_more_vertical"
+        android:orderInCategory="101"
+        android:title="cvvc"
+        app:showAsAction="always">
+
+        <menu>
+            <item
+                android:id="@+id/menu_detailsFragment_report"
+                android:title="@string/menu_reportOffensiveContent"
+                app:showAsAction="ifRoom" />
+        </menu>
+
+    </item>
+
+</menu>

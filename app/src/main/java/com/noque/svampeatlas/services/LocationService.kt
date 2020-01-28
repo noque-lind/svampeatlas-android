@@ -60,6 +60,7 @@ class LocationService(private val applicationContext: Context) {
     }
 
     fun start() {
+        if (locationClient != null) return
         locationClient = LocationServices.getFusedLocationProviderClient(applicationContext)
 
         if (permissionGranted) {

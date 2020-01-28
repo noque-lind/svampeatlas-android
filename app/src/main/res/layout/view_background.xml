@@ -8,14 +8,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <LinearLayout
+    <RelativeLayout
             android:id="@+id/backgroundView_errorView_linearLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="16dp" app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="16dp"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp">
 
         <TextView
                 android:id="@+id/backgroundView_errorView_titleTextView"
@@ -30,20 +32,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
+            android:layout_below="@id/backgroundView_errorView_titleTextView"
                 style="@style/AppPrimary"/>
 
         <Button
             android:id="@+id/backgroundView_handlerButton"
             style="@style/AppPrimaryHighlighted"
-            android:layout_marginTop="32dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/backgroundView_errorView_messageTextView"
+            android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
+            android:layout_marginTop="32dp"
             android:backgroundTint="@color/colorPrimary"
             android:padding="16dp"
             android:visibility="gone"
             tools:visibility="visible" />
-    </LinearLayout>
+    </RelativeLayout>
 
     <com.noque.svampeatlas.views.SpinnerView
         android:id="@+id/backgroundView_spinnerView"

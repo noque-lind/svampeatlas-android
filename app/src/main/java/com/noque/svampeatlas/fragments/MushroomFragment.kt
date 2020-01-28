@@ -91,71 +91,93 @@ class MushroomFragment : Fragment() {
 
     // Listeners
 
-    private val searchBarListener = object : SearchBarListener {
-        override fun newSearch(entry: String) {
-            mushroomsViewModel.search(entry, true)
-        }
+    private val searchBarListener by lazy {
+        object : SearchBarListener {
+            override fun newSearch(entry: String) {
+                mushroomsViewModel.search(entry, true)
+            }
 
-        override fun clearedSearchEntry() {
+            override fun clearedSearchEntry() {
+                mushroomsViewModel.reloadData()
+            }
+        }
+    }
+
+    private val onScrollListener by lazy {
+        object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                if (!recyclerView.canScrollVertically(-1)) {
+                    searchBarView?.expand()
+                } else if (dy > 0) {
+                    searchBarView?.collapse()
+                }
+            }
+        }
+    }
+
+    private val onRefreshListener  by lazy {
+        SwipeRefreshLayout.OnRefreshListener {
             mushroomsViewModel.reloadData()
+            swipeRefreshLayout?.isRefreshing = false
         }
     }
 
-    private val onScrollListener = object : RecyclerView.OnScrollListener() {
-        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-            super.onScrolled(recyclerView, dx, dy)
+    private val onTapSelectedListener by lazy {
+        object : TabLayout.OnTabSelectedListener {
+            override fun onTabReselected(tab: TabLayout.Tab) {
+                val category = MushroomsViewModel.Category.values[tab.position]
 
-            if (!recyclerView.canScrollVertically(-1)) {
-                searchBarView?.expand()
-            } else if (dy > 0) {
-                searchBarView?.collapse()
+                when (category) {
+                    MushroomsViewModel.Category.FAVORITES -> {
+                        searchBarView?.visibility = View.GONE
+                        recyclerView?.setPadding(0, 0, 0, 0)
+
+                    }
+                    MushroomsViewModel.Category.SPECIES -> {
+                        searchBarView?.visibility = View.VISIBLE
+                        recyclerView?.setPadding(
+                            0,
+                            (resources.getDimension(R.dimen.searchbar_view_height) + resources.getDimension(
+                                R.dimen.searchbar_top_margin
+                            )).toInt(),
+                            0,
+                            0
+                        )
+                    }
+                }
+            }
+
+            override fun onTabUnselected(p0: TabLayout.Tab?) {}
+
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                val category = MushroomsViewModel.Category.values[tab.position]
+                mushroomsViewModel.selectCategory(category)
+
+                when (category) {
+                    MushroomsViewModel.Category.FAVORITES -> {
+                        searchBarView?.visibility = View.GONE
+                        recyclerView?.setPadding(0, 0, 0, 0)
+
+                    }
+                    MushroomsViewModel.Category.SPECIES -> {
+                        searchBarView?.visibility = View.VISIBLE
+                        recyclerView?.setPadding(
+                            0,
+                            (resources.getDimension(R.dimen.searchbar_view_height) + resources.getDimension(
+                                R.dimen.searchbar_top_margin
+                            )).toInt(),
+                            0,
+                            0
+                        )
+                    }
+                }
             }
         }
     }
 
-    private val onRefreshListener = SwipeRefreshLayout.OnRefreshListener {
-        mushroomsViewModel.reloadData()
-        swipeRefreshLayout?.isRefreshing = false
-    }
-
-    private val onTapSelectedListener = object : TabLayout.OnTabSelectedListener {
-        override fun onTabReselected(tab: TabLayout.Tab) {
-            val category = MushroomsViewModel.Category.values[tab.position]
-
-            when (category) {
-                MushroomsViewModel.Category.FAVORITES ->  {
-                    searchBarView?.visibility = View.GONE
-                    recyclerView?.setPadding(0, 0, 0, 0)
-
-                }
-                MushroomsViewModel.Category.SPECIES ->  {
-                    searchBarView?.visibility = View.VISIBLE
-                    recyclerView?.setPadding(0, (resources.getDimension(R.dimen.searchbar_view_height) + resources.getDimension(R.dimen.searchbar_top_margin)).toInt(), 0, 0)
-                }
-            }
-        }
-
-        override fun onTabUnselected(p0: TabLayout.Tab?) {}
-
-        override fun onTabSelected(tab: TabLayout.Tab) {
-            val category = MushroomsViewModel.Category.values[tab.position]
-            mushroomsViewModel.selectCategory(category)
-
-            when (category) {
-                MushroomsViewModel.Category.FAVORITES ->  {
-                    searchBarView?.visibility = View.GONE
-                    recyclerView?.setPadding(0, 0, 0, 0)
-
-                }
-                MushroomsViewModel.Category.SPECIES ->  {
-                    searchBarView?.visibility = View.VISIBLE
-                    recyclerView?.setPadding(0, (resources.getDimension(R.dimen.searchbar_view_height) + resources.getDimension(R.dimen.searchbar_top_margin)).toInt(), 0, 0)
-                }
-            }
-        }
-    }
-
-    private val imageSwipedCallback =
+    private val imageSwipedCallback by lazy {
         object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             override fun onChildDrawOver(
                 c: Canvas,
@@ -193,14 +215,16 @@ class MushroomFragment : Fragment() {
 
                 val rightMargin = 32.dpToPx(requireContext())
                 val iconSize = 30.dpToPx(requireContext())
-                var icon: Drawable
-                var background: ColorDrawable
+                val icon: Drawable
+                val background: ColorDrawable
 
                 if (mushroomsViewModel.selectedCategory.value == MushroomsViewModel.Category.FAVORITES) {
-                    background = ColorDrawable(ResourcesCompat.getColor(resources, R.color.colorRed, null))
+                    background =
+                        ColorDrawable(ResourcesCompat.getColor(resources, R.color.colorRed, null))
                     icon = resources.getDrawable(R.drawable.icon_favorite_remove, null)
                 } else {
-                    background = ColorDrawable(ResourcesCompat.getColor(resources, R.color.colorGreen, null))
+                    background =
+                        ColorDrawable(ResourcesCompat.getColor(resources, R.color.colorGreen, null))
                     icon = resources.getDrawable(R.drawable.icon_favorite_make, null)
                 }
 
@@ -209,7 +233,7 @@ class MushroomFragment : Fragment() {
                     viewHolder.itemView.right - iconSize * 2 - rightMargin,
                     viewHolder.itemView.top + (viewHolder.itemView.height / 2) - iconSize,
                     viewHolder.itemView.right - rightMargin,
-                     viewHolder.itemView.bottom - (viewHolder.itemView.height / 2) + iconSize
+                    viewHolder.itemView.bottom - (viewHolder.itemView.height / 2) + iconSize
                 )
 
 
@@ -223,13 +247,17 @@ class MushroomFragment : Fragment() {
                 background.draw(c)
                 icon.draw(c)
 
-                if (isCurrentlyActive) {
-                    swipeRefreshLayout?.isEnabled = false
-                } else {
-                    swipeRefreshLayout?.isEnabled = true
-                }
+                swipeRefreshLayout?.isEnabled = !isCurrentlyActive
 
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                super.onChildDraw(
+                    c,
+                    recyclerView,
+                    viewHolder,
+                    dX,
+                    dY,
+                    actionState,
+                    isCurrentlyActive
+                )
             }
 
 
@@ -251,6 +279,7 @@ class MushroomFragment : Fragment() {
 
             }
         }
+    }
 
 
     override fun onCreateView(
@@ -390,16 +419,6 @@ class MushroomFragment : Fragment() {
         }
     }
 
-override fun onPause() {
-    Log.d(TAG, "On Pause")
-    super.onPause()
-}
-
-override fun onStop() {
-    Log.d(TAG, "On Stop")
-    super.onStop()
-}
-
 override fun onDestroyView() {
     recyclerView?.adapter = null
     recyclerView = null
@@ -408,17 +427,6 @@ override fun onDestroyView() {
     swipeRefreshLayout = null
     swipeRefreshLayout = null
     tabLayout = null
-
     super.onDestroyView()
-}
-
-override fun onDestroy() {
-    Log.d(TAG, "On Destroy")
-    super.onDestroy()
-}
-
-override fun onDetach() {
-    Log.d(TAG, "On Detach")
-    super.onDetach()
 }
 }

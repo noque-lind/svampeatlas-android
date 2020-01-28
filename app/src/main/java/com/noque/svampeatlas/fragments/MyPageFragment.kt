@@ -56,7 +56,7 @@ class MyPageFragment : Fragment() {
                 val action = MyPageFragmentDirections.actionGlobalMushroomDetailsFragment(
                     observation.id,
                     DetailsFragment.TakesSelection.NO,
-                    DetailsFragment.Type.OBSERVATION,
+                    DetailsFragment.Type.OBSERVATIONWITHSPECIES,
                     null,
                     null
                 )
@@ -76,10 +76,11 @@ class MyPageFragment : Fragment() {
             }
 
             override fun notificationSelected(notification: Notification) {
+                sessionViewModel.markNotificationAsRead(notification)
                 val action = MyPageFragmentDirections.actionGlobalMushroomDetailsFragment(
                     notification.observationID,
                     DetailsFragment.TakesSelection.NO,
-                    DetailsFragment.Type.OBSERVATION,
+                    DetailsFragment.Type.OBSERVATIONWITHSPECIES,
                     null,
                     null
                 )
@@ -136,6 +137,8 @@ class MyPageFragment : Fragment() {
             adapter = this@MyPageFragment.adapter
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         }
+
+
     }
 
     private fun setupViewModels() {
@@ -162,7 +165,7 @@ class MyPageFragment : Fragment() {
                     }
 
                     is State.Error -> {
-                        adapter.configureNotificationsState(State.Error(state.error))
+                        adapter.configureNotificationsState(State.Error(state.error), getString(R.string.myPageFragment_notificationsHeader))
                     }
                 }
 
@@ -184,14 +187,14 @@ class MyPageFragment : Fragment() {
                         } else {
                             val items: MutableList<MyPageAdapter.Item> = state.items.first.map { MyPageAdapter.Item.Observation(it) }.toMutableList()
                             if (items.count() != state.items.second) items.add(MyPageAdapter.Item.LoadMore(MyPageAdapter.Item.Category.OBSERVATIONS, items.lastIndex))
-                            adapter.configureObservationsState(State.Items(items), "\${state.items.second} ${getText(
+                            adapter.configureObservationsState(State.Items(items), "${state.items.second} ${getText(
                                 R.string.myPageFragment_observationsHeader
                             )}")
                         }
                     }
 
                     is State.Error -> {
-                        adapter.configureObservationsState(State.Error(state.error))
+                        adapter.configureObservationsState(State.Error(state.error), getString(R.string.myPageFragment_observationsHeader))
                     }
                 }
 

@@ -64,6 +64,10 @@
         <action
             android:id="@+id/action_addObservationFragment_to_cameraFragment"
             app:destination="@id/cameraFragment" />
+        <argument
+            android:name="type"
+            app:argType="com.noque.svampeatlas.fragments.AddObservationFragment$Type"
+            android:defaultValue="NEWOBSERVATION" />
     </fragment>
     <fragment
         android:id="@+id/cameraFragment"

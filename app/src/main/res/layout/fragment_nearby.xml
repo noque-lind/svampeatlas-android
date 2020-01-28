@@ -4,7 +4,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:id="@+id/nearbyFragment_root"
     tools:context=".fragments.NearbyFragment">
+
+    <fragment
+        android:id="@+id/nearbyFragment_mapFragment"
+        android:name="com.noque.svampeatlas.fragments.MapFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nearbyFragment_toolbar" />
+
+    <com.noque.svampeatlas.views.ObservationView
+        android:id="@+id/nearbyFragment_observationView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/marker_window_background"
+        android:clickable="true"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:elevation="@dimen/app_elevation"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/nearbyFragment_toolbar"
@@ -20,13 +51,80 @@
         app:navigationIcon="@drawable/icon_menu_button"
         app:title="@string/nearbyFragment" />
 
-    <fragment
-        android:id="@+id/nearbyFragment_mapFragment"
-        android:name="com.noque.svampeatlas.fragments.MapFragment"
-        android:layout_width="0dp"
+
+    <LinearLayout
+        android:background="@drawable/settings_view_background"
+        android:id="@+id/nearbyFragment_settingsViewLinearLayout"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        android:layout_width="wrap_content"
         android:layout_height="0dp"
+        android:gravity="center_vertical"
+        android:paddingEnd="50dp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="@id/nearbyFragment_settingsButton"
+        app:layout_constraintBottom_toBottomOf="@id/nearbyFragment_settingsButton"
+        app:layout_constraintEnd_toEndOf="@id/nearbyFragment_settingsButton">
+
+        <ImageView
+            android:id="@+id/nearbyFragment_markerImageView"
+            android:layout_marginStart="8dp"
+            android:elevation="@dimen/app_elevation"
+            android:layout_marginEnd="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/icon_location" />
+
+        <View
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:id="@+id/nearbyFragment_dividerView"
+            android:layout_width="1.5dp"
+            android:background="@color/colorWhite"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/nearbyFragment_distanceImageView"
+            android:layout_marginStart="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/glyph_distance"/>
+
+        <TextView
+            android:layout_marginStart="4dp"
+            android:id="@+id/nearbyFragment_distanceLabel"
+            android:layout_width="wrap_content"
+            style="@style/AppPrimary"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:id="@+id/nearbyFragment_ageImageView"
+            android:layout_marginStart="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/glyph_age"/>
+
+        <TextView
+            android:id="@+id/nearbyFragment_ageLabel"
+            style="@style/AppPrimary"
+            android:layout_marginStart="4dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+
+
+    <ImageButton
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/nearbyFragment_toolbar" />
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/glyph_settings"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/circle_view_color_primary"
+        android:elevation="@dimen/app_elevation"
+        android:padding="16dp"
+        android:id="@+id/nearbyFragment_settingsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.models.AppError
-import com.noque.svampeatlas.models.Mushroom
 import com.noque.svampeatlas.models.PredictionResult
 import com.noque.svampeatlas.view_holders.ErrorViewHolder
 import com.noque.svampeatlas.view_holders.ReloaderViewHolder
@@ -64,16 +63,16 @@ class ResultsAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun getItemViewType(position: Int): Int {
         return if (error != null) {
-            return if (position == 0) ViewType.ERROR.ordinal else ViewType.RETRY.ordinal
+            if (position == 0) ViewType.ERROR.ordinal else ViewType.RETRY.ordinal
         } else {
-            return if (position > results.lastIndex) ViewType.RETRY.ordinal else ViewType.RESULT.ordinal
+            if (position > results.lastIndex) ViewType.RETRY.ordinal else ViewType.RESULT.ordinal
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        var view: View
-        var viewHolder: RecyclerView.ViewHolder
+        val view: View
+        val viewHolder: RecyclerView.ViewHolder
 
         when (ViewType.values[viewType]) {
             ViewType.RESULT -> {

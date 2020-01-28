@@ -10,10 +10,17 @@ import com.noque.svampeatlas.models.*
 import org.json.JSONObject
 import com.google.android.gms.maps.model.LatLng
 import com.noque.svampeatlas.R
+import com.noque.svampeatlas.extensions.getBitmap
+import com.noque.svampeatlas.extensions.rotate
 import com.noque.svampeatlas.extensions.toBase64
+import com.noque.svampeatlas.extensions.toJPEG
 import com.noque.svampeatlas.utilities.*
-import com.noque.svampeatlas.utilities.MultipartFormImage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
+import kotlin.coroutines.suspendCoroutine
 
 class DataService private constructor(context: Context) {
 
@@ -29,13 +36,25 @@ class DataService private constructor(context: Context) {
         }
     }
 
-    sealed class Error(title: String, message: String): AppError(title, message) {
-        class VolleyError(title: String, message: String): Error(title, message)
-        class SearchResponseEmpty(context: Context): Error(context.getString(R.string.dataServiceError_emptyResponse_title), context.getString(R.string.dataServiceError_emptyResponse_message))
-        class LoginError(context: Context): Error(context.getString(R.string.dataServiceError_loginError_title), context.getString(R.string.dataServiceError_loginError_message))
-        class NotFound(context: Context): Error(context.getString(R.string.dataServiceError_notFound_title), context.getString(R.string.dataServiceError_notFound_message))
-        class UnknownError(): Error("Unknown error", "")
-        class ExtractionError(): Error("", "")
+    sealed class Error(title: String, message: String) : AppError(title, message) {
+        class VolleyError(title: String, message: String) : Error(title, message)
+        class SearchResponseEmpty(context: Context) : Error(
+            context.getString(R.string.dataServiceError_emptyResponse_title),
+            context.getString(R.string.dataServiceError_emptyResponse_message)
+        )
+
+        class LoginError(context: Context) : Error(
+            context.getString(R.string.dataServiceError_loginError_title),
+            context.getString(R.string.dataServiceError_loginError_message)
+        )
+
+        class NotFound(context: Context) : Error(
+            context.getString(R.string.dataServiceError_notFound_title),
+            context.getString(R.string.dataServiceError_notFound_message)
+        )
+
+        class UnknownError() : Error("Unknown error", "")
+        class ExtractionError() : Error("", "")
     }
 
     enum class ImageSize(val value: String) {
@@ -54,12 +73,14 @@ class DataService private constructor(context: Context) {
 
     fun getMushroom(tag: String, id: Int, completion: (Result<Mushroom, Error>) -> Unit) {
         val api = API(APIType.Request.Mushroom(id))
-        val request = AppGetRequest<List<Mushroom>>(object: TypeToken<List<Mushroom>>() {}.type,
+        val request = AppRequest<List<Mushroom>>(object : TypeToken<List<Mushroom>>() {}.type,
             api,
             null,
             null,
             Response.Listener {
-                if (it.firstOrNull() != null) completion(Result.Success(it.first())) else completion(Result.Error(Error.NotFound(applicationContext)))
+                if (it.firstOrNull() != null) completion(Result.Success(it.first())) else completion(
+                    Result.Error(Error.NotFound(applicationContext))
+                )
             },
 
             Response.ErrorListener {
@@ -70,118 +91,112 @@ class DataService private constructor(context: Context) {
         addToRequestQueue(request)
     }
 
-    fun getMushrooms(tag: String, searchString: String?, queries: List<SpeciesQueries>, offset: Int = 0, limit: Int = 100, completion: (Result<List<Mushroom>, Error>) -> Unit)  {
-        val api = API(APIType.Request.Mushrooms(searchString,
-            queries,
-            offset,
-            limit))
-
-        val request = AppGetRequest<List<Mushroom>>(object: TypeToken<List<Mushroom>>() {}.type,
-            api,
-            null,
-            null,
-            Response.Listener {
-                completion(Result.Success(it))
-            },
-            Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
-            })
-
-        request.tag = tag
-        addToRequestQueue(request)
-    }
-
-    fun getObservationsWithin(tag: String, geometry: Geometry, taxonID: Int? = null, ageInYear: Int? = null, completion: (Result<List<Observation>, AppError>) -> Unit) {
-        val api = API(APIType.Request.Observation(
-            geometry,
-            listOf(
-                ObservationQueries.Locality(),
-                ObservationQueries.DeterminationView(taxonID)
+    fun getMushrooms(
+        tag: String,
+        searchString: String?,
+        queries: List<SpeciesQueries>,
+        offset: Int = 0,
+        limit: Int = 100,
+        completion: (Result<List<Mushroom>, Error>) -> Unit
+    ) {
+        val request = AppRequest<List<Mushroom>>(object : TypeToken<List<Mushroom>>() {}.type,
+            API(
+                APIType.Request.Mushrooms(
+                    searchString,
+                    queries,
+                    offset,
+                    limit
+                )
             ),
-            ageInYear,
-            null,
-            null
-            ))
-
-       val request = AppGetRequest<List<Observation>>(
-           object: TypeToken<List<Observation>>() {}.type,
-        api,
-         null,
-           null,
-           Response.Listener {
-               completion(Result.Success(it))
-           },
-           Response.ErrorListener {
-               completion(Result.Error(parseVolleyError(it)))
-           })
-
-        request.tag = tag
-        addToRequestQueue(request)
-    }
-
-    fun getRecentObservations(tag: String, offset: Int, taxonID: Int, completion: (Result<List<Observation>, Error>) -> Unit) {
-        val api = API(APIType.Request.Observation(
-            null, listOf(ObservationQueries.Images(), ObservationQueries.DeterminationView(taxonID), ObservationQueries.GeomNames(), ObservationQueries.Locality(), ObservationQueries.User(null)),
-            null, 10, offset))
-
-        val request = AppGetRequest<List<Observation>>(
-            object: TypeToken<List<Observation>>() {}.type,
-            api,
             null,
             null,
             Response.Listener {
-                completion(Result.Success(it))
-            },
-
-            Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
-            }
-        )
-
-        request.tag = tag
-        addToRequestQueue(request)
-    }
-
-    fun getLocalities(tag: String, coordinate: LatLng, radius: API.Radius = API.Radius.SMALLEST, completion: (Result<List<Locality>, Error>) -> Unit) {
-        val api = API(APIType.Request.Locality(Geometry(coordinate, radius.radius, Geometry.Type.RECTANGLE)))
-
-        val request = AppGetRequest<List<Locality>>(
-            object: TypeToken<List<Locality>>() {}.type,
-            api,
-            null,
-            null,
-            Response.Listener {
-                if (it.count() <= 3) {
-                    var newRadius: API.Radius
-
-                    when (radius) {
-                        API.Radius.SMALLEST -> newRadius = API.Radius.SMALLER
-                        API.Radius.SMALLER -> newRadius = API.Radius.SMALL
-                        API.Radius.SMALL -> newRadius = API.Radius.MEDIUM
-                        API.Radius.MEDIUM -> newRadius = API.Radius.LARGE
-                        API.Radius.LARGE -> newRadius = API.Radius.LARGER
-                        API.Radius.LARGER -> newRadius = API.Radius.LARGEST
-                        API.Radius.LARGEST -> newRadius = API.Radius.HUGE
-                        API.Radius.HUGE -> newRadius = API.Radius.HUGER
-                        API.Radius.HUGER -> newRadius = API.Radius.HUGEST
-                        API.Radius.HUGEST -> {
-                            if (it.count() != 0) {
-                                (completion(Result.Success(it)))
-                                return@Listener
-                            } else {
-                                newRadius = API.Radius.COUNTRY
-                            }
-                        }
-                        API.Radius.COUNTRY -> return@Listener
-                    }
-
-                    getLocalities(tag, coordinate, newRadius, completion)
+                if (it.isEmpty()) {
+                    completion(Result.Error(Error.SearchResponseEmpty(applicationContext)))
                 } else {
                     completion(Result.Success(it))
                 }
             },
             Response.ErrorListener {
                 completion(Result.Error(parseVolleyError(it)))
+            })
+
+        request.tag = tag
+        addToRequestQueue(request)
+    }
+
+    fun getObservationsWithin(
+        tag: String,
+        geometry: Geometry,
+        taxonID: Int? = null,
+        ageInYear: Int? = null,
+        completion: (Result<List<Observation>, AppError>) -> Unit
+    ) {
+        val api = API(
+            APIType.Request.Observation(
+                geometry,
+                listOf(
+                    ObservationQueries.Locality(),
+                    ObservationQueries.DeterminationView(taxonID),
+                    ObservationQueries.Images(),
+                    ObservationQueries.GeomNames(),
+                    ObservationQueries.User(null)
+                ),
+                ageInYear,
+                null,
+                null
+            )
+        )
+
+        val request = AppRequest<List<Observation>>(
+            object : TypeToken<List<Observation>>() {}.type,
+            api,
+            null,
+            null,
+            Response.Listener {
+                completion(Result.Success(it))
+            },
+            Response.ErrorListener {
+                completion(Result.Error(parseVolleyError(it)))
+            })
+
+        request.tag = tag
+        addToRequestQueue(request)
+    }
+
+    fun getRecentObservations(
+        tag: String,
+        offset: Int,
+        taxonID: Int,
+        completion: (Result<List<Observation>, Error>) -> Unit
+    ) {
+        val api = API(
+            APIType.Request.Observation(
+                null,
+                listOf(
+                    ObservationQueries.Images(),
+                    ObservationQueries.DeterminationView(taxonID),
+                    ObservationQueries.GeomNames(),
+                    ObservationQueries.Locality(),
+                    ObservationQueries.User(null)
+                ),
+                null,
+                10,
+                offset
+            )
+        )
+
+        val request = AppRequest<List<Observation>>(
+            object : TypeToken<List<Observation>>() {}.type,
+            api,
+            null,
+            null,
+            Response.Listener {
+                completion(Result.Success(it))
+            },
+
+            Response.ErrorListener {
+                completion(Result.Error(parseVolleyError(it)))
             }
         )
 
@@ -189,11 +204,104 @@ class DataService private constructor(context: Context) {
         addToRequestQueue(request)
     }
 
+    fun getLocalities(
+        tag: String,
+        coordinate: LatLng,
+        radius: API.Radius = API.Radius.SMALLEST,
+        completion: (Result<List<Locality>, Error>) -> Unit
+    ) {
+
+        if (radius == API.Radius.COUNTRY) {
+            val api = API(APIType.Request.GeomNames(coordinate))
+
+            val request = AppRequest<GeoNames>(
+                object : TypeToken<GeoNames>() {}.type,
+                api,
+                null,
+                null,
+                Response.Listener {
+                    val localities = it.geoNames.map {
+                        Locality(
+                            it.geonameId,
+                            "${it.name}, ${it.countryName}",
+                            null,
+                            it.lat.toDouble(),
+                            it.lng.toDouble(),
+                            it
+                        )
+                    }
+                    completion(Result.Success(localities))
+                },
+                Response.ErrorListener {
+                    completion(Result.Error(parseVolleyError(it)))
+                }
+            )
+
+            request.tag = tag
+            addToRequestQueue(request)
+
+        } else {
+            val api = API(
+                APIType.Request.Locality(
+                    Geometry(
+                        coordinate,
+                        radius.radius,
+                        Geometry.Type.RECTANGLE
+                    )
+                )
+            )
+
+
+            val request = AppRequest<List<Locality>>(
+                object : TypeToken<List<Locality>>() {}.type,
+                api,
+                null,
+                null,
+                Response.Listener {
+                    if (it.count() <= 3) {
+                        val newRadius: API.Radius
+
+                        when (radius) {
+                            API.Radius.SMALLEST -> newRadius = API.Radius.SMALLER
+                            API.Radius.SMALLER -> newRadius = API.Radius.SMALL
+                            API.Radius.SMALL -> newRadius = API.Radius.MEDIUM
+                            API.Radius.MEDIUM -> newRadius = API.Radius.LARGE
+                            API.Radius.LARGE -> newRadius = API.Radius.LARGER
+                            API.Radius.LARGER -> newRadius = API.Radius.LARGEST
+                            API.Radius.LARGEST -> newRadius = API.Radius.HUGE
+                            API.Radius.HUGE -> newRadius = API.Radius.HUGER
+                            API.Radius.HUGER -> newRadius = API.Radius.HUGEST
+                            API.Radius.HUGEST -> {
+                                if (it.count() != 0) {
+                                    (completion(Result.Success(it)))
+                                    return@Listener
+                                } else {
+                                    newRadius = API.Radius.COUNTRY
+                                }
+                            }
+                            API.Radius.COUNTRY -> return@Listener
+                        }
+
+                        getLocalities(tag, coordinate, newRadius, completion)
+                    } else {
+                        completion(Result.Success(it))
+                    }
+                },
+                Response.ErrorListener {
+                    completion(Result.Error(parseVolleyError(it)))
+                }
+            )
+
+            request.tag = tag
+            addToRequestQueue(request)
+        }
+    }
+
     fun getSubstrateGroups(tag: String, completion: (Result<List<SubstrateGroup>, Error>) -> Unit) {
         val api = API(APIType.Request.Substrate())
 
-        val request = AppGetRequest<List<Substrate>>(
-            object: TypeToken<List<Substrate>>() {}.type,
+        val request = AppRequest<List<Substrate>>(
+            object : TypeToken<List<Substrate>>() {}.type,
             api,
             null,
             null,
@@ -201,17 +309,23 @@ class DataService private constructor(context: Context) {
                 var substrateGroups = mutableListOf<SubstrateGroup>()
 
                 it.forEach { substrate ->
-                    val substrateGroup = substrateGroups.firstOrNull { it.dkName == substrate.groupDkName }
+                    val substrateGroup =
+                        substrateGroups.firstOrNull { it.dkName == substrate.groupDkName }
 
                     if (substrateGroup != null) {
                         substrateGroup.appendSubstrate(substrate)
                     } else {
-                        substrateGroups.add(SubstrateGroup(substrate.groupDkName, substrate.groupEnName, mutableListOf(substrate)))
+                        substrateGroups.add(
+                            SubstrateGroup(
+                                substrate.groupDkName,
+                                substrate.groupEnName,
+                                mutableListOf(substrate)
+                            )
+                        )
                     }
                 }
 
-                completion(Result.Success(substrateGroups))
-
+                completion(Result.Success(substrateGroups.sortedBy { it.id }))
             },
             Response.ErrorListener {
                 completion(Result.Error(parseVolleyError(it)))
@@ -224,13 +338,13 @@ class DataService private constructor(context: Context) {
 
     fun getVegetationTypes(tag: String, completion: (Result<List<VegetationType>, Error>) -> Unit) {
         val api = API(APIType.Request.VegetationType())
-        val request = AppGetRequest<List<VegetationType>>(
-            object: TypeToken<List<VegetationType>>() {}.type,
+        val request = AppRequest<List<VegetationType>>(
+            object : TypeToken<List<VegetationType>>() {}.type,
             api,
             null,
             null,
             Response.Listener {
-                completion(Result.Success(it.sortedBy {it.id}))
+                completion(Result.Success(it.sortedBy { it.id }))
             },
 
             Response.ErrorListener {
@@ -242,10 +356,14 @@ class DataService private constructor(context: Context) {
         addToRequestQueue(request)
     }
 
-    fun getHosts(tag: String, searchString: String?, completion: (Result<List<Host>, Error>) -> Unit) {
+    fun getHosts(
+        tag: String,
+        searchString: String?,
+        completion: (Result<List<Host>, Error>) -> Unit
+    ) {
         val api = API(APIType.Request.Host(null))
-        val request = AppGetRequest<List<Host>>(
-            object: TypeToken<List<Host>>() {}.type,
+        val request = AppRequest<List<Host>>(
+            object : TypeToken<List<Host>>() {}.type,
             api,
             null,
             null,
@@ -262,37 +380,39 @@ class DataService private constructor(context: Context) {
         addToRequestQueue(request)
     }
 
-    fun uploadObservation(tag: String, token: String, jsonObject: JSONObject, images: List<File>?, completion: (Result<Pair<Int, Int>, Error>) -> Unit) {
-        val api = API(APIType.Post.Observation())
+    fun uploadObservation(
+        tag: String,
+        token: String,
+        jsonObject: JSONObject,
+        completion: (Result<Int, Error>) -> Unit
+    ) {
 
-        val request = AppJSONObjectRequest(api,
+        Log.d(TAG, jsonObject.toString())
+
+        val request = AppJSONObjectRequest(
+            API(APIType.Post.Observation()),
             token,
             jsonObject,
-
             Response.Listener {
                 val id = it.getInt("_id")
-
-                if (images != null) {
-                    uploadImages(tag, id, images, token) {
-                        when (it) {
-                            is Result.Success -> { completion(Result.Success(Pair(id, it.value))) }
-                            is Result.Error -> { completion(Result.Success(Pair(id, 0))) }
-                        }
-                    }
-                } else {
-                    completion(Result.Success(Pair(id, 0)))
-                }
+                completion(Result.Success(id))
             },
-
             Response.ErrorListener {
                 completion(Result.Error(parseVolleyError(it)))
             })
 
         request.tag = tag
         addToRequestQueue(request)
+
     }
 
-    private fun uploadImages(tag: String, observationID: Int, images: List<File>, token: String, completion: (Result<Int, Error>) -> Unit) {
+    suspend fun uploadImages(
+        tag: String,
+        observationID: Int,
+        images: List<File>,
+        token: String,
+        completion: (Result<Int, Error>) -> Unit
+    ) {
         var completedUploads = 0
 
         val dispatchGroup = DispatchGroup()
@@ -302,7 +422,9 @@ class DataService private constructor(context: Context) {
 
             uploadImage(tag, observationID, it, token) {
                 when (it) {
-                   is Result.Success -> { completedUploads += 1 }
+                    is Result.Success -> {
+                        completedUploads += 1
+                    }
                 }
                 dispatchGroup.leave()
             }
@@ -313,44 +435,83 @@ class DataService private constructor(context: Context) {
         }
     }
 
-    private fun uploadImage(tag: String, observationID: Int, image: File, token: String, completion: (Result<Boolean, Error>) -> Unit) {
-//        val api = API(APIType.Post.Image(observationID))
-//        val multipartFormImage = MultipartFormImage(image, "file")
-//        val request = AppMultipartPost(api,
-//            token,
-//            multipartFormImage,
-//            Response.Listener {
-//                completion(Result.Success(true))
-//            },
-//
-//            Response.ErrorListener {
-//                completion(Result.Error(parseVolleyError(it)))
-//            }
-//            )
-//
-//        request.tag = tag
-//        addToRequestQueue(request)
+    private suspend fun uploadImage(
+        tag: String,
+        observationID: Int,
+        image: File,
+        token: String,
+        completion: (Result<Boolean, AppError>) -> Unit
+    ) = withContext(Dispatchers.IO) {
+        val result = image.getBitmap()
+        result.onError { completion(Result.Error(it)) }
+        result.onSuccess {
+
+            val api = API(APIType.Post.Image(observationID))
+            val multipartFormImage = MultipartFormImage(it.rotate(image).toJPEG(0.6), "file")
+            val request = AppMultipartPost(api,
+                token,
+                multipartFormImage,
+                Response.Listener {
+                    completion(Result.Success(true))
+                },
+                Response.ErrorListener {
+                    completion(Result.Error(parseVolleyError(it)))
+                }
+            )
+
+            request.tag = tag
+            request.retryPolicy = DefaultRetryPolicy(
+                20000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+            )
+            addToRequestQueue(request)
+        }
     }
 
-    fun getPredictions(image: Bitmap, completion: (Result<List<PredictionResult>, Error>) -> Unit) {
-        val api = API(APIType.Post.ImagePrediction())
-        val mutableMap: MutableMap<Any?, Any?> = mutableMapOf(Pair("instances", listOf(mapOf(Pair("image_in", mapOf(Pair("b64", image.toBase64())))))))
-        val jsonObject = JSONObject(mutableMap)
+    suspend fun getPredictions(
+        imageFile: File,
+        completion: (Result<List<PredictionResult>, AppError>) -> Unit
+    ) = withContext(Dispatchers.IO) {
+        val bitmapResult = imageFile.getBitmap()
+        bitmapResult.onError { completion(Result.Error(it)) }
+        bitmapResult.onSuccess {
+            val mutableMap: MutableMap<Any?, Any?> = mutableMapOf(
+                Pair(
+                    "instances",
+                    listOf(
+                        mapOf(
+                            Pair(
+                                "image_in",
+                                mapOf(Pair("b64", it.rotate(imageFile).toBase64()))
+                            )
+                        )
+                    )
+                )
+            )
+            val jsonObject = JSONObject(mutableMap)
+            val request = AppRequest<List<PredictionResult>>(
+                object : TypeToken<List<PredictionResult>>() {}.type,
+                API(APIType.Post.ImagePrediction()),
+                null,
+                jsonObject,
+                Response.Listener {
+                    completion(Result.Success(it))
+                },
 
-        val request = AppGetRequest<List<PredictionResult>>(
-            object: TypeToken<List<PredictionResult>>() {}.type,
-            api,
-            null,
-            jsonObject,
-            Response.Listener {
-                completion(Result.Success(it.filter { it.score >= 0.10 }))
-            },
+                Response.ErrorListener {
+                    completion(Result.Error(parseVolleyError(it)))
+                })
 
-            Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
-            })
 
-        addToRequestQueue(request)
+            request.retryPolicy =
+                DefaultRetryPolicy(
+                    20000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+                )
+            addToRequestQueue(request)
+        }
     }
 
     fun login(initials: String, password: String, completion: (Result<String, Error>) -> Unit) {
@@ -369,7 +530,13 @@ class DataService private constructor(context: Context) {
             },
 
             Response.ErrorListener {
-                if (it is AuthFailureError) completion (Result.Error(Error.LoginError(applicationContext))) else completion (Result.Error(parseVolleyError(it)))
+                if (it is AuthFailureError) completion(
+                    Result.Error(
+                        Error.LoginError(
+                            applicationContext
+                        )
+                    )
+                ) else completion(Result.Error(parseVolleyError(it)))
             })
 
         addToRequestQueue(request)
@@ -377,12 +544,12 @@ class DataService private constructor(context: Context) {
 
     fun getUser(tag: String, token: String, completion: (Result<User, Error>) -> Unit) {
         val api = API(APIType.Request.User())
-        val request = AppGetRequest<User>(object: TypeToken<User>() {}.type,
+        val request = AppRequest<User>(object : TypeToken<User>() {}.type,
             api,
             token,
             null,
             Response.Listener {
-//                saveUser(it)
+                //                saveUser(it)
                 completion(Result.Success(it))
             },
 
@@ -395,9 +562,13 @@ class DataService private constructor(context: Context) {
     }
 
 
-    fun getUserNotificationCount(tag: String, token: String, completion: (Result<Int, Error>) -> Unit) {
+    fun getUserNotificationCount(
+        tag: String,
+        token: String,
+        completion: (Result<Int, Error>) -> Unit
+    ) {
         val api = API(APIType.Request.UserNotificationCount())
-        val request = object: JsonObjectRequest(api.volleyMethod(),
+        val request = object : JsonObjectRequest(api.volleyMethod(),
             api.url(),
             null,
             Response.Listener {
@@ -417,10 +588,16 @@ class DataService private constructor(context: Context) {
         addToRequestQueue(request)
     }
 
-    fun getNotifications(tag: String, token: String, limit: Int, offset: Int, completion: (Result<List<Notification>, Error>) -> Unit) {
+    fun getNotifications(
+        tag: String,
+        token: String,
+        limit: Int,
+        offset: Int,
+        completion: (Result<List<Notification>, Error>) -> Unit
+    ) {
         val api = API(APIType.Request.UserNotifications(limit, offset))
-        val request = AppGetRequest<GsonNotifications>(
-            object: TypeToken<GsonNotifications>() {}.type,
+        val request = AppRequest<GsonNotifications>(
+            object : TypeToken<GsonNotifications>() {}.type,
             api,
             token,
             null,
@@ -440,8 +617,8 @@ class DataService private constructor(context: Context) {
     fun getObservation(tag: String, id: Int, completion: (Result<Observation, Error>) -> Unit) {
         val api = API(APIType.Request.SingleObservation(id))
 
-        val request = AppGetRequest<Observation>(
-            object: TypeToken<Observation>() {}.type,
+        val request = AppRequest<Observation>(
+            object : TypeToken<Observation>() {}.type,
             api,
             null,
             null,
@@ -458,7 +635,11 @@ class DataService private constructor(context: Context) {
         addToRequestQueue(request)
     }
 
-    fun getObservationCountForUser(tag: String, userId: Int, completion: (Result<Int, Error>) -> Unit) {
+    fun getObservationCountForUser(
+        tag: String,
+        userId: Int,
+        completion: (Result<Int, Error>) -> Unit
+    ) {
         val api = API(APIType.Request.ObservationCountForUser(userId))
 
         val request = JsonArrayRequest(
@@ -479,20 +660,31 @@ class DataService private constructor(context: Context) {
     }
 
 
-    fun getObservationsForUser(tag: String, userId: Int, offset: Int, limit: Int, completion: (Result<List<Observation>, Error>) -> Unit) {
-        val api = API(APIType.Request.Observation(
-            null,
-            listOf(ObservationQueries.User(userId),
-                ObservationQueries.Images(),
-                ObservationQueries.GeomNames(),
-                ObservationQueries.Locality(),
-                ObservationQueries.DeterminationView(null),
-                ObservationQueries.Comments())
-        ,null,
-            limit, offset))
+    fun getObservationsForUser(
+        tag: String,
+        userId: Int,
+        offset: Int,
+        limit: Int,
+        completion: (Result<List<Observation>, Error>) -> Unit
+    ) {
+        val api = API(
+            APIType.Request.Observation(
+                null,
+                listOf(
+                    ObservationQueries.User(userId),
+                    ObservationQueries.Images(),
+                    ObservationQueries.GeomNames(),
+                    ObservationQueries.Locality(),
+                    ObservationQueries.DeterminationView(null),
+                    ObservationQueries.Comments()
+                )
+                , null,
+                limit, offset
+            )
+        )
 
-        val request = AppGetRequest<List<Observation>>(
-            object: TypeToken<List<Observation>>() {}.type,
+        val request = AppRequest<List<Observation>>(
+            object : TypeToken<List<Observation>>() {}.type,
             api,
             null,
             null,
@@ -509,7 +701,12 @@ class DataService private constructor(context: Context) {
         addToRequestQueue(request)
     }
 
-    fun postComment(observationID: Int, comment: String, token: String, completion: (Result<Comment, Error>) -> Unit) {
+    fun postComment(
+        observationID: Int,
+        comment: String,
+        token: String,
+        completion: (Result<Comment, Error>) -> Unit
+    ) {
         val api = API(APIType.Post.Comment(observationID))
 
         val jsonObject = JSONObject().put("content", comment)
@@ -524,7 +721,7 @@ class DataService private constructor(context: Context) {
                 val date = it.optString("createdAt")
                 val content = it.optString("content")
                 val user = it.optJSONObject("User")
-                val name = user.optString("name")
+                val name = user?.optString("name")
                 val facebook = it.optString("facebook")
                 val initials = it.optString("Initialer")
 
@@ -538,8 +735,22 @@ class DataService private constructor(context: Context) {
             Response.ErrorListener {
                 completion(Result.Error(parseVolleyError(it)))
             }
-            )
+        )
 
+        addToRequestQueue(request)
+    }
+
+    fun markNotificationAsRead(tag: String, notificationID: Int, token: String) {
+        val api = API(APIType.Put.NotificationLastRead(notificationID))
+        val request = AppJSONObjectRequest(
+            api,
+            token,
+            JSONObject(),
+            Response.Listener {},
+            Response.ErrorListener {}
+        )
+
+        request.tag = tag
         addToRequestQueue(request)
     }
 
@@ -547,28 +758,57 @@ class DataService private constructor(context: Context) {
         requestQueue.cancelAll(tag)
     }
 
+    fun postOffensiveComment(tag: String, observationID: Int, json: JSONObject, token: String) {
+        val api = API(APIType.Post.OffensiveContentComment(observationID))
+        val request = AppJSONObjectRequest(
+            api,
+            token,
+            json,
+            Response.Listener {  },
+            Response.ErrorListener {  }
+        )
+
+        request.tag = tag
+        addToRequestQueue(request)
+    }
+
     private fun parseVolleyError(error: VolleyError): Error {
-            when (error) {
-                is AuthFailureError -> {
-                    return Error.VolleyError(applicationContext.getString(R.string.volleyError_authError_title), applicationContext.getString(R.string.volleyError_authError_message))
-                }
-
-               is NoConnectionError -> {
-                   return Error.VolleyError(applicationContext.getString(R.string.volleyError_networkError_title), applicationContext.getString(R.string.volleyError_networkError_message))
-               }
-
-                is TimeoutError -> {
-                    return Error.VolleyError(applicationContext.getString(R.string.volleyError_timeoutError_title), applicationContext.getString(R.string.volleyError_timeoutError_message))
-                }
-
-                is ServerError -> {
-                    return Error.VolleyError(applicationContext.getString(R.string.volleyError_serverError_title), applicationContext.getString(R.string.volleyError_serverError_message))
-                }
-
-                is ParseError -> {
-                    return Error.VolleyError(applicationContext.getString(R.string.volleyError_parseError_title), applicationContext.getString(R.string.volleyError_parseError_message))
-                }
+        when (error) {
+            is AuthFailureError -> {
+                return Error.VolleyError(
+                    applicationContext.getString(R.string.volleyError_authError_title),
+                    applicationContext.getString(R.string.volleyError_authError_message)
+                )
             }
+
+            is NoConnectionError -> {
+                return Error.VolleyError(
+                    applicationContext.getString(R.string.volleyError_networkError_title),
+                    applicationContext.getString(R.string.volleyError_networkError_message)
+                )
+            }
+
+            is TimeoutError -> {
+                return Error.VolleyError(
+                    applicationContext.getString(R.string.volleyError_timeoutError_title),
+                    applicationContext.getString(R.string.volleyError_timeoutError_message)
+                )
+            }
+
+            is ServerError -> {
+                return Error.VolleyError(
+                    applicationContext.getString(R.string.volleyError_serverError_title),
+                    applicationContext.getString(R.string.volleyError_serverError_message)
+                )
+            }
+
+            is ParseError -> {
+                return Error.VolleyError(
+                    applicationContext.getString(R.string.volleyError_parseError_title),
+                    applicationContext.getString(R.string.volleyError_parseError_message)
+                )
+            }
+        }
 
         return Error.UnknownError()
     }
