@@ -5,9 +5,9 @@ import android.content.res.Resources
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.models.*
 
-class RoomService(private val context: Context) {
+class RoomService private constructor(context: Context) {
 
-    sealed class Error(title: String, message: String) : AppError(title, message) {
+    sealed class Error(title: String, message: String) : AppError(title, message, null) {
         enum class DataType {
             FAVORITES,
             USER,
@@ -18,10 +18,10 @@ class RoomService(private val context: Context) {
         }
 
         class NoData(resources: Resources, dataType: DataType) : Error(
-            resources.getString(R.string.roomService_error_noData_title),
+            resources.getString(R.string.error_database_noEntries_title),
             when (dataType) {
-                DataType.FAVORITES -> resources.getString(R.string.roomService_error_noFavorites_message)
-                else -> ""
+                DataType.FAVORITES -> resources.getString(R.string.error_database_noEntries_favoritedMushrooms_message)
+                else -> resources.getString(R.string.error_database_noEntries_message)
             }
         )
     }
@@ -38,12 +38,8 @@ class RoomService(private val context: Context) {
         }
     }
 
-    private var database: Database
-
-    init {
-        database = Database.buildDatabase(context)
-    }
-
+    private val database: Database = Database.buildDatabase(context)
+    private val resources: Resources = context.resources
 
     suspend fun saveUser(user: User) {
         database.UserDao().insert(user)
@@ -56,7 +52,7 @@ class RoomService(private val context: Context) {
     suspend fun getUser(): Result<User, Error> {
         val users = database.UserDao().getUsers()
         return if (users.firstOrNull() != null) Result.Success(users.first()) else Result.Error(
-            Error.NoData(context.resources, Error.DataType.USER)
+            Error.NoData(resources, Error.DataType.USER)
         )
     }
 
@@ -66,7 +62,7 @@ class RoomService(private val context: Context) {
 
     suspend fun getSubstrateWithID(id: Int): Result<Substrate, Error> {
         val substrate = database.SubstratesDao().getSubstrateWithID(id)
-        return if (substrate != null) Result.Success(substrate) else Result.Error(Error.NoData(context.resources, Error.DataType.SUBSTRATE))
+        return if (substrate != null) Result.Success(substrate) else Result.Error(Error.NoData(resources, Error.DataType.SUBSTRATE))
     }
 
     suspend fun saveVegetationType(vegetationType: VegetationType) {
@@ -75,7 +71,7 @@ class RoomService(private val context: Context) {
 
     suspend fun getVegetationTypeWithID(id: Int): Result<VegetationType, Error> {
         val vegetationType = database.VegetationTypeDao().getVegetationTypeWithID(id)
-        return if (vegetationType != null) Result.Success(vegetationType) else Result.Error(Error.NoData(context.resources, Error.DataType.VEGETATIONTYPE))
+        return if (vegetationType != null) Result.Success(vegetationType) else Result.Error(Error.NoData(resources, Error.DataType.VEGETATIONTYPE))
     }
 
     suspend fun saveHosts(hosts: List<Host>) {
@@ -90,7 +86,7 @@ class RoomService(private val context: Context) {
                 hosts.add(it)
             }
         }
-        return if (hosts.isNotEmpty()) Result.Success(hosts) else Result.Error(Error.NoData(context.resources, Error.DataType.HOST))
+        return if (hosts.isNotEmpty()) Result.Success(hosts) else Result.Error(Error.NoData(resources, Error.DataType.HOST))
     }
 
     suspend fun saveMushroom(mushroom: Mushroom) {
@@ -105,7 +101,7 @@ class RoomService(private val context: Context) {
     suspend fun getFavoritedMushrooms(): Result<List<Mushroom>, Error> {
         val mushrooms = database.mushroomsDao().getFavorites().toList()
         if (mushrooms.isEmpty()) {
-            return Result.Error(Error.NoData(context.resources, Error.DataType.FAVORITES))
+            return Result.Error(Error.NoData(resources, Error.DataType.FAVORITES))
         } else {
             return Result.Success(mushrooms)
         }
@@ -115,7 +111,7 @@ class RoomService(private val context: Context) {
         val mushroom = database.mushroomsDao().getMushroom(id)
 
         if (mushroom == null) {
-            return Result.Error(Error.NoData(context.resources, Error.DataType.MUSHROOM))
+            return Result.Error(Error.NoData(resources, Error.DataType.MUSHROOM))
         } else {
             return Result.Success(mushroom)
         }

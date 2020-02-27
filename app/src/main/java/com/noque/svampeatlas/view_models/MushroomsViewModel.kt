@@ -64,6 +64,7 @@ class MushroomsViewModel(category: Category?, application: Application) :
                 TAG,
                 null,
                 listOf(
+                    SpeciesQueries.Attributes(true),
                     SpeciesQueries.DanishNames(),
                     SpeciesQueries.Statistics(),
                     SpeciesQueries.Images(true)

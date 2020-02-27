@@ -39,6 +39,5 @@
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
         app:elevation="0dp"
-        app:navigationIcon="@drawable/icon_menu_button"
-        app:title="@string/nearbyFragment" />
+        app:navigationIcon="@drawable/icon_menu_button" />
 </androidx.constraintlayout.widget.ConstraintLayout>

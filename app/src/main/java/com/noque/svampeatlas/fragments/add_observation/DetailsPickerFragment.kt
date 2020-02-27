@@ -1,5 +1,6 @@
 package com.noque.svampeatlas.fragments.add_observation
 
+import android.content.pm.ActivityInfo
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -25,6 +26,8 @@ import com.noque.svampeatlas.view_models.DetailsPickerViewModel
 import kotlinx.android.synthetic.main.fragment_details_picker.*
 import android.widget.ImageButton
 import com.noque.svampeatlas.adapters.PickerAdapter
+import com.noque.svampeatlas.extensions.capitalized
+import com.noque.svampeatlas.extensions.upperCased
 import com.noque.svampeatlas.view_models.factories.DetailsPickerViewModelFactory
 
 
@@ -130,6 +133,7 @@ class DetailsPickerFragment() : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         return inflater.inflate(R.layout.fragment_details_picker, container, false)
     }
 
@@ -229,7 +233,7 @@ class DetailsPickerFragment() : DialogFragment() {
                     is State.Error -> backgroundView.setError(state.error)
                     is State.Items -> {
                         val sections = state.items.map {
-                            Section.Builder<PickerAdapter.Item<Substrate>>().title(it.dkName).items(it.substrates.map { PickerAdapter.Item(it) }).build()
+                            Section.Builder<PickerAdapter.Item<Substrate>>().title(it.localizedName.capitalized()).items(it.substrates.map { PickerAdapter.Item(it) }).build()
                         }
 
                         substratesAdapter.configure(sections)

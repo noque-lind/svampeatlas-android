@@ -49,7 +49,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/icon_menu_button"
-        app:title="@string/nearbyFragment" />
+        app:title="@string/nearbyVC_title" />
 
 
     <LinearLayout

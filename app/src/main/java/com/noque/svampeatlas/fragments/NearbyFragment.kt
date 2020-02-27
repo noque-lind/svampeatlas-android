@@ -1,19 +1,15 @@
 package com.noque.svampeatlas.fragments
 
 import android.content.Intent
-import android.graphics.Point
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.transition.TransitionManager
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -23,22 +19,41 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.clustering.ClusterItem
 import com.noque.svampeatlas.BuildConfig
 
 import com.noque.svampeatlas.R
+import com.noque.svampeatlas.extensions.openSettings
 import com.noque.svampeatlas.models.Locality
 import com.noque.svampeatlas.models.Observation
+import com.noque.svampeatlas.models.RecoveryAction
 import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.services.LocationService
 import com.noque.svampeatlas.view_models.NearbyObservationsViewModel
 import com.noque.svampeatlas.views.BlankActivity
 import com.noque.svampeatlas.views.ObservationView
-import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.android.synthetic.main.fragment_nearby.*
 
 
-class NearbyFragment : Fragment() {
+class NearbyFragment : Fragment(), MapSettingsFragment.Listener {
+    override fun newSearch() {
+        mapFragment?.setLoading()
+        locationService.start()
+    }
+
+    override fun radiusChanged(value: Int) {
+        settings.radius = value
+        setDistanceLabel()
+    }
+
+    override fun ageChanged(value: Int) {
+        settings.ageInYears = value
+        setAgeLabel()
+    }
+
+    override fun clearAllSet(value: Boolean) {
+        settings.clearAll = value
+    }
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -96,16 +111,9 @@ class NearbyFragment : Fragment() {
             }
 
             override fun locationRetrievalError(error: LocationService.Error) {
-                when (error) {
-                    is LocationService.Error.PermissionDenied -> {
-                        mapFragment?.setError(error, getString(R.string.locationservice_error_permissions_handler)) {
-                            val intent = Intent()
-                            intent.action = android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                            val uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
-                            intent.data = uri
-                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                            startActivity(intent)
-                        }
+                mapFragment?.setError(error) {
+                    if (error.recoveryAction == RecoveryAction.OPENSETTINGS) {
+                        openSettings()
                     }
                 }
             }
@@ -144,34 +152,17 @@ class NearbyFragment : Fragment() {
 
     private val settingsButtonOnClick  by lazy {
         View.OnClickListener {
-            val dialog = MapSettingsFragment(settings.radius, settings.ageInYears)
-            dialog.setListener(mapSettingsFragmentListener)
-            dialog.show(childFragmentManager, null)
+            val dialog = MapSettingsFragment()
+            val bundle = Bundle()
+            bundle.putInt(MapSettingsFragment.KEY_RADIUS, settings.radius)
+            bundle.putInt(MapSettingsFragment.KEY_AGE, settings.ageInYears)
+
+            dialog.setTargetFragment(this, 0)
+            dialog.arguments = bundle
+            dialog.show(requireFragmentManager(), null)
         }
     }
 
-    private val mapSettingsFragmentListener by lazy {
-        object: MapSettingsFragment.Listener {
-            override fun newSearch() {
-                locationService.start()
-            }
-
-            override fun radiusChanged(value: Int) {
-                settings.radius = value
-                setDistanceLabel()
-            }
-
-            override fun ageChanged(value: Int) {
-               settings.ageInYears = value
-                setAgeLabel()
-            }
-
-            override fun clearAllSet(value: Boolean) {
-                settings.clearAll = value
-            }
-
-        }
-    }
 
     private val markerOnTouchListener by lazy {
         object: View.OnTouchListener {
@@ -262,7 +253,7 @@ class NearbyFragment : Fragment() {
         nearbyObservationsViewModel.observationsState.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is State.Loading -> { mapFragment?.setLoading() }
-                is State.Error -> { mapFragment?.setError(it.error, null, null) }
+                is State.Error -> { mapFragment?.setError(it.error, null) }
                 is State.Items -> {
                     mapFragment?.clearCircleOverlays()
                     mapFragment?.addObservationMarkers(it.items.first)
@@ -292,7 +283,7 @@ class NearbyFragment : Fragment() {
 
 
     private fun setAgeLabel() {
-        ageLabel?.text = "${settings.ageInYears} år."
+        ageLabel?.text = resources.getString(R.string.mapViewSettingsView_year, settings.ageInYears)
     }
 
     override fun onDestroyView() {

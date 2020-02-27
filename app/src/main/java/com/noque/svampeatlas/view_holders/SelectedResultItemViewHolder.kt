@@ -41,13 +41,13 @@ class SelectedResultItemViewHolder(itemView: View) : RecyclerView.ViewHolder(ite
             resultView.configure(mushroom)
 
             if (mushroom.isGenus) {
-                radioButtonDetermined.setText(R.string.genus_confidence_determined)
-                radioButtonGuessing.setText(R.string.genus_confidence_guessing)
-                radioButtonUnsure.setText(R.string.genus_confidence_unsure)
+                radioButtonDetermined.setText(R.string.selectedSpeciesCell_confident_genus)
+                radioButtonGuessing.setText(R.string.selectedSpeciesCell_likely_genus)
+                radioButtonUnsure.setText(R.string.selectedSpeciesCell_possible_genus)
             } else {
-                radioButtonDetermined.setText(R.string.species_confidence_determined)
-                radioButtonUnsure.setText(R.string.species_confidence_unsure)
-                radioButtonGuessing.setText(R.string.species_confidence_guessing)
+                radioButtonDetermined.setText(R.string.selectedSpeciesCell_confident_species)
+                radioButtonUnsure.setText(R.string.selectedSpeciesCell_likely_species)
+                radioButtonGuessing.setText(R.string.selectedSpeciesCell_possible_species)
             }
 
             radioGroup.setOnCheckedChangeListener(null)

@@ -16,8 +16,8 @@ class ReloaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     fun configure(type: Type) {
         when (type) {
-            Type.RELOAD -> { textView.setText(R.string.reloaderItem_reloader) }
-            Type.LOAD -> { textView.setText(R.string.reloaderItem_loader) }
+            Type.RELOAD -> { textView.setText(R.string.reloadCell_tryAgain) }
+            Type.LOAD -> { textView.setText(R.string.reloadCell_showMore) }
         }
     }
 }

@@ -12,7 +12,7 @@ class VegetationTypesAdapter: PickerAdapter<VegetationType>() {
         when (holder) {
             is ItemViewHolder -> {
                 sections.getItem(position)
-                    .item.let { holder.configure("- ${it.dkName}") }
+                    .item.let { holder.configure("- ${it.localizedName}") }
             }
         }
     }

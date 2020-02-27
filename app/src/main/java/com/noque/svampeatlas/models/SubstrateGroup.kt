@@ -1,8 +1,11 @@
 package com.noque.svampeatlas.models
 
+import com.noque.svampeatlas.extensions.isDanish
+import java.util.*
+
 data class SubstrateGroup(val dkName: String,
                           val enName: String,
-                          private var _substrates: MutableList<Substrate>) {
+                          val substrates: MutableList<Substrate>) {
 
     val id: Int get() {
         when (dkName) {
@@ -17,9 +20,15 @@ data class SubstrateGroup(val dkName: String,
         }
     }
 
-    val substrates: List<Substrate> get() = _substrates
+    val localizedName: String get() {
+        return if (Locale.getDefault().isDanish()) {
+            dkName
+        } else {
+            enName
+        }
+    }
 
     fun appendSubstrate(substrate: Substrate) {
-        _substrates.add(substrate)
+        substrates.add(substrate)
     }
 }

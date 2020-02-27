@@ -34,8 +34,8 @@ class UserView(context: Context?, attrs: AttributeSet?) : LinearLayout(context, 
     }
 
     fun configureAsGuest() {
-        primaryTextView.text = resources.getText(R.string.application_title)
-        secondaryTextView.text = resources.getText(R.string.menu_guest)
+        primaryTextView.text = resources.getText(R.string.userView_guest_title)
+        secondaryTextView.text = resources.getText(R.string.userView_guest_message)
         secondaryTextView.visibility = View.VISIBLE
         profileImageView.configure(null, R.mipmap.android_app)
     }

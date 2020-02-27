@@ -33,6 +33,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.tabs.TabLayout
 import com.noque.svampeatlas.extensions.changeColor
 import com.noque.svampeatlas.extensions.dpToPx
+import com.noque.svampeatlas.extensions.italized
 import com.noque.svampeatlas.extensions.pxToDp
 import com.noque.svampeatlas.views.BackgroundView
 import com.noque.svampeatlas.views.BlankActivity
@@ -127,9 +128,7 @@ class MushroomFragment : Fragment() {
     private val onTapSelectedListener by lazy {
         object : TabLayout.OnTabSelectedListener {
             override fun onTabReselected(tab: TabLayout.Tab) {
-                val category = MushroomsViewModel.Category.values[tab.position]
-
-                when (category) {
+                when (MushroomsViewModel.Category.values[tab.position]) {
                     MushroomsViewModel.Category.FAVORITES -> {
                         searchBarView?.visibility = View.GONE
                         recyclerView?.setPadding(0, 0, 0, 0)
@@ -314,10 +313,10 @@ class MushroomFragment : Fragment() {
 
                 when (it) {
                     MushroomsViewModel.Category.FAVORITES -> {
-                        tab.text = resources.getText(R.string.mushroomCategory_favorites)
+                        tab.text = resources.getText(R.string.mushroomVC_category_favorites)
                     }
                     MushroomsViewModel.Category.SPECIES -> {
-                        tab.text = resources.getText(R.string.mushroomCategory_species)
+                        tab.text = resources.getText(R.string.mushroomVC_category_species)
                     }
                 }
 
@@ -388,7 +387,7 @@ class MushroomFragment : Fragment() {
                 is State.Items -> {
                     mushroomsViewModel.resetFavoritizingState()
                     val bitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_elmessageview_failure).changeColor(ResourcesCompat.getColor(resources, R.color.colorGreen, null))
-                    createToast(getString(R.string.mushroomFragment_favoritizingSucces_title), getString(R.string.mushroomFragment_favoritizingSucces_message), bitmap)
+                    createToast(getString(R.string.prompt_favoritizingSucces_title, it.items.localizedName ?: it.items.fullName.italized()), getString(R.string.prompt_favoritizingSucces_message), bitmap)
                 }
             }
         })

@@ -9,7 +9,7 @@
     <fragment
         android:id="@+id/mushroomFragment"
         android:name="com.noque.svampeatlas.fragments.MushroomFragment"
-        android:label="@string/fragment_mushroom"
+        android:label="@string/navigationItem_mushroomsVC"
         tools:layout="@layout/fragment_mushroom" />
 
     <fragment
@@ -59,7 +59,7 @@
     <fragment
         android:id="@+id/addObservationFragment"
         android:name="com.noque.svampeatlas.fragments.AddObservationFragment"
-        android:label="@string/fragment_addObservation"
+        android:label="@string/navigationItem_newObservationVC"
         tools:layout="@layout/fragment_add_observation" >
         <action
             android:id="@+id/action_addObservationFragment_to_cameraFragment"
@@ -67,7 +67,7 @@
         <argument
             android:name="type"
             app:argType="com.noque.svampeatlas.fragments.AddObservationFragment$Type"
-            android:defaultValue="NEWOBSERVATION" />
+            android:defaultValue="NEW_OBSERVATION" />
     </fragment>
     <fragment
         android:id="@+id/cameraFragment"

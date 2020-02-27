@@ -10,7 +10,6 @@
 
 
         <com.google.android.material.textfield.TextInputLayout
-            android:hint="@string/searchBarView_hint"
             android:id="@+id/searchBarView_textInputLayout"
             android:visibility="gone"
             android:layout_width="0dp"

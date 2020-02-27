@@ -28,7 +28,7 @@
 
             <TextView
                 style="@style/AppTitle"
-                android:text="@string/mapSettingsFragment"
+                android:text="@string/mapViewSettings_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toStartOf="@id/mapSettingsFragment_cancelButton"
@@ -57,7 +57,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
             android:layout_weight="0"
-            android:text="@string/mapSettingsFragment_clearOldResults"
+            android:text="@string/mapViewSettings_clearOldResults"
             android:textColor="@color/colorWhite"
             android:theme="@style/AppSwitch" />
     </LinearLayout>
@@ -77,7 +77,7 @@
             android:layout_width="wrap_content"
             style="@style/AppPrimary"
             android:layout_height="wrap_content"
-            android:text="@string/mapSearchFragment_radiusTitle"
+            android:text="@string/mapViewSettings_radius"
             android:id="@+id/mapSettingsFragment_radiusTitle" />
 
         <TextView
@@ -103,7 +103,7 @@
             android:layout_width="wrap_content"
             style="@style/AppPrimary"
             android:layout_height="wrap_content"
-            android:text="@string/mapSearchFragment_ageTitle"
+            android:text="@string/mapViewSettings_age"
             android:layout_marginTop="32dp"
             />
 
@@ -136,7 +136,7 @@
         android:layout_height="55dp"
         android:textAppearance="@style/AppPrimaryHighlighted"
         android:textColor="@color/colorWhite"
-        android:text="@string/mapSearchFragment_search"
+        android:text="@string/mapViewSettingsView_newSearch"
         android:id="@+id/mapSettingsFragment_searchButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/mapSettingsFragment_relativeLayout"

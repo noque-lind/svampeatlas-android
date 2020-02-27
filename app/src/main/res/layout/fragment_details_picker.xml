@@ -60,7 +60,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
             android:layout_weight="0"
-            android:text="@string/detailsPickerFragment_rememberChoice"
+            android:text="@string/pickerCell_rememberChoice"
             android:textColor="@color/colorWhite"
             android:theme="@style/AppSwitch" />
     </LinearLayout>

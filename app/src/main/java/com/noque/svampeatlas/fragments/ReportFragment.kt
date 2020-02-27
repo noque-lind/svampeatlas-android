@@ -25,14 +25,14 @@ class ReportFragment(private val observationID: Int): DialogFragment() {
 
         val dialog = AlertDialog.Builder(requireContext())
             .setView(editText)
-            .setMessage(R.string.reportFragment_message)
+            .setMessage(R.string.observationDetailsScrollView_rapportContent_message)
             .setCancelable(true)
-            .setNegativeButton(R.string.reportFragment_reportButton) { _, _ ->
+            .setNegativeButton("OK") { _, _ ->
                 sessionViewModel.postOffensiveContentComment(observationID, editText.text.toString())
                 dismiss()
             }
 
-            .setNeutralButton(R.string.reportFragment_cancelButton) { _, _ ->
+            .setNeutralButton(R.string.observationDetailsScrollView_rapportContent_abort) { _, _ ->
                 dismiss()
             }
 

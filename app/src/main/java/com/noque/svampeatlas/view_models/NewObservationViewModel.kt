@@ -3,7 +3,10 @@ package com.noque.svampeatlas.view_models
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
+import android.location.Location
+import android.location.LocationProvider
 import android.util.Log
+import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.JsonObject
@@ -24,20 +27,25 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.util.*
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import com.noque.svampeatlas.view_models.NewObservationViewModel
+import com.noque.svampeatlas.view_models.NewObservationViewModel.DeterminationConfidence
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+
 
 class NewObservationViewModel(application: Application) : AndroidViewModel(application) {
 
-    sealed class Error(title: String, message: String): AppError(title, message) {
-        class NoMushroomError(context: Context): Error(context.getString(R.string.newObservationViewModelError_noMushroom_title), context.getString(R.string.newObservationViewModelError_noMushroom_message))
-        class NoSubstrateError(context: Context): Error(context.getString(R.string.newObservationViewModelError_noSubstrate_title), context.getString(R.string.newObservationViewModelError_noSubstrate_message))
-        class NoVegetationTypeError(context: Context): Error(context.getString(R.string.newObservationViewModelError_noVegetationType_title), context.getString(R.string.newObservationViewModelError_noVegetationType_message))
-        class NoLocationDataError(context: Context): Error(context.getString(R.string.newObservationViewModelError_noLocation_title), context.getString(R.string.newObservationViewModelError_noLocation_message))
-        class LocalityFetchError(context: Context): Error(context.getString(R.string.newObservationViewModelError_localityFetch_title), context.getString(R.string.newObservationViewModelError_localityFetch_message))
+    sealed class Error(title: String, message: String, recoveryAction: RecoveryAction? = null): AppError(title, message, recoveryAction) {
+        class NoMushroomError(context: Context): Error(context.getString(R.string.error_newObservation_missingInformation_title), context.getString(R.string.error_newObservation_noMushroom_message))
+        class NoSubstrateError(context: Context): Error(context.getString(R.string.error_newObservation_missingInformation_title), context.getString(R.string.error_newObservation_noSubstrategroup_message))
+        class NoVegetationTypeError(context: Context): Error(context.getString(R.string.error_newObservation_missingInformation_title), context.getString(R.string.error_newObservation_noVegetationType_message))
+        class NoLocationDataError(context: Context): Error(context.getString(R.string.error_newObservation_noCoordinates_title), context.getString(R.string.error_newObservation_noCoordinates_message))
+        class LocalityFetchError(context: Context): Error(context.getString(R.string.error_newObservation_noLocality_title), context.getString(R.string.error_newObservation_noLocality_message), RecoveryAction.TRYAGAIN)
     }
 
-
     companion object {
-        val TAG = "NewObservationViewModel"
+        private const val TAG = "NewObservationViewModel"
     }
 
     enum class DeterminationConfidence(val databaseName: String) {
@@ -52,36 +60,36 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
 
     private val _date by lazy {MutableLiveData<Date>()}
     private val _locality by lazy {MutableLiveData<Locality?>()}
-    private val _coordinate by lazy {MutableLiveData<LatLng?>()}
     private val _substrate by lazy {MutableLiveData<Pair<Substrate, Boolean>?>()}
     private val _vegetationType by lazy {MutableLiveData<Pair<VegetationType, Boolean>?>()}
     private val _hosts by lazy { MutableLiveData<Pair<MutableList<Host>, Boolean>?>()}
     private val _images by lazy {MutableLiveData<MutableList<File>?>()}
     private val _mushroom by lazy {MutableLiveData<Pair<Mushroom, DeterminationConfidence>?>()}
 
-    private var coordinateAccuracy: Float = 60F
     private var _notes: String? = null
     private var _ecologyNotes: String? = null
     private var _determinationNotes: String? = null
 
-
+    private val _coordinateState by lazy { MutableLiveData<State<com.noque.svampeatlas.models.Location>>() }
     private val _localityState by lazy { MutableLiveData<State<List<Locality>>>() }
-    val localityState: LiveData<State<List<Locality>>> get() = _localityState
-
     private val _predictionResultsState by lazy { MutableLiveData<State<List<PredictionResult>>>() }
-    val predictionResultsState: LiveData<State<List<PredictionResult>>> get() = _predictionResultsState
-
+    private val _useImageLocationPromptState by lazy { MutableLiveData<State<Pair<com.noque.svampeatlas.models.Location, com.noque.svampeatlas.models.Location?>>>() }
 
     val date: LiveData<Date> get() = _date
     val substrate: LiveData<Pair<Substrate, Boolean>?> get() = _substrate
     val vegetationType: LiveData<Pair<VegetationType, Boolean>?> get() = _vegetationType
     val hosts: LiveData<Pair<MutableList<Host>, Boolean>?> get() = _hosts
     val locality: LiveData<Locality?> get() = _locality
-    val coordinate: LiveData<LatLng?> get() = _coordinate
     val notes get() = _notes
     val ecologyNotes get() = _ecologyNotes
     val images: LiveData<MutableList<File>?> get() = _images
     val mushroom: LiveData<Pair<Mushroom, DeterminationConfidence>?> get() = _mushroom
+
+    val coordinateState: LiveData<State<com.noque.svampeatlas.models.Location>> get() = _coordinateState
+    val localityState: LiveData<State<List<Locality>>> get() = _localityState
+    val predictionResultsState: LiveData<State<List<PredictionResult>>> get() = _predictionResultsState
+    val useImageLocationPromptState: LiveData<State<Pair<com.noque.svampeatlas.models.Location, com.noque.svampeatlas.models.Location?>>> get() = _useImageLocationPromptState
+
 
     init {
         setup()
@@ -89,10 +97,20 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
 
     private fun setup() {
         _date.value = Calendar.getInstance().time
-        _coordinate.value = null
+        _substrate.value = null
+        _vegetationType.value = null
+        _hosts.value = null
+        _locality.value = null
+        _notes = null
+        _ecologyNotes = null
+        _images.value = null
         _mushroom.value = null
+        _determinationNotes = null
+
+        _coordinateState.value = State.Empty()
         _localityState.value = State.Empty()
         _predictionResultsState.value = State.Empty()
+        _useImageLocationPromptState.value = State.Empty()
 
         viewModelScope.launch {
             SharedPreferencesHelper(getApplication()).getSubstrateID()?.let {
@@ -123,14 +141,38 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         _locality.value = locality
     }
 
-    fun setCoordinate(coordinate: LatLng, accuracy: Float) {
-        _coordinate.value = coordinate
-        this.coordinateAccuracy = accuracy
-        getLocalities(coordinate)
+    fun setCoordinateState(state: State<com.noque.svampeatlas.models.Location>) {
+        when (state) {
+            is State.Loading -> {
+                _coordinateState.value = state
+            }
+
+            is State.Error -> {
+                _localityState.value = State.Error(state.error)
+            }
+
+            is State.Items -> {
+                if (_useImageLocationPromptState.value == null || _useImageLocationPromptState.value is State.Empty) {
+                    val imageLocation = returnImageLocationIfNecessary(state.items)
+                    if (imageLocation != null) {
+                        _useImageLocationPromptState.value = State.Items(Pair(imageLocation, state.items))
+                    } else {
+                        _date.value = state.items.date
+                        _coordinateState.value = state
+                        getLocalities(state.items.latLng)
+                    }
+                } else {
+                    _date.value = state.items.date
+                    _coordinateState.value = state
+                    getLocalities(state.items.latLng)
+                    _useImageLocationPromptState.value = State.Empty()
+                }
+            }
+        }
+
     }
 
     fun setSubstrate(substrate: Substrate, isLocked: Boolean) {
-
         _substrate.value = Pair(substrate, isLocked)
 
         SharedPreferencesHelper(getApplication()).saveSubstrateID(if (isLocked) substrate.id else null)
@@ -189,19 +231,81 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
     fun appendImage(imageFile: File) {
         var images = images.value
 
-        if (images == null) {
+        if (images != null && images.isNotEmpty()) {
+            images.add(imageFile)
+        } else {
             images = mutableListOf(imageFile)
             if (mushroom.value?.first == null) getPredictions(imageFile)
-        } else {
-            images.add(imageFile)
+            returnImageLocationIfNecessary(imageFile)?.let {
+                _useImageLocationPromptState.value = State.Items(Pair(it, null))
+            }
         }
 
         _images.value = images
     }
 
+    private fun returnImageLocationIfNecessary(imageFile: File): com.noque.svampeatlas.models.Location? {
+
+        val exif = ExifInterface(imageFile.inputStream())
+        val lat = exif.latLong?.first()
+        val lng = exif.latLong?.last()
+//            val accuracy =  exif.getAttribute(ExifInterface.TAG_GPS_DOP)
+        val date = exif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL)?.let {
+            SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.getDefault()).parse(it)
+        }?: kotlin.run {
+            Date()
+        }
+
+        when (val state = _coordinateState.value) {
+            is State.Items -> {
+                val location = state.items
+                return if (lat != null && lng != null) {
+                    if (SphericalUtil.computeDistanceBetween(location.latLng, LatLng(lat, lng)) > 500) Location(date, LatLng(lat, lng), -1F) else null
+                } else {
+                    null
+                }
+            }
+
+            is State.Error -> {
+                return if (lat != null && lng != null) {
+                    Location(date, LatLng(lat, lng), -1F)
+                } else {
+                    null
+                }
+            }
+
+            else -> { return null}
+        }
+    }
+
+    private fun returnImageLocationIfNecessary(location: com.noque.svampeatlas.models.Location): com.noque.svampeatlas.models.Location? {
+        val image = _images.value?.first()
+
+        return if (image != null) {
+            val exif = ExifInterface(image.inputStream())
+            val lat = exif.latLong?.first()
+            val lng = exif.latLong?.last()
+//            val accuracy =  exif.getAttribute(ExifInterface.TAG_GPS_DOP)
+            val date = exif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL)?.let {
+                SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.getDefault()).parse(it)
+            }?: kotlin.run {
+                Date()
+            }
+
+            return if (lat != null && lng != null) {
+                val latLng = LatLng(lat, lng)
+                return if (SphericalUtil.computeDistanceBetween(latLng, location.latLng) > 500) Location(date, latLng, -1F) else null
+            } else {
+                null
+            }
+        } else {
+             null
+        }
+    }
+
     fun removeImageAt(position: Int) {
         if (_images.value != null && _images.value!!.lastIndex >= position) {
-            _images.value?.removeAt(position)
+            _images.value?.removeAt(position)?.delete()
 
             if (_images.value?.count() == 0) {
                 _images.value = null
@@ -238,22 +342,15 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         _ecologyNotes = ecologyNotes
     }
 
-
-    fun setLocationError(error: LocationService.Error) {
-        _localityState.value = State.Error(error)
-    }
-
     fun resetLocationData() {
         _localityState.value = State.Empty()
-        _coordinate.value = null
+        _coordinateState.value = State.Empty()
         _locality.value = null
     }
 
     fun reset() {
         _date.value = null
         _locality.value = null
-        _coordinate.value = null
-        coordinateAccuracy = 60F
         _substrate.value = null
         _vegetationType.value = null
         _hosts.value = null
@@ -315,7 +412,7 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         val mushroom = mushroom.value
         val substrate = substrate.value?.first
         val vegetationType = vegetationType.value?.first
-        val coordinate = coordinate.value
+        val location = (_coordinateState.value as? State.Items)?.items
         val locality = locality.value
         val hosts = hosts.value?.first
 
@@ -331,7 +428,7 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
             return Result.Error(Error.NoSubstrateError(getApplication()))
         }
 
-        if (coordinate == null) {
+        if (location == null) {
             return Result.Error(Error.NoLocationDataError(getApplication()))
         }
 
@@ -358,9 +455,9 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         jsonObject.put("associatedOrganisms", hostArray)
         jsonObject.put("ecologynote", ecologyNotes)
         jsonObject.put("note", notes)
-        jsonObject.put("decimalLatitude", coordinate.latitude)
-        jsonObject.put("decimalLongitude", coordinate.longitude)
-        jsonObject.put("accuracy", coordinateAccuracy)
+        jsonObject.put("decimalLatitude", location.latLng.latitude)
+        jsonObject.put("decimalLongitude", location.latLng.longitude)
+        jsonObject.put("accuracy", location.accuracy)
 
         if (locality.geoName != null) {
             jsonObject.put("geonameId", locality.geoName.geonameId)

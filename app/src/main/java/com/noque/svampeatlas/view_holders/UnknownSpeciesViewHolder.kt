@@ -13,8 +13,8 @@ class UnknownSpeciesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
     init {
         resultsView.configure(
             itemView.resources.getDrawable(R.drawable.icon_missing_image, null),
-            itemView.resources.getString(R.string.unknownSpeciesItem_title),
-            itemView.resources.getString(R.string.unknownSpeciesItem_message)
+            itemView.resources.getString(R.string.unknownSpeciesButton_title),
+            itemView.resources.getString(R.string.unknownSpeciesButton_message)
         )
     }
 

@@ -1,15 +1,9 @@
 package com.noque.svampeatlas.fragments
 
 
-import android.annotation.SuppressLint
-import android.content.Intent
 import android.graphics.Color
 import android.location.Location
-import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
-import android.text.SpannableString
-import android.text.SpannableStringBuilder
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -29,12 +23,12 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.noque.svampeatlas.adapters.CommentsAdapter
 import com.noque.svampeatlas.adapters.ObservationsAdapter
-import com.noque.svampeatlas.BuildConfig
 import com.noque.svampeatlas.extensions.italized
 import com.noque.svampeatlas.extensions.toReadableDate
 import com.noque.svampeatlas.extensions.upperCased
 import kotlinx.android.synthetic.main.fragment_details.*
 import com.noque.svampeatlas.R
+import com.noque.svampeatlas.extensions.openSettings
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.services.LocationService
 import com.noque.svampeatlas.utilities.Geometry
@@ -43,7 +37,6 @@ import com.noque.svampeatlas.view_models.factories.ObservationsViewModelFactory
 import com.noque.svampeatlas.view_models.factories.SpeciesViewModelFactory
 import com.noque.svampeatlas.views.*
 import java.io.File
-import java.util.*
 import kotlin.math.abs
 
 
@@ -86,21 +79,15 @@ class DetailsFragment : Fragment() {
         service.setListener(object : LocationService.Listener {
 
             override fun requestPermission(permissions: Array<out String>, requestCode: Int) {
-                mapFragment?.setError(LocationService.Error.PermissionDenied(requireContext()), getString(R.string.util_givePermission)) {
-                    requestPermissions(permissions, requestCode)
+                mapFragment?.setError(LocationService.Error.PermissionsUndetermined(resources)) {
+                    if (it == RecoveryAction.ACTIVATE) requestPermissions(permissions, requestCode)
                 }
             }
 
             override fun locationRetrievalError(error: LocationService.Error) {
-                mapFragment?.setError(error,
-                    resources.getString(R.string.locationservice_error_permissions_handler)
-                ) {
-                    val intent = Intent()
-                    intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                    val uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
-                    intent.data = uri
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    startActivity(intent)
+                mapFragment?.setError(error) {
+                    if (it == RecoveryAction.OPENSETTINGS) openSettings()
+                    else if (it == RecoveryAction.TRYAGAIN) service.start()
                 }
             }
 
@@ -262,7 +249,12 @@ class DetailsFragment : Fragment() {
 
                     if (args.predictionResults != null && args.imageFilePath != null) {
                         newObservationViewModel.setDeterminationNotes(args.predictionResults)
-                        speciesViewModel.saveObservationImage(File(args.imageFilePath))
+                        newObservationViewModel.appendImage(File(args.imageFilePath))
+
+                        val action =
+                            DetailsFragmentDirections.actionMushroomDetailsFragmentToAddObservationFragment()
+                        action.type = AddObservationFragment.Type.IDENTIFYED_OBSERVATION
+                        findNavController().navigate(action)
                     } else {
                         findNavController().navigateUp()
                     }
@@ -510,7 +502,7 @@ class DetailsFragment : Fragment() {
                             }
 
                             is State.Error -> {
-                                mapFragment?.setError(it.error, null, null)
+                                mapFragment?.setError(it.error, null)
                             }
                         }
                     })
@@ -520,23 +512,6 @@ class DetailsFragment : Fragment() {
                         is State.Items -> {
                             observationsAdapter.configure(it.items, false)
                         }
-                    }
-                })
-
-                speciesViewModel.observationImageSaveState.observe(viewLifecycleOwner, Observer {
-                    backgroundView?.reset()
-
-                    when (it) {
-                        is State.Loading -> { backgroundView?.setLoading() }
-                        is State.Items -> {
-                            newObservationViewModel.appendImage(it.items)
-                            val action =
-                                DetailsFragmentDirections.actionMushroomDetailsFragmentToAddObservationFragment()
-                            action.type = AddObservationFragment.Type.IDENTIFYEDOBSERVATION
-                            findNavController().navigate(action)
-                        }
-
-                        is State.Error -> { }
                     }
                 })
             }
@@ -588,10 +563,10 @@ class DetailsFragment : Fragment() {
         )
 
         addDescriptionView(
-            resources.getString(R.string.detailsFragment_ecologyNotes),
+            resources.getString(R.string.observationDetailsScrollView_ecologyNotes),
             observation.ecologyNote
         )
-        addDescriptionView(resources.getString(R.string.detailsFragment_notes), observation.note)
+        addDescriptionView(resources.getString(R.string.observationDetailsScrollView_notes), observation.note)
 
 
         val information = mutableListOf<Pair<String, String>>()
@@ -620,35 +595,34 @@ class DetailsFragment : Fragment() {
         }
 
         observation.location?.let {
-            information.add(Pair(getString(R.string.detailsFragment_observationLocation), it))
+            information.add(Pair(getString(R.string.observationDetailsScrollView_location), it))
         }
 
         informationView?.configure(information)
 
-        recyclerViewHeader?.text = getString(R.string.detailsFragment_commentsHeader)
+        recyclerViewHeader?.text = getString(R.string.observationDetailsScrollView_comments)
         commentsAdapter.configure(observation.comments, sessionViewModel.isLoggedIn)
-        mapFragmentHeader?.setText(R.string.detailsFragment_observationLocation)
+        mapFragmentHeader?.setText(R.string.observationDetailsScrollView_location)
         mapFragment?.addLocationMarker(observation.coordinate)
         mapFragment?.setRegion(observation.coordinate, 80000)
     }
 
-    @SuppressLint("DefaultLocale")
     private fun configureView(mushroom: Mushroom) {
         prepareViewsForContent()
-        configureUpperLayout(mushroom.danishName?.upperCased() ?: mushroom.fullName.italized(), mushroom.images)
+        configureUpperLayout(mushroom.localizedName?.upperCased() ?: mushroom.fullName.italized(), mushroom.images)
         if (mushroom.isGenus) {
             when (args.takesSelection) {
                 TakesSelection.NO -> {
                 }
                 TakesSelection.SELECT -> {
                     if (args.imageFilePath != null) {
-                        takesSelectionButton?.setText(R.string.menu_new_observation)
+                        takesSelectionButton?.setText(R.string.detailsVC_newSightingPrompt)
                     } else {
-                            takesSelectionButton?.setText(R.string.detailsFragment_select_genus)
+                            takesSelectionButton?.setText(R.string.observationSpeciesCell_chooseGenus)
                     }
                 }
                 TakesSelection.DESELECT -> {
-                        takesSelectionButton?.setText(R.string.detailsFragment_deselect_genus)
+                        takesSelectionButton?.setText(R.string.observationSpeciesCell_deselect)
 
                 }
             }
@@ -658,57 +632,48 @@ class DetailsFragment : Fragment() {
                 }
                 TakesSelection.SELECT -> {
                     if (args.imageFilePath != null) {
-                        takesSelectionButton?.setText(R.string.menu_new_observation)
+                        takesSelectionButton?.setText(R.string.detailsVC_newSightingPrompt)
                     } else {
-                        takesSelectionButton?.setText(R.string.detailsFragment_select_species)
+                        takesSelectionButton?.setText(R.string.observationSpeciesCell_chooseSpecies)
                     }
                 }
                 TakesSelection.DESELECT -> {
-                    takesSelectionButton?.setText(R.string.detailsFragment_deselect_species)
+                    takesSelectionButton?.setText(R.string.observationSpeciesCell_deselect)
                 }
             }
         }
 
         titlesView?.configure(
-            mushroom.danishName?.upperCased() ?: mushroom.fullName.italized(),
-            (if (mushroom.danishName == null) null else mushroom.fullName.italized())
+            mushroom.localizedName?.upperCased() ?: mushroom.fullName.italized(),
+            (if (mushroom.localizedName == null) null else mushroom.fullName.italized())
         )
 
-        if (Locale.getDefault() == Locale.forLanguageTag("da-DK")) {
-            addDescriptionView(
-                getString(R.string.detailsFragment_diagnosis),
-                mushroom.attributes?.diagnosis?.capitalize()
-            )
+        addDescriptionView(
+            getString(R.string.mushroomDetailsScrollView_description),
+            mushroom.attributes?.localizedDescription
+        )
 
-            addDescriptionView(
-                getString(R.string.detailsFragment_ecologyNotes),
-                    mushroom.attributes?.ecology?.capitalize()
-            )
+        addDescriptionView(
+            getString(R.string.mushroomDetailsScrollView_ecology),
+            mushroom.attributes?.localizedEcology
+        )
 
+        addDescriptionView(
+            resources.getString(R.string.mushroomDetailsScrollView_similarities),
+            mushroom.attributes?.localizedSimilarities
+        )
 
-            addDescriptionView(
-                resources.getString(R.string.detailsFragment_similarities),
-                mushroom.attributes?.similarities?.capitalize()
-            )
+        addDescriptionView(
+            getString(R.string.mushroomDetailsScrollView_eatability),
+            mushroom.attributes?.localizedEdibility
+        )
 
-            addDescriptionView(
-                getString(R.string.detailsFragment_eatability),
-                mushroom.attributes?.edibility?.capitalize()
-            )
-        } else {
-            addDescriptionView(
-                getString(
-                    R.string.detailsFragment_diagnosis
-                ),
-                mushroom.attributes?.englishDescription?.capitalize()
-            )
-        }
-
+       
         val information = mutableListOf<Pair<String, String>>()
         mushroom.statistics?.acceptedObservationsCount?.let {
             information.add(
                 Pair(
-                    getString(R.string.detailsFragment_acceptedObservations),
+                    getString(R.string.mushroomDetailsScrollView_acceptedRecords),
                     it.toString()
                 )
             )
@@ -716,7 +681,7 @@ class DetailsFragment : Fragment() {
         mushroom.statistics?.lastAcceptedObservationDate?.let {
             information.add(
                 Pair(
-                    getString(R.string.detailsFragment_latestObservation),
+                    getString(R.string.mushroomDetailsScrollView_latestAcceptedRecord),
                     it.toReadableDate(recentFormatting = true, ignoreTime = true)
                 )
             )
@@ -724,15 +689,15 @@ class DetailsFragment : Fragment() {
         mushroom.updatedAtDate?.let {
             information.add(
                 Pair(
-                    getString(R.string.detailsFragment_lastUpdate),
+                    getString(R.string.mushroomDetailsScrollView_latestUpdated),
                     it.toReadableDate(recentFormatting = true, ignoreTime = true)
                 )
             )
         }
         informationView?.configure(information)
 
-        mapFragmentHeader?.setText(R.string.detailsFragment_heatmap)
-        recyclerViewHeader?.text = getString(R.string.detailsFragment_latest_observations)
+        mapFragmentHeader?.setText(R.string.mushroomDetailsScrollView_heatMap)
+        recyclerViewHeader?.text = getString(R.string.mushroomDetailsScrollView_latestObservations)
     }
 
     private fun configureUpperLayout(title: CharSequence, images: List<Image>?) {

@@ -12,7 +12,7 @@
         <menu>
             <item
                 android:id="@+id/menu_detailsFragment_report"
-                android:title="@string/menu_reportOffensiveContent"
+                android:title="@string/observationDetailsScrollView_rapportContent_title"
                 app:showAsAction="ifRoom" />
         </menu>
 

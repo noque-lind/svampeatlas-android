@@ -6,8 +6,9 @@ import com.google.gson.annotations.SerializedName
 import com.noque.svampeatlas.extensions.Date
 import java.util.*
 import com.google.gson.reflect.TypeToken
+import com.noque.svampeatlas.extensions.capitalized
+import com.noque.svampeatlas.extensions.isDanish
 import java.util.Collections.emptyList
-import java.util.Collections.list
 
 object RedListDataTypeConverters {
 
@@ -110,20 +111,30 @@ class Mushroom(
     @SerializedName("Images") val images: List<Image>?
 ) {
 
+    val localizedName: String? get() {
+        return if (Locale.getDefault().isDanish()) {
+            return if (_vernacularNameDK?._vernacularNameDK != null && _vernacularNameDK._vernacularNameDK != "") {
+                _vernacularNameDK._vernacularNameDK.capitalized()
+            } else {
+                null
+            }
+        } else if (attributes?.vernacularNameEn != null && attributes.vernacularNameEn != "") {
+            attributes.vernacularNameEn.capitalized()
+        } else {
+            null
+        }
+    }
+
+    val redListStatus: String? get() {
+        return _redListData?.firstOrNull()?.status
+    }
+
 
     val updatedAtDate: Date?
         get() {
             return Date(updatedAt)
         }
 
-    val danishName: String?
-        get() {
-            return _vernacularNameDK?._vernacularNameDK
-        }
-
-    val redListStatus: String? get() {
-        return _redListData?.firstOrNull()?.status
-    }
 
     val isGenus: Boolean get() { return (_rankName == "gen.") }
 }
@@ -138,14 +149,61 @@ data class RedListData(
 )
 
 data class Attributes(
-    @SerializedName("PresentInDK") val presentInDenmark: Boolean?,
     @SerializedName("diagnose") val diagnosis: String?,
+    @SerializedName("bogtekst_gyldendal_en") val diagnosisEn: String?,
+    @SerializedName("spiselighedsrapport") val edibility: String?,
     @SerializedName("forvekslingsmuligheder") val similarities: String?,
     @SerializedName("oekologi") val ecology: String?,
-    @SerializedName("spiselighedsrapport") val edibility: String?,
-    @SerializedName("beskrivelse") val description: String?,
-    @SerializedName("BeskrivelseUK") val englishDescription: String?
-)
+    @SerializedName("valideringsrapport") val validationTips: String?,
+    @SerializedName("vernacular_name_GB") val vernacularNameEn: String?,
+    @SerializedName("PresentInDK") val presentInDenmark: Boolean?
+) {
+
+    val localizedDescription: String? get() {
+        return if (Locale.getDefault().isDanish()) {
+            diagnosis
+        } else {
+            return diagnosisEn
+        }
+    }
+
+
+    val localizedEdibility: String? get() {
+        return if (Locale.getDefault().isDanish()) {
+            edibility
+        } else {
+            return null
+        }
+    }
+
+    val localizedSimilarities: String? get() {
+        return if (Locale.getDefault().isDanish()) {
+            similarities
+        } else {
+            null
+        }
+    }
+
+    val localizedEcology: String? get() {
+        return if (Locale.getDefault().isDanish()) {
+            ecology
+        } else {
+            return null
+        }
+    }
+
+    val localizedValidationTips: String? get() {
+        return if (Locale.getDefault().isDanish()) {
+            validationTips
+        } else {
+            return null
+        }
+    }
+
+    val isPoisonous: Boolean get() {
+            return edibility != null && edibility.contains("giftig", true) && !edibility.contains("ikke giftig", true)
+    }
+}
 
 data class Statistics(
     @SerializedName("accepted_count") val acceptedCount: Int?,

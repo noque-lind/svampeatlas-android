@@ -24,6 +24,8 @@ class SpeciesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     sealed class Item(viewType: ViewType) :
         com.noque.svampeatlas.models.Item<Item.ViewType>(viewType) {
+        class Caution: Item(ViewType.CAUTIONCELL)
+        class Creditation: Item(ViewType.CREDITATIONCELL)
         class UnknownSpecies: Item(ViewType.UNKNOWNSPECIES)
         class SelectableMushroom(val mushroom: Mushroom, val score: Double? = null) : Item(ViewType.SELECTABLE)
         class SelectedMushroom(
@@ -34,7 +36,9 @@ class SpeciesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         enum class ViewType : com.noque.svampeatlas.models.ViewType {
             UNKNOWNSPECIES,
             SELECTEDSPECIES,
-            SELECTABLE;
+            SELECTABLE,
+            CAUTIONCELL,
+            CREDITATIONCELL;
 
             companion object {
                 val values = values()
@@ -46,7 +50,7 @@ class SpeciesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val upperSection = Section<Item>(null)
     private val middleSection = Section<Item>(null)
-    private val suggestionsSection = Section<Item>(null)
+    private val lowerSection = Section<Item>(null)
 
     private var listener: Listener? = null
 
@@ -75,7 +79,7 @@ class SpeciesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     init {
         sections.addSection(upperSection)
         sections.addSection(middleSection)
-        sections.addSection(suggestionsSection)
+        sections.addSection(lowerSection)
     }
 
 
@@ -95,9 +99,9 @@ class SpeciesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         notifyDataSetChanged()
     }
 
-    fun configureSuggestionsSection(state: State<List<Item>>, title: String?) {
-        suggestionsSection.setTitle(title)
-        suggestionsSection.setState(state)
+    fun configureLowerSectionState(state: State<List<Item>>, title: String?) {
+        lowerSection.setTitle(title)
+        lowerSection.setState(state)
         notifyDataSetChanged()
     }
 
@@ -150,6 +154,18 @@ class SpeciesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                         view.setOnClickListener(onClickListener)
                         viewHolder = ResultItemViewHolder(view)
                     }
+
+                    Item.ViewType.CAUTIONCELL -> {
+                        view = layoutInflater.inflate(R.layout.item_caution, parent, false)
+                        viewHolder = CautionViewHolder(view)
+                    }
+
+                    Item.ViewType.CREDITATIONCELL -> {
+                        view = layoutInflater.inflate(R.layout.item_creditation, parent, false)
+                        val creditationViewHolder = CreditationViewHolder(view)
+                        creditationViewHolder.configure(CreditationViewHolder.Type.AINEWOBSERVATION)
+                        viewHolder = creditationViewHolder
+                    }
                 }
             }
         }
@@ -168,7 +184,7 @@ class SpeciesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             is ResultItemViewHolder -> {
                 when (val item = sections.getItem(position)) {
                     is Item.SelectableMushroom -> {
-                        holder.configure(item.mushroom, item.score)
+                        holder.configure(item.mushroom)
                     }
                 }
             }

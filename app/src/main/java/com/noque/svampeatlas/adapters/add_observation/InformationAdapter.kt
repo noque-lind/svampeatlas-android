@@ -12,10 +12,10 @@ import com.noque.svampeatlas.fragments.add_observation.SpeciesFragment
 class InformationAdapter(val context: Context?, val categories: Array<AddObservationFragment.Category>, fm: FragmentManager, behavior: Int) : FragmentPagerAdapter(fm, behavior) {
 
     override fun getItem(position: Int): Fragment {
-        when (categories[position]) {
-            AddObservationFragment.Category.SPECIES -> return SpeciesFragment()
-            AddObservationFragment.Category.DETAILS -> return DetailsFragment()
-            AddObservationFragment.Category.LOCALITY -> return LocalityFragment()
+        return when (categories[position]) {
+            AddObservationFragment.Category.SPECIES -> SpeciesFragment()
+            AddObservationFragment.Category.DETAILS -> DetailsFragment()
+            AddObservationFragment.Category.LOCALITY -> LocalityFragment()
         }
     }
 
@@ -24,10 +24,10 @@ class InformationAdapter(val context: Context?, val categories: Array<AddObserva
     }
 
     override fun getPageTitle(position: Int): CharSequence? {
-        when (categories[position]) {
-            AddObservationFragment.Category.DETAILS -> return context?.resources?.getText(R.string.addObservationCategory_details)
-            AddObservationFragment.Category.LOCALITY -> return context?.resources?.getText(R.string.addObservationCategory_location)
-            AddObservationFragment.Category.SPECIES -> return context?.resources?.getText(R.string.addObservationCategory_species)
+        return when (categories[position]) {
+            AddObservationFragment.Category.DETAILS -> context?.resources?.getText(R.string.addObservationVC_observationCategories_details)
+            AddObservationFragment.Category.LOCALITY -> context?.resources?.getText(R.string.addObservationVC_observationCategories_location)
+            AddObservationFragment.Category.SPECIES -> context?.resources?.getText(R.string.addObservationVC_observationCategories_species)
         }
     }
 }

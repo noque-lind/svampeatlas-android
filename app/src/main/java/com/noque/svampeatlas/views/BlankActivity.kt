@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.net.Uri
 import android.util.Log
+import com.noque.svampeatlas.services.FileManager
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
@@ -37,26 +38,8 @@ import java.util.*
 class BlankActivity : AppCompatActivity() {
 
     companion object {
-        val TAG = "BlankActivity"
-        val KEY_IS_LOGGED_IN = "IsLoggedIn"
-
-        private fun getOutputDirectory(context: Context): File {
-            val appContext = context.applicationContext
-            val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
-                File(it, appContext.resources.getString(R.string.app_name)).apply { mkdirs() }
-            }
-
-            return if (mediaDir != null && mediaDir.exists()) mediaDir else appContext.filesDir
-        }
-
-        private fun getCacheDir(context: Context): File {
-            val appContext = context.applicationContext
-            val cacheDir = context.externalCacheDirs.firstOrNull()
-            return if (cacheDir != null && cacheDir.exists()) cacheDir else appContext.cacheDir
-        }
-
-        fun createTempFile(context: Context): File = File.createTempFile(SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.getDefault()).format(System.currentTimeMillis()), ".jpg", BlankActivity.getCacheDir(context))
-        fun createFile(context: Context): File = File(BlankActivity.getOutputDirectory(context), SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.getDefault()).format(System.currentTimeMillis()) + ".jpg")
+        private const val TAG = "BlankActivity"
+        const val KEY_IS_LOGGED_IN = "IsLoggedIn"
     }
 
 
@@ -224,5 +207,13 @@ class BlankActivity : AppCompatActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    override fun onPause() {
+        if (isFinishing) {
+            FileManager.clearTemporaryFiles()
+        }
+
+        super.onPause()
     }
 }

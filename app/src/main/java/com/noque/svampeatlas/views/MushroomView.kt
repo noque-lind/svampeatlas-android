@@ -80,8 +80,8 @@ class MushroomView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(c
             mushroomView_imageView.visibility = View.GONE
         }
 
-        if (mushroom.danishName != null) {
-            mushroomView_primaryLabel.text = mushroom.danishName!!.upperCased()
+        if (mushroom.localizedName != null) {
+            mushroomView_primaryLabel.text = mushroom.localizedName!!.upperCased()
             mushroomView_secondaryLabel.visibility = View.VISIBLE
             mushroomView_secondaryLabel.text = mushroom.fullName.italized()
         } else {
@@ -92,11 +92,11 @@ class MushroomView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(c
         var information: MutableList<Pair<String, String>> = mutableListOf()
 
         mushroom.statistics?.acceptedObservationsCount?.let {
-            information.add(Pair("Antal danske fund:", it.toString()))
+            information.add(Pair(resources.getString(R.string.mushroomView_numberOfRecords), it.toString()))
         }
 
         mushroom.statistics?.lastAcceptedObservationDate?.let {
-            information.add(Pair("Seneste fund:", it.toReadableDate(true, true)))
+            information.add(Pair(resources.getString(R.string.mushroomView_latestObservation), it.toReadableDate(true, true)))
         }
 
         mushroomView_informationView.configure(information)

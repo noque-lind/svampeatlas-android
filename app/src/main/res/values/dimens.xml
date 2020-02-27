@@ -10,6 +10,6 @@
     <dimen name="item_mushroom_top_margin">8dp</dimen>
     <dimen name="item_mushroom_bottom_margin">8dp</dimen>
     <dimen name="secondary_color_rounded">8dp</dimen>
-    <dimen name="app_elevation">10dp</dimen>
+    <dimen name="app_elevation">4dp</dimen>
     <dimen name="app_rounded_corners">8dp</dimen>
 </resources>

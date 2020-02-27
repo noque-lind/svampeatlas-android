@@ -40,6 +40,10 @@
         <item name="android:fontFamily">@font/avenir_next</item>
     </style>
 
+    <style name="AppPrimary.Small">
+
+    </style>
+
     <style name="AppPrimaryHighlighted">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">15sp</item>
@@ -49,7 +53,7 @@
     <style name="AppDivider">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">15sp</item>
-        <item name="android:fontFamily">@font/avenir_next</item>
+        <item name="android:fontFamily">@font/caviar_dreams</item>
     </style>
 
 

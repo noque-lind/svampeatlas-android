@@ -20,7 +20,7 @@
         android:layout_marginEnd="32dp"
         android:layout_marginTop="64dp"
         android:layout_width="wrap_content"
-        android:text="@string/species_confidence_title"
+        android:text="@string/selectedSpeciesCell_question"
         android:layout_height="wrap_content"
         style="@style/AppPrimaryHighlighted"/>
 

@@ -4,7 +4,6 @@ import android.content.pm.ActivityInfo
 import android.graphics.*
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -28,7 +27,6 @@ import com.noque.svampeatlas.extensions.pxToDp
 import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.services.LocationService
-import com.noque.svampeatlas.utilities.DispatchGroup
 import com.noque.svampeatlas.views.BlankActivity
 import com.noque.svampeatlas.views.SpinnerView
 import com.noque.svampeatlas.view_holders.AddImageViewHolder
@@ -38,10 +36,9 @@ import kotlinx.android.synthetic.main.custom_toast.*
 import kotlinx.android.synthetic.main.custom_toast.view.*
 import kotlinx.android.synthetic.main.fragment_add_observation.*
 import java.util.*
-import kotlin.concurrent.timerTask
 
 
-class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallback {
+class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallback, PromptFragment.Listener {
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -53,17 +50,17 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     }
 
     companion object {
-        val TAG = "AddObservationFragment"
-        val KEY_LOCALITY_ID_SHOWN = "KEY_LOCALITY_ID_SHOWN"
-        val KEY_ADDIMAGE_SHOWN = "KEY_ADDIMAGE_SHOWN"
-        val DEFAULT_LOCALITY_ID = 0
-        val LOCALITY_ID_FOR_ERROR = 1921
+        private const val TAG = "AddObservationFragment"
+        private const val KEY_LOCALITY_ID_SHOWN = "KEY_LOCALITY_ID_SHOWN"
+        private const val KEY_ADDIMAGE_SHOWN = "KEY_ADDIMAGE_SHOWN"
+        private const val DEFAULT_LOCALITY_ID = 0
+        private const val LOCALITY_ID_FOR_ERROR = 1921
 
     }
 
     enum class Type {
-        NEWOBSERVATION,
-        IDENTIFYEDOBSERVATION
+        NEW_OBSERVATION,
+        IDENTIFYED_OBSERVATION
     }
 
     enum class Category {
@@ -89,7 +86,6 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     private var toast: Toast? = null
 
     // Views
-
     private var viewPager: ViewPager? = null
     private var addImagesRecyclerView: RecyclerView? = null
     private var tabLayout: TabLayout? = null
@@ -112,7 +108,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         adapter.addImageButtonClicked = {
             val action =
                 AddObservationFragmentDirections.actionGlobalCameraFragment()
-            action.type = CameraFragment.Type.IMAGECAPTURE
+            action.type = CameraFragment.Type.IMAGE_CAPTURE
             findNavController().navigate(action)
         }
 
@@ -130,17 +126,29 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
 
     // Listeners
 
+    override fun positiveButtonPressed() {
+        (newObservationViewModel.useImageLocationPromptState.value as? State.Items)?.items?.first?.let {
+            newObservationViewModel.setCoordinateState(State.Items(it))
+        }
+    }
+
+    override fun negativeButtonPressed() {
+        (newObservationViewModel.useImageLocationPromptState.value as? State.Items)?.items?.second?.let {
+            newObservationViewModel.setCoordinateState(State.Items(it))
+        }
+    }
+
     private val locationServiceListener = object : LocationService.Listener {
         override fun requestPermission(permissions: Array<out String>, requestCode: Int) {
             requestPermissions(permissions, requestCode)
         }
 
         override fun locationRetrievalError(error: LocationService.Error) {
-            newObservationViewModel.setLocationError(error)
+            newObservationViewModel.setCoordinateState(State.Error(error))
         }
 
         override fun locationRetrieved(location: Location) {
-            newObservationViewModel.setCoordinate(LatLng(location.latitude, location.longitude), location.accuracy)
+            newObservationViewModel.setCoordinateState(State.Items(com.noque.svampeatlas.models.Location(Date(), LatLng(location.latitude, location.longitude), location.accuracy)))
         }
 
     }
@@ -215,11 +223,12 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        if (!addImageShown && args.type == Type.NEWOBSERVATION) {
+        if (!addImageShown && args.type == Type.NEW_OBSERVATION) {
             addImageShown = true
+            newObservationViewModel.reset()
             val action =
                 AddObservationFragmentDirections.actionAddObservationFragmentToCameraFragment()
-            action.type = CameraFragment.Type.NEWOBSERVATION
+            action.type = CameraFragment.Type.NEW_OBSERVATION
             findNavController().navigate(action)
         }
     }
@@ -239,9 +248,6 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         initViews()
         setupView()
         setupViewModels()
-
-        // Figure out if only activity is needed
-        locationService.setListener(locationServiceListener)
     }
 
     override fun onPause() {
@@ -311,7 +317,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                         R.drawable.icon_elmessageview_success
                     )
                     createToast(
-                        resources.getString(R.string.addObservationFragment_completedUpload_title),
+                        resources.getString(R.string.prompt_successRecordCreation_title),
                         "ID: ${it.items.first}",
                         bitmap.changeColor(
                             ResourcesCompat.getColor(
@@ -346,8 +352,6 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                             )
                         )
                     )
-
-                    sessionViewModel.resetObservationUploadState()
                 }
             }
         })
@@ -357,9 +361,35 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
             addImagesAdapter.configure(it)
         })
 
-        newObservationViewModel.coordinate.observe(viewLifecycleOwner, Observer {
-            if (it == null) {
-                locationService.start()
+        newObservationViewModel.coordinateState.observe(viewLifecycleOwner, Observer {
+            when (it) {
+
+                is State.Loading -> {
+                    locationService.setListener(locationServiceListener)
+                    locationService.start()
+                }
+
+                is State.Empty -> {
+                    newObservationViewModel.setCoordinateState(State.Loading())
+                }
+
+                is State.Error -> { }
+            }
+        })
+
+        newObservationViewModel.useImageLocationPromptState.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is State.Items -> {
+                    val dialog = PromptFragment()
+                    dialog.setTargetFragment(this, 10)
+                    val bundle = Bundle()
+                    bundle.putString(PromptFragment.KEY_TITLE, getString(R.string.prompt_useImageMetadata_title))
+                    bundle.putString(PromptFragment.KEY_MESSAGE, getString(R.string.prompt_useImageMetadata_message))
+                    bundle.putString(PromptFragment.KEY_POSITIVE, getString(R.string.prompt_useImageMetadata_positive))
+                    bundle.putString(PromptFragment.KEY_NEGATIVE, getString(R.string.prompt_useImageMetadata_negative))
+                    dialog.arguments = bundle
+                    dialog.show(requireFragmentManager(), null)
+                }
             }
         })
 
@@ -373,8 +403,8 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                         val bitmap =
                             BitmapFactory.decodeResource(resources, R.drawable.icon_locality_pin)
                         createToast(
-                            resources.getString(R.string.addObservationFragment_localityFound_title),
-                            "${resources.getString(R.string.addObservationFragment_localityFound_message)}${it.name}",
+                            resources.getString(R.string.prompt_localityDetermined_title),
+                            resources.getString(R.string.prompt_localityDetermined_message, it.name, it.location.latitude, it.location.longitude),
                             bitmap.changeColor(
                                 ResourcesCompat.getColor(
                                     resources,
@@ -398,7 +428,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                         val bitmap =
                             BitmapFactory.decodeResource(resources, R.drawable.icon_locality_pin)
                         createToast(
-                            state.error.title,
+                            getString(R.string.prompt_localityDeterminedError_title),
                             state.error.message,
                             bitmap.changeColor(
                                 ResourcesCompat.getColor(
@@ -470,7 +500,6 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         viewPager?.currentItem = Category.SPECIES.ordinal
         if (localityIdShown == LOCALITY_ID_FOR_ERROR) localityIdShown = DEFAULT_LOCALITY_ID
         newObservationViewModel.reset()
-        sessionViewModel.resetObservationUploadState()
     }
 
     override fun onDestroyView() {

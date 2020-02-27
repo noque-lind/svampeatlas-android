@@ -9,7 +9,7 @@ import com.noque.svampeatlas.daos.*
 import com.noque.svampeatlas.models.*
 
 @Database(entities = [User::class, Substrate::class, VegetationType::class, Host::class, Mushroom::class],
-    version = 11)
+    version = 12)
 
 @TypeConverters(ImagesTypeConverters::class, RedListDataTypeConverters::class)
 

@@ -36,7 +36,7 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <androidx.appcompat.widget.Toolbar
-        app:title="@string/fragment_addObservation"
+        app:title="@string/addObservationVC_title"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

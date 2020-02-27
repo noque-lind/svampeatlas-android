@@ -155,17 +155,17 @@ class MyPageFragment : Fragment() {
 
                     is State.Items -> {
                         if (state.items.first.count() == 0) {
-                            adapter.configureNotificationsState(State.Error(AppError(resources.getString(R.string.myPageFragment_noNotificationsTitle),
-                                resources.getString(R.string.myPageFragment_noNotifications_message))), getString(R.string.myPageFragment_notificationsHeader))
+                            adapter.configureNotificationsState(State.Error(AppError(resources.getString(R.string.error_session_noNotifications_title),
+                                resources.getString(R.string.error_session_noNotifications_message), null)), getString(R.string.myPageScrollView_notificationsHeader))
                         } else {
                             val items: MutableList<MyPageAdapter.Item> = state.items.first.map { MyPageAdapter.Item.Notification(it) }.toMutableList()
                             if (items.count() != state.items.second) items.add(MyPageAdapter.Item.LoadMore(MyPageAdapter.Item.Category.NOTIFICATIONS, items.lastIndex))
-                            adapter.configureNotificationsState(State.Items(items), "${state.items.second} ${getText(R.string.myPageFragment_notificationsHeader)}")
+                            adapter.configureNotificationsState(State.Items(items), "${state.items.second} ${getText(R.string.myPageScrollView_notificationsHeader)}")
                         }
                     }
 
                     is State.Error -> {
-                        adapter.configureNotificationsState(State.Error(state.error), getString(R.string.myPageFragment_notificationsHeader))
+                        adapter.configureNotificationsState(State.Error(state.error), getString(R.string.myPageScrollView_notificationsHeader))
                     }
                 }
 
@@ -181,20 +181,20 @@ class MyPageFragment : Fragment() {
                     is State.Items -> {
                         if (state.items.first.count() == 0) {
                             adapter.configureObservationsState(State.Error(AppError(
-                                resources.getString(R.string.myPageFragment_noObservations_title),
-                                resources.getString(R.string.myPageFragment_noObservations_message)
-                            )), getString(R.string.myPageFragment_observationsHeader))
+                                resources.getString(R.string.error_session_noObservations_title),
+                                resources.getString(R.string.error_session_noObservations_message), null
+                            )), getString(R.string.myPageScrollView_observationsHeader))
                         } else {
                             val items: MutableList<MyPageAdapter.Item> = state.items.first.map { MyPageAdapter.Item.Observation(it) }.toMutableList()
                             if (items.count() != state.items.second) items.add(MyPageAdapter.Item.LoadMore(MyPageAdapter.Item.Category.OBSERVATIONS, items.lastIndex))
                             adapter.configureObservationsState(State.Items(items), "${state.items.second} ${getText(
-                                R.string.myPageFragment_observationsHeader
+                                R.string.myPageScrollView_observationsHeader
                             )}")
                         }
                     }
 
                     is State.Error -> {
-                        adapter.configureObservationsState(State.Error(state.error), getString(R.string.myPageFragment_observationsHeader))
+                        adapter.configureObservationsState(State.Error(state.error), getString(R.string.myPageScrollView_observationsHeader))
                     }
                 }
 

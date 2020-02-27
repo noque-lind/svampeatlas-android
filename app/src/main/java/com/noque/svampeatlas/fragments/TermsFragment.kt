@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.fragments.add_observation.DetailsPickerFragment
 import com.noque.svampeatlas.utilities.SharedPreferencesHelper
+import com.noque.svampeatlas.views.HeaderView
 import kotlinx.android.synthetic.main.fragment_details_picker.*
 import kotlinx.android.synthetic.main.fragment_terms.*
 
@@ -22,7 +23,8 @@ class TermsFragment: DialogFragment() {
     }
 
     enum class Type {
-        IDENTIFICATION
+        IDENTIFICATION,
+        CAMERAHELPER
     }
 
     interface Listener {
@@ -36,8 +38,10 @@ class TermsFragment: DialogFragment() {
 
     // Views
 
+    private lateinit var headerView: HeaderView
     private lateinit var contentTextView: TextView
     private lateinit var acceptButton: Button
+
 
     // Listeners
 
@@ -83,14 +87,21 @@ class TermsFragment: DialogFragment() {
     private fun initViews() {
         contentTextView = termsFragment_contentTextView
         acceptButton = termsFragment_acceptButton
+        headerView = termsFragment_headerView
     }
 
     private fun setupViews() {
         acceptButton.setOnClickListener(acceptButtonPressed)
-        contentTextView.setText(when (type) {
+
+        when (type) {
             Type.IDENTIFICATION -> {
-                R.string.termsFragment_identification_text
+                headerView.configure(getString(R.string.termsVC_mlPredict_title))
+                contentTextView.text = getString(R.string.termsVC_mlPredict_message)
             }
-        })
+            Type.CAMERAHELPER -> {
+                headerView.configure(getString(R.string.termsVC_cameraHelper_title))
+                contentTextView.text = getString(R.string.termsVC_cameraHelper_message)
+            }
+        }
     }
 }

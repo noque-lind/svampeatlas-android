@@ -286,6 +286,9 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
                 .uploadObservation(TAG, token, jsonObject) {
                     it.onError {
                         _observationUploadState.value = State.Error(it)
+
+                        // Reset state after it has been posted once
+                        _observationUploadState.value = State.Empty()
                     }
 
                     it.onSuccess { id ->
@@ -296,11 +299,15 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
                                         it.onSuccess {
                                             _observationUploadState.value =
                                                 State.Items(Pair(id, it))
+                                            // Reset state after it has been posted once
+                                            _observationUploadState.value = State.Empty()
                                         }
                                     }
                             }
                         } else {
                             _observationUploadState.value = State.Items(Pair(id, 0))
+                            // Reset state after it has been posted once
+                            _observationUploadState.value = State.Empty()
                         }
                         lastUpdated = Date(0)
                     }
@@ -314,12 +321,6 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
         token?.let {
             DataService.getInstance(getApplication()).postOffensiveComment(TAG, observationID, json, it)
         }
-    }
-
-
-
-    fun resetObservationUploadState() {
-        _observationUploadState.value = State.Empty()
     }
 
     fun logout() {

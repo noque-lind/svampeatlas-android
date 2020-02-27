@@ -13,7 +13,7 @@ class HostsAdapter() : PickerAdapter<Host>() {
         when (holder) {
             is ItemViewHolder -> {
                 sections.getItem(position)
-                    .item.let { holder.configure("- ${it.dkName} (${it.latinName})") }
+                    .item.let { holder.configure("- ${it.localizedName} (${it.latinName})") }
             }
         }
         super.onBindViewHolder(holder, position)

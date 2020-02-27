@@ -54,13 +54,12 @@ class ResultView(context: Context?, attrs: AttributeSet?) : LinearLayout(context
         }
     }
 
-    @SuppressLint("DefaultLocale")
     fun configure(mushroom: Mushroom) {
         if (mushroom.isGenus) {
             imageView.setImageResource(R.drawable.icon_genus)
-            val primaryText = mushroom.danishName?.upperCased() ?: mushroom.fullName.italized()
-            primaryLabel.text = resources.getString(R.string.util_genus, primaryText)
-            secondaryLabel.text = if (mushroom.danishName != null) mushroom.fullName.italized() else null
+            val primaryText = mushroom.localizedName?.upperCased() ?: mushroom.fullName.italized()
+            primaryLabel.text = resources.getString(R.string.containedResultCell_genus, primaryText)
+            secondaryLabel.text = if (mushroom.localizedName != null) mushroom.fullName.italized() else null
         } else {
             if (mushroom.images?.firstOrNull() != null) {
                 imageView.visibility = View.VISIBLE
@@ -69,11 +68,11 @@ class ResultView(context: Context?, attrs: AttributeSet?) : LinearLayout(context
                 imageView.visibility = View.GONE
             }
 
-            primaryLabel.text = mushroom.danishName?.upperCased() ?: mushroom.fullName.italized()
-            secondaryLabel.text = if (mushroom.danishName != null) mushroom.fullName.italized() else null
+            primaryLabel.text = mushroom.localizedName?.upperCased() ?: mushroom.fullName.italized()
+            secondaryLabel.text = if (mushroom.localizedName != null) mushroom.fullName.italized() else null
         }
 
-        if (mushroom.attributes?.edibility != null && mushroom.attributes.edibility.contains("giftig", true)) {
+        if (mushroom.attributes?.isPoisonous == true) {
             toxicityView.visibility = View.VISIBLE
         } else {
             toxicityView.visibility = View.GONE

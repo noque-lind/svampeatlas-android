@@ -14,10 +14,14 @@ open class Item<V>(private val viewType: V) where V : ViewType, V: Enum<V> {
 
 class Sections<V, I> where V : ViewType, V: Enum<V>, I: Item<V> {
 
-    private val sections: MutableList<Section<I>> = mutableListOf()
+    private var sections: MutableList<Section<I>> = mutableListOf()
 
     fun addSection(section: Section<I>) {
         sections.add(section)
+    }
+
+    fun setSections(sections: MutableList<Section<I>>) {
+        this.sections = sections
     }
 
     fun getTitle(position: Int): String? {
@@ -100,7 +104,7 @@ class Sections<V, I> where V : ViewType, V: Enum<V>, I: Item<V> {
 }
 
 
-class Section<T>(private var title: String?) {
+class Section<T>(private var title: String?, private var state: State<List<T>> = State.Empty()) {
 
     enum class ViewType: com.noque.svampeatlas.models.ViewType {
         HEADER,
@@ -113,7 +117,6 @@ class Section<T>(private var title: String?) {
         }
     }
 
-    private var state: State<List<T>> = State.Empty()
 
     fun setState(state: State<List<T>>) {
         this.state = state

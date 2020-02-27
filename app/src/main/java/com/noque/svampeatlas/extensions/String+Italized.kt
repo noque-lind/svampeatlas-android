@@ -64,6 +64,10 @@ fun String.upperCased(): SpannableStringBuilder {
     return SpannableStringBuilder().append(this.capitalize())
 }
 
+fun String.capitalized(): String {
+    return this.capitalize()
+}
+
 fun String.red(): SpannableStringBuilder {
     val currentString = this
 

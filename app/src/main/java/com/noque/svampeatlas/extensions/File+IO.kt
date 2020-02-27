@@ -19,15 +19,15 @@ import java.util.*
 
 suspend fun File.getBitmap(): Result<Bitmap, AppError> = withContext(Dispatchers.IO) {
     try {
-        if (!this@getBitmap.exists()) Result.Error<Bitmap, AppError>(AppError("Sorry", "An error occurred while trying to upload image. It does not exist any longer."))
+        if (!this@getBitmap.exists()) Result.Error<Bitmap, AppError>(AppError("Sorry", "An error occurred while trying to upload image. It does not exist any longer.", null))
         val bitmap = BitmapFactory.decodeFile(this@getBitmap.absolutePath)
         if (bitmap != null) {
             Result.Success<Bitmap, AppError>(bitmap)
         } else {
-            Result.Error<Bitmap, AppError>(AppError("Sorry", "An error occurred while trying to upload image. It does not exist any longer."))
+            Result.Error<Bitmap, AppError>(AppError("Sorry", "An error occurred while trying to upload image. It does not exist any longer.", null))
         }
     } catch (exception: IllegalArgumentException) {
-        Result.Error<Bitmap, AppError>(AppError("Sorry", "An error occurred while trying to upload image. It does not exist any longer."))
+        Result.Error<Bitmap, AppError>(AppError("Sorry", "An error occurred while trying to upload image. It does not exist any longer.", null))
     }
 }
 
@@ -74,9 +74,9 @@ suspend fun File.copyTo(file: File): Result<File, AppError> = withContext(Dispat
     try {
         return@withContext Result.Success<File, AppError>(value = this@copyTo.copyTo(file, false))
     } catch (exception: NoSuchFileException) {
-        Result.Error<File, AppError>(AppError("", ""))
+        Result.Error<File, AppError>(AppError("", "", null))
     } catch (exception: IOException) {
-        Result.Error<File, AppError>(AppError("", ""))
+        Result.Error<File, AppError>(AppError("", "", null))
     }
 
 //        val inputStream = this@copyTo.inputStream()

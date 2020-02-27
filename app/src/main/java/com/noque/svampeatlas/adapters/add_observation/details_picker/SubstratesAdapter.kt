@@ -12,7 +12,7 @@ class SubstratesAdapter(): PickerAdapter<Substrate>() {
         when (holder) {
             is ItemViewHolder -> {
                 sections.getItem(position)
-                    .item.let { holder.configure("- ${it.dkName}") }
+                    .item.let { holder.configure("- ${it.localizedName}") }
             }
             is HeaderViewHolder -> {
                 sections.getTitle(position)?.let { holder.configure(it) }

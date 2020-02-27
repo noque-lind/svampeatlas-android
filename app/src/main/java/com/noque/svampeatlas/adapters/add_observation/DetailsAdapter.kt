@@ -85,7 +85,7 @@ class DetailsAdapter(private val resources: Resources, private val categories: A
         when (categories[position]) {
             DetailsFragment.Categories.DATE -> (holder as? SettingsViewHolder)?.configure(
                 R.drawable.glyph_age,
-                resources.getString(R.string.detailsFragment_observationDate),
+                resources.getString(R.string.observationDetailsCell_date),
                 date?.toReadableDate(recentFormatting = false, ignoreTime = true) ?: "-"
             )
             DetailsFragment.Categories.SUBSTRATE -> {
@@ -93,7 +93,7 @@ class DetailsAdapter(private val resources: Resources, private val categories: A
 
                 (holder as? SettingsViewHolder)?.configure(
                     R.drawable.glyph_substrate,
-                    resources.getString(R.string.detailsFragment_substrate), string.plus(substrate?.first?.dkName ?: "*")
+                    resources.getString(R.string.observationDetailsCell_substrate), string.plus(substrate?.first?.localizedName ?: "*")
                 )
             }
 
@@ -101,8 +101,8 @@ class DetailsAdapter(private val resources: Resources, private val categories: A
                 val string = if (vegetationType?.second == true) "\uD83D\uDD12 " else ""
             (holder as? SettingsViewHolder)?.configure(
                 R.drawable.glyph_vegetation_type,
-                resources.getString(R.string.detailsFragment_vegetationType),
-                string.plus(vegetationType?.first?.dkName ?: "*")
+                resources.getString(R.string.observationDetailsCell_vegetationType),
+                string.plus(vegetationType?.first?.localizedName ?: "*")
             )
 
         }
@@ -116,25 +116,25 @@ class DetailsAdapter(private val resources: Resources, private val categories: A
                 } else {
                     hostsString = if (hosts?.second == true) "\uD83D\uDD12 " else ""
                     hosts?.first?.forEach {
-                        hostsString += "${it.dkName}, "
+                        hostsString += "${it.localizedName}, "
                     }
                    hostsString = hostsString.dropLast(2)
 
                 }
 
-                (holder as? SettingsViewHolder)?.configure(R.drawable.glyph_host,resources.getString(R.string.detailsFragment_hosts), hostsString)
+                (holder as? SettingsViewHolder)?.configure(R.drawable.glyph_host,resources.getString(R.string.observationDetailsCell_host), hostsString)
             }
 
 
             DetailsFragment.Categories.ECOLOGYNOTES -> (holder as? InputTypeViewHolder)?.configure(
-                resources.getString(R.string.detailsFragment_ecologyNotes),
-                resources.getString(R.string.detailsFragment_ecologyNotes_placeholder),
+                resources.getString(R.string.observationDetailsCell_ecologyNotes_title),
+                resources.getString(R.string.observationDetailsCell_ecologyNotes_message),
                 ecologyNotes
             )
 
             DetailsFragment.Categories.NOTES -> (holder as? InputTypeViewHolder)?.configure(
-                resources.getString(R.string.detailsFragment_notes),
-                resources.getString(R.string.detailsFragment_notes_placeholder),
+                resources.getString(R.string.observationDetailsCell_notes_title),
+                resources.getString(R.string.observationDetailsCell_notes_message),
                 notes
             )
         }

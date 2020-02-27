@@ -1,6 +1,7 @@
 package com.noque.svampeatlas.fragments.add_observation
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -14,17 +15,18 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
 import com.noque.svampeatlas.adapters.add_observation.LocalityAdapter
 import com.noque.svampeatlas.BuildConfig
-import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.R
+import com.noque.svampeatlas.extensions.openSettings
 import com.noque.svampeatlas.services.LocationService
 import com.noque.svampeatlas.fragments.MapFragment
-import com.noque.svampeatlas.fragments.NearbyFragment
-import com.noque.svampeatlas.models.Locality
-import com.noque.svampeatlas.models.Observation
+import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.view_models.NewObservationViewModel
 import kotlinx.android.synthetic.main.fragment_add_observation_locality.*
+import java.util.*
 
 class LocalityFragment: Fragment() {
 
@@ -72,6 +74,7 @@ class LocalityFragment: Fragment() {
     private val markerOnTouchListener by lazy {
         object: View.OnTouchListener {
 
+            var hasStarted = false
             var originX: Float = 0F
             var originY: Float = 0F
 
@@ -80,28 +83,40 @@ class LocalityFragment: Fragment() {
                 val y = motionEvent.rawY
 
                 when (motionEvent.action) {
+
                     MotionEvent.ACTION_DOWN -> {
-                        val location: IntArray = IntArray(2)
+                        val location = IntArray(2)
                         view.getLocationInWindow(location)
                         originX = location.first().toFloat()
-                        originY = location.last().toFloat() + 250
+                        originY = location.last().toFloat()
                     }
 
                     MotionEvent.ACTION_MOVE -> {
-                        markerImageView?.translationX = x - originX
-                        markerImageView?.translationY = y - originY
+                        if ((x - originX > 500 || y - originY > 500) || hasStarted) {
+                            hasStarted = true
+                            markerImageView?.translationX = x - (originX + ((markerImageView?.width?.toFloat() ?: 0.toFloat())))
+                            markerImageView?.translationY = y - (originY + ((markerImageView?.height?.toFloat() ?: 0.toFloat()) * 2))
+                        } else {
+                            markerImageView?.translationX = x / 4 - originX
+                            markerImageView?.translationY = (y - (originY + ((markerImageView?.height?.toFloat() ?: 0.toFloat())))) * 0.2.toFloat()
+                        }
                     }
 
-                    MotionEvent.ACTION_UP -> {
-                        val location: IntArray = IntArray(2)
-                        view.getLocationInWindow(location)
-                        val finalX = location.first().toFloat()
-                        val finalY = location.last().toFloat()
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        if (hasStarted) {
+                            val location: IntArray = IntArray(2)
+                            view.getLocationInWindow(location)
+                            val finalX = location.first().toFloat()
+                            val finalY = location.last().toFloat()
 
-                        mapFragment?.getCoordinatesFor(finalX + (view.width / 2), finalY + view.height)?.let { newObservationViewModel.setCoordinate(it, 5F) }
+                            mapFragment?.getCoordinatesFor(finalX + (view.width / 2), finalY + view.height)?.let { newObservationViewModel.setCoordinateState(
+                                State.Items(Location(Date(), it, 5F))
+                            ) }
+                        }
 
                         markerImageView?.translationX = 0F
                         markerImageView?.translationY = 0F
+                        hasStarted = false
                     }
                 }
 
@@ -115,6 +130,7 @@ class LocalityFragment: Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         return inflater.inflate(R.layout.fragment_add_observation_locality, container, false)
     }
 
@@ -153,7 +169,6 @@ class LocalityFragment: Fragment() {
         mapFragment?.setType(MapFragment.Category.TOPOGRAPHY)
         retryButton?.setOnClickListener(retryButtonClicked)
         markerImageView?.setOnTouchListener(markerOnTouchListener)
-
     }
 
     private fun setupViewModels() {
@@ -162,7 +177,6 @@ class LocalityFragment: Fragment() {
                     is State.Items -> {
                         localityAdapter.configure(it.items)
                         mapFragment?.addLocalities(it.items)
-                        mapFragment?.setRegionToShowMarkers()
                     }
 
                     is State.Loading -> {
@@ -170,28 +184,20 @@ class LocalityFragment: Fragment() {
                     }
 
                     is State.Error -> {
-                        when (it.error) {
-                            is LocationService.Error.PermissionDenied -> {
-                                mapFragment?.setError(
-                                    it.error,
-                                    resources.getString(R.string.locationservice_error_permissions_handler)
-                                ) {
-                                    val intent = Intent()
-                                    intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                                    val uri =
-                                        Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
-                                    intent.data = uri
-                                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                    startActivity(intent)
+                        mapFragment?.setError(it.error) {
+                            when (it) {
+                                RecoveryAction.OPENSETTINGS -> {
+                                    openSettings()
+                                }
+
+                                RecoveryAction.TRYAGAIN -> {
+                                    newObservationViewModel.resetLocationData()
                                 }
                             }
-                            else -> { mapFragment?.setError(it.error, null, null) }
                         }
                     }
 
-                    is State.Empty -> {
-                        mapFragment?.removeAllMarkers()
-                    }
+                    is State.Empty -> {}
                 }
             })
 
@@ -202,9 +208,20 @@ class LocalityFragment: Fragment() {
                 }
             })
 
-            newObservationViewModel.coordinate.observe(viewLifecycleOwner, Observer {
-                it?.let {
-                    mapFragment?.addLocationMarker(it, resources.getString(R.string.localityFragment_sightingLocation))
+            newObservationViewModel.coordinateState.observe(viewLifecycleOwner, Observer {
+                when (it) {
+                    is State.Items -> {
+                        mapFragment?.addLocationMarker(it.items.latLng, resources.getString(R.string.locationAnnotation_title))
+                        mapFragment?.setRegion(it.items.latLng)
+                    }
+
+                    is State.Loading -> {
+                        mapFragment?.setLoading()
+                    }
+
+                    is State.Empty -> {
+                        mapFragment?.removeAllMarkers()
+                    }
                 }
             })
     }

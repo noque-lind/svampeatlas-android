@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <androidx.appcompat.widget.Toolbar
-        app:title="@string/observationLocationFragment_title"
+        app:title="@string/observationDetailsScrollView_location"
         app:elevation="0dp"
         app:navigationIcon="?attr/homeAsUpIndicator"
         android:id="@+id/observationLocationFragment_toolbar"

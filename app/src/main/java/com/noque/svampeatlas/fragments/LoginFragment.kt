@@ -37,6 +37,7 @@ import android.util.Log
 import android.widget.ImageView
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.noque.svampeatlas.utilities.GlideApp
+import com.noque.svampeatlas.utilities.MyGlideApp
 import java.lang.Exception
 
 
@@ -63,9 +64,9 @@ class LoginFragment : Fragment() {
     private val loginButtonClickListener = View.OnClickListener {
 
         if (initialsEditText.text.isNullOrEmpty()) {
-            initialsEditText.setError(resources.getString(R.string.loginFragment_initialsError))
+            initialsEditText.setError(resources.getString(R.string.loginVC_initialsTextField_error))
         } else if (passwordEditText.text.isNullOrEmpty()) {
-            passwordEditText.setError(resources.getString(R.string.loginFragment_passwordError))
+            passwordEditText.setError(resources.getString(R.string.loginVC_passwordTextField_error))
         } else {
             sessionViewModel.login(initialsEditText.text.toString(), passwordEditText.text.toString())
         }
@@ -116,7 +117,6 @@ class LoginFragment : Fragment() {
 
         loginButton.setOnClickListener(loginButtonClickListener)
         createAccountButton.setOnClickListener(createAccountButtonPressed)
-
         GlideApp.with(requireContext()).load(R.drawable.background).transition(DrawableTransitionOptions.withCrossFade()).into(bg)
     }
 

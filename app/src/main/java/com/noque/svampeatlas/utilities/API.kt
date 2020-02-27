@@ -30,20 +30,20 @@ data class API(val apiType: APIType) {
     }
 
     fun url(): String {
-        when (apiType) {
-            is APIType.Request -> return createGetURL(apiType)
-            is APIType.Post -> return createPostURL(apiType)
-            is APIType.Put -> return createPutURL(apiType)
-            else -> return ""
+        return when (apiType) {
+            is APIType.Request -> createGetURL(apiType)
+            is APIType.Post -> createPostURL(apiType)
+            is APIType.Put -> createPutURL(apiType)
+            else -> ""
         }
     }
 
     fun volleyMethod(): Int {
-        when (apiType) {
-            is APIType.Request -> return Request.Method.GET
-            is APIType.Post -> return Request.Method.POST
-            is APIType.Put -> return Request.Method.PUT
-            else -> return Request.Method.GET
+        return when (apiType) {
+            is APIType.Request -> Request.Method.GET
+            is APIType.Post -> Request.Method.POST
+            is APIType.Put -> Request.Method.PUT
+            else -> Request.Method.GET
         }
     }
 
@@ -257,10 +257,13 @@ data class API(val apiType: APIType) {
             when (it) {
                 is SpeciesQueries.Attributes -> {
                     if (it.presentInDenmark != null) {
-                        string += "{\"model\":\"TaxonAttributes\",\"as\":\"attributes\",\"attributes\":[\"PresentInDK\", \"diagnose\", \"beskrivelse\", \"forvekslingsmuligheder\", \"oekologi\", \"spiselighedsrapport\", \"BeskrivelseUK\"],\"where\":\"{\\\"PresentInDK\\\":${it.presentInDenmark}}\"}"
+                        string += "{\"model\":\"TaxonAttributes\",\"as\":\"attributes\",\"attributes\":[\"valideringsrapport\",\"PresentInDK\", \"diagnose\", \"beskrivelse\", \"forvekslingsmuligheder\", \"oekologi\", \"bogtekst_gyldendal_en\", \"vernacular_name_GB\", \"spiselighedsrapport\"],\"where\":\"{\\\"PresentInDK\\\":${it.presentInDenmark}}\"}"
                     } else {
-                        string += "{\"model\":\"TaxonAttributes\",\"as\":\"attributes\",\"attributes\":[\"PresentInDK\", \"diagnose\", \"beskrivelse\", \"forvekslingsmuligheder\", \"oekologi\", \"spiselighedsrapport\", \"BeskrivelseUK\"]}"
+                        string += "{\"model\":\"TaxonAttributes\",\"as\":\"attributes\",\"attributes\":[\"valideringsrapport\",\"PresentInDK\", \"diagnose\", \"beskrivelse\", \"forvekslingsmuligheder\", \"oekologi\", \"bogtekst_gyldendal_en\", \"vernacular_name_GB\", \"spiselighedsrapport\"]}"
                     }
+
+
+
 
                 }
                 is SpeciesQueries.Images -> {

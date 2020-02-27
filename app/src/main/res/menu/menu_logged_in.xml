@@ -7,11 +7,11 @@
         <item
             android:id="@+id/myPageFragment"
             android:icon="@drawable/icon_profile"
-            android:title="@string/menu_my_page"/>
+            android:title="@string/navigationItem_myPageVC"/>
         <item
             android:id="@+id/addObservationFragment"
             android:icon="@drawable/icon_plus"
-            android:title="@string/menu_new_observation"/>
+            android:title="@string/navigationItem_newObservationVC"/>
 
         <item
             android:id="@+id/sectionDisabled"
@@ -22,15 +22,15 @@
         <item
             android:id="@+id/nearbyFragment"
             android:icon="@drawable/icon_location"
-            android:title="@string/menu_nearby"/>
+            android:title="@string/navigationItem_nearbyVC"/>
         <item
             android:id="@+id/mushroomFragment"
             android:icon="@drawable/icon_book"
-            android:title="@string/menu_mushrooms"/>
+            android:title="@string/navigationItem_mushroomsVC"/>
         <item
             android:id="@+id/cameraFragment"
             android:icon="@drawable/icon_camera"
-            android:title="@string/menu_recognize"
+            android:title="@string/navigationItem_cameraVC"
             />
 
         <item
@@ -40,7 +40,7 @@
             android:title=""/>
 
         <item
-            android:title="@string/aboutFragment"
+            android:title="@string/navigationItem_about"
             android:id="@+id/aboutFragment"
             android:icon="@drawable/icon_about"/>
 

@@ -101,7 +101,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="2dp"
-                        android:text="@string/header_informationView" />
+                        android:text="Information" />
 
                     <com.noque.svampeatlas.views.InformationView
                         android:id="@+id/detailsFragment_informationView"

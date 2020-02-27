@@ -10,7 +10,12 @@ import androidx.fragment.app.DialogFragment
 import com.noque.svampeatlas.R
 import kotlinx.android.synthetic.main.fragment_map_settings.*
 
-class MapSettingsFragment(private var radius: Int, private var age: Int) : DialogFragment() {
+class MapSettingsFragment : DialogFragment() {
+    companion object {
+        const val KEY_RADIUS = "KEY_RADIUS"
+        const val KEY_AGE = "KEY_AGE"
+    }
+
 
     interface Listener {
         fun newSearch()
@@ -20,7 +25,9 @@ class MapSettingsFragment(private var radius: Int, private var age: Int) : Dialo
     }
 
     // Objects
-    private var listener: Listener? = null
+    private var radius: Int = 1000
+    private var age = 1
+
 
     // Views
     private lateinit var cancelButton: ImageButton
@@ -38,11 +45,11 @@ class MapSettingsFragment(private var radius: Int, private var age: Int) : Dialo
             override fun onProgressChanged(p0: SeekBar, p1: Int, p2: Boolean) {
                 if (p0.id == R.id.mapSettingsFragment_radiusSlider) {
                     radius = p1 + 1000
-                    listener?.radiusChanged(radius)
+                    (targetFragment as? Listener)?.radiusChanged(radius)
                     setRadiusLabel()
                 } else if (p0.id == R.id.mapSettingsFragment_ageSlider) {
                     age = p1 + 1
-                    listener?.ageChanged(age)
+                    (targetFragment as? Listener)?.ageChanged(age)
                     setAgeLabel()
                 }
             }
@@ -60,14 +67,14 @@ class MapSettingsFragment(private var radius: Int, private var age: Int) : Dialo
 
     private val onSearchButtonPressed by lazy {
         View.OnClickListener {
-            listener?.newSearch()
+            (targetFragment as? Listener)?.newSearch()
             dismiss()
         }
     }
 
     private val onSwitchValueChanged by lazy {
         CompoundButton.OnCheckedChangeListener { _, value ->
-            listener?.clearAllSet(value)
+            (targetFragment as? Listener)?.clearAllSet(value)
         }
     }
 
@@ -76,6 +83,8 @@ class MapSettingsFragment(private var radius: Int, private var age: Int) : Dialo
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        radius = requireArguments().getInt(KEY_RADIUS)
+        age = requireArguments().getInt(KEY_AGE)
         return inflater.inflate(R.layout.fragment_map_settings, container, false)
     }
 
@@ -83,10 +92,6 @@ class MapSettingsFragment(private var radius: Int, private var age: Int) : Dialo
         super.onViewCreated(view, savedInstanceState)
         initViews()
         setupViews()
-    }
-
-    fun setListener(listener: Listener) {
-        this.listener = listener
     }
 
     private fun initViews() {
@@ -114,10 +119,10 @@ class MapSettingsFragment(private var radius: Int, private var age: Int) : Dialo
     }
 
     private fun setRadiusLabel() {
-        radiusLabel.text = "${(radius.toDouble() / 1000)} km."
+        radiusLabel.text = "${radius.toDouble() / 1000} km."
     }
 
     private fun setAgeLabel() {
-        ageLabel.text = "$age år."
+        ageLabel.text = getString(R.string.mapViewSettingsView_year, age)
     }
 }

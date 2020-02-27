@@ -8,6 +8,7 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.models.AppError
+import com.noque.svampeatlas.models.RecoveryAction
 import kotlinx.android.synthetic.main.view_background.view.*
 
 class BackgroundView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(context, attrs) {
@@ -37,15 +38,15 @@ class BackgroundView(context: Context?, attrs: AttributeSet?) : ConstraintLayout
         backgroundView_errorView_linearLayout.visibility = View.VISIBLE
     }
 
-    fun setErrorWithHandler(error: AppError, handlerTitle: String, handler: (() -> Unit)) {
+    fun setErrorWithHandler(error: AppError, recoveryAction: RecoveryAction?, handler: ((RecoveryAction?) -> Unit)) {
         errorLinearLayout.visibility = View.VISIBLE
 
         titleTextView.text = error.title
         messageTextView.text = error.message
         handlerButton.visibility = View.VISIBLE
-        handlerButton.text = handlerTitle
+        handlerButton.text = recoveryAction?.description(resources) ?: RecoveryAction.TRYAGAIN.description(resources)
         handlerButton.setOnClickListener {
-            handler.invoke()
+            handler.invoke(recoveryAction)
         }
     }
 

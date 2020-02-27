@@ -10,7 +10,7 @@
     android:orientation="vertical">
 
     <TextView
-        android:text="@string/addCommentItem_title"
+        android:text="@string/commentsTableView_cell_title"
         android:layout_marginTop="4dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -1,23 +1,16 @@
 package com.noque.svampeatlas.fragments
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.Point
 import android.os.Bundle
-import android.text.Layout
-import android.transition.TransitionManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import androidx.asynclayoutinflater.view.AsyncLayoutInflater
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.heatmaps.HeatmapTileProvider
@@ -28,7 +21,6 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.material.tabs.TabLayout
-import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterItem
 import com.google.maps.android.clustering.ClusterManager
 import com.noque.svampeatlas.extensions.changeColor
@@ -37,8 +29,6 @@ import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.utilities.DispatchGroup
 import com.noque.svampeatlas.utilities.OpenStreetMapTileProvider
 import com.noque.svampeatlas.views.BackgroundView
-import com.noque.svampeatlas.views.ObservationView
-import kotlinx.android.synthetic.main.activity_maps.*
 
 
 data class ObservationItem(val observation: Observation) : ClusterItem {
@@ -109,7 +99,7 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
         GoogleMap.OnMarkerClickListener {
             when (it.tag) {
                 LOCALITY_TAG -> {
-                    localities.get(it.id)?.let { listener?.localitySelected(it) }
+                    localities[it.id]?.let { listener?.localitySelected(it) }
                 }
                 LOCATION_TAG -> {
                     if (locationMarker?.title != null) it.showInfoWindow()
@@ -261,13 +251,13 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
         }
     }
 
-    fun setError(error: AppError, handlerTitle: String?, handler: (() -> Unit)?) {
+    fun setError(error: AppError, handler: ((RecoveryAction?) -> Unit)?) {
         dispatchGroup.notify {
             backgroundView?.reset()
             mapFragment?.view?.visibility = View.GONE
 
-            if (handlerTitle != null && handler != null) {
-                backgroundView?.setErrorWithHandler(error, handlerTitle, handler)
+            if (error.recoveryAction != null && handler != null) {
+                backgroundView?.setErrorWithHandler(error, error.recoveryAction, handler)
             } else {
                 backgroundView?.setError(error)
             }
@@ -290,6 +280,16 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
 
             val bounds = builder.build()
             googleMap?.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 0))
+        }
+    }
+
+    fun setRegion(coordinate: LatLng) {
+        dispatchGroup.notify {
+            if ((googleMap?.cameraPosition?.zoom ?: 0f) <= 13) {
+               googleMap?.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(coordinate, 13f)))
+            } else {
+                googleMap?.moveCamera(CameraUpdateFactory.newLatLng(coordinate))
+            }
         }
     }
 
@@ -408,6 +408,7 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
             }
         }
     }
+
 
     fun addLocationMarker(location: LatLng, title: String? = null) {
         dispatchGroup.notify {

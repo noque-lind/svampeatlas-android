@@ -22,7 +22,7 @@
             app:layout_constraintBottom_toBottomOf="parent">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:hint="@string/searchBarView_hint"
+                    android:hint="@string/searchBar_placeholder"
                     android:id="@+id/searchBarView_editText"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

@@ -64,7 +64,7 @@
         <TextView
             android:layout_marginStart="8dp"
             style="@style/AppPrimary"
-            android:text="@string/resultView_poisounous"
+            android:text="@string/toxicityLevel_poisonous"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </LinearLayout>

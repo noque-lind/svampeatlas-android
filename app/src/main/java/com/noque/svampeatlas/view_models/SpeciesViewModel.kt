@@ -23,9 +23,9 @@ import java.io.File
 
 class SpeciesViewModel(val id: Int, application: Application) : AndroidViewModel(application) {
 
-    sealed class Error(title: String, message: String) : AppError(title, message) {
-        class NoObservationsNearby(application: Application): Error(application.getString(R.string.detailsFragment_noObservationsNearbyError_title), application.getString(R.string.detailsFragment_noObservationsNearbyError_message))
-        class NoObservations(application: Application): Error(application.getString(R.string.detailsFragment_noObservationsError_title), application.getString(R.string.detailsFragment_noObservationsError_message))
+    sealed class Error(title: String, message: String) : AppError(title, message, null) {
+        class NoObservationsNearby(application: Application): Error("", "")
+        class NoObservations(application: Application): Error("", "")
     }
 
     companion object {
@@ -114,21 +114,6 @@ class SpeciesViewModel(val id: Int, application: Application) : AndroidViewModel
 
                 it.onError {
                     _heatMapObservationCoordinates.value = State.Error(it)
-                }
-            }
-        }
-    }
-
-    fun saveObservationImage(imageFile: File) {
-        _observationImageSaveState.value = State.Loading()
-
-        viewModelScope.launch {
-            when (val result = imageFile.copyTo(BlankActivity.createFile(getApplication()))) {
-                is Result.Success -> {
-                    _observationImageSaveState.value = State.Items(result.value)
-                }
-                is Result.Error -> {
-                    _observationImageSaveState.value = State.Error(result.error)
                 }
             }
         }

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 11,
-    "identityHash": "165484d396bbadb324572cf08a78c5aa",
+    "identityHash": "53e57880230bc3bba3f885a6f62722f2",
     "entities": [
       {
         "tableName": "user",
@@ -126,7 +126,7 @@
       },
       {
         "tableName": "hosts",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `dkName` TEXT NOT NULL, `latinName` TEXT NOT NULL, `probability` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `dkName` TEXT, `latinName` TEXT NOT NULL, `probability` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -138,7 +138,7 @@
             "fieldPath": "dkName",
             "columnName": "dkName",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "latinName",
@@ -164,7 +164,7 @@
       },
       {
         "tableName": "mushrooms",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `fullName` TEXT NOT NULL, `fullNameAuthor` TEXT, `updatedAt` TEXT, `probability` INTEGER, `_rankName` TEXT, `_redListData` TEXT, `images` TEXT, `_vernacularNameDK` TEXT, `_source` TEXT, `presentInDenmark` INTEGER, `diagnosis` TEXT, `similarities` TEXT, `ecology` TEXT, `edibility` TEXT, `description` TEXT, `englishDescription` TEXT, `acceptedCount` INTEGER, `lastAcceptedRecord` TEXT, `firstAcceptedRecord` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `fullName` TEXT NOT NULL, `fullNameAuthor` TEXT, `updatedAt` TEXT, `probability` INTEGER, `_rankName` TEXT, `_redListData` TEXT, `images` TEXT, `_vernacularNameDK` TEXT, `_source` TEXT, `_diagnosis` TEXT, `_diagnosisEn` TEXT, `_edibility` TEXT, `_similarities` TEXT, `_ecology` TEXT, `_validationTips` TEXT, `vernacularNameEn` TEXT, `presentInDenmark` INTEGER, `acceptedCount` INTEGER, `lastAcceptedRecord` TEXT, `firstAcceptedRecord` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -227,45 +227,51 @@
             "notNull": false
           },
           {
+            "fieldPath": "attributes._diagnosis",
+            "columnName": "_diagnosis",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "attributes._diagnosisEn",
+            "columnName": "_diagnosisEn",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "attributes._edibility",
+            "columnName": "_edibility",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "attributes._similarities",
+            "columnName": "_similarities",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "attributes._ecology",
+            "columnName": "_ecology",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "attributes._validationTips",
+            "columnName": "_validationTips",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "attributes.vernacularNameEn",
+            "columnName": "vernacularNameEn",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
             "fieldPath": "attributes.presentInDenmark",
             "columnName": "presentInDenmark",
             "affinity": "INTEGER",
-            "notNull": false
-          },
-          {
-            "fieldPath": "attributes.diagnosis",
-            "columnName": "diagnosis",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "attributes.similarities",
-            "columnName": "similarities",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "attributes.ecology",
-            "columnName": "ecology",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "attributes.edibility",
-            "columnName": "edibility",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "attributes.description",
-            "columnName": "description",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "attributes.englishDescription",
-            "columnName": "englishDescription",
-            "affinity": "TEXT",
             "notNull": false
           },
           {
@@ -300,7 +306,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '165484d396bbadb324572cf08a78c5aa')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '53e57880230bc3bba3f885a6f62722f2')"
     ]
   }
 }

@@ -36,24 +36,24 @@ class DataService private constructor(context: Context) {
         }
     }
 
-    sealed class Error(title: String, message: String) : AppError(title, message) {
+    sealed class Error(title: String, message: String) : AppError(title, message, null) {
         class VolleyError(title: String, message: String) : Error(title, message)
         class SearchResponseEmpty(context: Context) : Error(
-            context.getString(R.string.dataServiceError_emptyResponse_title),
-            context.getString(R.string.dataServiceError_emptyResponse_message)
+            context.getString(R.string.error_dataService_searchResponseEmpty_title),
+            context.getString(R.string.error_dataService_searchResponseEmpty_message)
         )
 
         class LoginError(context: Context) : Error(
-            context.getString(R.string.dataServiceError_loginError_title),
-            context.getString(R.string.dataServiceError_loginError_message)
+            context.getString(R.string.error_dataService_loginError_title),
+            context.getString(R.string.error_dataService_loginError_message)
         )
 
         class NotFound(context: Context) : Error(
-            context.getString(R.string.dataServiceError_notFound_title),
-            context.getString(R.string.dataServiceError_notFound_message)
+            context.getString(R.string.error_dataService_empty_title),
+            context.getString(R.string.error_dataService_empty_message)
         )
 
-        class UnknownError() : Error("Unknown error", "")
+        class UnknownError(context: Context) : Error(context.getString(R.string.error_dataService_unknown_title), context.getString(R.string.error_dataService_unknown_message))
         class ExtractionError() : Error("", "")
     }
 
@@ -452,9 +452,11 @@ class DataService private constructor(context: Context) {
                 token,
                 multipartFormImage,
                 Response.Listener {
+                    image.delete()
                     completion(Result.Success(true))
                 },
                 Response.ErrorListener {
+                    image.delete()
                     completion(Result.Error(parseVolleyError(it)))
                 }
             )
@@ -776,40 +778,40 @@ class DataService private constructor(context: Context) {
         when (error) {
             is AuthFailureError -> {
                 return Error.VolleyError(
-                    applicationContext.getString(R.string.volleyError_authError_title),
-                    applicationContext.getString(R.string.volleyError_authError_message)
+                    applicationContext.getString(R.string.error_network_unAuthorized_title),
+                    applicationContext.getString(R.string.error_network_unAuthorized_message)
                 )
             }
 
             is NoConnectionError -> {
                 return Error.VolleyError(
-                    applicationContext.getString(R.string.volleyError_networkError_title),
-                    applicationContext.getString(R.string.volleyError_networkError_message)
+                    applicationContext.getString(R.string.error_network_noInternet_title),
+                    applicationContext.getString(R.string.error_network_noInternet_message)
                 )
             }
 
             is TimeoutError -> {
                 return Error.VolleyError(
-                    applicationContext.getString(R.string.volleyError_timeoutError_title),
-                    applicationContext.getString(R.string.volleyError_timeoutError_message)
+                    applicationContext.getString(R.string.error_network_timeout_title),
+                    applicationContext.getString(R.string.error_network_timeout_message)
                 )
             }
 
             is ServerError -> {
                 return Error.VolleyError(
-                    applicationContext.getString(R.string.volleyError_serverError_title),
-                    applicationContext.getString(R.string.volleyError_serverError_message)
+                    applicationContext.getString(R.string.error_network_serverError_title),
+                    applicationContext.getString(R.string.error_network_serverError_message)
                 )
             }
 
             is ParseError -> {
                 return Error.VolleyError(
-                    applicationContext.getString(R.string.volleyError_parseError_title),
-                    applicationContext.getString(R.string.volleyError_parseError_message)
+                    applicationContext.getString(R.string.error_network_invalidResponse_title),
+                    applicationContext.getString(R.string.error_network_invalidResponse_message)
                 )
             }
         }
 
-        return Error.UnknownError()
+        return Error.UnknownError(applicationContext)
     }
 }

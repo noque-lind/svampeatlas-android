@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<resources>
+    <string name="error_dataService_decodingError_message">Přijatá data nelze přečíst</string>
+    <string name="error_dataService_decodingError_title">Chyba dekódování</string>
+    <string name="error_dataService_empty_message">Odpověď serveru neobsahuje žádná data</string>
+    <string name="error_dataService_empty_title">Neplatná prázdná odpověď</string>
+    <string name="error_dataService_encodingError_message"/>
+    <string name="error_dataService_encodingError_title">Chyba</string>
+    <string name="error_dataService_loginError_message">Zkuste použít jiné uživatelské jméno nebo heslo</string>
+    <string name="error_dataService_loginError_title">Chyba přihlášení</string>
+    <string name="error_dataService_searchResponseEmpty_message">Podle vašeho vyhledávání nebylo nic nalezeno, zkuste upravit zadání.</string>
+    <string name="error_dataService_searchResponseEmpty_title">Nenalezeno</string>
+    <string name="error_dataService_unknown_message">Došlo k neznámé chybě</string>
+    <string name="error_dataService_unknown_title">Neznámá chyba</string>
+    <string name="error_database_contentOutdated_message">Uložená data nejsou aktuální</string>
+    <string name="error_database_contentOutdated_title">Uložená data vyžadují aktualizaci</string>
+    <string name="error_database_initError_message">Při vytváření / načítání databáze došlo k chybě. To znamená, že můžete mít problémy s načítáním uložených dat. Pokud se vyskytnou nějaké problémy, zkuste aplikaci restartovat.</string>
+    <string name="error_database_initError_title">Chyba databáze</string>
+    <string name="error_database_noEntries_favoritedMushrooms_message">Nemáte žádné uložené oblíbené položky. Položku přidáte mezi oblíbené posunutím doleva.</string>
+    <string name="error_database_noEntries_message">Nebyla uložena žádná data</string>
+    <string name="error_database_noEntries_title">Nenalezeno</string>
+    <string name="error_database_readError_message">Při čtení dat došlo k chybě</string>
+    <string name="error_database_readError_title">Chyba načítání</string>
+    <string name="error_database_saveError_message">Při ukládání dat došlo k chybě</string>
+    <string name="error_database_saveError_title">Chyba uložení</string>
+    <string name="error_fileManager_imageSavingError_message">Při pokusu o uložení obrázku do dočasného úložiště v telefonu došlo k chybě.</string>
+    <string name="error_fileManager_imageSavingError_title">Chyba při ukládání</string>
+    <string name="error_locationManager_badAccuracy_message">Nebylo možné určit vaši polohu s dostatečnou přesností.</string>
+    <string name="error_locationManager_badAccuracy_title">Nepřesné</string>
+    <string name="error_locationManager_networkError_message">Zdá se, že došlo k chybě určování polohy ve vašem zařízení.</string>
+    <string name="error_locationManager_networkError_title">Chyba sítě</string>
+    <string name="error_locationManager_permissionDenied_message">Nepovolili jste aplikaci přístup k vaší GPS poloze, což je nezbytné, aby se vám tato data mohla zobrazit.</string>
+    <string name="error_locationManager_permissionDenied_title">Chybějící povolení</string>
+    <string name="error_locationManager_permissionsUndetermined_message">Pro zobrazení dat, musí aplikace znát vaši polohu, kde se nacházíte.</string>
+    <string name="error_locationManager_permissionsUndetermined_title">Kde se nacházíte?</string>
+    <string name="error_locationManager_unknown_message">Při hledání polohy GPS došlo k neznámé chybě.</string>
+    <string name="error_locationManager_unknown_title">Neznámá chyba</string>
+    <string name="error_network_invalidResponse_message">Server vrátil neočekávanou odpověď</string>
+    <string name="error_network_invalidResponse_title">Neplatná odpověď</string>
+    <string name="error_network_noInternet_message">Vaše zařízení nemá přístup k internetu.</string>
+    <string name="error_network_noInternet_title">Bez připojení</string>
+    <string name="error_network_payloadTooLarge_message">Server má problém s nadměrným zatížením.</string>
+    <string name="error_network_payloadTooLarge_title">Překročena velikost souboru</string>
+    <string name="error_network_serverError_message">Zda se, že je momentálně problém se serverem. Možná by potřeboval obejmout :)</string>
+    <string name="error_network_serverError_title">Chyba serveru</string>
+    <string name="error_network_timeout_message">Odpověď serveru trvala příliš dlouho. Prosím, zkuste to znovu.</string>
+    <string name="error_network_timeout_title">Time-out</string>
+    <string name="error_network_unAuthorized_message">Váš účet nemohl být ověřen, budete se muset přihlásit znovu.</string>
+    <string name="error_network_unAuthorized_title">Neoprávněný</string>
+    <string name="error_network_unknown_message">Došlo k neznámé chybě</string>
+    <string name="error_network_unknown_title">Neznámá chyba</string>
+    <string name="error_newObservation_missingInformation_title">Chybějící informace</string>
+    <string name="error_newObservation_noCoordinates_message">Vaše poloha nemohla být automaticky stanovena, musíte určit místo svého pozorování.</string>
+    <string name="error_newObservation_noCoordinates_title">Žádné souřadnice</string>
+    <string name="error_newObservation_noLocality_message">Vaše poloha byla určena, ačkoli nebylo možné najít odpovídající název místa. Prosím zkuste to znovu.</string>
+    <string name="error_newObservation_noLocality_title">Kde se nacházíte?</string>
+    <string name="error_newObservation_noMushroom_message">Musíte určit druh, který jste našli. Pokud si nejste jisti, můžete stisknout tlačítko „Neznámý druh“.</string>
+    <string name="error_newObservation_noSubstrategroup_message">Musíte zadat typ podkladu</string>
+    <string name="error_newObservation_noVegetationType_message">Musíte zadat typ vegetace</string>
+    <string name="error_photosManager_notAuthorized_message">Nepovolili jste aplikaci číst a zapisovat do vaší galerie. Oprávnění udělíte v nastavení telefonu. Provedená změna restartuje aplikaci.</string>
+    <string name="error_photosManager_notAuthorized_title">Nepovoleno</string>
+    <string name="error_photosManager_unknownFetchError_message">Při pokusu o získání přístupu k vybranému obrázku došlo k neznámé chybě.</string>
+    <string name="error_photosManager_unknownFetchError_title">Neznámá chyba</string>
+    <string name="error_photosManager_unknownSaveError_message">Při pokusu o uložení obrázku do galerie došlo k neznámé chybě.</string>
+    <string name="error_photosManager_unknownSaveError_title">Neznámá chyba</string>
+    <string name="error_session_noNotifications_message">To znamená, že máte více času na hledání hub</string>
+    <string name="error_session_noNotifications_title">Nemáte žádná oznámení</string>
+    <string name="error_session_noObservations_message">Rychle vyraž ven a ukaž, co si našel.</string>
+    <string name="error_session_noObservations_title">Zatím nemáte žádná pozorování.</string>
+    <string name="error_session_notLoggedIn_message">Nejste přihlášeni a neměli byste mít možnost provádět tyto změny.</string>
+    <string name="error_session_notLoggedIn_title">Nepřihlášen</string>
+    <string name="error_session_tokenInvalid_message">Vaše přihlášení vypršelo, přihlaste se znovu.</string>
+    <string name="error_session_tokenInvalid_title">Neplatné přihlášení</string>
+
+    <string name="error_camera_cameraError_title">Chyba fotoaparátu</string>
+    <string name="error_camera_permissionsError_message">V nastavení můžete aplikaci povolit používání fotoaparátu.</string>
+    <string name="error_camera_permissionsError_title">Chybějící povolení</string>
+    <string name="error_camera_unknown_message">Došlo k neznámé chybě</string>
+    <string name="error_camera_unknown_title">Neznámá chyba</string>
+
+    <string name="recovery_action_activate">Spustit</string>
+    <string name="recovery_action_login">Přihlášení</string>
+    <string name="recovery_action_openSettings">Otevřít nastavení</string>
+    <string name="recovery_action_tryAgain">Zkusit znovu</string>
+
+    <string name="prompt_localityDetermined_message">Název: %1$s\nPoloha: %2$.02f - %3$.02f</string>
+    <string name="prompt_localityDetermined_title">Místo vašeho pozorování bylo určeno</string>
+    <string name="prompt_localityDeterminedError_title">V blízkosti nic nenalezeno</string>
+
+    <string name="prompt_successRecordCreation_title">Vaše pozorování bylo vytvořeno</string>
+    <string name="prompt_useImageMetadata_message">Zdá se, že přidaný obrázek byl pořízen více než 500 metrů od aktuálního umístění pozorování. Chcete použít informace o GPS a datu z obrázku?</string>
+    <string name="prompt_useImageMetadata_negative">Ne</string>
+    <string name="prompt_useImageMetadata_positive">Ano, použijte metadata obrázku</string>
+    <string name="prompt_useImageMetadata_title">Návrh umístění</string>
+
+    <string name="prompt_shouldSaveImages_message">Pokud máte zájem, můžete si své obrázky uložit do alba, kde všechny pořízené obrázky najdete na jednom místě.</string>
+    <string name="prompt_shouldSaveImages_negative">Ne</string>
+    <string name="prompt_shouldSaveImages_positive">Ano, uložte obrázky</string>
+    <string name="prompt_shouldSaveImages_title">Chcete uložit vaše fotografie?</string>
+
+    <string name="prompt_favoritizingSucces_message">Nyní máte přístup k houbám a jejím obrázkům, a to i bez internetu - na záložce „Moje oblíbené“.</string>
+    <string name="prompt_favoritizingSucces_title">%s označeno jako oblíbené</string>
+</resources>

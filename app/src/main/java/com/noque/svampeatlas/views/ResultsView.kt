@@ -57,13 +57,8 @@ class ResultsView(context: Context?, attrs: AttributeSet?) : LinearLayout(contex
     }
 
     fun showResults(results: List<PredictionResult>) {
-        if (results.count() > 0 ) {
-            titleTextView.text = resources.getString(R.string.resultsView_results_title, results.count().toString())
-            messageTextView.setText(context.getString(R.string.resultsView_results_message).red())
-        } else {
-            titleTextView.setText(R.string.resultsView_noResults_title)
-            messageTextView.setText(R.string.resultsView_noResults_message)
-        }
+        titleTextView.text = resources.getString(R.string.resultsView_header_title, results.count())
+        messageTextView.setText(context.getString(R.string.resultsView_header_message).red())
 
         resultsAdapter.configure(results)
         recyclerView.scrollTo(0,0)

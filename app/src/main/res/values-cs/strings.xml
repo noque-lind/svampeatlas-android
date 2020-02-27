@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="addObservationFragment_upload">Nahrát</string>
+    <string name="addObservationFragment_reset">Začněte znovu</string>
+
+    <string name="mapViewSettings_title">Upravte filtry</string>
+    <string name="mapViewSettings_clearOldResults">Vymazat vše</string>
+    <string name="mapViewSettings_age">Věk pozorování:</string>
+    <string name="mapViewSettings_radius">Poloměr:</string>
+
+
+    <string name="aboutVC_general_message">(Not translated) Svampeatlas 2.0 bygger videre på atlasprojektet Danmarks Svampeatlas, som kortlagde danske storsvampe, med hovedfokus på basidiesvampene i en femårig periode fra 2009-13. Projektet var støttet af Aage V. Jensen Naturfond og havde som hovedformål at øge vores viden om svampenes udbredelse og økologi i Danmark, og at gøre denne viden tilgængelig for offentligheden.\n\nMere end 400 frivillige var involveret i Danmarks Svampeatlas, hvor de bidrog med ca. 250.000 kvalitetstjekkede svampefund. Siden er yderligere ca. 50.000 nye svampefund kommet til, mens godt 230.000 gamle svampefund er importeret i projektdatabasen som nu indeholder mere end 600.000 kvalitetstjekkede svampefund. Projektet har medført et langt bedre kendskab til Danmarks funga. Mere end 180 basidiesvampe er blevet føjet til listen over kendte danske arter, og flere arter der var regnet som uddøde er genfundet. Samtidigt er der udviklet en række søge- og hjælpefunktioner der præsenterer vores viden om de enkelte svampearter i overskuelig form, og som gør det meget nemmere at inddrage viden om truede svampearter i naturforvaltningen.\n\nI Svampeatlas 2.0 er det målet at fastholde, fremtidssikre og videreudvikle de ressourcer der er opbygget gennem Danmarks Svampeatlas, til glæde for alle naturinteresserede og til gavn for alle der arbejder med naturforvaltning professionelt. Dette vil bl.a. ske gennem udvikling af en ny databasestruktur, og et interaktivt brugerinterface, der i høj grad inddrager de frivillige svampekyndige som aktive medspillere i processen med at sikre høj datakvalitet. Samtidigt vil vi indbygge smarte filtre, baseret på eksisterende viden om svampenes fænologi og udbredelse i Danmark, der automatisk kan registrere om et nyt svampefund kan regnes som sandsynligt.\n\nUdover udviklingen af nye database og web-funktioner vil projektet udvikle en mobil-app til bestemmelse og registrering af svampefund i felten. Derudover er det målet at fastholde projektets overordnede koncept og resultater i en sammenfattende bog om Danmarks Svampeatlas, samt at skrive et nyt bestemmelsesværk for Danmarks basidiesvampe, baseret på de bestemmelsesnøgler der blev lavet i Danmarks Svampeatlas.\n\nSvampeatlas 2.0 udføres i et samarbejde mellem Center for Makroøkologi, Evolution og Klima (CMEC) ved Statens Naturhistoriske Museum (SNM), Københavns Universitet, Foreningen til Svampekundskabens Fremme og MycoKey. Projektgruppen består af Tobias Guldberg Frøslev, Thomas Stjernegaard Jeppesen, Thomas Læssøe (SNM) og Jens H. Petersen med Jacob Heilmann-Clausen som projektleder. Projektet er støttet af Aage V. Jensens Naturfond.</string>
+    <!-- (No Comment) -->
+    <string name="aboutVC_general_title">(Not translated) Generelt</string>
+    <!-- (No Comment) -->
+    <string name="aboutVC_generalTerms_message">(Not translated) Når du opretter dig som bruger/indrapportør på Danmarks Svampeatlas, har du mulighed for at indlægge svampefund og kommentere på andres fund. Nedenfor gennemgår vi mere detaljeret de betingelser og retningslinier, som vi arbejder efter.\n\nAlle kan oprette sig som brugere på Danmarks Svampeatlas. Alle indrapporteringer og kommentarer er åbent tilgængelige for alle brugere. Vi henstiller til en god og konstruktiv omgangstone og gør opmærksom på, at du er ansvarlig for de handlinger, der bliver foretaget med dit login på netstedet. Ved gentagne brud på de specifikke retningslinjer som gennemgås nedenfor, forbeholder Danmarks Svampeatlas sig ret til at slette din profil og/eller stoppe din brugeradgang. Det samme kan ske i tilfælde af grov og gentagen forsømmelse af almindelige regler for god omgangstone på nettet.\n\nVi ser meget gerne at du uploader fotos og tekst som dokumentation for dine svampefund. I mange tilfælde kan et godt foto være et krav for, at dine fund kan valideres. Hvis du anvender fotos eller tekster, der ikke er dine egne, skal du sikre at du har rettigheder til at bruge disse. Du er desuden forpligtet til så vidt muligt at sikre, at de geografiske koordinater knyttet til hvert fund er præcise, og at det valgte zoom-niveau ikke resulterer i en højere præcision end der er belæg for.\n\nInformationer og fotos, som du har videregivet til Danmarks Svampeatlas, vises på projektets hjemmeside, under det enkelte fund og ved gallerivisninger for de arter som fundene repræsenterer. Fotos og andre informationer er knyttet til det enkelte svampefund og udgør i mange tilfælde en vigtig dokumentation som derfor ikke slettes. Ved visning på Danmarks Svampeatlas vil fotografens navn tydeligt fremgå. Brug af billederne, ud over de nævnte, vil kun finde sted efter direkte aftale med brugerne, som beholder alle rettigheder til egne fotos. Sender du belæg som dokumentation for enkelte fund, vil den enkelte ekspert beslutte om belægget skal gemmes for eftertiden i samlingerne på Statens Naturhistoriske Museum ved Københavns Universitet eller ved en anden internationalt anerkendt samling.\n\nDe fund-data du indtaster i Danmarks Svampeatlas, videregives til den Globale Biodiversisetets Facilitet (GBIF) under OECD og er internationlt søgbare via gbif.org under OECD. Billeder som er uploadet som dokumentation af hvert fund er linket til dette og er således synlige hos GBIF. Ønsker du ikke at links til dine billeder videregives til GBIF, så send venligst en email til atlas@svampe.dk\n\nHvis du på et tidspunkt vælger at få slettet din profil, forbliver alle informationer og materiale indlagt med denne profil synlige og søgbare på projektets hjemmeside.\n\nValidatorer og administratorer har ret til at slette/ændre information, som vedrører dine observationer, så længe retningslinjerne for information ikke bliver overtrådt derved.</string>
+    <!-- (No Comment) -->
+    <string name="aboutVC_generalTerms_title">(Not translated) Generelle betingelser</string>
+    <!-- (No Comment) -->
+    <string name="aboutVC_guidelines_message">(Not translated) Simple funddata kan søges via webinterfacet på Danmarks Svampeatlas og kan frit bruges i alle typer af forvaltningsopgaver på såvel lokalt som nationalt plan, fx i forbindelse med miljøvurderinger (VVM’er), udarbejdelse af plejeplaner samt til lokal og national prioritering af naturbeskyttelse i Danmark. Danmarks Svampeatlas bør i hvert tilfælde citeres som kilde. Data kan på tilsvarende vis bruges i forskningssammenhæng. Bemærk at databasen indeholder både godkendte, uvaliderede og afviste fund, hvilket er specificeret under hvert fund.\n\nValideringsprocessen omfatter artsbestemmelsen, og de grovere geografiske data. Især ældre fund har ofte meget upræcise fund-koordinater, men også for helt nye fund kan de være upræcist angivet. Den brugerdefinerede usikkerhed på fund-koordinater er angivet i meter for hvert fund, og skal betragtes som vejledende, fx ved udarbejdelse af detaljerede lokale forvaltningsplaner. Danmarks Svampeatlas rummer et meget stort antal standardnavne for lokaliteter, som vælges af rapportøren. Det betyder, at fund af den samme svamp kan være indrapporteret med flere forskellige lokalitetsnavne af forskellige brugere, og tillige med forskellige koordinater. I praksis er dette mest aktuelt for meget sjældne og karismatiske arter, fx pindsvinepigsvamp og safrangul fedtporesvamp.</string>
+    <!-- (No Comment) -->
+    <string name="aboutVC_guidelines_title">(Not translated) Retningslinier for brug af data fra Danmarks Svampeatlas</string>
+    <!-- (No Comment) -->
+    <string name="aboutVC_qualityAssurance_message">(Not translated) For at sikre at de informationer, der ligger i svampebasen er troværdige, undergår alle fund kvalitetssikring. Fund af arter uden valideringskrav bliver automatisk godkendt, mens fund af arter med valideringskrav som udgangspunkt er uvaliderede, indtil de er godkendt af en validator. For de valideringskrævende arter er der angivet en række valideringskrav. Hvis disse krav ikke er opfyldt i forbindelse med indlæggelse af fund, kan man ikke regne med en seriøs behandling af observationen og fundet afvises. Godkendte fund, også af arter, der ikke kræver validering, kan senere afvises af validatorer, fx hvis det vurderes at der ikke er tilstrækkelig dokumentation til at fundet kan godkendes eller at den vedlagte dokumentation viser, at det er en anden men ubestemmelig art. Alle brugere har mulighed for at kommentere på alle fund - både uvaliderede, godkendte og afviste. Kvalitetssikring/validering kræver ofte mikroskopisk undersøgelse af materiale, hvorfor behandlingstiden kan være lang.</string>
+    <!-- (No Comment) -->
+    <string name="aboutVC_qualityAssurance_title">(Not translated) Kvalitetssikring/validering</string>
+    <!-- (No Comment) -->
+    <string name="aboutVC_recognition_message">Použití automatického rozpoznávání obrazu nemůže být vždy přesné a směrodatné, a proto je zásadní, aby byl systém používán s velkou obezřetností. Nikdy nejezte houbu bez konzultace s odborníkem. Danmarks Svampeatlas (Atlas hub) a Noque ApS se zříká jakékoli odpovědnosti za otravu nebo jiné nežádoucí zdravotní komplikace.\n\nSystém rozpoznávání obrazu vyvinuli Milan Šulc a Jiří Matas z ČVUT v Praze a Lukáš Picek z ZČU v Plzni a Danmarks Svampeatlas (Atlas hub). Systém je založen na umělé inteligenci a byl vyškolen na všechny obrázky, které nashromáždili naši uživatelé. Čím více přispíváte pozorováními a kvalitními obrázky, tím lépe můžeme v budoucnu technologii dále vyvíjet a školit.</string>
+    <!-- (No Comment) -->
+    <string name="aboutVC_recognition_title">Automatické rozpoznávání obrázku</string>
+    <!-- AboutVC -->
+    <string name="aboutVC_title">O aplikaci</string>
+    <!-- (No Comment) -->
+
+    <!-- (No Comment) -->
+    <string name="addObservationVC_observationCategories_details">Detaily</string>
+    <!-- (No Comment) -->
+    <string name="addObservationVC_observationCategories_location">Lokace</string>
+    <!-- (No Comment) -->
+    <string name="addObservationVC_observationCategories_species">Druh</string>
+    <!-- AddObservationVC -->
+    <string name="addObservationVC_title">Nové pozorování</string>
+    <!-- AppScrollView -->
+    <string name="appScrollView_informationHeaderTitle">Informace</string>
+    <!-- (No Comment) -->
+
+    <!-- CameraControlsTextButton -->
+    <string name="cameraControlTextButton_noPhoto">Žádná fotografie</string>
+    <!-- (No Comment) -->
+    <string name="cameraControlTextButton_usePhoto">Použít fotografii</string>
+    <!-- (No Comment) -->
+
+    <!-- CautionCell -->
+    <string name="cautionCell_lowConfidence">Žádný z níže uvedených návrhů pravděpodobně není správný.</string>
+    <!-- CommentsTableView -->
+    <string name="commentsTableView_cell_title">Napsat komentář</string>
+    <!-- (No Comment) -->
+    <string name="containedResultCell_genus">Rod: %s</string>
+    <!-- CreditationCell -->
+    <string name="creditationCell_ai">Systém rozpoznávání obrazu vyvinuli Milan Šulc a Jiří Matas z ČVUT v Praze a Lukáš Picek z ZČU v Plzni a Danmarks Svampeatlas (Atlas hub).</string>
+    <!-- (No Comment) -->
+    <string name="creditationCell_aiNewObservation">Tyto návrhy jsou založeny na prvním obrázku, který jste přidali k pozorování. Systém rozpoznávání obrazu vyvinuli Milan Šulc a Jiří Matas z ČVUT v Praze a Lukáš Picek z ZČU v Plzni a Danmarks Svampeatlas (Atlas hub).</string>
+    <!-- (No Comment) -->
+
+    <!-- (No Comment) -->
+    <string name="dateFormatting_1dayHasPassed">Před 1 dnem</string>
+    <!-- (No Comment) -->
+    <string name="dateFormatting_daysPassed">před %d dny</string>
+    <!-- (No Comment) -->
+    <string name="dateFormatting_hoursSince">před %d hodinami</string>
+    <!-- Date stringable -->
+    <string name="dateFormatting_rightNow">Teď</string>
+    <!-- (No Comment) -->
+    <string name="dateFormatting_today">Dnes</string>
+    <!-- (No Comment) -->
+    <string name="detailsVC_newSightingPrompt">Nové pozorování</string>
+    <!-- DetailsVC -->
+    <string name="detailsVC_observationTitle">Pozorování: %s</string>
+    <!-- (No Comment) -->
+    <!-- LocationAnnotation -->
+    <string name="locationAnnotation_title">Místo pozorování</string>
+    <!-- (No Comment) -->
+    <string name="loginVC_createNewAccountButton">Kliknutím zde vytvoříte nový účet</string>
+    <!-- (No Comment) -->
+    <string name="loginVC_detailsLabel">Sdílejte svá pozorování s ostatními a přispějte k poznání druhů hub, zároveň tak získejte potvrzení vaší identifikace od předních odborníků v Dánsku</string>
+    <!-- (No Comment) -->
+    <string name="loginVC_initialsTextField_error">Musíte zadat uživatelské jméno</string>
+    <!-- (No Comment) -->
+    <string name="loginVC_initialsTextField_placeholder">Uživatelské jméno</string>
+    <!-- (No Comment) -->
+    <string name="loginVC_loginButton">Přihlásit</string>
+    <!-- (No Comment) -->
+    <string name="loginVC_lowerLabel">Atlas hub</string>
+    <!-- (No Comment) -->
+    <string name="loginVC_passwordTextField_error">Musíte zadat vaše heslo</string>
+    <!-- (No Comment) -->
+    <string name="loginVC_passwordTextField_placeholder">Heslo</string>
+    <!-- LoginVC -->
+    <string name="loginVC_upperLabel">Přihlášení</string>
+    <!-- MapVC -->
+    <string name="mapVC_title">Místo pozorování</string>
+    <!-- MapView -->
+    <string name="mapViewCategories_regular">Mapa</string>
+    <!-- (No Comment) -->
+    <string name="mapViewCategories_satelite">Satelitní</string>
+    <!-- (No Comment) -->
+    <string name="mapViewCategories_topographical">Terén</string>
+    <!-- MapViewFilteringSettings -->
+    <string name="mapViewFilteringSettings_ageOfSighting">Věk:</string>
+    <!-- (No Comment) -->
+    <string name="mapViewSettingsView_newSearch">Nové hledání</string>
+    <!-- MapViewSettingsView -->
+    <string name="mapViewSettingsView_year">%d rok</string>
+    <!-- (No Comment) -->
+    <string name="mushroomDetailsScrollView_acceptedRecords">Přijaté záznamy:</string>
+    <!-- (No Comment) -->
+    <string name="mushroomDetailsScrollView_description">Popis</string>
+    <!-- (No Comment) -->
+    <string name="mushroomDetailsScrollView_eatability">Poživatelnost</string>
+    <!-- (No Comment) -->
+    <string name="mushroomDetailsScrollView_ecology">Ekologie</string>
+    <!-- (No Comment) -->
+    <string name="mushroomDetailsScrollView_heatMap">Pozorování v okolí</string>
+    <!-- (No Comment) -->
+    <string name="mushroomDetailsScrollView_latestAcceptedRecord">Poslední přijatý záznam:</string>
+    <!-- (No Comment) -->
+    <string name="mushroomDetailsScrollView_latestObservations">Poslední pozorování</string>
+    <!-- (No Comment) -->
+    <string name="mushroomDetailsScrollView_latestUpdated">Poslední aktualizace:</string>
+    <!-- (No Comment) -->
+    <string name="mushroomDetailsScrollView_similarities">Podobnost</string>
+    <!-- MushroomDetailsScrollView -->
+    <string name="mushroomDetailsScrollView_validationTips">Doporučení pro ověření</string>
+    <!-- (No Comment) -->
+    <string name="mushroomVC_category_favorites">Oblíbené</string>
+    <!-- (No Comment) -->
+    <string name="mushroomVC_category_species">Druh</string>
+    <!-- (No Comment) -->
+
+    <!-- MushroomVC -->
+    <string name="mushroomVC_title">Atlas hub</string>
+    <!-- (No Comment) -->
+    <string name="mushroomView_lastUpdate">Poslední aktualizace:</string>
+    <!-- (No Comment) -->
+    <string name="mushroomView_latestObservation">Poslední pozorování (DK):</string>
+    <!-- MushroomView -->
+    <string name="mushroomView_numberOfRecords">Počet pozorování (DK):</string>
+    <!-- (No Comment) -->
+    <string name="myPageScrollView_logout">Odhlásit</string>
+    <!-- MyPageScrollView -->
+    <string name="myPageScrollView_notificationsHeader">Oznámení</string>
+    <!-- (No Comment) -->
+    <string name="myPageScrollView_observationsHeader">Pozorování</string>
+    <!-- (No Comment) -->
+    <string name="navigationItem_about">O aplikaci</string>
+    <!-- (No Comment) -->
+    <string name="navigationItem_cameraVC">Rozpoznávání</string>
+    <!-- (No Comment) -->
+    <string name="navigationItem_facebook">Facebook</string>
+    <!-- NavigationItems -->
+    <string name="navigationItem_loginVC">Přihlášení</string>
+    <!-- (No Comment) -->
+    <string name="navigationItem_mushroomsVC">Atlas hub</string>
+    <!-- (No Comment) -->
+    <string name="navigationItem_myPageVC">Moje stránka</string>
+    <!-- (No Comment) -->
+    <string name="navigationItem_nearbyVC">Ve vašem okolí</string>
+    <!-- (No Comment) -->
+    <string name="navigationItem_newObservationVC">Nové pozorování</string>
+    <!-- NearbyVC -->
+    <string name="nearbyVC_title">Nedaleko</string>
+
+    <!-- NotificationCell -->
+    <string name="notificationCell_commentAdded_1">okomentována poznámka od:</string>
+    <!-- (No Comment) -->
+    <string name="notificationCell_commentAdded_2">jsou následující</string>
+    <!-- (No Comment) -->
+    <string name="notificationCell_determinationAdded_1">určení přidáno:</string>
+    <!-- (No Comment) -->
+    <string name="notificationCell_determinationAdded_2">k pozorování, které sledujete.</string>
+    <!-- (No Comment) -->
+    <string name="notificationCell_determinationApproved_1">Pozorování, které sledujete, bylo potvrzeno a schváleno jako:</string>
+    <!-- (No Comment) -->
+    <string name="notificationCell_determinationExpertApproved">schváleno odborníkem.</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsCell_date">Datum:</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsCell_ecologyNotes_message">Na písčité půdě ...</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsCell_ecologyNotes_title">Komentáře k ekologii</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsCell_host">Hostitel:</string>
+    <!-- ObservationDetailsCell -->
+    <string name="observationDetailsCell_mostUsed">Nejpoužívanější</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsCell_notes_message">Vůně, výtrusný prach, ...</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsCell_notes_title">Další poznámky</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsCell_substrate">Podklad:</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsCell_vegetationType">Typ vegetace:</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsScrollView_comments">Komentáře</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsScrollView_ecologyNotes">Komentáře k ekologii</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsScrollView_location">Lokace</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsScrollView_notes">Další poznámky</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsScrollView_observationDate">Datum pozorování:</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsScrollView_rapportContent_abort">Zrušit</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsScrollView_rapportContent_message">Chcete nahlásit nevhodný nebo urážlivý obsah? Vysvětlete důvod, podíváme se na to.</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsScrollView_rapportContent_placeholder">Např. nevhodné obrázky</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsScrollView_rapportContent_thankYou_message">Vaše zpráva je důležitá součást, aby se Atlas hub stal bezpečnějším místem.</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsScrollView_rapportContent_thankYou_title">Děkujeme</string>
+    <!-- ObservationDetailsScrollView -->
+    <string name="observationDetailsScrollView_rapportContent_title">Nahlásit nevhodný obsah</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsScrollView_species">Druh</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsScrollView_substrate">Podklad:</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsScrollView_validationStatus">Stav ověřování:</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsScrollView_validationStatus_approved">Schváleno</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsScrollView_validationStatus_declined">Zamítnuto</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsScrollView_validationStatus_unknown">Neznámý</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsScrollView_validationStatus_verifying">Probíhá ověřování</string>
+    <!-- (No Comment) -->
+    <string name="observationDetailsScrollView_vegetationType">Typ vegetace:</string>
+    <!-- (No Comment) -->
+    <string name="observationSpeciesCell_chooseGenus">Vyberte rod</string>
+    <!-- (No Comment) -->
+    <string name="observationSpeciesCell_choosenGenus">Vybraný rod</string>
+    <!-- (No Comment) -->
+    <string name="observationSpeciesCell_choosenSpecies">Vybraný druh</string>
+    <!-- ObservationSpeciesCell -->
+    <string name="observationSpeciesCell_chooseSpecies">Vyberte druh</string>
+    <!-- (No Comment) -->
+    <string name="observationSpeciesCell_deselect">Zrušit výběr</string>
+    <!-- (No Comment) -->
+    <string name="observationSpeciesCell_predictionsHeader">Rozpoznávání</string>
+    <!-- (No Comment) -->
+    <string name="observationSpeciesCell_searchResults">Výsledky vyhledávání</string>
+    <string name="observationSpeciesCell_myFavorites">Oblíbené</string>
+    <!-- PickerCell -->
+    <string name="pickerCell_rememberChoice">Pamatovat moje nastavení</string>
+
+    <!-- (No Comment) -->
+    <string name="redlistView_cren">Ohrožené druhy</string>
+    <!-- (No Comment) -->
+    <string name="redlistView_dd">Neznamý</string>
+    <!-- RedlistView -->
+    <string name="redlistView_lcnt">Není ohrožený druh</string>
+    <!-- (No Comment) -->
+    <string name="redlistView_vu">Zranitelný druh</string>
+    <!-- ReloadCell -->
+    <string name="reloadCell_showMore">Zobrazit více</string>
+    <!-- (No Comment) -->
+    <string name="reloadCell_tryAgain">Zkusit znovu</string>
+    <!-- ResultsView -->
+    <string name="resultsView_header_title">Máme pro vás %d doporučení</string>
+    <string name="resultsView_header_message">Be advised: Do not rely on these suggested identifications if you wish to eat the mushrooms you have found.</string>
+    <!-- Searchbar -->
+    <string name="searchBar_placeholder">Vyhledávání ...</string>
+    <!-- SearchCell -->
+    <string name="searchCell_title">Search for a host here ... 👇</string>
+    <!-- (No Comment) -->
+    <string name="searchVC_cancelButton">Zrušit</string>
+    <!-- SearchVC -->
+    <string name="searchVC_searchBar_placeholder">Search for a host here ...</string>
+    <!-- (No Comment) -->
+    <string name="selectedSpeciesCell_confident_genus">Jsem si jistý, že rod je správně</string>
+    <!-- (No Comment) -->
+    <string name="selectedSpeciesCell_confident_species">Jsem si jistý, že druh je správně</string>
+    <!-- (No Comment) -->
+    <string name="selectedSpeciesCell_likely_genus">Myslím si, že rod je správně</string>
+    <!-- (No Comment) -->
+    <string name="selectedSpeciesCell_likely_species">Myslím si, že druh je správně</string>
+    <!-- (No Comment) -->
+    <string name="selectedSpeciesCell_possible_genus">Domnívám se, že rod je správně</string>
+    <!-- (No Comment) -->
+    <string name="selectedSpeciesCell_possible_species">Domnívám se, že druh je správně</string>
+    <!-- SelectedSpeciesCell -->
+    <string name="selectedSpeciesCell_question">Jste si jistí?</string>
+
+    <string name="termsVC_cameraHelper_message">Při fotografování hub je třeba řídit se následujícími pokyny:\n\n\t- Foťte pouze ve formátu na šířku (přesvědčte se, že váš telefon nemá aktivovaný zámek otáčení dispeje).\n\n\t- V jednom snímku zachyťte mladou i starší plodnici\n- Pokud je to možné, zachyťte všechny části plodnice (klobouk, třeň, výtrusné rouško,...), položte mladší a starší plodnice vedle sebe\n\n\t- Foťte při dobrém osvětlení, ale plodnice zastiňte proti přímému slunečnímu světlu, např. vlastním tělem\n- Foťte rourky nebo lupeny, poté podélně prořízněte celé tělo plodnice</string>
+    <!-- (No Comment) -->
+    <string name="termsVC_cameraHelper_title">Takto pořídíte nejlepší snímky</string>
+    <!-- TermsVC -->
+    <string name="termsVC_dismissButton">Rozumím</string>
+    <!-- (No Comment) -->
+    <string name="termsVC_localityHelper_title">Takto upravíte místo vašeho pozorování</string>
+    <!-- (No Comment) -->
+    <string name="termsVC_mlPredict_message">Použití automatického rozpoznávání obrazu nemůže být vždy přesné a směrodatné, a proto je zásadní, aby byl systém používán s velkou obezřetností. Nikdy nejezte houbu bez konzultace s odborníkem. Danmarks Svampeatlas (Atlas hub) a Noque ApS se zříká jakékoli odpovědnosti za otravu nebo jiné nežádoucí zdravotní komplikace.\n\nSystém rozpoznávání obrazu vyvinuli Milan Šulc a Jiří Matas z ČVUT v Praze a Lukáš Picek z ZČU v Plzni a Danmarks Svampeatlas (Atlas hub). Systém je založen na umělé inteligenci a byl vyškolen na všechny obrázky, které nashromáždili naši uživatelé. Čím více přispíváte pozorováními a kvalitními obrázky, tím lépe můžeme v budoucnu technologii dále vyvíjet a školit.</string>
+    <!-- (No Comment) -->
+    <string name="termsVC_mlPredict_title">Automatické rozpoznávání obrázku - musíte přijmout podmínky.</string>
+    <!-- ToxicityLevels -->
+    <string name="toxicityLevel_poisonous">Jedovatý</string>
+    <!-- (No Comment) -->
+    <string name="unknownSpeciesButton_message">Klikněte zde, pokud chcete zaznamenat dosud nerozpoznanou houbu - odborníci se pokusí pomoci s identifikací.</string>
+    <!-- UnknownSpeciesButton -->
+    <string name="unknownSpeciesButton_title">Neznámý druh</string>
+    <!-- (No Comment) -->
+
+    <!-- (No Comment) -->
+    <string name="userView_guest_message">Přihlaste se pro lepší zážitek z aplikace</string>
+    <!-- UserView -->
+    <string name="userView_guest_title">Atlas hub</string>
+    <!-- Utilities -->
+    <string name="utilities_photoAlbumName">Atlas hub</string>
+
+
+
+</resources>

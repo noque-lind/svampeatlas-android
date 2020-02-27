@@ -1,14 +1,20 @@
 package com.noque.svampeatlas.view_models
 
 import android.app.Application
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Camera
+import android.media.MediaScannerConnection
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import android.webkit.MimeTypeMap
+import androidx.camera.core.CameraX
+import androidx.core.net.toFile
+import androidx.lifecycle.*
+import com.noque.svampeatlas.R
 import com.noque.svampeatlas.extensions.copyTo
 import com.noque.svampeatlas.extensions.getBitmap
 import com.noque.svampeatlas.fragments.CameraFragment
@@ -44,7 +50,6 @@ class CameraViewModel(private val type: CameraFragment.Type, application: Applic
 
     fun setImageFile(imageFile: File) {
         _imageFileState.value = State.Items(imageFile)
-
         if (type == CameraFragment.Type.IDENTIFY) {
             getPredictions(imageFile)
         }
@@ -60,7 +65,8 @@ class CameraViewModel(private val type: CameraFragment.Type, application: Applic
                     setImageFile(file)
                 }
             } catch (exception: FileNotFoundException) {
-                _imageFileState.value = State.Error(AppError("Der skete en fejl", "Den valgte fil kunne ikke findes"))
+                val res = getApplication<Application>().resources
+                _imageFileState.value = State.Error(AppError(res.getString(R.string.error_photosManager_unknownFetchError_title), res.getString(R.string.error_photosManager_unknownFetchError_message), null))
             }
         }
     }
@@ -81,16 +87,20 @@ class CameraViewModel(private val type: CameraFragment.Type, application: Applic
 
     fun saveImage(file: File) {
         (imageFileState.value as? State.Items)?.items?.let {
-            _imageSaveState.value = State.Loading()
+//            _imageSaveState.value = State.Loading()
 
             viewModelScope.launch {
                 val result = it.copyTo(file)
-                result.onError {
-                    _imageSaveState.value = State.Error(it)
-                }
 
                 result.onSuccess {
-                    _imageSaveState.value = State.Items(it)
+//                    _imageSaveState.value = State.Items(it)
+
+                    // If the folder selected is an external media directory, this is unnecessary
+                    // but otherwise other apps will not be able to access our images unless we
+                    // scan them using [MediaScannerConnection]
+
+                    val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(it.extension)
+                    MediaScannerConnection.scanFile(getApplication(), arrayOf(it.absolutePath), arrayOf(mimeType), null)
                 }
             }
         }
@@ -105,10 +115,5 @@ class CameraViewModel(private val type: CameraFragment.Type, application: Applic
                 it.onSuccess { _predictionResultsState.value = State.Items(it) }
             }
         }
-    }
-
-    override fun onCleared() {
-        reset()
-        super.onCleared()
     }
 }

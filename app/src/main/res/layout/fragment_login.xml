@@ -31,20 +31,20 @@
             style="@style/AppPrimaryHighlighted"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/loginFragment_upperLabel" />
+            android:text="@string/loginVC_upperLabel" />
 
         <TextView
             style="@style/AppTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/loginFragment_lowerLabel" />
+            android:text="@string/loginVC_lowerLabel" />
 
 
         <TextView
             style="@style/AppPrimary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/loginFragment_detailsLabel" />
+            android:text="@string/loginVC_detailsLabel" />
 
     </LinearLayout>
 
@@ -71,7 +71,7 @@
                 style="@style/AppPrimary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/loginFragment_initialsHint"
+                android:hint="@string/loginVC_initialsTextField_placeholder"
                 android:inputType="text" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -85,7 +85,7 @@
                 style="@style/AppPrimary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/loginFragment_passwordHint"
+                android:hint="@string/loginVC_passwordTextField_placeholder"
                 android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -95,7 +95,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@color/colorGreen"
-            android:text="@string/loginFragment_loginButton"
+            android:text="@string/loginVC_loginButton"
             android:textAppearance="@style/AppTitle" />
 
         <Button
@@ -105,7 +105,7 @@
             android:textAppearance="@style/AppPrimary"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@string/loginFragment_createAccountButton" />
+            android:text="@string/loginVC_createNewAccountButton" />
 
     </LinearLayout>
 
