@@ -10,6 +10,7 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.*
+import com.google.android.gms.tasks.Task
 import com.noque.svampeatlas.models.AppError
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.models.RecoveryAction
@@ -74,7 +75,7 @@ class LocationService(private val applicationContext: Context) {
 
 
     private val permissionsNotDetermined: Boolean get() {
-        return (ContextCompat.checkSelfPermission(applicationContext, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        return (ContextCompat.checkSelfPermission(applicationContext, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
     }
 
     private val locationCallback = object: LocationCallback() {

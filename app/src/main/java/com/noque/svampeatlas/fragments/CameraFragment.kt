@@ -11,6 +11,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.location.LocationManager
 import android.media.ExifInterface
 import android.net.Uri
 import android.os.Build
@@ -36,16 +37,18 @@ import java.io.File
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.noque.svampeatlas.BuildConfig
 import com.noque.svampeatlas.adapters.ResultsAdapter
+import com.noque.svampeatlas.extensions.openSettings
 import com.noque.svampeatlas.models.PredictionResult
 import com.noque.svampeatlas.models.RecoveryAction
 import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.services.FileManager
+import com.noque.svampeatlas.services.LocationService
 import com.noque.svampeatlas.utilities.AutoFitPreviewBuilder
 import com.noque.svampeatlas.utilities.DeviceOrientation
 import com.noque.svampeatlas.utilities.SharedPreferencesHelper
@@ -189,20 +192,38 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
     private val captureButtonPressed by lazy {
         View.OnClickListener {
             imageCapture?.let { imageCapture ->
-                locationManager.lastLocation.addOnCompleteListener {
-                    val metadata = ImageCapture.Metadata()
-                    metadata.location = it.result
-                    imageCapture.takePicture(FileManager.createTempFile(requireContext()), onImageSavedListener, metadata)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        container?.postDelayed(
-                            {
-                                container?.foreground = ColorDrawable(Color.WHITE)
-                                container?.postDelayed({ container?.foreground = null }, 150)
-                            }, 400
-                        )
+                val metadata = ImageCapture.Metadata()
+
+                if (ContextCompat.checkSelfPermission(
+                        requireContext(),
+                        android.Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    locationManager.lastLocation.addOnCompleteListener {
+                        metadata.location = it.result
+                        takePicture(imageCapture, metadata)
                     }
+                } else {
+                    takePicture(imageCapture, metadata)
                 }
             }
+        }
+    }
+
+    private fun takePicture(imageCapture: ImageCapture, metadata: ImageCapture.Metadata) {
+        imageCapture.takePicture(
+            FileManager.createTempFile(requireContext()),
+            onImageSavedListener,
+            metadata
+        )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            container?.postDelayed(
+                {
+                    container?.foreground = ColorDrawable(Color.WHITE)
+                    container?.postDelayed({ container?.foreground = null }, 150)
+                }, 400
+            )
         }
     }
 
@@ -237,9 +258,10 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
             } else {
                 stopCamera()
 
-                val intent = Intent(Intent.ACTION_PICK)
+                val intent = Intent(Intent.ACTION_GET_CONTENT)
                 intent.setType("image/*")
                 intent.putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/jpeg", "image/png"))
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true)
                 startActivityForResult(intent, CODE_LIBRARYREQUEST)
             }
         }
@@ -530,12 +552,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         private fun setError(error: AppError) {
             backgroundView?.setErrorWithHandler(error, error.recoveryAction) {
                 if (error.recoveryAction == RecoveryAction.OPENSETTINGS) {
-                    val intent = Intent()
-                    intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                    val uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
-                    intent.data = uri
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    startActivity(intent)
+                    openSettings()
                 }
                 else if (error.recoveryAction == RecoveryAction.TRYAGAIN) {
                     cameraViewModel.reset()
