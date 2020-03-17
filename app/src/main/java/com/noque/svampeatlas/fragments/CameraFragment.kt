@@ -1,22 +1,17 @@
 package com.noque.svampeatlas.fragments
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Resources
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.location.LocationManager
 import android.media.ExifInterface
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.transition.TransitionManager
 import android.util.Log
 import android.util.Rational
@@ -35,6 +30,8 @@ import com.noque.svampeatlas.view_models.NewObservationViewModel
 import kotlinx.android.synthetic.main.fragment_camera.*
 import java.io.File
 import androidx.appcompat.widget.Toolbar
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
@@ -48,22 +45,18 @@ import com.noque.svampeatlas.models.PredictionResult
 import com.noque.svampeatlas.models.RecoveryAction
 import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.services.FileManager
-import com.noque.svampeatlas.services.LocationService
-import com.noque.svampeatlas.utilities.AutoFitPreviewBuilder
 import com.noque.svampeatlas.utilities.DeviceOrientation
 import com.noque.svampeatlas.utilities.SharedPreferencesHelper
 import com.noque.svampeatlas.view_models.CameraViewModel
 import com.noque.svampeatlas.view_models.factories.CameraViewModelFactory
 import com.noque.svampeatlas.views.BlankActivity
+import com.noque.svampeatlas.views.CameraControlsView
 import com.noque.svampeatlas.views.ResultsView
-import kotlinx.android.synthetic.main.fragment_camera.cameraFragment_backgroundView
-import kotlinx.android.synthetic.main.fragment_camera.cameraFragment_captureButton
 import kotlinx.android.synthetic.main.fragment_camera.cameraFragment_imageView
-import kotlinx.android.synthetic.main.fragment_camera.cameraFragment_libraryButton
-import kotlinx.android.synthetic.main.fragment_camera.cameraFragment_noPhotoButton
 import kotlinx.android.synthetic.main.fragment_camera.cameraFragment_root
-import kotlinx.android.synthetic.main.fragment_camera.cameraFragment_textureView
 import kotlinx.android.synthetic.main.fragment_camera.cameraFragment_toolbar
+import java.lang.Exception
+import java.util.concurrent.Executors
 
 
 class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallback {
@@ -71,7 +64,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
     companion object {
         private const val TAG = "CameraFragment"
         private const val CODE_PERMISSION = 200
-        private const val CODE_LIBRARYREQUEST = 1234
+        private const val CODE_LIBRARY_REQUEST = 1234
     }
 
     enum class Type {
@@ -85,12 +78,13 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         class CaptureError(resources: Resources): Error(resources.getString(R.string.error_camera_cameraError_title), resources.getString(R.string.error_camera_unknown_message), RecoveryAction.TRYAGAIN) }
 
     // Objects
-
     private val args: CameraFragmentArgs by navArgs()
 
     private val locationManager: FusedLocationProviderClient by lazy {
         LocationServices.getFusedLocationProviderClient(requireContext())
     }
+
+    private val cameraExecutor = Executors.newSingleThreadExecutor()
 
     private val deviceOrientation by lazy { DeviceOrientation() }
     private val rootConstraintSet by lazy { ConstraintSet() }
@@ -105,13 +99,10 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
     // Views
     private var toolbar: Toolbar? = null
     private var container: ConstraintLayout? = null
-    private var textureView: TextureView? = null
+    private var viewFinder: PreviewView? = null
     private var resultsView: ResultsView? = null
-    private var captureButton: ImageButton? = null
-    private var captureButtonSpinner: ProgressBar? = null
+    private var cameraControlsView: CameraControlsView? = null
     private var backgroundView: BackgroundView? = null
-    private var photoLibraryButton: ImageButton? = null
-    private var actionButton: Button? = null
     private var imageView: ImageView? = null
 
 
@@ -177,7 +168,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                    currentOrientation = surfaceRotation
                    rotateViews(surfaceRotation)
                    imageCapture?.setTargetRotation(surfaceRotation)
-                   imageCapture?.setTargetAspectRatio(aspectRatio)
+//                   imageCapture?.setTargetAspectRatio(aspectRatio)
                }
            }
        }
@@ -211,20 +202,20 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
     }
 
     private fun takePicture(imageCapture: ImageCapture, metadata: ImageCapture.Metadata) {
-        imageCapture.takePicture(
-            FileManager.createTempFile(requireContext()),
-            onImageSavedListener,
-            metadata
-        )
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            container?.postDelayed(
-                {
-                    container?.foreground = ColorDrawable(Color.WHITE)
-                    container?.postDelayed({ container?.foreground = null }, 150)
-                }, 400
-            )
-        }
+//        imageCapture.takePicture(
+//            FileManager.createTempFile(requireContext()),
+//            onImageSavedListener,
+//            metadata
+//        )
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            container?.postDelayed(
+//                {
+//                    container?.foreground = ColorDrawable(Color.WHITE)
+//                    container?.postDelayed({ container?.foreground = null }, 150)
+//                }, 400
+//            )
+//        }
     }
 
     private val actionButtonPressed by lazy {
@@ -262,27 +253,27 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                 intent.setType("image/*")
                 intent.putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/jpeg", "image/png"))
                 intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true)
-                startActivityForResult(intent, CODE_LIBRARYREQUEST)
+                startActivityForResult(intent, CODE_LIBRARY_REQUEST)
             }
         }
     }
 
-        private val onImageSavedListener by lazy {
-            object : ImageCapture.OnImageSavedListener {
-                override fun onError(
-                    imageCaptureError: ImageCapture.ImageCaptureError,
-                    message: String,
-                    cause: Throwable?
-                ) {
-                    cameraViewModel.setImageFileError(Error.CaptureError(resources))
-                }
-
-                override fun onImageSaved(file: File) {
-                    cameraViewModel.setImageFile(file)
-                    cameraViewModel.saveImage(FileManager.createFile(requireContext()))
-                }
-            }
-        }
+//        private val onImageSavedListener by lazy {
+//            object : ImageCapture.OnImageSavedListener {
+//                override fun onError(
+//                    imageCaptureError: ImageCapture.ImageCaptureError,
+//                    message: String,
+//                    cause: Throwable?
+//                ) {
+//                    cameraViewModel.setImageFileError(Error.CaptureError(resources))
+//                }
+//
+//                override fun onImageSaved(file: File) {
+//                    cameraViewModel.setImageFile(file)
+//                    cameraViewModel.saveImage(FileManager.createFile(requireContext()))
+//                }
+//            }
+//        }
 
         override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
             if (requestCode == CODE_PERMISSION) {
@@ -298,7 +289,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
            Log.d(TAG, "On activity result")
 
-            if (requestCode == CODE_LIBRARYREQUEST && data != null) {
+            if (requestCode == CODE_LIBRARY_REQUEST && data != null) {
                 data.data?.let {
                     cameraViewModel.setImageFile(it, FileManager.createTempFile(requireContext()))
                 }
@@ -307,6 +298,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         }
 
 
+        @SuppressLint("SourceLockedOrientationActivity")
         override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -350,13 +342,13 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
     }
 
         override fun onResume() {
-            requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+//            requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             (requireActivity() as BlankActivity).hideSystemBars()
             super.onResume()
         }
 
         override fun onStart() {
-            requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+//            requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             (requireActivity() as BlankActivity).hideSystemBars()
             Log.d(TAG, "On start")
             validateState()
@@ -376,15 +368,11 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
             resultsConstraintSet.clone(requireContext(), R.layout.fragment_camera_results)
 
             toolbar = cameraFragment_toolbar
-            actionButton = cameraFragment_noPhotoButton
             container = cameraFragment_root
             imageView = cameraFragment_imageView
-            textureView = cameraFragment_textureView
-            resultsView = cameraFragment_resultsView
-            captureButton = cameraFragment_captureButton
-            captureButtonSpinner = cameraFragment_captureButtonSpinner
-            backgroundView = cameraFragment_backgroundView
-            photoLibraryButton = cameraFragment_libraryButton
+            viewFinder = cameraFragment_previewView
+//            resultsView = cameraFragment_resultsView
+//            backgroundView = cameraFragment_backgroundView
         }
 
         private fun setupViews() {
@@ -399,13 +387,13 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                 }
                 Type.NEW_OBSERVATION -> {
                     (requireActivity() as BlankActivity).setSupportActionBar(toolbar)
-                    actionButton?.setText(R.string.cameraControlTextButton_noPhoto)
+//                    actionButton?.setText(R.string.cameraControlTextButton_noPhoto)
                 }
             }
 
-            captureButton?.setOnClickListener(captureButtonPressed)
-            photoLibraryButton?.setOnClickListener(photoLibraryButtonPressed)
-            actionButton?.setOnClickListener(actionButtonPressed)
+//            captureButton?.setOnClickListener(captureButtonPressed)
+//            photoLibraryButton?.setOnClickListener(photoLibraryButtonPressed)
+//            actionButton?.setOnClickListener(actionButtonPressed)
 
 
             //Implement later to support tap-to-focus
@@ -439,29 +427,29 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                 }
             })
 
-            cameraViewModel.predictionResultsState.observe(viewLifecycleOwner, androidx.lifecycle.Observer { state ->
-                captureButtonSpinner?.visibility = View.GONE
-
-                when (state) {
-                    is State.Loading -> { captureButtonSpinner?.visibility = View.VISIBLE }
-                    is State.Error -> {
-                        expand()
-                        captureButton?.visibility = View.GONE
-                        resultsView?.visibility = View.VISIBLE
-                        resultsView?.showError(state.error)
-                    }
-                    is State.Items -> {
-                        expand()
-                        captureButton?.visibility = View.GONE
-                        resultsView?.visibility = View.VISIBLE
-                        resultsView?.showResults(state.items)
-                    }
-
-                    is State.Empty -> {
-                        collapse()
-                    }
-                }
-            })
+//            cameraViewModel.predictionResultsState.observe(viewLifecycleOwner, androidx.lifecycle.Observer { state ->
+//                captureButtonSpinner?.visibility = View.GONE
+//
+//                when (state) {
+//                    is State.Loading -> { captureButtonSpinner?.visibility = View.VISIBLE }
+//                    is State.Error -> {
+//                        expand()
+//                        captureButton?.visibility = View.GONE
+//                        resultsView?.visibility = View.VISIBLE
+//                        resultsView?.showError(state.error)
+//                    }
+//                    is State.Items -> {
+//                        expand()
+//                        captureButton?.visibility = View.GONE
+//                        resultsView?.visibility = View.VISIBLE
+//                        resultsView?.showResults(state.items)
+//                    }
+//
+//                    is State.Empty -> {
+//                        collapse()
+//                    }
+//                }
+//            })
         }
 
         private fun validateState() {
@@ -485,43 +473,64 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         }
 
         private fun startSession() {
-            backgroundView?.reset()
+//            backgroundView?.reset()
 
-            if (CameraX.isBound(imageCapture) && CameraX.isBound(preview)) { return }
-            imageView?.setImageDrawable(null)
-            imageView?.visibility = View.GONE
-            textureView?.visibility = View.VISIBLE
-            if (args.type == Type.NEW_OBSERVATION) actionButton?.setText(R.string.cameraControlTextButton_noPhoto)
+            viewFinder?.let { viewFinder ->
+                preview?.setSurfaceProvider(viewFinder.previewSurfaceProvider)
+                val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
+                cameraProviderFuture.addListener(kotlinx.coroutines.Runnable {
+
+                    preview = Preview.Builder()
+                        .setTargetAspectRatio(AspectRatio.RATIO_16_9)
+                        .setTargetRotation(viewFinder.display.rotation)
+                        .build()
+                    preview?.setSurfaceProvider(viewFinder.previewSurfaceProvider)
 
 
-            captureButton?.visibility = View.VISIBLE
-            photoLibraryButton?.visibility = View.VISIBLE
-            photoLibraryButton?.setImageDrawable(resources.getDrawable(R.drawable.icon_photo_library, null))
-            resultsView?.visibility = View.GONE
+                    try {
+                        cameraProviderFuture.get().bindToLifecycle(viewLifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, preview)
+                    } catch(exc: Exception) {
 
-            val viewFinderConfig = PreviewConfig.Builder().apply {
-                setLensFacing(CameraX.LensFacing.BACK)
-                setTargetRotation(currentOrientation)
-                setTargetAspectRatio(Rational(3,4))
-            }.build()
+                    }
 
-            preview = AutoFitPreviewBuilder.build(viewFinderConfig, textureView!!)
+                }, ContextCompat.getMainExecutor(requireContext()))
+            }
 
-            val imageCaptureConfig = ImageCaptureConfig.Builder().apply {
-                setLensFacing(CameraX.LensFacing.BACK)
-                setTargetAspectRatio(Rational(3, 4))
-                setCaptureMode(ImageCapture.CaptureMode.MIN_LATENCY)
-                setTargetRotation(currentOrientation)
-            }.build()
 
-            imageCapture = ImageCapture(imageCaptureConfig)
 
-            CameraX.bindToLifecycle(viewLifecycleOwner, preview, imageCapture)
+
+//            imageView?.setImageDrawable(null)
+//            imageView?.visibility = View.GONE
+//            textureView?.visibility = View.VISIBLE
+//            if (args.type == Type.NEW_OBSERVATION) actionButton?.setText(R.string.cameraControlTextButton_noPhoto)
+//
+//
+//            captureButton?.visibility = View.VISIBLE
+//            photoLibraryButton?.visibility = View.VISIBLE
+//            photoLibraryButton?.setImageDrawable(resources.getDrawable(R.drawable.icon_photo_library, null))
+//            resultsView?.visibility = View.GONE
+//
+//            val viewFinderConfig = PreviewConfig.Builder().apply {
+//                setLensFacing(CameraX.LensFacing.BACK)
+//                setTargetRotation(currentOrientation)
+//                setTargetAspectRatio(Rational(3,4))
+//            }.build()
+//
+//            preview = AutoFitPreviewBuilder.build(viewFinderConfig, textureView!!)
+//
+//            val imageCaptureConfig = ImageCaptureConfig.Builder().apply {
+//                setLensFacing(CameraX.LensFacing.BACK)
+//                setTargetAspectRatio(Rational(3, 4))
+//                setCaptureMode(ImageCapture.CaptureMode.MIN_LATENCY)
+//                setTargetRotation(currentOrientation)
+//            }.build()
+//
+//            imageCapture = ImageCapture(imageCaptureConfig)
         }
 
         private fun setImageState(file: File) {
             backgroundView?.reset()
-            textureView?.visibility = View.INVISIBLE
+//            textureView?.visibility = View.INVISIBLE
             stopCamera()
 
             imageView?.let {
@@ -534,17 +543,17 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
 
             when (args.type) {
                 Type.IMAGE_CAPTURE, Type.NEW_OBSERVATION -> {
-                    captureButton?.visibility = View.GONE
-                    photoLibraryButton?.visibility = View.VISIBLE
-                    actionButton?.visibility = View.VISIBLE
-                    photoLibraryButton?.setImageDrawable(resources.getDrawable(R.drawable.icon_back_button, null))
-                    actionButton?.text = getText(R.string.cameraControlTextButton_usePhoto)
+//                    captureButton?.visibility = View.GONE
+//                    photoLibraryButton?.visibility = View.VISIBLE
+//                    actionButton?.visibility = View.VISIBLE
+//                    photoLibraryButton?.setImageDrawable(resources.getDrawable(R.drawable.icon_back_button, null))
+//                    actionButton?.text = getText(R.string.cameraControlTextButton_usePhoto)
                 }
 
 
                 Type.IDENTIFY -> {
-                    photoLibraryButton?.visibility = View.GONE
-                    actionButton?.visibility = View.GONE
+//                    photoLibraryButton?.visibility = View.GONE
+//                    actionButton?.visibility = View.GONE
                 }
             }
         }
@@ -573,7 +582,6 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
             constraint.applyTo(cameraFragment_root)
         }
 
-
         private fun rotateViews(rotation: Int) {
             var transform: Float
 
@@ -585,12 +593,12 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                 else -> { transform = 0F }
             }
 
-            photoLibraryButton?.animate()?.rotation(transform)?.setDuration(350)?.start()
-            actionButton?.animate()?.rotation(transform)?.setDuration(350)?.start()
+//            photoLibraryButton?.animate()?.rotation(transform)?.setDuration(350)?.start()
+//            actionButton?.animate()?.rotation(transform)?.setDuration(350)?.start()
         }
 
         private fun stopCamera() {
-            CameraX.unbindAll()
+//            CameraX.unbindAll()
             imageCapture = null
             preview = null
         }
@@ -609,13 +617,8 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
             Log.d(TAG, "On Destroy View")
             toolbar = null
             container = null
-            textureView == null
             resultsView == null
-            captureButton == null
-            captureButtonSpinner == null
             backgroundView == null
-            photoLibraryButton == null
-            actionButton == null
             imageView == null
             sensorManager?.unregisterListener(deviceOrientation.eventListener)
             sensorManager?.unregisterListener(sensorEventListener)
