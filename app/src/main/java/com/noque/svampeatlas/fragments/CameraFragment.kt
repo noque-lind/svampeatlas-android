@@ -11,6 +11,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.media.ExifInterface
+import android.media.Image
 import android.os.Bundle
 import android.transition.TransitionManager
 import android.util.Log
@@ -31,10 +32,12 @@ import kotlinx.android.synthetic.main.fragment_camera.*
 import java.io.File
 import androidx.appcompat.widget.Toolbar
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.CameraView
 import androidx.camera.view.PreviewView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -79,6 +82,8 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
 
     // Objects
     private val args: CameraFragmentArgs by navArgs()
+    private var photoFile: File? = null
+
 
     private val locationManager: FusedLocationProviderClient by lazy {
         LocationServices.getFusedLocationProviderClient(requireContext())
@@ -116,7 +121,6 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
 
     private val resultsAdapterListener by lazy {
         object : ResultsAdapter.Listener {
-
             override fun reloadSelected() { cameraViewModel.reset() }
 
             override fun predictionResultSelected(predictionResult: PredictionResult) {
@@ -180,28 +184,47 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         }
     }
 
-    private val captureButtonPressed by lazy {
-        View.OnClickListener {
-            imageCapture?.let { imageCapture ->
-                val metadata = ImageCapture.Metadata()
+    private val cameraControlsViewListener by lazy {
+        object: CameraControlsView.Listener {
+            override fun captureButtonPressed() {
+                imageCapture?.let { imageCapture ->
+                    val metadata = ImageCapture.Metadata()
 
-                if (ContextCompat.checkSelfPermission(
-                        requireContext(),
-                        android.Manifest.permission.ACCESS_FINE_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    locationManager.lastLocation.addOnCompleteListener {
-                        metadata.location = it.result
+                    if (ContextCompat.checkSelfPermission(
+                            requireContext(),
+                            android.Manifest.permission.ACCESS_FINE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        locationManager.lastLocation.addOnCompleteListener {
+                            metadata.location = it.result
+                            takePicture(imageCapture, metadata)
+                        }
+                    } else {
                         takePicture(imageCapture, metadata)
                     }
-                } else {
-                    takePicture(imageCapture, metadata)
                 }
             }
+
+            override fun resetButtonPressed() {
+                TODO("Not yet implemented")
+            }
+
+            override fun photoLibraryButtonPressed() {
+                TODO("Not yet implemented")
+            }
+
         }
     }
 
     private fun takePicture(imageCapture: ImageCapture, metadata: ImageCapture.Metadata) {
+        photoFile = FileManager.createTempFile(requireContext())
+
+        imageCapture.takePicture(
+            ImageCapture.OutputFileOptions.Builder(photoFile!!).setMetadata(metadata).build(),
+            cameraExecutor,
+            onImageSavedCallback
+        )
+
 //        imageCapture.takePicture(
 //            FileManager.createTempFile(requireContext()),
 //            onImageSavedListener,
@@ -258,22 +281,18 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         }
     }
 
-//        private val onImageSavedListener by lazy {
-//            object : ImageCapture.OnImageSavedListener {
-//                override fun onError(
-//                    imageCaptureError: ImageCapture.ImageCaptureError,
-//                    message: String,
-//                    cause: Throwable?
-//                ) {
-//                    cameraViewModel.setImageFileError(Error.CaptureError(resources))
-//                }
-//
-//                override fun onImageSaved(file: File) {
-//                    cameraViewModel.setImageFile(file)
-//                    cameraViewModel.saveImage(FileManager.createFile(requireContext()))
-//                }
-//            }
-//        }
+    private val onImageSavedCallback by lazy {
+        object: ImageCapture.OnImageSavedCallback {
+            override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                cameraViewModel.setImageFile(photoFile!!)
+                cameraViewModel.saveImage(FileManager.createFile(requireContext()))
+            }
+
+            override fun onError(exception: ImageCaptureException) {
+                cameraViewModel.setImageFileError(Error.CaptureError(resources))
+            }
+        }
+    }
 
         override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
             if (requestCode == CODE_PERMISSION) {
@@ -371,6 +390,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
             container = cameraFragment_root
             imageView = cameraFragment_imageView
             viewFinder = cameraFragment_previewView
+            cameraControlsView = cameraFragment_cameraControlsView
 //            resultsView = cameraFragment_resultsView
 //            backgroundView = cameraFragment_backgroundView
         }
@@ -391,6 +411,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                 }
             }
 
+            cameraControlsView?.setListener(cameraControlsViewListener)
 //            captureButton?.setOnClickListener(captureButtonPressed)
 //            photoLibraryButton?.setOnClickListener(photoLibraryButtonPressed)
 //            actionButton?.setOnClickListener(actionButtonPressed)
@@ -486,9 +507,14 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                         .build()
                     preview?.setSurfaceProvider(viewFinder.previewSurfaceProvider)
 
+                    imageCapture = ImageCapture.Builder()
+                        .setTargetAspectRatio(AspectRatio.RATIO_16_9)
+                        .setTargetRotation(currentOrientation)
+                        .build()
+
 
                     try {
-                        cameraProviderFuture.get().bindToLifecycle(viewLifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, preview)
+                        cameraProviderFuture.get().bindToLifecycle(viewLifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageCapture)
                     } catch(exc: Exception) {
 
                     }
@@ -530,7 +556,6 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
 
         private fun setImageState(file: File) {
             backgroundView?.reset()
-//            textureView?.visibility = View.INVISIBLE
             stopCamera()
 
             imageView?.let {
@@ -540,20 +565,13 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                     .into(it)
             }
 
-
             when (args.type) {
                 Type.IMAGE_CAPTURE, Type.NEW_OBSERVATION -> {
-//                    captureButton?.visibility = View.GONE
-//                    photoLibraryButton?.visibility = View.VISIBLE
-//                    actionButton?.visibility = View.VISIBLE
-//                    photoLibraryButton?.setImageDrawable(resources.getDrawable(R.drawable.icon_back_button, null))
-//                    actionButton?.text = getText(R.string.cameraControlTextButton_usePhoto)
+                    cameraControlsView?.configureState(CameraControlsView.State.CONFIRM)
                 }
 
-
                 Type.IDENTIFY -> {
-//                    photoLibraryButton?.visibility = View.GONE
-//                    actionButton?.visibility = View.GONE
+                    cameraControlsView?.configureState(CameraControlsView.State.HIDDEN)
                 }
             }
         }
@@ -617,9 +635,10 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
             Log.d(TAG, "On Destroy View")
             toolbar = null
             container = null
-            resultsView == null
-            backgroundView == null
-            imageView == null
+            resultsView = null
+            backgroundView = null
+            imageView = null
+            cameraControlsView = null
             sensorManager?.unregisterListener(deviceOrientation.eventListener)
             sensorManager?.unregisterListener(sensorEventListener)
             super.onDestroyView()
