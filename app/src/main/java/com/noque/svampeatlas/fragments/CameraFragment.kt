@@ -497,7 +497,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
 //            backgroundView?.reset()
 
             viewFinder?.let { viewFinder ->
-                preview?.setSurfaceProvider(viewFinder.previewSurfaceProvider)
+                preview?.setSurfaceProvider(viewFinder.surfaceProvider)
                 val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
                 cameraProviderFuture.addListener(kotlinx.coroutines.Runnable {
 
@@ -505,7 +505,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                         .setTargetAspectRatio(AspectRatio.RATIO_16_9)
                         .setTargetRotation(viewFinder.display.rotation)
                         .build()
-                    preview?.setSurfaceProvider(viewFinder.previewSurfaceProvider)
+                    preview?.setSurfaceProvider(viewFinder.surfaceProvider)
 
                     imageCapture = ImageCapture.Builder()
                         .setTargetAspectRatio(AspectRatio.RATIO_16_9)
