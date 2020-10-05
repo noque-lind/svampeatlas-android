@@ -46,6 +46,7 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.preference:preference:1.1.1'
     def nav_version = "2.3.0"
     def camerax_version = "1.0.0-beta10"
     def lifecycle_version = "2.2.0"

@@ -205,4 +205,8 @@
     <string name="searchBar_placeholder">Søg efter en art her ...</string>
     <!-- CommentsTableView -->
     <string name="commentsTableView_cell_title">Skriv en kommentar</string>
+
+    <!-- SettingsVC -->
+    <string name="settingsVC_title">Indstillinger</string>
+
 </resources>

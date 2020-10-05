@@ -320,6 +320,9 @@
     <!-- Utilities -->
     <string name="utilities_photoAlbumName">Atlas hub</string>
 
+    <!-- SettingsVC -->
+    <string name="settingsVC_title">Settings</string>
+
 
 
 </resources>
