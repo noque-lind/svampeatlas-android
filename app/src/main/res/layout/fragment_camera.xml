@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/black"
-    android:fitsSystemWindows="false"
     android:theme="@style/Light"
     tools:context=".fragments.CameraFragment">
 
@@ -28,18 +27,29 @@
         android:id="@+id/cameraFragment_imageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="@android:color/black"
         android:visibility="gone"
         android:scaleType="fitCenter"
-        app:layout_constraintTop_toTopOf="@id/cameraFragment_previewView"
-        app:layout_constraintBottom_toBottomOf="@id/cameraFragment_previewView"
-        app:layout_constraintStart_toStartOf="@id/cameraFragment_previewView"
-        app:layout_constraintEnd_toEndOf="@id/cameraFragment_previewView" />
+        app:layout_constraintTop_toTopOf="@id/cameraFragment_cameraView"
+        app:layout_constraintBottom_toBottomOf="@id/cameraFragment_cameraView"
+        app:layout_constraintStart_toStartOf="@id/cameraFragment_cameraView"
+        app:layout_constraintEnd_toEndOf="@id/cameraFragment_cameraView" />
 
-    <androidx.camera.view.PreviewView
-        android:id="@+id/cameraFragment_previewView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </androidx.camera.view.PreviewView>
+    <androidx.camera.view.CameraView
+        android:id="@+id/cameraFragment_cameraView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintDimensionRatio="H,3:4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cameraFragment_toolbar" />
+
+<!--    <androidx.camera.view.PreviewView-->
+<!--        android:id="@+id/cameraFragment_previewView"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent">-->
+<!--    </androidx.camera.view.PreviewView>-->
 
     <com.noque.svampeatlas.views.CameraControlsView
         android:id="@+id/cameraFragment_cameraControlsView"
