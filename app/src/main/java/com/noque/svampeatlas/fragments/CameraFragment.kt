@@ -37,6 +37,8 @@ import androidx.camera.view.PreviewView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -113,8 +115,8 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
 
     // View models
 
-    private val cameraViewModel by lazy { ViewModelProviders.of(this, CameraViewModelFactory(args.type, requireActivity().application)). get(CameraViewModel::class.java) }
-    private val newObservationViewModel by lazy { ViewModelProviders.of(requireActivity()).get(NewObservationViewModel::class.java) }
+    private val cameraViewModel by lazy { ViewModelProvider(this, CameraViewModelFactory(args.type, requireActivity().application)).get(CameraViewModel::class.java) }
+    private val newObservationViewModel by lazy { ViewModelProvider(this).get(NewObservationViewModel::class.java) }
 
 
     // Listeners
@@ -171,7 +173,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                if (currentOrientation != surfaceRotation) {
                    currentOrientation = surfaceRotation
                    rotateViews(surfaceRotation)
-                   imageCapture?.setTargetRotation(surfaceRotation)
+                   imageCapture?.targetRotation = surfaceRotation
 //                   imageCapture?.setTargetAspectRatio(aspectRatio)
                }
            }
