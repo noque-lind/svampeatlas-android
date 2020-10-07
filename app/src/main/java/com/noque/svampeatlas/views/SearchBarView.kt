@@ -34,7 +34,7 @@ interface SearchBarListener {
     fun clearedSearchEntry()
 }
 
-class SearchBarView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(context, attrs) {
+class SearchBarView(context: Context, attrs: AttributeSet?) : ConstraintLayout(context, attrs) {
 
     companion object {
         val TAG = "SearchBarView"

@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.net.Uri
 import android.util.Log
+import android.view.View.*
 import com.noque.svampeatlas.services.FileManager
 import java.lang.Exception
 import java.text.SimpleDateFormat
@@ -175,7 +176,8 @@ class BlankActivity : AppCompatActivity() {
 
     fun hideSystemBars() {
         val flags = (
-                        View.SYSTEM_UI_FLAG_FULLSCREEN
+                        View.SYSTEM_UI_FLAG_FULLSCREEN or
+                                SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or SYSTEM_UI_FLAG_LAYOUT_STABLE or SYSTEM_UI_FLAG_LOW_PROFILE
                 )
 
         window.decorView.systemUiVisibility = flags

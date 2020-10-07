@@ -11,7 +11,7 @@ import com.noque.svampeatlas.models.AppError
 import com.noque.svampeatlas.models.RecoveryAction
 import kotlinx.android.synthetic.main.view_background.view.*
 
-class BackgroundView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(context, attrs) {
+class BackgroundView(context: Context, attrs: AttributeSet?) : ConstraintLayout(context, attrs) {
 
     private val titleTextView by lazy {backgroundView_errorView_titleTextView}
     private val messageTextView by lazy {backgroundView_errorView_messageTextView}

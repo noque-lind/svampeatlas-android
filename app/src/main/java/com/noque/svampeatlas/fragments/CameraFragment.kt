@@ -11,8 +11,8 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.media.ExifInterface
-import android.media.Image
 import android.os.Bundle
+import android.os.Handler
 import android.transition.TransitionManager
 import android.util.Log
 import android.util.Rational
@@ -26,7 +26,6 @@ import androidx.navigation.fragment.navArgs
 import com.noque.svampeatlas.models.AppError
 
 import com.noque.svampeatlas.R
-import com.noque.svampeatlas.views.BackgroundView
 import com.noque.svampeatlas.view_models.NewObservationViewModel
 import kotlinx.android.synthetic.main.fragment_camera.*
 import java.io.File
@@ -52,11 +51,10 @@ import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.services.FileManager
 import com.noque.svampeatlas.utilities.DeviceOrientation
 import com.noque.svampeatlas.utilities.SharedPreferencesHelper
+import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.view_models.CameraViewModel
 import com.noque.svampeatlas.view_models.factories.CameraViewModelFactory
-import com.noque.svampeatlas.views.BlankActivity
-import com.noque.svampeatlas.views.CameraControlsView
-import com.noque.svampeatlas.views.ResultsView
+import com.noque.svampeatlas.views.*
 import kotlinx.android.synthetic.main.fragment_camera.cameraFragment_imageView
 import kotlinx.android.synthetic.main.fragment_camera.cameraFragment_root
 import kotlinx.android.synthetic.main.fragment_camera.cameraFragment_toolbar
@@ -106,11 +104,12 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
     // Views
     private var toolbar: Toolbar? = null
     private var container: ConstraintLayout? = null
-    private var cameraView: CameraView? = null
+    private var cameraView by autoCleared<CameraView>()
     private var resultsView: ResultsView? = null
     private var cameraControlsView: CameraControlsView? = null
     private var backgroundView: BackgroundView? = null
     private var imageView: ImageView? = null
+    private var zoomControlsView by autoCleared<ZoomControlsView>()
 
 
     // View models
@@ -189,20 +188,25 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
     private val cameraControlsViewListener by lazy {
         object: CameraControlsView.Listener {
             override fun captureButtonPressed() {
-                val metadata = ImageCapture.Metadata()
+                zoomControlsView.expand()
 
-                if (ContextCompat.checkSelfPermission(
-                        requireContext(),
-                        android.Manifest.permission.ACCESS_FINE_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    locationManager.lastLocation.addOnCompleteListener {
-                        metadata.location = it.result
-                        takePicture(metadata)
-                    }
-                } else {
-                    takePicture(metadata)
-                }
+                Handler().postDelayed(Runnable {
+                    zoomControlsView.collapse()
+                }, 2000)
+//                val metadata = ImageCapture.Metadata()
+//
+//                if (ContextCompat.checkSelfPermission(
+//                        requireContext(),
+//                        android.Manifest.permission.ACCESS_FINE_LOCATION
+//                    ) == PackageManager.PERMISSION_GRANTED
+//                ) {
+//                    locationManager.lastLocation.addOnCompleteListener {
+//                        metadata.location = it.result
+//                        takePicture(metadata)
+//                    }
+//                } else {
+//                    takePicture(metadata)
+//                }
             }
 
             override fun resetButtonPressed() {
@@ -317,11 +321,6 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
             super.onActivityResult(requestCode, resultCode, data)
         }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        (requireActivity() as BlankActivity).hideSystemBars()
-        super.onCreate(savedInstanceState)
-    }
-
         @SuppressLint("SourceLockedOrientationActivity")
         override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -374,7 +373,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
 
         override fun onStart() {
 //            requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-//            (requireActivity() as BlankActivity).hideSystemBars()
+            (requireActivity() as BlankActivity).hideSystemBars()
             Log.d(TAG, "On start")
             validateState()
             super.onStart()
@@ -392,6 +391,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
             rootConstraintSet.clone(cameraFragment_root)
             resultsConstraintSet.clone(requireContext(), R.layout.fragment_camera_results)
 
+            zoomControlsView = cameraFragment_zoomControlsView
             toolbar = cameraFragment_toolbar
             container = cameraFragment_root
             imageView = cameraFragment_imageView
@@ -416,7 +416,15 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
 //                    actionButton?.setText(R.string.cameraControlTextButton_noPhoto)
                 }
             }
+
+
             cameraControlsView?.setListener(cameraControlsViewListener)
+            zoomControlsView.setListener(object: ZoomControlsView.Listener {
+                override fun zoomLevelSet(zoomRatio: Float) {
+                    cameraView.zoomRatio = zoomRatio
+                }
+
+            })
 //            captureButton?.setOnClickListener(captureButtonPressed)
 //            photoLibraryButton?.setOnClickListener(photoLibraryButtonPressed)
 //            actionButton?.setOnClickListener(actionButtonPressed)
@@ -499,9 +507,10 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
 
         @SuppressLint("MissingPermission")
         private fun startSession() {
-            cameraView?.bindToLifecycle(viewLifecycleOwner)
-            cameraView?.captureMode = CameraView.CaptureMode.IMAGE
-            cameraView?.scaleType = PreviewView.ScaleType.FILL_CENTER
+            cameraView.bindToLifecycle(viewLifecycleOwner)
+            cameraView.captureMode = CameraView.CaptureMode.IMAGE
+            cameraView.scaleType = PreviewView.ScaleType.FILL_CENTER
+            zoomControlsView.configure(cameraView.zoomRatio, cameraView.maxZoomRatio, cameraView.minZoomRatio)
 //            backgroundView?.reset()
 
 //            viewFinder?.let { viewFinder ->

@@ -9,7 +9,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.noque.svampeatlas.R
 import kotlinx.android.synthetic.main.view_camera_controls.view.*
 
-class CameraControlsView(context: Context?, attrs: AttributeSet?) :
+class CameraControlsView(context: Context, attrs: AttributeSet?) :
     ConstraintLayout(context, attrs) {
 
     interface Listener {
