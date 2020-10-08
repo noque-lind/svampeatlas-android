@@ -89,7 +89,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         LocationServices.getFusedLocationProviderClient(requireContext())
     }
 
-    private val cameraExecutor = Executors.newSingleThreadExecutor()
+    private val cameraExecutor by lazy { Executors.newSingleThreadExecutor() }
 
     private val deviceOrientation by lazy { DeviceOrientation() }
     private val rootConstraintSet by lazy { ConstraintSet() }
@@ -190,9 +190,6 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
             override fun captureButtonPressed() {
                 zoomControlsView.expand()
 
-                Handler().postDelayed(Runnable {
-                    zoomControlsView.collapse()
-                }, 2000)
 //                val metadata = ImageCapture.Metadata()
 //
 //                if (ContextCompat.checkSelfPermission(
@@ -326,7 +323,6 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
         ): View? {
-
             setHasOptionsMenu(true)
             requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             return inflater.inflate(R.layout.fragment_camera, container, false)
@@ -422,6 +418,14 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
             zoomControlsView.setListener(object: ZoomControlsView.Listener {
                 override fun zoomLevelSet(zoomRatio: Float) {
                     cameraView.zoomRatio = zoomRatio
+                }
+
+                override fun collapsed() {
+                    cameraView.isPinchToZoomEnabled = true
+                }
+
+                override fun expanded() {
+                    cameraView.isPinchToZoomEnabled = false
                 }
 
             })

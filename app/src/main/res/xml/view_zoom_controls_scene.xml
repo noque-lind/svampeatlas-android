@@ -7,14 +7,7 @@
         motion:constraintSetEnd="@+id/end"
         motion:constraintSetStart="@id/start"
         motion:duration="150">
-        <OnClick
-            motion:targetId="@id/zoomControlsView_textView"
-            motion:clickAction="toggle" />
        <KeyFrameSet>
-           <KeyAttribute
-               motion:motionTarget="@+id/zoomControlsView_zoomInButton"
-               motion:framePosition="70"
-               android:alpha="0.0" />
            <KeyAttribute />
            <KeyAttribute
                motion:motionTarget="@+id/zoomControlsView_zoomOutButton"
@@ -24,10 +17,6 @@
                motion:motionTarget="@+id/zoomControlsView_seekbar"
                motion:framePosition="38"
                android:alpha="0.0" />
-           <KeyAttribute
-               motion:motionTarget="@+id/zoomControlsView_textView"
-               motion:framePosition="5"
-               android:alpha="0.2" />
        </KeyFrameSet>
     </Transition>
 
@@ -36,23 +25,18 @@
             <PropertySet motion:alpha="1" />
         </Constraint>
 
-        <Constraint android:id="@id/zoomControlsView_zoomInButton">
-            <PropertySet motion:alpha="1" />
-        </Constraint>
+        <Constraint android:id="@id/zoomControlsView_zoomInButton"
+            android:layout_width="40dp"
+            motion:layout_constraintEnd_toEndOf="@id/zoomControlsView_containerConstraintLayout"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintTop_toTopOf="parent" />
         <Constraint android:id="@id/zoomControlsView_seekbar">
             <PropertySet motion:alpha="1" />
-        </Constraint>
-        <Constraint android:id="@id/zoomControlsView_textView">
-            <PropertySet motion:alpha="0.1"
-                android:visibility="invisible"
-                android:alpha="0" />
         </Constraint>
         <Constraint android:id="@id/zoomControlsView_containerConstraintLayout"
             android:layout_width="0dp"
             android:layout_height="40dp"
-            motion:layout_constraintTop_toTopOf="parent"
             motion:layout_constraintStart_toStartOf="parent"
-            motion:layout_constraintBottom_toBottomOf="parent"
             motion:layout_constraintEnd_toEndOf="parent"
             />
     </ConstraintSet>
@@ -70,11 +54,10 @@
         <Constraint
             android:id="@+id/zoomControlsView_zoomInButton"
             motion:layout_constraintEnd_toEndOf="@id/zoomControlsView_containerConstraintLayout"
-            motion:layout_constraintStart_toEndOf="@id/zoomControlsView_seekbar"
-            android:layout_width="40dp"
+            motion:layout_constraintStart_toStartOf="@id/zoomControlsView_containerConstraintLayout"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             motion:layout_constraintBottom_toBottomOf="@id/zoomControlsView_containerConstraintLayout"
-            android:alpha="0"
             motion:layout_constraintTop_toTopOf="@id/zoomControlsView_containerConstraintLayout" />
         <Constraint
             android:id="@+id/zoomControlsView_seekbar"
@@ -84,14 +67,6 @@
             android:layout_height="40dp"
             android:alpha="0"
             />
-        <Constraint
-            android:id="@+id/zoomControlsView_textView"
-            motion:layout_constraintEnd_toEndOf="@id/zoomControlsView_containerConstraintLayout"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            motion:layout_constraintBottom_toBottomOf="@id/zoomControlsView_containerConstraintLayout"
-            motion:layout_constraintTop_toTopOf="@id/zoomControlsView_containerConstraintLayout"
-            motion:layout_constraintStart_toStartOf="@id/zoomControlsView_containerConstraintLayout" />
         <Constraint
             android:id="@+id/zoomControlsView_containerConstraintLayout"
             android:layout_width="40dp"
