@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.res.ResourcesCompat
 import com.noque.svampeatlas.R
 import kotlinx.android.synthetic.main.view_camera_controls.view.*
 
@@ -16,6 +17,7 @@ class CameraControlsView(context: Context, attrs: AttributeSet?) :
         fun captureButtonPressed()
         fun resetButtonPressed()
         fun photoLibraryButtonPressed()
+        fun actionButtonPressed(state: State)
     }
 
     enum class State {
@@ -27,6 +29,7 @@ class CameraControlsView(context: Context, attrs: AttributeSet?) :
     }
 
     private var listener: Listener? = null
+    private var state: State = State.HIDDEN
 
     private val captureButton by lazy {cameraControlsView_captureButton }
     private val photoLibraryButton by lazy {cameraControlsView_libraryButton }
@@ -46,6 +49,10 @@ class CameraControlsView(context: Context, attrs: AttributeSet?) :
 
         photoLibraryButton.setOnClickListener {
             listener?.photoLibraryButtonPressed()
+        }
+
+        actionButton.setOnClickListener {
+            listener?.actionButtonPressed(state)
         }
     }
 
@@ -73,7 +80,6 @@ class CameraControlsView(context: Context, attrs: AttributeSet?) :
             State.CAPTURE -> {
                 captureButton.visibility = View.VISIBLE
                 spinner.visibility = View.GONE
-                photoLibraryButton.visibility = View.GONE
                 actionButton.visibility = View.GONE
             }
 
@@ -81,12 +87,17 @@ class CameraControlsView(context: Context, attrs: AttributeSet?) :
                 captureButton.visibility = View.GONE
                 spinner.visibility = View.GONE
                 photoLibraryButton.visibility = View.VISIBLE
-                photoLibraryButton.setImageDrawable(resources.getDrawable(R.drawable.icon_back_button, null))
+                photoLibraryButton.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.icon_back_button, null))
                 actionButton.setText(R.string.cameraControlTextButton_usePhoto)
             }
             State.HIDDEN -> {
                 visibility = View.GONE
             }
         }
+    }
+
+    fun rotate(transform: Float, animationDuration: Long) {
+        photoLibraryButton.animate().rotation(transform).setDuration(animationDuration).start()
+        actionButton.animate().rotation(transform).setDuration(animationDuration).start()
     }
 }

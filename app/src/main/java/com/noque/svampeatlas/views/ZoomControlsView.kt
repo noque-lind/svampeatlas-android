@@ -5,6 +5,7 @@ import android.os.CountDownTimer
 import android.os.Handler
 import android.util.AttributeSet
 import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.SeekBar
@@ -14,6 +15,26 @@ import kotlinx.android.synthetic.main.view_zoom_controls.view.*
 import kotlin.concurrent.timer
 
 class ZoomControlsView(context: Context, attrs: AttributeSet?) : MotionLayout(context, attrs) {
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        return when (keyCode) {
+            KeyEvent.KEYCODE_VOLUME_UP -> {
+                seekBar.progress = seekBar.progress - (seekBar.max / 10)
+                countDownTimer.start()
+                if (root.progress == 0F) expand()
+                expand()
+                true
+            }
+            KeyEvent.KEYCODE_VOLUME_DOWN -> {
+                seekBar.progress = seekBar.progress - (seekBar.max / 10)
+                countDownTimer.start()
+                if (root.progress == 0F) expand()
+                true
+            }
+            else -> super.onKeyDown(keyCode, event)
+        }
+    }
+
 
     interface Listener {
         fun zoomLevelSet(zoomRatio: Float)
@@ -33,10 +54,8 @@ class ZoomControlsView(context: Context, attrs: AttributeSet?) : MotionLayout(co
         override fun onFinish() {
             collapse()
         }
-
     }
-    private var minZoomRatio: Float = 0f
-    private var isExpanded = false
+    private val minZoomRatio: Float = 0f
 
     private val seekbarChangeLister = object: SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
@@ -54,7 +73,6 @@ class ZoomControlsView(context: Context, attrs: AttributeSet?) : MotionLayout(co
     private val zoomOutButtonClickListener = View.OnClickListener {
         seekBar.progress = seekBar.progress - (seekBar.max / 10)
         listener?.zoomLevelSet(getZoomRatio(seekBar.progress))
-
         countDownTimer.start()
     }
 
@@ -75,6 +93,7 @@ class ZoomControlsView(context: Context, attrs: AttributeSet?) : MotionLayout(co
     }
 
     private fun setupView() {
+        seekBar.max = 100
         seekBar.setOnSeekBarChangeListener(seekbarChangeLister)
         zoomOutButton.setOnClickListener(zoomOutButtonClickListener)
         zoomInButton.setOnClickListener(zoomInButtonClickListener)
@@ -84,26 +103,24 @@ class ZoomControlsView(context: Context, attrs: AttributeSet?) : MotionLayout(co
         this.listener = listener
     }
 
-    fun configure(zoomRatio: Float, maxZoomRatio: Float, minZoomRatio: Float) {
-        Log.d("Some", "$maxZoomRatio $minZoomRatio")
-        seekBar.max = ((maxZoomRatio * 100) - (minZoomRatio * 100)).toInt()
-        this.minZoomRatio = minZoomRatio
-        setValue(zoomRatio)
-    }
-
     fun setValue(zoomRatio: Float) {
         seekBar.progress = ((zoomRatio * 100) - (minZoomRatio * 100)).toInt()
     }
 
-    fun expand() {
+    private fun expand() {
         root.transitionToEnd()
     }
+
     fun collapse() {
         root.transitionToStart()
-
     }
 
     private fun getZoomRatio(newValue: Int): Float {
-        return (newValue / seekBar.max.toFloat()) * (seekBar.max.toFloat() / 100) + minZoomRatio
+        return newValue.toFloat() / 100
+    }
+
+    fun rotate(transform: Float, animationDuration: Long) {
+        zoomInButton.animate().rotation(transform).setDuration(animationDuration).start()
+        zoomOutButton.animate().rotation(transform).setDuration(animationDuration).start()
     }
 }

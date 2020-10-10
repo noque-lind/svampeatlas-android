@@ -49,12 +49,13 @@ class CameraViewModel(private val type: CameraFragment.Type, application: Applic
     }
 
     fun setImageFile(imageFile: File) {
-        viewModelScope.launch(Dispatchers.Main) {
-            _imageFileState.value = State.Items(imageFile)
-            if (type == CameraFragment.Type.IDENTIFY) {
-                getPredictions(imageFile)
-            }
-        }
+        _imageFileState.postValue(State.Items(imageFile))
+//        viewModelScope.launch(Dispatchers.Main) {
+//            _imageFileState.value = State.Items(imageFile)
+//            if (type == CameraFragment.Type.IDENTIFY) {
+//                getPredictions(imageFile)
+//            }
+//        }
     }
 
     fun setImageFile(imageUri: Uri, file: File) {
