@@ -64,28 +64,28 @@ class CameraControlsView(context: Context, attrs: AttributeSet?) :
         visibility = View.VISIBLE
         when (state) {
             State.CAPTURE_NEW -> {
-                spinner.visibility = View.GONE
+                spinner.visibility = View.INVISIBLE
                 captureButton.visibility = View.VISIBLE
                 photoLibraryButton.visibility = View.VISIBLE
                 actionButton.visibility = View.VISIBLE
                 actionButton.setText(R.string.cameraControlTextButton_noPhoto)
             }
             State.LOADING -> {
-                captureButton.visibility = View.GONE
+                captureButton.visibility = View.INVISIBLE
                 spinner.visibility = View.VISIBLE
-                photoLibraryButton.visibility = View.GONE
-                actionButton.visibility = View.GONE
+                photoLibraryButton.visibility = View.INVISIBLE
+                actionButton.visibility = View.INVISIBLE
             }
 
             State.CAPTURE -> {
                 captureButton.visibility = View.VISIBLE
-                spinner.visibility = View.GONE
-                actionButton.visibility = View.GONE
+                spinner.visibility = View.INVISIBLE
+                actionButton.visibility = View.INVISIBLE
             }
 
             State.CONFIRM -> {
-                captureButton.visibility = View.GONE
-                spinner.visibility = View.GONE
+                captureButton.visibility = View.INVISIBLE
+                spinner.visibility = View.INVISIBLE
                 photoLibraryButton.visibility = View.VISIBLE
                 photoLibraryButton.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.icon_back_button, null))
                 actionButton.setText(R.string.cameraControlTextButton_usePhoto)

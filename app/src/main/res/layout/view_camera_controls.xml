@@ -1,58 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/cameraControlsView_noPhotoButton"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHorizontal_weight="1"
+        android:layout_gravity="center_vertical"
+        android:textAppearance="@style/AppPrimaryHighlighted"
+        app:layout_constraintDimensionRatio="W,1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/cameraControlsView_captureButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/cameraControlsView_captureButton"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintHorizontal_weight="2"
+        android:src="@drawable/selector_capture_button"
+        android:background="@null"
+        app:layout_constraintEnd_toStartOf="@id/cameraControlsView_noPhotoButton"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHeight_max="100dp"
+        app:layout_constraintDimensionRatio="W,1:1"
+        app:layout_constraintStart_toEndOf="@+id/cameraControlsView_libraryButton"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <ImageButton
         android:id="@+id/cameraControlsView_libraryButton"
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHorizontal_weight="1"
         android:adjustViewBounds="true"
         android:background="@null"
-        android:scaleType="centerInside"
+        android:scaleType="fitCenter"
         android:src="@drawable/icon_photo_library"
+        app:layout_constraintDimensionRatio="W,1:1"
+        app:layout_constraintEnd_toStartOf="@id/cameraControlsView_captureButton"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <Button
-            android:id="@+id/cameraControlsView_noPhotoButton"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="16dp"
-            android:textAppearance="@style/AppPrimaryHighlighted"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <ProgressBar
+        android:id="@+id/cameraControlsView_captureButtonSpinner"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/cameraControlsView_captureButton"
+        app:layout_constraintEnd_toEndOf="@id/cameraControlsView_captureButton"
+        app:layout_constraintStart_toStartOf="@+id/cameraControlsView_captureButton"
+        app:layout_constraintTop_toTopOf="@id/cameraControlsView_captureButton" />
 
-        <ProgressBar
-            android:id="@+id/cameraControlsView_captureButtonSpinner"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            style="?android:attr/progressBarStyle"
-            android:visibility="gone"
-            app:layout_constraintTop_toTopOf="@id/cameraControlsView_captureButton"
-            app:layout_constraintBottom_toBottomOf="@id/cameraControlsView_captureButton"
-            app:layout_constraintStart_toStartOf="@id/cameraControlsView_captureButton"
-            app:layout_constraintEnd_toEndOf="@id/cameraControlsView_captureButton"/>
-
-        <ImageButton
-            android:id="@+id/cameraControlsView_captureButton"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scaleType="fitCenter"
-            android:src="@drawable/selector_capture_button"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

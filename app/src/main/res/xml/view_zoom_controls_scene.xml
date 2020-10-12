@@ -6,7 +6,8 @@
     <Transition
         motion:constraintSetEnd="@+id/end"
         motion:constraintSetStart="@id/start"
-        motion:duration="150">
+        motion:motionInterpolator="easeInOut"
+        motion:duration="100">
        <KeyFrameSet>
            <KeyAttribute />
            <KeyAttribute

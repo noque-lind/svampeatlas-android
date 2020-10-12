@@ -50,20 +50,16 @@ class CameraViewModel(private val type: CameraFragment.Type, application: Applic
 
     fun setImageFile(imageFile: File) {
         _imageFileState.postValue(State.Items(imageFile))
-//        viewModelScope.launch(Dispatchers.Main) {
-//            _imageFileState.value = State.Items(imageFile)
-//            if (type == CameraFragment.Type.IDENTIFY) {
-//                getPredictions(imageFile)
-//            }
-//        }
+        if (type == CameraFragment.Type.IDENTIFY) {
+            getPredictions(imageFile)
+        }
     }
 
     fun setImageFile(imageUri: Uri, file: File) {
         _imageFileState.value = State.Loading()
-
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                getApplication<Application>().contentResolver.openInputStream(imageUri)?.let {
+                getApplication<Application>().contentResolver.openInputStream(imageUri)?.use {
                     it.copyTo(file)
                     setImageFile(file)
                 }
@@ -110,7 +106,7 @@ class CameraViewModel(private val type: CameraFragment.Type, application: Applic
     }
 
     private fun getPredictions(imageFile: File) {
-        _predictionResultsState.value = State.Loading()
+        _predictionResultsState.postValue(State.Loading())
 
         viewModelScope.launch {
             DataService.getInstance(getApplication()).getPredictions(imageFile) {

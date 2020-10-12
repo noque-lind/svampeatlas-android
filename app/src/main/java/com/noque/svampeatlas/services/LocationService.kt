@@ -17,6 +17,7 @@ import com.noque.svampeatlas.models.RecoveryAction
 import kotlin.properties.Delegates
 
 
+@SuppressLint("MissingPermission")
 class LocationService(private val applicationContext: Context) {
 
     companion object {
@@ -52,8 +53,6 @@ class LocationService(private val applicationContext: Context) {
     private var runnable: Runnable? = null
 
     private var state: State by Delegates.observable(State.STOPPED) { _, _, newValue ->
-        Log.d(TAG, "Setting location service state to $newValue")
-
         when (newValue) {
             State.LOCATING -> {
                 locationClient = LocationServices.getFusedLocationProviderClient(applicationContext)
@@ -80,8 +79,6 @@ class LocationService(private val applicationContext: Context) {
 
     private val locationCallback = object: LocationCallback() {
         override fun onLocationResult(result: LocationResult?) {
-            Log.d(TAG, "Location recieved")
-
             if (result?.lastLocation != null && result.lastLocation.accuracy > 0 && (SystemClock.elapsedRealtimeNanos() - result.lastLocation.elapsedRealtimeNanos) < 5000000000) {
                 latestLocation = result.lastLocation
 
@@ -137,14 +134,12 @@ class LocationService(private val applicationContext: Context) {
 
 
     private fun requestPermissions() {
-            Log.d(TAG, "Requesting permissions")
             listener?.requestPermission(arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE)
     }
 
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == REQUEST_CODE) {
             if ((grantResults.isNotEmpty() && grantResults.first() == PackageManager.PERMISSION_GRANTED)) {
-                Log.d(TAG,"Permission has now been granted")
                 start()
             } else {
                 listener?.locationRetrievalError(Error.PermissionDenied(applicationContext.resources))
