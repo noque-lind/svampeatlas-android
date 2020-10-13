@@ -208,5 +208,10 @@
 
     <!-- SettingsVC -->
     <string name="settingsVC_title">Indstillinger</string>
+    <string name="navigationItem_SettingsVC">Indstillinger</string>
+    <string name="settings_general_title">Generelt</string>
+    <string name="settings_language_title">Brug altid danske betegnelser</string>
+    <string name="settings_language_on">Brug altid danske navne og beskrivelser uanset telefonens sprogopsætning</string>
+    <string name="settings_language_off">Hvis en oversættelse er tilgængelig, vil lokaliserede navne og beskrivelser vises</string>
 
 </resources>

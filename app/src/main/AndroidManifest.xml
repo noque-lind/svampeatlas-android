@@ -3,6 +3,7 @@
     package="com.noque.svampeatlas">
 
     <application
+        android:name=".utilities.MyApplication"
         android:allowBackup="true"
         android:debuggable="false"
         android:icon="@mipmap/android_app_background"

@@ -2,24 +2,16 @@ package com.noque.svampeatlas.view_models
 
 import android.app.Application
 import android.content.Context
-import android.graphics.Bitmap
-import android.location.Location
-import android.location.LocationProvider
-import android.util.Log
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.*
 import com.google.android.gms.maps.model.LatLng
-import com.google.gson.JsonObject
 import com.google.maps.android.SphericalUtil
 import com.noque.svampeatlas.R
-import com.noque.svampeatlas.extensions.getBitmap
 import com.noque.svampeatlas.extensions.toSimpleString
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.services.DataService
-import com.noque.svampeatlas.services.LocationService
 import com.noque.svampeatlas.services.RoomService
-import com.noque.svampeatlas.utilities.Geometry
-import com.noque.svampeatlas.utilities.SharedPreferencesHelper
+import com.noque.svampeatlas.utilities.SharedPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -27,11 +19,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.util.*
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import com.noque.svampeatlas.view_models.NewObservationViewModel
-import com.noque.svampeatlas.view_models.NewObservationViewModel.DeterminationConfidence
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
 
 
 class NewObservationViewModel(application: Application) : AndroidViewModel(application) {
@@ -113,19 +101,19 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         _useImageLocationPromptState.value = State.Empty()
 
         viewModelScope.launch {
-            SharedPreferencesHelper(getApplication()).getSubstrateID()?.let {
+        SharedPreferences.getSubstrateID()?.let {
                 RoomService.getInstance(getApplication()).getSubstrateWithID(it).onSuccess {
                     _substrate.value = Pair(it, true)
                 }
             }
 
-            SharedPreferencesHelper(getApplication()).getVegetationTypeID()?.let {
+            SharedPreferences.getVegetationTypeID()?.let {
                 RoomService.getInstance(getApplication()).getVegetationTypeWithID(it).onSuccess {
                     _vegetationType.value = Pair(it, true)
                 }
             }
 
-            SharedPreferencesHelper(getApplication()).getHosts()?.let {
+            SharedPreferences.getHosts()?.let {
                 RoomService.getInstance(getApplication()).getHostsWithIds(it).onSuccess {
                     _hosts.value = Pair(it.toMutableList(), true)
                 }
@@ -175,7 +163,7 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
     fun setSubstrate(substrate: Substrate, isLocked: Boolean) {
         _substrate.value = Pair(substrate, isLocked)
 
-        SharedPreferencesHelper(getApplication()).saveSubstrateID(if (isLocked) substrate.id else null)
+        SharedPreferences.saveSubstrateID(if (isLocked) substrate.id else null)
         if (isLocked) {
             viewModelScope.launch {
                 RoomService.getInstance(getApplication()).saveSubstrate(substrate)
@@ -186,7 +174,7 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
     fun setVegetationType(vegetationType: VegetationType, isLocked: Boolean) {
         _vegetationType.value = Pair(vegetationType, isLocked)
 
-        SharedPreferencesHelper(getApplication()).saveVegetationTypeID(if (isLocked) vegetationType.id else null)
+        SharedPreferences.saveVegetationTypeID(if (isLocked) vegetationType.id else null)
 
         if (isLocked) {
             viewModelScope.launch {
@@ -206,7 +194,7 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
 
         _hosts.value = Pair(hosts, isLocked)
 
-        SharedPreferencesHelper(getApplication()).saveHostsID(hosts.map { it.id })
+        SharedPreferences.saveHostsID(hosts.map { it.id })
 
         if (isLocked) {
             viewModelScope.launch {
@@ -225,7 +213,7 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
             if (it.first.remove(host)) _hosts.value = Pair(it.first, isLocked)
         }
 
-        SharedPreferencesHelper(getApplication()).saveHostsID(hosts.value?.first?.map { it.id })
+        SharedPreferences.saveHostsID(hosts.value?.first?.map { it.id })
     }
 
     fun appendImage(imageFile: File) {

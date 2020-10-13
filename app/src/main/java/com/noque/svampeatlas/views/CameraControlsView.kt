@@ -48,7 +48,7 @@ class CameraControlsView(context: Context, attrs: AttributeSet?) :
         }
 
         photoLibraryButton.setOnClickListener {
-            listener?.photoLibraryButtonPressed()
+            if (state == State.CONFIRM) listener?.resetButtonPressed() else listener?.photoLibraryButtonPressed()
         }
 
         actionButton.setOnClickListener {
@@ -61,9 +61,11 @@ class CameraControlsView(context: Context, attrs: AttributeSet?) :
     }
 
     fun configureState(state: State) {
+        this.state = state
         visibility = View.VISIBLE
         when (state) {
             State.CAPTURE_NEW -> {
+                photoLibraryButton.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.icon_photo_library, null))
                 spinner.visibility = View.INVISIBLE
                 captureButton.visibility = View.VISIBLE
                 photoLibraryButton.visibility = View.VISIBLE
@@ -78,6 +80,7 @@ class CameraControlsView(context: Context, attrs: AttributeSet?) :
             }
 
             State.CAPTURE -> {
+                photoLibraryButton.visibility = View.VISIBLE
                 captureButton.visibility = View.VISIBLE
                 spinner.visibility = View.INVISIBLE
                 actionButton.visibility = View.INVISIBLE
@@ -89,6 +92,7 @@ class CameraControlsView(context: Context, attrs: AttributeSet?) :
                 photoLibraryButton.visibility = View.VISIBLE
                 photoLibraryButton.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.icon_back_button, null))
                 actionButton.setText(R.string.cameraControlTextButton_usePhoto)
+                actionButton.visibility = View.VISIBLE
             }
             State.HIDDEN -> {
                 visibility = View.GONE

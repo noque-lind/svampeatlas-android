@@ -41,9 +41,6 @@ class AppRequest<T>(private val type: Type, private val endpoint: API,
             val json = String(
                 response?.data ?: ByteArray(0),
                 Charset.forName(HttpHeaderParser.parseCharset(response?.headers)))
-
-            Log.d("Som", json)
-
             Response.success(
                 Gson().fromJson<T>(json, type),
                 HttpHeaderParser.parseCacheHeaders(response)

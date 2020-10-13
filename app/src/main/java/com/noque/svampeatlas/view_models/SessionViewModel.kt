@@ -1,7 +1,6 @@
 package com.noque.svampeatlas.view_models
 
 import android.app.Application
-import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -10,10 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.services.DataService
 import com.noque.svampeatlas.services.RoomService
-import com.noque.svampeatlas.utilities.SharedPreferencesHelper
-import kotlinx.coroutines.Dispatchers
+import com.noque.svampeatlas.utilities.SharedPreferences
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -55,7 +52,7 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
     val observationUploadState: LiveData<State<Pair<Int, Int>>> get() = _observationUploadState
 
     init {
-        this.token = SharedPreferencesHelper(application).getToken()
+        this.token = SharedPreferences.getToken()
         evaluateLoginState(this.token)
     }
 
@@ -161,7 +158,7 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
 
             it.onSuccess {
                 token = it
-                SharedPreferencesHelper(getApplication()).saveToken(it)
+                SharedPreferences.saveToken(it)
                 getUser(it)
             }
         }
@@ -324,7 +321,7 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun logout() {
-        SharedPreferencesHelper(getApplication()).removeToken()
+       SharedPreferences.removeToken()
         viewModelScope.launch {
             RoomService.getInstance(getApplication()).clearUser()
         }

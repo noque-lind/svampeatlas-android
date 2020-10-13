@@ -45,7 +45,6 @@ class BlankActivity : AppCompatActivity() {
 
 
     // Objects
-
     private lateinit var navController: NavController
     private var isLoggedIn: Boolean? = null
 
@@ -195,7 +194,7 @@ class BlankActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp(AppBarConfiguration(setOf(R.id.loginFragment, R.id.myPageFragment, R.id.addObservationFragment, R.id.mushroomFragment, R.id.nearbyFragment, R.id.cameraFragment), drawerLayout)) || super.onSupportNavigateUp()
+        return navController.navigateUp(AppBarConfiguration(setOf(R.id.loginFragment, R.id.myPageFragment, R.id.addObservationFragment, R.id.mushroomFragment, R.id.nearbyFragment, R.id.cameraFragment, R.id.settingsFragment, R.id.aboutFragment), drawerLayout)) || super.onSupportNavigateUp()
     }
 
     override fun onBackPressed() {

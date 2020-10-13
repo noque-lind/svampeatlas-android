@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.appcompat.widget.Toolbar
@@ -19,11 +20,15 @@
         app:navigationIcon="@drawable/icon_menu_button"
         app:title="@string/settingsVC_title" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment"
+        android:name="com.noque.svampeatlas.fragments.PreferencesFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settingsFragment_toolbar"/>
+        app:layout_constraintTop_toBottomOf="@+id/settingsFragment_toolbar" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

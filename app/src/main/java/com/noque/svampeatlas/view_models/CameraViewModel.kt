@@ -84,27 +84,6 @@ class CameraViewModel(private val type: CameraFragment.Type, application: Applic
         DataService.getInstance(getApplication()).clearRequestsWithTag(TAG)
     }
 
-    fun saveImage(file: File) {
-        (imageFileState.value as? State.Items)?.items?.let {
-//            _imageSaveState.value = State.Loading()
-
-            viewModelScope.launch {
-                val result = it.copyTo(file)
-
-                result.onSuccess {
-//                    _imageSaveState.value = State.Items(it)
-
-                    // If the folder selected is an external media directory, this is unnecessary
-                    // but otherwise other apps will not be able to access our images unless we
-                    // scan them using [MediaScannerConnection]
-
-                    val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(it.extension)
-                    MediaScannerConnection.scanFile(getApplication(), arrayOf(it.absolutePath), arrayOf(mimeType), null)
-                }
-            }
-        }
-    }
-
     private fun getPredictions(imageFile: File) {
         _predictionResultsState.postValue(State.Loading())
 

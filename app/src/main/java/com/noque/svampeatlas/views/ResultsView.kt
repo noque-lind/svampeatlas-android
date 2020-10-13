@@ -27,27 +27,24 @@ import org.w3c.dom.Text
 
 class ResultsView(context: Context?, attrs: AttributeSet?) : LinearLayout(context, attrs) {
 
-    private var titleTextView: TextView
-    private var messageTextView: TextView
-    private var recyclerView: RecyclerView
+    private val titleTextView: TextView
+    private val messageTextView: TextView
+    private val recyclerView: RecyclerView
 
     private val resultsAdapter by lazy { ResultsAdapter() }
-
 
     init {
         val inflater = LayoutInflater.from(getContext())
         inflater.inflate(R.layout.view_results, this)
-
         titleTextView = resultsView_titleTextView
         messageTextView = resultsView_messageTextView
         recyclerView = resultsView_recyclerView
-
         setupViews()
     }
 
     private fun setupViews() {
         recyclerView.apply {
-            this.adapter = resultsAdapter
+            adapter = resultsAdapter
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         }
     }
@@ -58,14 +55,25 @@ class ResultsView(context: Context?, attrs: AttributeSet?) : LinearLayout(contex
 
     fun showResults(results: List<PredictionResult>) {
         titleTextView.text = resources.getString(R.string.resultsView_header_title, results.count())
-        messageTextView.setText(context.getString(R.string.resultsView_header_message).red())
+        messageTextView.text = context.getString(R.string.resultsView_header_message).red()
 
         resultsAdapter.configure(results)
         recyclerView.scrollTo(0,0)
         recyclerView.layoutManager?.scrollToPosition(0)
+
+        titleTextView.animate().alpha(1F).setDuration(1000).start()
+        messageTextView.animate().alpha(1F).setDuration(1000).start()
+        recyclerView.animate().alpha(1F).setDuration(1000).start()
     }
 
     fun showError(error: AppError) {
         resultsAdapter.configure(error)
+        recyclerView.animate().alpha(1F).setDuration(1000).start()
+    }
+
+    fun reset() {
+        titleTextView.animate().alpha(0F).setDuration(1000).start()
+        messageTextView.animate().alpha(0F).setDuration(1000).start()
+        recyclerView.animate().alpha(0F).setDuration(1000).start()
     }
 }
