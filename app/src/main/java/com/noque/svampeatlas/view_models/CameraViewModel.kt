@@ -40,10 +40,6 @@ class CameraViewModel(private val type: CameraFragment.Type, application: Applic
     private val _predictionResultsState by lazy { MutableLiveData<State<List<PredictionResult>>>() }
     val predictionResultsState: LiveData<State<List<PredictionResult>>> get() = _predictionResultsState
 
-    private val _imageSaveState by lazy { MutableLiveData<State<File>>() }
-    val imageSaveState: LiveData<State<File>> get() = _imageSaveState
-
-
     fun start() {
         _imageFileState.value = State.Empty()
     }

@@ -137,12 +137,25 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         )
     ).get(CameraViewModel::class.java) }
 
-    private val newObservationViewModel by lazy { ViewModelProvider(this).get(
+    private val newObservationViewModel by lazy { ViewModelProvider(requireActivity()).get(
         NewObservationViewModel::class.java
     ) }
 
 
     // Listeners
+    override fun positiveButtonPressed() {
+        SharedPreferences.setSaveImages(true)
+        photoFile?.let {
+            GlobalScope.launch {
+                FileManager.saveTempImage(it, FileManager.createFile(requireContext()), requireContext())
+            }
+        }
+    }
+
+    override fun negativeButtonPressed() {
+        SharedPreferences.setSaveImages(false)
+    }
+
     private val resultsAdapterListener by lazy {
         object : ResultsAdapter.Listener {
             override fun reloadSelected() { cameraViewModel.reset() }
@@ -430,7 +443,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                     }
                 })
 
-            cameraViewModel.predictionResultsState.observe(viewLifecycleOwner, androidx.lifecycle.Observer { state ->
+            cameraViewModel.predictionResultsState.observe(viewLifecycleOwner, Observer { state ->
                 when (state) {
                     is State.Loading -> { cameraControlsView.configureState(CameraControlsView.State.LOADING) }
                     is State.Error -> {
@@ -544,19 +557,6 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
             sensorManager?.unregisterListener(sensorEventListener)
             super.onDestroyView()
         }
-
-    override fun positiveButtonPressed() {
-        SharedPreferences.setSaveImages(true)
-        photoFile?.let {
-            GlobalScope.launch {
-                FileManager.saveTempImage(it, FileManager.createFile(requireContext()), requireContext())
-            }
-        }
-    }
-
-    override fun negativeButtonPressed() {
-        SharedPreferences.setSaveImages(false)
-    }
 }
 
 

@@ -80,6 +80,7 @@ class CameraControlsView(context: Context, attrs: AttributeSet?) :
             }
 
             State.CAPTURE -> {
+                photoLibraryButton.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.icon_photo_library, null))
                 photoLibraryButton.visibility = View.VISIBLE
                 captureButton.visibility = View.VISIBLE
                 spinner.visibility = View.INVISIBLE

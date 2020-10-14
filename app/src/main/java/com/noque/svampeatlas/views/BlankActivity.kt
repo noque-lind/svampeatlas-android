@@ -207,6 +207,7 @@ class BlankActivity : AppCompatActivity() {
 
     override fun onPause() {
         if (isFinishing) {
+            // Note: this happens only when application is closed by exiting it probably, meaning that potentially a lot of temp images could end up be saved unintentionally
             FileManager.clearTemporaryFiles()
         }
 

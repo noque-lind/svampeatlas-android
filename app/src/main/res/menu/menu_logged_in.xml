@@ -47,7 +47,7 @@
         <item
             android:title="@string/navigationItem_SettingsVC"
             android:id="@+id/settingsFragment"
-            android:icon="@drawable/icon_about"/>
+            android:icon="@drawable/icons_settings"/>
 
         <item
             android:title="Facebook"

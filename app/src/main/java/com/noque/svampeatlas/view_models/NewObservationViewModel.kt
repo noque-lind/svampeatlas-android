@@ -2,6 +2,7 @@ package com.noque.svampeatlas.view_models
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.*
 import com.google.android.gms.maps.model.LatLng
