@@ -11,7 +11,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.fragments.add_observation.DetailsPickerFragment
-import com.noque.svampeatlas.utilities.SharedPreferencesHelper
+import com.noque.svampeatlas.utilities.SharedPreferences
 import com.noque.svampeatlas.views.HeaderView
 import kotlinx.android.synthetic.main.fragment_details_picker.*
 import kotlinx.android.synthetic.main.fragment_terms.*
@@ -49,8 +49,7 @@ class TermsFragment: DialogFragment() {
         View.OnClickListener {
             when (type) {
                 Type.IDENTIFICATION -> {
-                    SharedPreferencesHelper(requireContext()).setHasAcceptedIdentificationTerms(true)
-
+                    SharedPreferences.setHasAcceptedIdentificationTerms(true)
                 }
             }
 

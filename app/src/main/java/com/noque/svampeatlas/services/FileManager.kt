@@ -1,8 +1,12 @@
 package com.noque.svampeatlas.services
 
 import android.content.Context
+import android.media.MediaScannerConnection
+import android.webkit.MimeTypeMap
 import com.noque.svampeatlas.R
-import com.noque.svampeatlas.views.BlankActivity
+import com.noque.svampeatlas.extensions.copyTo
+import com.noque.svampeatlas.models.AppError
+import com.noque.svampeatlas.models.Result
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -39,5 +43,12 @@ object FileManager {
         return if (cacheDir != null && cacheDir.exists()) cacheDir else appContext.cacheDir
     }
 
-
+    suspend fun saveTempImage(tempImageFile: File, toNewFile: File, context: Context): Result<File, AppError> {
+        val result = tempImageFile.copyTo(toNewFile)
+        result.onSuccess {
+            val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(it.extension)
+            MediaScannerConnection.scanFile(context, arrayOf(it.absolutePath), arrayOf(mimeType), null)
+        }
+        return result
+    }
 }

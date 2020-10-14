@@ -10,7 +10,7 @@ import androidx.core.graphics.ColorUtils
 import com.noque.svampeatlas.R
 import kotlinx.android.synthetic.main.view_spinner.view.*
 
-class SpinnerView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(context, attrs) {
+class SpinnerView(context: Context, attrs: AttributeSet?) : ConstraintLayout(context, attrs) {
 
     private val progressBar by lazy { spinnerView_progressBar }
 

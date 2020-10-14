@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.net.Uri
 import android.util.Log
+import android.view.View.*
 import com.noque.svampeatlas.services.FileManager
 import java.lang.Exception
 import java.text.SimpleDateFormat
@@ -44,7 +45,6 @@ class BlankActivity : AppCompatActivity() {
 
 
     // Objects
-
     private lateinit var navController: NavController
     private var isLoggedIn: Boolean? = null
 
@@ -175,12 +175,8 @@ class BlankActivity : AppCompatActivity() {
 
     fun hideSystemBars() {
         val flags = (
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        or View.SYSTEM_UI_FLAG_FULLSCREEN
-                        or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        View.SYSTEM_UI_FLAG_FULLSCREEN or
+                                SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or SYSTEM_UI_FLAG_LAYOUT_STABLE or SYSTEM_UI_FLAG_LOW_PROFILE
                 )
 
         window.decorView.systemUiVisibility = flags
@@ -198,7 +194,7 @@ class BlankActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp(AppBarConfiguration(setOf(R.id.loginFragment, R.id.myPageFragment, R.id.addObservationFragment, R.id.mushroomFragment, R.id.nearbyFragment, R.id.cameraFragment), drawerLayout)) || super.onSupportNavigateUp()
+        return navController.navigateUp(AppBarConfiguration(setOf(R.id.loginFragment, R.id.myPageFragment, R.id.addObservationFragment, R.id.mushroomFragment, R.id.nearbyFragment, R.id.cameraFragment, R.id.settingsFragment, R.id.aboutFragment), drawerLayout)) || super.onSupportNavigateUp()
     }
 
     override fun onBackPressed() {
@@ -211,6 +207,7 @@ class BlankActivity : AppCompatActivity() {
 
     override fun onPause() {
         if (isFinishing) {
+            // Note: this happens only when application is closed by exiting it probably, meaning that potentially a lot of temp images could end up be saved unintentionally
             FileManager.clearTemporaryFiles()
         }
 

@@ -42,6 +42,11 @@
             android:icon="@drawable/icon_about"/>
 
         <item
+            android:title="@string/navigationItem_SettingsVC"
+            android:id="@+id/settingsFragment"
+            android:icon="@drawable/icons_settings"/>
+
+        <item
             android:title="Facebook"
             android:id="@+id/facebook"
             android:icon="@drawable/icon_fb"/>

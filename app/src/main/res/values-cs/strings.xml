@@ -320,6 +320,13 @@
     <!-- Utilities -->
     <string name="utilities_photoAlbumName">Atlas hub</string>
 
+    <!-- SettingsVC -->
+    <string name="settingsVC_title">Settings</string>
+    <string name="navigationItem_SettingsVC">Settings</string>
+    <string name="settings_general_title">General</string>
+    <string name="settings_language_title">Always use Danish names</string>
+    <string name="settings_language_on">Will always use Danish names and descriptions without regard for the phone language</string>
+    <string name="settings_language_off">If a translation is present, the app will use localized names and descriptions</string>
 
 
 </resources>

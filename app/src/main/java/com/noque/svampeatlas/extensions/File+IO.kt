@@ -78,22 +78,6 @@ suspend fun File.copyTo(file: File): Result<File, AppError> = withContext(Dispat
     } catch (exception: IOException) {
         Result.Error<File, AppError>(AppError("", "", null))
     }
-
-//        val inputStream = this@copyTo.inputStream()
-//
-//        val buffer = ByteArray(1024)
-//        var length = inputStream.read(buffer)
-//
-//        //Transferring data
-//        while (length != -1) {
-//            outputStream.write(buffer, 0, length)
-//            length = inputStream.read(buffer)
-//        }
-//        //Finalizing
-//        outputStream.flush()
-//        outputStream.close()
-//        inputStream.close()
-//        return@withContext 2
     }
 
 

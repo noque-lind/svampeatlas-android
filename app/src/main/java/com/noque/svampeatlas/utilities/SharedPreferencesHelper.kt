@@ -1,20 +1,26 @@
 package com.noque.svampeatlas.utilities
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.preference.PreferenceManager
 
-class SharedPreferencesHelper(context: Context) {
+object SharedPreferences {
 
-    companion object {
-        private val TOKEN_KEY = "TOKEN_KEY"
-        private val LOCKED_SUBSTRATE_ID = "LOCKED_SUBSTRATE_ID"
-        private val LOCKED_VEGETATIONTYPE_ID = "LOCKED_VEGETATIONTYPE_ID"
-        private val LOCKED_HOSTS = "LOCKED_HOSTS"
-        private val HAS_ACCEPTED_IDENTIFCATION_TERMS = "HAS_ACCEPTED_IDENTIFCATION_TERMS"
+    private const val TOKEN_KEY = "TOKEN_KEY"
+    private const val LOCKED_SUBSTRATE_ID = "LOCKED_SUBSTRATE_ID"
+    private const val LOCKED_VEGETATIONTYPE_ID = "LOCKED_VEGETATIONTYPE_ID"
+    private const val LOCKED_HOSTS = "LOCKED_HOSTS"
+    private const val HAS_ACCEPTED_IDENTIFCATION_TERMS = "HAS_ACCEPTED_IDENTIFCATION_TERMS"
+    private const val ALWAYS_USE_DK = "ALWAYS_USE_DK"
+    private const val SAVE_IMAGES = "SAVE_IMAGES"
+    private const val SAVE_IMAGES_DECIDED = "SAVE_IMAGES_DECIDED"
+
+    private lateinit var prefs: SharedPreferences
+
+    fun init(context: Context) {
+        prefs = PreferenceManager.getDefaultSharedPreferences(context)
     }
-
-    private val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
 
     fun saveToken(token: String) {
         prefs.edit().putString(TOKEN_KEY, token).apply()
@@ -30,12 +36,14 @@ class SharedPreferencesHelper(context: Context) {
 
     fun saveSubstrateID(id: Int?) {
         if (id != null)  prefs.edit().putInt(LOCKED_SUBSTRATE_ID, id).apply() else prefs.edit().remove(
-            LOCKED_SUBSTRATE_ID).apply()
+            LOCKED_SUBSTRATE_ID
+        ).apply()
     }
 
     fun saveVegetationTypeID(id: Int?) {
         if (id != null) prefs.edit().putInt(LOCKED_VEGETATIONTYPE_ID, id).apply() else prefs.edit().remove(
-            LOCKED_VEGETATIONTYPE_ID).apply()
+            LOCKED_VEGETATIONTYPE_ID
+        ).apply()
     }
 
     fun saveHostsID(hostsID: List<Int>?) {
@@ -72,5 +80,22 @@ class SharedPreferencesHelper(context: Context) {
 
     fun setHasAcceptedIdentificationTerms(value: Boolean) {
         prefs.edit().putBoolean(HAS_ACCEPTED_IDENTIFCATION_TERMS, value).apply()
+    }
+
+    fun getAlwaysUseDKNames(): Boolean {
+        return prefs.getBoolean(ALWAYS_USE_DK, false)
+    }
+
+    fun getSaveImages(): Boolean? {
+        return if (!prefs.getBoolean(SAVE_IMAGES_DECIDED, false)) {
+            null
+        } else {
+            prefs.getBoolean(SAVE_IMAGES, false)
+        }
+    }
+
+    fun setSaveImages(newValue: Boolean) {
+
+        prefs.edit().putBoolean(SAVE_IMAGES, newValue).putBoolean(SAVE_IMAGES_DECIDED, true).apply()
     }
 }

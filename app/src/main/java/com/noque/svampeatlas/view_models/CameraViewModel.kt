@@ -40,16 +40,12 @@ class CameraViewModel(private val type: CameraFragment.Type, application: Applic
     private val _predictionResultsState by lazy { MutableLiveData<State<List<PredictionResult>>>() }
     val predictionResultsState: LiveData<State<List<PredictionResult>>> get() = _predictionResultsState
 
-    private val _imageSaveState by lazy { MutableLiveData<State<File>>() }
-    val imageSaveState: LiveData<State<File>> get() = _imageSaveState
-
-
     fun start() {
         _imageFileState.value = State.Empty()
     }
 
     fun setImageFile(imageFile: File) {
-        _imageFileState.value = State.Items(imageFile)
+        _imageFileState.postValue(State.Items(imageFile))
         if (type == CameraFragment.Type.IDENTIFY) {
             getPredictions(imageFile)
         }
@@ -57,10 +53,9 @@ class CameraViewModel(private val type: CameraFragment.Type, application: Applic
 
     fun setImageFile(imageUri: Uri, file: File) {
         _imageFileState.value = State.Loading()
-
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                getApplication<Application>().contentResolver.openInputStream(imageUri)?.let {
+                getApplication<Application>().contentResolver.openInputStream(imageUri)?.use {
                     it.copyTo(file)
                     setImageFile(file)
                 }
@@ -85,29 +80,8 @@ class CameraViewModel(private val type: CameraFragment.Type, application: Applic
         DataService.getInstance(getApplication()).clearRequestsWithTag(TAG)
     }
 
-    fun saveImage(file: File) {
-        (imageFileState.value as? State.Items)?.items?.let {
-//            _imageSaveState.value = State.Loading()
-
-            viewModelScope.launch {
-                val result = it.copyTo(file)
-
-                result.onSuccess {
-//                    _imageSaveState.value = State.Items(it)
-
-                    // If the folder selected is an external media directory, this is unnecessary
-                    // but otherwise other apps will not be able to access our images unless we
-                    // scan them using [MediaScannerConnection]
-
-                    val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(it.extension)
-                    MediaScannerConnection.scanFile(getApplication(), arrayOf(it.absolutePath), arrayOf(mimeType), null)
-                }
-            }
-        }
-    }
-
     private fun getPredictions(imageFile: File) {
-        _predictionResultsState.value = State.Loading()
+        _predictionResultsState.postValue(State.Loading())
 
         viewModelScope.launch {
             DataService.getInstance(getApplication()).getPredictions(imageFile) {

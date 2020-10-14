@@ -11,6 +11,8 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -27,6 +29,7 @@ import com.noque.svampeatlas.extensions.pxToDp
 import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.services.LocationService
+import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.views.BlankActivity
 import com.noque.svampeatlas.views.SpinnerView
 import com.noque.svampeatlas.view_holders.AddImageViewHolder
@@ -86,20 +89,14 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     private var toast: Toast? = null
 
     // Views
-    private var viewPager: ViewPager? = null
-    private var addImagesRecyclerView: RecyclerView? = null
-    private var tabLayout: TabLayout? = null
-    private var spinnerView: SpinnerView? = null
+    private var viewPager by autoCleared<ViewPager>()
+    private var addImagesRecyclerView by autoCleared<RecyclerView>()
+    private var tabLayout by autoCleared<TabLayout>()
+    private var spinnerView by autoCleared<SpinnerView>()
 
     // View models
-    private val newObservationViewModel by lazy {
-        ViewModelProviders.of(requireActivity()).get(NewObservationViewModel::class.java)
-    }
-
-    private val sessionViewModel by lazy {
-        ViewModelProviders.of(requireActivity()).get(SessionViewModel::class.java)
-    }
-
+    private val newObservationViewModel by lazy { ViewModelProvider(requireActivity()).get(NewObservationViewModel::class.java)}
+    private val sessionViewModel by lazy { ViewModelProvider(requireActivity()).get(SessionViewModel::class.java)}
 
     // Adapters
     private val addImagesAdapter by lazy {
@@ -177,17 +174,18 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                 isCurrentlyActive: Boolean
             ) {
 
-                val trashIcon = resources.getDrawable(R.drawable.ic_delete_black_24dp, null)
-                trashIcon.bounds = Rect(
-                    viewHolder.itemView.left + (viewHolder.itemView.width / 2) - (trashIcon.intrinsicWidth / 2),
-                    ((viewHolder.itemView.height) / 2) - (trashIcon.intrinsicHeight / 2) + recyclerView.paddingTop,
-                    viewHolder.itemView.right - (viewHolder.itemView.width / 2) + (trashIcon.intrinsicWidth / 2),
-                    (viewHolder.itemView.height / 2) + (trashIcon.intrinsicHeight / 2) + recyclerView.paddingTop
-                )
+                val trashIcon = ResourcesCompat.getDrawable(resources, R.drawable.ic_delete_black_24dp, null)?.apply {
+                    bounds = Rect(
+                        viewHolder.itemView.left + (viewHolder.itemView.width / 2) - (intrinsicWidth / 2),
+                        ((viewHolder.itemView.height) / 2) - (intrinsicHeight / 2) + recyclerView.paddingTop,
+                        viewHolder.itemView.right - (viewHolder.itemView.width / 2) + (intrinsicWidth / 2),
+                        (viewHolder.itemView.height / 2) + (intrinsicHeight / 2) + recyclerView.paddingTop
+                    )
+                }
 
                 viewHolder.itemView.alpha = 1 - (-(dY) / viewHolder.itemView.height)
 
-                trashIcon.draw(c)
+                trashIcon?.draw(c)
                 super.onChildDraw(
                     c,
                     recyclerView,
@@ -289,9 +287,9 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     private fun setupView() {
         (requireActivity() as BlankActivity).setSupportActionBar(addObservationFragment_toolbar)
 
-        tabLayout?.setupWithViewPager(viewPager)
+        tabLayout.setupWithViewPager(viewPager)
 
-        addImagesRecyclerView?.apply {
+        addImagesRecyclerView.apply {
             val myHelper = ItemTouchHelper(imageSwipedCallback)
             myHelper.attachToRecyclerView(this)
 
@@ -302,7 +300,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         }
 
         viewPager.apply {
-            this?.adapter = informationAdapter
+            adapter = informationAdapter
         }
     }
 
@@ -310,7 +308,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         sessionViewModel.observationUploadState.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is State.Items -> {
-                    spinnerView?.stopLoading()
+                    spinnerView.stopLoading()
 
                     val bitmap = BitmapFactory.decodeResource(
                         resources,
@@ -331,11 +329,11 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                 }
 
                 is State.Loading -> {
-                    spinnerView?.startLoading()
+                    spinnerView.startLoading()
                 }
 
                 is State.Error -> {
-                    spinnerView?.stopLoading()
+                    spinnerView.stopLoading()
 
                     val bitmap = BitmapFactory.decodeResource(
                         resources,
@@ -394,7 +392,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         })
 
         newObservationViewModel.locality.observe(viewLifecycleOwner, Observer {
-            if (viewPager?.currentItem == Category.LOCALITY.ordinal) {
+            if (viewPager.currentItem == Category.LOCALITY.ordinal) {
                 localityIdShown = it?.id ?: DEFAULT_LOCALITY_ID
             } else {
                 it?.let {
@@ -419,7 +417,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         })
 
         newObservationViewModel.localityState.observe(viewLifecycleOwner, Observer { state ->
-            if (viewPager?.currentItem == Category.LOCALITY.ordinal) return@Observer
+            if (viewPager.currentItem == Category.LOCALITY.ordinal) return@Observer
 
             when (state) {
                 is State.Error -> {
@@ -450,19 +448,19 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         result.onError {
             when (it) {
                 is NewObservationViewModel.Error.NoLocationDataError -> {
-                    viewPager?.currentItem = Category.LOCALITY.ordinal
+                    viewPager.currentItem = Category.LOCALITY.ordinal
                 }
 
                 is NewObservationViewModel.Error.NoSubstrateError -> {
-                    viewPager?.currentItem = Category.DETAILS.ordinal
+                    viewPager.currentItem = Category.DETAILS.ordinal
                 }
 
                 is NewObservationViewModel.Error.NoVegetationTypeError -> {
-                    viewPager?.currentItem = Category.DETAILS.ordinal
+                    viewPager.currentItem = Category.DETAILS.ordinal
                 }
 
                 is NewObservationViewModel.Error.NoMushroomError -> {
-                    viewPager?.currentItem = Category.SPECIES.ordinal
+                    viewPager.currentItem = Category.SPECIES.ordinal
                 }
             }
 
@@ -497,21 +495,13 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
             }
 
     private fun reset() {
-        viewPager?.currentItem = Category.SPECIES.ordinal
+        viewPager.currentItem = Category.SPECIES.ordinal
         if (localityIdShown == LOCALITY_ID_FOR_ERROR) localityIdShown = DEFAULT_LOCALITY_ID
         newObservationViewModel.reset()
     }
 
     override fun onDestroyView() {
         locationService.setListener(null)
-        addImagesRecyclerView?.adapter = null
-        viewPager?.adapter = null
-
-        addImagesRecyclerView = null
-        viewPager = null
-        tabLayout = null
-        spinnerView = null
-
         super.onDestroyView()
     }
 }

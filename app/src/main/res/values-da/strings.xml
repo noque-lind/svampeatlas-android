@@ -205,4 +205,13 @@
     <string name="searchBar_placeholder">Søg efter en art her ...</string>
     <!-- CommentsTableView -->
     <string name="commentsTableView_cell_title">Skriv en kommentar</string>
+
+    <!-- SettingsVC -->
+    <string name="settingsVC_title">Indstillinger</string>
+    <string name="navigationItem_SettingsVC">Indstillinger</string>
+    <string name="settings_general_title">Generelt</string>
+    <string name="settings_language_title">Brug altid danske betegnelser</string>
+    <string name="settings_language_on">Brug altid danske navne og beskrivelser uanset telefonens sprogopsætning</string>
+    <string name="settings_language_off">Hvis en oversættelse er tilgængelig, vil lokaliserede navne og beskrivelser vises</string>
+
 </resources>

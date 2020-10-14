@@ -398,7 +398,7 @@ class DetailsFragment : Fragment() {
                     takesSelectionButton?.setOnClickListener(takesSelectionButtonPressed)
                     takesSelectionButton?.setBackgroundColor(
                         ContextCompat.getColor(
-                            context!!,
+                            requireContext(),
                             R.color.colorGreen
                         )
                     )
@@ -408,7 +408,7 @@ class DetailsFragment : Fragment() {
                     takesSelectionButton?.setOnClickListener(takesSelectionButtonPressed)
                     takesSelectionButton?.setBackgroundColor(
                         ContextCompat.getColor(
-                            context!!,
+                            requireContext(),
                             R.color.colorRed
                         )
                     )

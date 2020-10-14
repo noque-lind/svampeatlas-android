@@ -17,7 +17,7 @@ import com.noque.svampeatlas.R
 import com.noque.svampeatlas.services.DataService
 import kotlinx.android.synthetic.main.view_mushroom.view.*
 
-class MushroomView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(context, attrs) {
+class MushroomView(context: Context, attrs: AttributeSet?) : ConstraintLayout(context, attrs) {
 
     interface Listener {
         fun onClicked(mushroom: Mushroom)

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/zoomControlsView_root"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layoutDescription="@xml/view_zoom_controls_scene">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/zoomControlsView_containerConstraintLayout"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/zoom_controls_view_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/zoomControlsView_zoomOutButton"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:background="@android:color/transparent"
+        android:layout_width="40dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        android:src="@drawable/ic_baseline_zoom_out_24"
+        app:layout_constraintBottom_toBottomOf="@id/zoomControlsView_containerConstraintLayout"
+        app:layout_constraintEnd_toStartOf="@id/zoomControlsView_seekbar"
+        app:layout_constraintStart_toStartOf="@id/zoomControlsView_containerConstraintLayout"
+        app:layout_constraintTop_toTopOf="@id/zoomControlsView_containerConstraintLayout" />
+
+    <ImageButton
+        android:id="@+id/zoomControlsView_zoomInButton"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:background="@android:color/transparent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/ic_baseline_zoom_in_24"
+        app:layout_constraintBottom_toBottomOf="@id/zoomControlsView_containerConstraintLayout"
+        app:layout_constraintEnd_toEndOf="@id/zoomControlsView_containerConstraintLayout"
+        app:layout_constraintStart_toEndOf="@id/zoomControlsView_containerConstraintLayout"
+        app:layout_constraintTop_toTopOf="@id/zoomControlsView_containerConstraintLayout" />
+
+    <SeekBar
+        android:id="@+id/zoomControlsView_seekbar"
+        style="@android:style/Widget.Material.SeekBar"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/zoomControlsView_zoomInButton"
+        app:layout_constraintStart_toEndOf="@id/zoomControlsView_zoomOutButton"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.motion.widget.MotionLayout>

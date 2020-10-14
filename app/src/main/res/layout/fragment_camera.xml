@@ -1,124 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/cameraFragment_root"
+<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cameraFragment_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/black"
-    android:fitsSystemWindows="false"
     android:theme="@style/Light"
+    app:layoutDescription="@xml/fragment_camera_scene"
     tools:context=".fragments.CameraFragment">
 
+
     <androidx.appcompat.widget.Toolbar
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:elevation="0dp"
-        app:title=" "
         android:id="@+id/cameraFragment_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
-        app:navigationIcon="@drawable/icon_menu_button" />
+        app:elevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/icon_menu_button"
+        app:title=" " />
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/cameraFragment_cameraView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="H,3:4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cameraFragment_toolbar" />
+
+    <com.noque.svampeatlas.views.BackgroundView
+        android:id="@+id/cameraFragment_backgroundView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@id/cameraFragment_cameraView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/cameraFragment_cameraView" />
 
     <ImageView
         android:id="@+id/cameraFragment_imageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:visibility="gone"
+        android:background="@android:color/transparent"
         android:scaleType="fitCenter"
-        app:layout_constraintTop_toTopOf="@id/cameraFragment_textureView"
-        app:layout_constraintBottom_toBottomOf="@id/cameraFragment_textureView"
-        app:layout_constraintStart_toStartOf="@id/cameraFragment_textureView"
-        app:layout_constraintEnd_toEndOf="@id/cameraFragment_textureView" />
+        app:layout_constraintBottom_toBottomOf="@id/cameraFragment_cameraView"
+        app:layout_constraintEnd_toEndOf="@id/cameraFragment_cameraView"
+        app:layout_constraintStart_toStartOf="@id/cameraFragment_cameraView"
+        app:layout_constraintTop_toTopOf="@id/cameraFragment_cameraView" />
 
-    <TextureView
-        android:id="@+id/cameraFragment_textureView"
+    <com.noque.svampeatlas.views.ResultsView
+        android:id="@+id/cameraFragment_resultsView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="3:4"
+        android:background="#B2000000"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cameraFragment_toolbar" />
+        app:layout_constraintTop_toTopOf="@id/cameraFragment_cameraControlsView" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cameraFragment_cameraViewConstraintLayout"
-        android:layout_width="match_parent"
+    <com.noque.svampeatlas.views.CameraControlsView
+        android:id="@+id/cameraFragment_cameraControlsView"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#B3000000"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/cameraFragment_textureView"
-        app:layout_constraintBottom_toBottomOf="@+id/cameraFragment_backgroundView"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cameraFragment_cameraView" />
 
-        <com.noque.svampeatlas.views.ResultsView
-            android:id="@+id/cameraFragment_resultsView"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-        <Button
-            android:id="@+id/cameraFragment_noPhotoButton"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="16dp"
-            android:textAppearance="@style/AppPrimaryHighlighted"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-
-        <ProgressBar
-            android:id="@+id/cameraFragment_captureButtonSpinner"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            style="?android:attr/progressBarStyle"
-            android:visibility="gone"
-            app:layout_constraintTop_toTopOf="@id/cameraFragment_captureButton"
-            app:layout_constraintBottom_toBottomOf="@id/cameraFragment_captureButton"
-            app:layout_constraintStart_toStartOf="@id/cameraFragment_captureButton"
-            app:layout_constraintEnd_toEndOf="@id/cameraFragment_captureButton"/>
-
-        <ImageButton
-            android:id="@+id/cameraFragment_captureButton"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scaleType="fitCenter"
-            android:src="@drawable/selector_capture_button"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageButton
-            android:id="@+id/cameraFragment_libraryButton"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:adjustViewBounds="true"
-            android:background="@null"
-            android:scaleType="centerInside"
-            android:src="@drawable/icon_photo_library"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <com.noque.svampeatlas.views.BackgroundView
-        android:id="@+id/cameraFragment_backgroundView"
+    <com.noque.svampeatlas.views.ZoomControlsView
+        android:id="@+id/cameraFragment_zoomControlsView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="@id/cameraFragment_cameraView" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.motion.widget.MotionLayout>

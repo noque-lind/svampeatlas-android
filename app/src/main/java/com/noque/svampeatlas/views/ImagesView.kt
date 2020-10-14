@@ -14,7 +14,7 @@ import com.noque.svampeatlas.models.Image
 import com.noque.svampeatlas.R
 import kotlinx.android.synthetic.main.view_images.view.*
 
-class ImagesView(context: Context?, attrs: AttributeSet?) : ConstraintLayout(context, attrs) {
+class ImagesView(context: Context, attrs: AttributeSet?) : ConstraintLayout(context, attrs) {
 
     private val imagesAdapter by lazy {
         val adapter = ImagesAdapter()
