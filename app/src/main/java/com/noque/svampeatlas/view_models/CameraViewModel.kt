@@ -85,8 +85,8 @@ class CameraViewModel(private val type: CameraFragment.Type, application: Applic
 
         viewModelScope.launch {
             DataService.getInstance(getApplication()).getPredictions(imageFile) {
-                it.onError { _predictionResultsState.value = State.Error(it) }
-                it.onSuccess { _predictionResultsState.value = State.Items(it) }
+                it.onError { _predictionResultsState.postValue(State.Error(it)) }
+                it.onSuccess { _predictionResultsState.postValue(State.Items(it)) }
             }
         }
     }

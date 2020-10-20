@@ -97,7 +97,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        if (requestCode == CODE_PERMISSION) {
+        if (requestCode == CODE_PERMISSION && view != null) {
             startSessionIfNeeded()
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
