@@ -1,5 +1,6 @@
 package com.noque.svampeatlas.fragments
 
+import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import android.graphics.Point
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.widget.Toolbar
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
@@ -28,7 +30,9 @@ import com.noque.svampeatlas.extensions.dpToPx
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.utilities.DispatchGroup
 import com.noque.svampeatlas.utilities.OpenStreetMapTileProvider
+import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.views.BackgroundView
+import kotlinx.android.synthetic.main.activity_maps.*
 
 
 data class ObservationItem(val observation: Observation) : ClusterItem {
@@ -68,8 +72,7 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     }
 
     // Objects
-
-    private var dispatchGroup = DispatchGroup()
+    private var dispatchGroup = DispatchGroup("MapFragment")
     private var listener: Listener? = null
     private var clusterManager: ClusterManager<ObservationItem>? = null
 
@@ -82,10 +85,19 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     private var circleOverlays = mutableListOf<Circle>()
 
     // Views
-    private var styleSelector: TabLayout? = null
-    private var mapFragment: SupportMapFragment? = null
-    private var backgroundView: BackgroundView? = null
-    private var googleMap: GoogleMap? = null
+    private var styleSelector by autoCleared<TabLayout>()
+    private var backgroundView by autoCleared<BackgroundView>()
+    private var mapView by autoCleared<MapView> {
+        it?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
+        it?.onDestroy()
+    }
+
+    private var googleMap by autoCleared<GoogleMap> {
+        it?.setOnCameraIdleListener(null)
+        it?.setOnMarkerClickListener(null)
+        it?.setOnMapClickListener(null)
+        it?.clear()
+    }
 
     // Listeners
     private val onClickListener by lazy {
@@ -93,7 +105,6 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
             listener?.onClick()
         }
     }
-
 
     private val onMarkerClickListener by lazy {
         GoogleMap.OnMarkerClickListener {
@@ -116,15 +127,9 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
             override fun onTabSelected(tab: TabLayout.Tab) {
                 when (tab.position) {
-                    0 -> {
-                        setType(Category.REGULAR)
-                    }
-                    1 -> {
-                        setType(Category.SATELLITE)
-                    }
-                    2 -> {
-                        setType(Category.TOPOGRAPHY)
-                    }
+                    0 -> setType(Category.REGULAR)
+                    1 -> setType(Category.SATELLITE)
+                    2 -> setType(Category.TOPOGRAPHY)
                 }
             }
         }
@@ -135,7 +140,7 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
         it.items.forEach {
             builder.include(it.position)
         }
-        googleMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 300))
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 300))
         true
     }}
 
@@ -149,163 +154,182 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
 
     // Forced to put the whole fragment as listener, as it was impossible to remove just a listener var/object within the callback
     override fun onGlobalLayout() {
-        if (mapFragment?.view?.height != 0 && mapFragment?.view?.width != 0) {
-            mapFragment?.view?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
+        if (mapView.height != 0 && mapView.width != 0) {
+            mapView.viewTreeObserver.removeOnGlobalLayoutListener(this)
             dispatchGroup.leave()
         }
     }
 
     private val onMapReadyCallBack by lazy {
         OnMapReadyCallback {
-            it.setOnMapClickListener(onClickListener)
-            googleMap = it
-            googleMap?.uiSettings?.isIndoorLevelPickerEnabled = false
-            googleMap?.uiSettings?.isMapToolbarEnabled = false
-            googleMap?.uiSettings?.isCompassEnabled = false
-            googleMap?.setOnMarkerClickListener(onMarkerClickListener)
+            googleMap = it.apply {
+                uiSettings.isIndoorLevelPickerEnabled = false
+                uiSettings.isMapToolbarEnabled = false
+                uiSettings.isCompassEnabled = false
+                setOnMarkerClickListener(onMarkerClickListener)
+                setOnMapClickListener(onClickListener)
+            }
             setType(Category.REGULAR)
             dispatchGroup.leave()
         }
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_map, container, false)
-    }
+    ): View? = inflater.inflate(R.layout.fragment_map, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         initViews()
         setupViews()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        dispatchGroup.notify(Runnable {
+            mapView.onStart()
+        })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        dispatchGroup.notify(Runnable {
+            mapView.onResume()
+        })
+    }
+
+    override fun onPause() {
+        dispatchGroup.notify(Runnable {
+            mapView.onPause()
+        })
+        super.onPause()
+    }
+
+    override fun onStop() {
+        dispatchGroup.notify(Runnable {
+            mapView.onStop()
+        })
+        super.onStop()
     }
 
     private fun initViews() {
         styleSelector = mapFragment_tabLayout
         backgroundView = fragmentMap_backgroundView
-        mapFragment =
-            childFragmentManager.findFragmentById(R.id.fragmentMap_supportMapFragment) as SupportMapFragment
+        mapView = fragmentMap_mapView
     }
 
     private fun setupViews() {
-        backgroundView?.setLoading()
-
-        // Making sure that all the called functions will not be called unless map has been returned.
         dispatchGroup.enter()
-        mapFragment?.getMapAsync(onMapReadyCallBack)
-        mapFragment?.view?.viewTreeObserver?.let {
-            dispatchGroup.enter()
-            it.addOnGlobalLayoutListener(this)
-        }
+        dispatchGroup.enter()
+        backgroundView.setLoading()
+        mapView.viewTreeObserver.addOnGlobalLayoutListener(this)
+        mapView.postDelayed({
+            mapView.onCreate(null)
+            mapView.getMapAsync(onMapReadyCallBack)
+        }, 10)
     }
 
     fun showStyleSelector(show: Boolean) {
-        styleSelector?.visibility = if (show) View.VISIBLE else View.GONE
-        styleSelector?.addOnTabSelectedListener(onTabChangeListener)
+        styleSelector.visibility = if (show) View.VISIBLE else View.GONE
+        styleSelector.addOnTabSelectedListener(onTabChangeListener)
     }
 
     fun setType(category: Category) {
-        dispatchGroup.notify {
+        dispatchGroup.notify(Runnable {
             tileOverlay?.remove()
             tileOverlay = null
-
             when (category) {
-                Category.REGULAR -> googleMap?.mapType = GoogleMap.MAP_TYPE_TERRAIN
-                Category.SATELLITE -> googleMap?.mapType = GoogleMap.MAP_TYPE_SATELLITE
+                Category.REGULAR -> googleMap.mapType = GoogleMap.MAP_TYPE_TERRAIN
+                Category.SATELLITE -> googleMap.mapType = GoogleMap.MAP_TYPE_SATELLITE
                 Category.TOPOGRAPHY -> {
-                    googleMap?.mapType = GoogleMap.MAP_TYPE_NONE
-                    tileOverlay = googleMap?.addTileOverlay(
+                    googleMap.mapType = GoogleMap.MAP_TYPE_NONE
+                    tileOverlay = googleMap.addTileOverlay(
                         TileOverlayOptions().tileProvider(OpenStreetMapTileProvider())
                     )
                 }
             }
-        }
+        })
     }
 
-    fun setListener(listener: Listener?, disableGestures: Boolean) {
-        this.listener = listener
-
-        if (disableGestures) {
-            dispatchGroup.notify {
-                googleMap?.uiSettings?.isRotateGesturesEnabled = false
-                googleMap?.uiSettings?.isScrollGesturesEnabled = false
-                googleMap?.uiSettings?.isZoomControlsEnabled = false
-                googleMap?.setOnMarkerClickListener(null)
-                googleMap?.uiSettings?.isMapToolbarEnabled = false
-                googleMap?.uiSettings?.setAllGesturesEnabled(false)
+    fun disableGestures() {
+        dispatchGroup.notify(Runnable {
+            googleMap.apply {
+                uiSettings.isRotateGesturesEnabled = false
+                uiSettings.isScrollGesturesEnabled = false
+                uiSettings.isZoomControlsEnabled = false
+                uiSettings.isMapToolbarEnabled = false
+                uiSettings.setAllGesturesEnabled(false)
+                setOnMarkerClickListener(null)
             }
-        }
+        })
     }
 
+    fun setListener(listener: Listener?) {
+        this.listener = listener
+    }
 
     fun setLoading() {
 //         Putting this in notify, as the fragment itself shows a spinner before Google map is ready.
 //         By putting it in notify, this function called by the developer is not stopped in OnMapReadyCallback.
-
-        dispatchGroup.notify {
-            backgroundView?.reset()
-            backgroundView?.setLoading()
-        }
+        dispatchGroup.notify(Runnable {
+            backgroundView.reset()
+            backgroundView.setLoading()
+        })
     }
 
     fun setError(error: AppError, handler: ((RecoveryAction?) -> Unit)?) {
-        dispatchGroup.notify {
-            backgroundView?.reset()
-            mapFragment?.view?.visibility = View.GONE
-
+        dispatchGroup.notify(Runnable {
+            backgroundView.reset()
+            mapView.alpha = 0.3f
             if (error.recoveryAction != null && handler != null) {
-                backgroundView?.setErrorWithHandler(error, error.recoveryAction, handler)
+                backgroundView.setErrorWithHandler(error, error.recoveryAction, handler)
             } else {
-                backgroundView?.setError(error)
+                backgroundView.setError(error)
             }
-        }
+        })
     }
 
     fun setPadding(leftPx: Int, topPx: Int, rightPx: Int, bottomPx: Int) {
-        dispatchGroup.notify {
-            googleMap?.setPadding(leftPx, topPx, rightPx, bottomPx)
-        }
+        dispatchGroup.notify(Runnable {
+            googleMap.setPadding(leftPx, topPx, rightPx, bottomPx)
+        })
     }
 
 
     fun setRegion(coordinate: LatLng, radius: Int) {
-        dispatchGroup.notify {
-            val builder = LatLngBounds.Builder()
-            coordinate.toRectanglePolygon(radius).forEach {
-                builder.include(it)
-            }
-
-            val bounds = builder.build()
-            googleMap?.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 0))
-        }
+        dispatchGroup.notify(Runnable {
+            reset()
+            val bounds = LatLngBounds.Builder().apply {
+                coordinate.toRectanglePolygon(radius).forEach { include(it) }
+            }.build()
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 0))
+        })
     }
 
     fun setRegion(coordinate: LatLng) {
-        dispatchGroup.notify {
-            if ((googleMap?.cameraPosition?.zoom ?: 0f) <= 13) {
-               googleMap?.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(coordinate, 13f)))
+        dispatchGroup.notify(Runnable {
+            reset()
+            if ((googleMap.cameraPosition?.zoom ?: 0f) <= 13) {
+                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(coordinate, 13f)))
             } else {
-                googleMap?.moveCamera(CameraUpdateFactory.newLatLng(coordinate))
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(coordinate))
             }
-        }
+        })
     }
 
     fun setRegionToShowMarkers() {
-        dispatchGroup.notify {
+        dispatchGroup.notify(Runnable {
+            reset()
             if (markers.count() > 0) {
                 view?.let { view ->
-                    val builder = LatLngBounds.Builder()
+                    val bounds = LatLngBounds.Builder().apply {
+                        markers.forEach { include(it.position) }
+                    }.build()
 
-                    markers.forEach { marker ->
-                        builder.include(marker.position)
-                    }
-
-                    googleMap?.moveCamera(
+                    googleMap.moveCamera(
                         CameraUpdateFactory.newLatLngBounds(
-                            builder.build(),
+                            bounds,
                             view.width,
                             view.height,
                             80.dpToPx(context)
@@ -313,11 +337,12 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
                     )
                 }
             }
-        }
+        })
     }
 
     fun setSelectedLocalityAnnotation(latLng: LatLng) {
-        dispatchGroup.notify {
+        dispatchGroup.notify(Runnable {
+            reset()
             when (selectedMarker?.tag) {
                 LOCALITY_TAG -> {
                     val bitmap =
@@ -349,36 +374,41 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
                     }
                 }
             }
-        }
+        })
     }
 
+    @SuppressLint("MissingPermission")
     fun setShowMyLocation(show: Boolean) {
-        googleMap?.isMyLocationEnabled = show
+        googleMap.isMyLocationEnabled = show
     }
 
     fun addHeatMap(coordinates: List<LatLng>) {
-        dispatchGroup.notify {
+        dispatchGroup.notify(Runnable {
             reset()
 
             if (coordinates.isNotEmpty()) {
+                HeatmapTileProvider.Builder()
+
+
                 val provider = HeatmapTileProvider.Builder()
                     .data(coordinates)
                     .radius(25)
                     .opacity(0.8)
+                    .build()
 
-                googleMap?.setMapStyle(
+                googleMap.setMapStyle(
                     MapStyleOptions.loadRawResourceStyle(
                         requireActivity(),
                         R.raw.raw_googlemap_heatmap_style
                     )
                 )
-                googleMap?.addTileOverlay(TileOverlayOptions().tileProvider(provider.build()))
+                googleMap.addTileOverlay(TileOverlayOptions().tileProvider(provider))
             }
-        }
+        })
     }
 
     fun addLocalities(localities: List<Locality>) {
-        dispatchGroup.notify {
+        dispatchGroup.notify(Runnable {
             reset()
 
             localities.forEach { locality ->
@@ -399,19 +429,18 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
                             )
                         )
                     )
-
-                googleMap?.addMarker(markerOptions)?.let {
+                googleMap.addMarker(markerOptions).also {
                     it.tag = LOCALITY_TAG
                     markers.add(it)
                     this.localities.put(it.id, locality)
                 }
             }
-        }
+        })
     }
 
 
     fun addLocationMarker(location: LatLng, title: String? = null) {
-        dispatchGroup.notify {
+        dispatchGroup.notify(Runnable {
             reset()
 
             locationMarker?.remove()
@@ -434,16 +463,16 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
                     )
                 )
 
-            googleMap?.addMarker(markerOptions)?.let {
+            googleMap.addMarker(markerOptions)?.let {
                 it.tag = LOCATION_TAG
                 markers.add(it)
                 locationMarker = it
             }
-        }
+        })
     }
 
     fun addObservationMarkers(observations: List<Observation>) {
-        dispatchGroup.notify {
+        dispatchGroup.notify(Runnable {
             reset()
 
             if (clusterManager != null) {
@@ -453,20 +482,21 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
                 clusterManager = ClusterManager(requireContext(), googleMap)
             }
 
-            googleMap?.setOnCameraIdleListener(clusterManager)
-            googleMap?.setOnMarkerClickListener(clusterManager)
+            googleMap.setOnCameraIdleListener(clusterManager)
+            googleMap.setOnMarkerClickListener(clusterManager)
             clusterManager?.setOnClusterClickListener(onClusterClickListener)
             clusterManager?.setOnClusterItemClickListener(onClusterItemListener)
 
             observations.forEach { observation ->
                 clusterManager?.addItem(ObservationItem(observation))
             }
-        }
+        })
     }
 
     fun addCircleOverlay(center: LatLng, radius: Int) {
-        dispatchGroup.notify {
-            googleMap?.addCircle(
+        dispatchGroup.notify(Runnable {
+            reset()
+            googleMap.addCircle(
                 CircleOptions()
                     .center(center)
                     .strokeWidth(5F)
@@ -481,13 +511,14 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
             )?.let {
                 circleOverlays.add(it)
             }
-        }
+        })
     }
 
     fun getCoordinatesFor(x: Float, y: Float): LatLng? {
-        val location: IntArray = IntArray(2)
-        mapFragment?.view?.getLocationInWindow(location)
-        return googleMap?.projection?.fromScreenLocation(Point(x.toInt() - location.first(), y.toInt() - location.last()))
+
+            val location: IntArray = IntArray(2)
+            mapView.getLocationInWindow(location)
+            return googleMap.projection?.fromScreenLocation(Point(x.toInt() - location.first(), y.toInt() - location.last()))
     }
 
     fun clearCircleOverlays() {
@@ -504,17 +535,12 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
 
 
     private fun reset() {
-        backgroundView?.reset()
-        mapFragment?.view?.visibility = View.VISIBLE
+        backgroundView.reset()
+        mapView.alpha = 1f
     }
 
-
     override fun onDestroyView() {
-        Log.d(TAG, "On destroy view")
         clusterManager?.clearItems()
-        googleMap?.setOnCameraIdleListener(null)
-        googleMap?.setOnMarkerClickListener(null)
-        googleMap?.clear()
         clusterManager = null
 
         listener = null
@@ -526,12 +552,6 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
         localities.clear()
         dispatchGroup.clear()
         circleOverlays.clear()
-
-        mapFragment?.view?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
-        mapFragment = null
-        styleSelector = null
-        backgroundView = null
-        googleMap = null
         super.onDestroyView()
     }
 }

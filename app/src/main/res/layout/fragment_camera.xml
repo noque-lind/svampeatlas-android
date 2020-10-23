@@ -10,7 +10,6 @@
     app:layoutDescription="@xml/fragment_camera_scene"
     tools:context=".fragments.CameraFragment">
 
-
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/cameraFragment_toolbar"
         android:layout_width="match_parent"

@@ -30,6 +30,8 @@ import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.net.Uri
 import android.util.Log
 import android.view.View.*
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.noque.svampeatlas.services.FileManager
 import java.lang.Exception
 import java.text.SimpleDateFormat
@@ -127,7 +129,7 @@ class BlankActivity : AppCompatActivity() {
 
     private fun initViews() {
         drawerLayout = blankActitivy_drawerLayout
-        navController = findNavController(R.id.blankActivity_navHostFragment)
+        navController = supportFragmentManager.findFragmentById(R.id.blankActivity_navHostFragment)!!.findNavController()
         navigationView = blankActivity_navigationView
         userView = navigationView.getHeaderView(0).navigationHeader_userView
     }

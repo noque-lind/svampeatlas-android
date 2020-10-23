@@ -89,8 +89,12 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     private var toast: Toast? = null
 
     // Views
-    private var viewPager by autoCleared<ViewPager>()
-    private var addImagesRecyclerView by autoCleared<RecyclerView>()
+    private var viewPager by autoCleared<ViewPager> {
+        it?.adapter = null
+    }
+    private var addImagesRecyclerView by autoCleared<RecyclerView> {
+        it?.adapter = null
+    }
     private var tabLayout by autoCleared<TabLayout>()
     private var spinnerView by autoCleared<SpinnerView>()
 

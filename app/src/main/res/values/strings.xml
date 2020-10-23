@@ -224,4 +224,6 @@
     <string name="settings_language_title">Always use Danish names</string>
     <string name="settings_language_on">Will always use Danish names and descriptions without regard for the phone language</string>
     <string name="settings_language_off">If a translation is present, the app will use localized names and descriptions</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

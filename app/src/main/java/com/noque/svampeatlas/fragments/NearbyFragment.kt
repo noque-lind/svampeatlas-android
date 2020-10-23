@@ -1,8 +1,6 @@
 package com.noque.svampeatlas.fragments
 
-import android.content.Intent
 import android.location.Location
-import android.net.Uri
 import android.os.Bundle
 import android.transition.TransitionManager
 import androidx.fragment.app.Fragment
@@ -19,7 +17,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.model.LatLng
-import com.noque.svampeatlas.BuildConfig
 
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.extensions.openSettings
@@ -237,7 +234,7 @@ class NearbyFragment : Fragment(), MapSettingsFragment.Listener {
     private fun setupViews() {
         (requireActivity() as BlankActivity).setSupportActionBar(toolbar)
         mapFragment?.showStyleSelector(true)
-        mapFragment?.setListener(mapFragmentListener, false)
+        mapFragment?.setListener(mapFragmentListener)
         observationView?.apply {
             setOnClickListener(observationViewOnClick)
         }
@@ -288,7 +285,7 @@ class NearbyFragment : Fragment(), MapSettingsFragment.Listener {
 
     override fun onDestroyView() {
         toolbar = null
-        mapFragment?.setListener(null, false)
+        mapFragment?.setListener(null)
         mapFragment = null
         observationView = null
         settingsButton = null

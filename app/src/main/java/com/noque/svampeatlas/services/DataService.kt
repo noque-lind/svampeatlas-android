@@ -415,7 +415,7 @@ class DataService private constructor(context: Context) {
     ) {
         var completedUploads = 0
 
-        val dispatchGroup = DispatchGroup()
+        val dispatchGroup = DispatchGroup("UploadImages")
 
         images.forEach {
             dispatchGroup.enter()
@@ -430,9 +430,9 @@ class DataService private constructor(context: Context) {
             }
         }
 
-        dispatchGroup.notify {
+        dispatchGroup.notify (Runnable {
             completion(Result.Success(completedUploads))
-        }
+        })
     }
 
     private suspend fun uploadImage(
@@ -648,11 +648,11 @@ class DataService private constructor(context: Context) {
             api.volleyMethod(),
             api.url(),
             null,
-            Response.Listener {
+            {
                 completion(Result.Success(it.getJSONObject(0).getInt("count")))
             },
 
-            Response.ErrorListener {
+            {
                 completion(Result.Error(parseVolleyError(it)))
             }
         )

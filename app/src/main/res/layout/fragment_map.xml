@@ -6,15 +6,26 @@
     android:theme="@style/Light"
     android:id="@+id/mapFragment_root">
 
-    <fragment
-            android:id="@+id/fragmentMap_supportMapFragment"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            app:layout_constraintTop_toBottomOf="@id/mapFragment_tabLayout"
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/fragmentMap_mapView"
+        app:layout_constraintTop_toBottomOf="@id/mapFragment_tabLayout"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_width="0dp"
-            android:layout_height="0dp"/>
+        android:layout_height="0dp"/>
+
+
+
+<!--        <androidx.fragment.app.FragmentContainerView-->
+<!--            android:id="@+id/fragmentMap_supportMapFragment"-->
+<!--            android:name="com.google.android.gms.maps.MapFragment"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/mapFragment_tabLayout"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        android:layout_width="0dp"-->
+<!--            android:layout_height="0dp"/>-->
 
     <com.google.android.material.tabs.TabLayout
         android:visibility="gone"
