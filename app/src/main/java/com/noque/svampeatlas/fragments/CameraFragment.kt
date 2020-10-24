@@ -266,6 +266,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
 
     private fun takePicture(metadata: ImageCapture.Metadata) {
         photoFile = FileManager.createTempFile(requireContext()).also {
+            cameraControlsView.configureState(CameraControlsView.State.LOADING)
             imageCaptureUseCase?.takePicture(
                 ImageCapture.OutputFileOptions.Builder(it).setMetadata(metadata).build(),
                 ContextCompat.getMainExecutor(requireContext()),
@@ -382,7 +383,6 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
             super.onResume()
             requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             (requireActivity() as BlankActivity).hideSystemBars()
-            Log.d(TAG, "on resume")
             validateState()
         }
 
@@ -479,23 +479,6 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
             } else {
                 requestPermissions(arrayOf(Manifest.permission.CAMERA), CODE_PERMISSION)
             }
-//            ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-//
-//            if (android.Manifest.permission.CAMERA.isPermissioj)
-//            if (Manifest.permission.CAMERA.isPermissionGranted()) {
-//            Log.d(TAG, "ValidateState")
-//            fun request() =
-//                requestPermissions(arrayOf(android.Manifest.permission.CAMERA), CODE_PERMISSION)
-//
-//            if (args.type == Type.IDENTIFY && !SharedPreferences.hasAcceptedIdentificationTerms()) {
-//                TermsFragment().also {
-//                    it.arguments = Bundle().also { bundle -> bundle.putSerializable(TermsFragment.KEY_TYPE, TermsFragment.Type.IDENTIFICATION) }
-//                    it.listener = object: TermsFragment.Listener {
-//                        override fun onDismiss(termsAccepted: Boolean) = request()
-//                    }
-//                    it.show(childFragmentManager, null)
-//                }
-//            } else request()
         }
 
         private fun reset() {
