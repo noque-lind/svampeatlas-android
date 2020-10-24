@@ -145,6 +145,14 @@
         android:id="@+id/settingsFragment"
         android:name="com.noque.svampeatlas.fragments.SettingsFragment"
         android:label="SettingsFragment" />
+    <fragment
+        android:id="@+id/emptyFragment"
+        android:name="com.noque.svampeatlas.fragments.EmptyFragment"
+        android:label="fragment_empty"
+        tools:layout="@layout/fragment_empty" />
+    <action
+        android:id="@+id/action_global_emptyFragment"
+        app:destination="@id/emptyFragment" />
 
 
 </navigation>

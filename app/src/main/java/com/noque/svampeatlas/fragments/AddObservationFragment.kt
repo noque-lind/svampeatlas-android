@@ -11,9 +11,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -89,8 +87,13 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     private var toast: Toast? = null
 
     // Views
-    private var viewPager by autoCleared<ViewPager>()
-    private var addImagesRecyclerView by autoCleared<RecyclerView>()
+    private var toolbar by autoCleared<androidx.appcompat.widget.Toolbar>()
+    private var viewPager by autoCleared<ViewPager> {
+        it?.adapter = null
+    }
+    private var addImagesRecyclerView by autoCleared<RecyclerView> {
+        it?.adapter = null
+    }
     private var tabLayout by autoCleared<TabLayout>()
     private var spinnerView by autoCleared<SpinnerView>()
 
@@ -278,6 +281,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     }
 
     private fun initViews() {
+        toolbar = addObservationFragment_toolbar
         viewPager = addObservationFragment_viewPager
         addImagesRecyclerView = addObservationFragment_addObservationImagesRecyclerView
         tabLayout = addObservationFragment_tabLayout
@@ -285,7 +289,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     }
 
     private fun setupView() {
-        (requireActivity() as BlankActivity).setSupportActionBar(addObservationFragment_toolbar)
+        (requireActivity() as BlankActivity).setSupportActionBar(toolbar)
 
         tabLayout.setupWithViewPager(viewPager)
 

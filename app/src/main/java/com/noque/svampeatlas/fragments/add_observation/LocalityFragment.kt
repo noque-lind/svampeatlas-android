@@ -1,10 +1,7 @@
 package com.noque.svampeatlas.fragments.add_observation
 
-import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import android.view.*
 import android.widget.ImageButton
@@ -15,15 +12,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
 import com.noque.svampeatlas.adapters.add_observation.LocalityAdapter
-import com.noque.svampeatlas.BuildConfig
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.extensions.openSettings
-import com.noque.svampeatlas.services.LocationService
 import com.noque.svampeatlas.fragments.MapFragment
 import com.noque.svampeatlas.models.*
+import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.view_models.NewObservationViewModel
 import kotlinx.android.synthetic.main.fragment_add_observation_locality.*
 import java.util.*
@@ -35,7 +29,9 @@ class LocalityFragment: Fragment() {
     }
 
     // Views
-    private var mapFragment: MapFragment? = null
+    private var mapFragment by autoCleared<MapFragment> {
+        it?.setListener(null)
+    }
     private var recyclerView: RecyclerView? = null
     private var retryButton: ImageButton? = null
     private var markerImageView: ImageView? = null
@@ -165,8 +161,8 @@ class LocalityFragment: Fragment() {
             layoutManager = linearLayoutManager
         }
 
-        mapFragment?.setListener(mapFragmentListener, false)
-        mapFragment?.setType(MapFragment.Category.TOPOGRAPHY)
+        mapFragment?.setListener(mapFragmentListener)
+        mapFragment?.setType(com.noque.svampeatlas.fragments.MapFragment.Category.REGULAR)
         retryButton?.setOnClickListener(retryButtonClicked)
         markerImageView?.setOnTouchListener(markerOnTouchListener)
     }
@@ -204,23 +200,23 @@ class LocalityFragment: Fragment() {
             newObservationViewModel.locality.observe(viewLifecycleOwner, Observer {
                 it?.let {
                     recyclerView?.scrollToPosition(localityAdapter.setSelected(it))
-                    mapFragment?.setSelectedLocalityAnnotation(it.location)
+                    mapFragment.setSelectedLocalityAnnotation(it.location)
                 }
             })
 
             newObservationViewModel.coordinateState.observe(viewLifecycleOwner, Observer {
                 when (it) {
                     is State.Items -> {
-                        mapFragment?.addLocationMarker(it.items.latLng, resources.getString(R.string.locationAnnotation_title))
-                        mapFragment?.setRegion(it.items.latLng)
+                        mapFragment.addLocationMarker(it.items.latLng, resources.getString(R.string.locationAnnotation_title))
+                        mapFragment.setRegion(it.items.latLng)
                     }
 
                     is State.Loading -> {
-                        mapFragment?.setLoading()
+                        mapFragment.setLoading()
                     }
 
                     is State.Empty -> {
-                        mapFragment?.removeAllMarkers()
+                        mapFragment.removeAllMarkers()
                     }
                 }
             })
@@ -230,8 +226,6 @@ class LocalityFragment: Fragment() {
         Log.d(TAG, "On destroy view")
 
         recyclerView?.adapter = null
-
-        mapFragment = null
         recyclerView = null
         retryButton = null
         markerImageView = null

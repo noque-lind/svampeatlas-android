@@ -1,5 +1,6 @@
 package com.noque.svampeatlas.fragments
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -13,14 +14,9 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.media.ExifInterface
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Looper
-import android.provider.Settings
-import android.transition.TransitionManager
 import android.util.Log
-import android.util.Rational
 import android.view.*
 import android.widget.ImageView
 import androidx.appcompat.widget.Toolbar
@@ -28,8 +24,6 @@ import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.constraintlayout.motion.widget.MotionLayout
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -40,6 +34,7 @@ import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.common.util.concurrent.ListenableFuture
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.adapters.ResultsAdapter
 import com.noque.svampeatlas.extensions.openSettings
@@ -59,7 +54,6 @@ import kotlinx.android.synthetic.main.fragment_camera.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
-import java.util.jar.Manifest
 
 
 class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallback, PromptFragment.Listener {
@@ -97,17 +91,23 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        if (requestCode == CODE_PERMISSION) {
-            startSessionIfNeeded()
+        Log.d(TAG, "permissions results ${view} ${cameraControl}")
+        if (requestCode == CODE_PERMISSION && view != null) {
+            cameraView.post {
+                startSessionIfNeeded()
+            }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
+
     // Objects
     private val args: CameraFragmentArgs by navArgs()
     private var cameraControl: CameraControl? = null
-    private var imageCapture: ImageCapture? = null
     private var photoFile: File? = null
+
+    private var previewUseCase: Preview? = null
+    private var imageCaptureUseCase: ImageCapture? = null
 
     private val locationManager: FusedLocationProviderClient by lazy {
         LocationServices.getFusedLocationProviderClient(requireContext())
@@ -141,7 +141,6 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         NewObservationViewModel::class.java
     ) }
 
-
     // Listeners
     override fun positiveButtonPressed() {
         SharedPreferences.setSaveImages(true)
@@ -158,7 +157,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
 
     private val resultsAdapterListener by lazy {
         object : ResultsAdapter.Listener {
-            override fun reloadSelected() { cameraViewModel.reset() }
+            override fun reloadSelected() {  cameraViewModel.reset(); }
             override fun predictionResultSelected(predictionResult: PredictionResult) {
                 val state = cameraViewModel.predictionResultsState.value
                 val action = CameraFragmentDirections.actionGlobalMushroomDetailsFragment(
@@ -171,6 +170,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                         state.items
                     ) else null
                 )
+
                 findNavController().navigate(action)
             }
         }
@@ -191,6 +191,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
 
                if (currentOrientation != surfaceRotation) {
                    currentOrientation = surfaceRotation
+                   imageCaptureUseCase?.targetRotation = surfaceRotation
                    rotateViews(surfaceRotation)
                }
            }
@@ -265,9 +266,8 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
 
     private fun takePicture(metadata: ImageCapture.Metadata) {
         photoFile = FileManager.createTempFile(requireContext()).also {
-            val imageCapture = imageCapture ?: return
-            imageCapture.targetRotation = currentOrientation
-            imageCapture.takePicture(
+            cameraControlsView.configureState(CameraControlsView.State.LOADING)
+            imageCaptureUseCase?.takePicture(
                 ImageCapture.OutputFileOptions.Builder(it).setMetadata(metadata).build(),
                 ContextCompat.getMainExecutor(requireContext()),
                 onImageSavedCallback
@@ -380,15 +380,15 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
     }
 
         override fun onResume() {
+            super.onResume()
             requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             (requireActivity() as BlankActivity).hideSystemBars()
-            super.onResume()
+            validateState()
         }
 
         override fun onStart() {
             requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             (requireActivity() as BlankActivity).hideSystemBars()
-            validateState()
             super.onStart()
         }
 
@@ -468,17 +468,16 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                 TermsFragment().also {
                     it.arguments = Bundle().also { bundle -> bundle.putSerializable(TermsFragment.KEY_TYPE, TermsFragment.Type.IDENTIFICATION) }
                     it.listener = object: TermsFragment.Listener {
-                        override fun onDismiss(termsAccepted: Boolean) {
-                            requestPermissions(
-                                arrayOf(android.Manifest.permission.CAMERA),
-                                CODE_PERMISSION
-                            )
-                        }
+                        override fun onDismiss(termsAccepted: Boolean) = requestPermissions(arrayOf(Manifest.permission.CAMERA), CODE_PERMISSION)
                     }
                     it.show(childFragmentManager, null)
                 }
+            } else if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                cameraView.post {
+                    startSessionIfNeeded()
+                }
             } else {
-                requestPermissions(arrayOf(android.Manifest.permission.CAMERA), CODE_PERMISSION)
+                requestPermissions(arrayOf(Manifest.permission.CAMERA), CODE_PERMISSION)
             }
         }
 
@@ -486,7 +485,6 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
             backgroundView.reset()
             imageView.setImageResource(android.R.color.transparent)
             imageView.setBackgroundResource(android.R.color.transparent)
-            imageView.visibility = View.GONE
             when (args.type) {
                 Type.IMAGE_CAPTURE, Type.IDENTIFY -> cameraControlsView.configureState(CameraControlsView.State.CAPTURE)
                 Type.NEW_OBSERVATION -> cameraControlsView.configureState(CameraControlsView.State.CAPTURE_NEW)
@@ -494,29 +492,33 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         }
 
         private fun startSessionIfNeeded() {
-            if (cameraControl == null && ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "StartSession if needed")
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                 val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
                 cameraProviderFuture.addListener(Runnable {
                     val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-                    val preview = Preview.Builder()
-                        .setTargetAspectRatio(AspectRatio.RATIO_4_3)
-                        .setTargetRotation(cameraView.display.rotation)
-                        .build().also { it.setSurfaceProvider(cameraView.surfaceProvider) }
+                    previewUseCase =
+                        Preview.Builder()
+                            .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+                            .setTargetRotation(Surface.ROTATION_0)
 
-                    val imageCapture = ImageCapture.Builder()
-                        .build().also { this.imageCapture = it }
-
+                            .build()
+                    imageCaptureUseCase = ImageCapture.Builder().build()
+                    cameraProvider.unbindAll()
                     try {
-                        cameraProvider.unbindAll()
-                        val camera = cameraProvider.bindToLifecycle(
-                            viewLifecycleOwner,
-                            CameraSelector.DEFAULT_BACK_CAMERA,
-                            preview,
-                            imageCapture
-                        )
-                        cameraControl = camera.cameraControl
-                    } catch (error: Exception) {
-                    }
+
+                            val camera = cameraProvider.bindToLifecycle(
+                                this,
+                                CameraSelector.DEFAULT_BACK_CAMERA,
+                                previewUseCase,
+                                imageCaptureUseCase
+                            )
+                            previewUseCase?.setSurfaceProvider(cameraView.surfaceProvider)
+                            cameraControl = camera.cameraControl
+                        } catch (error: Exception) {
+                            cameraViewModel.setImageFileError(Error.CaptureError(resources))
+                        }
+
                 },  ContextCompat.getMainExecutor(requireContext()))
             }
         }
@@ -555,6 +557,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         override fun onDestroyView() {
             sensorManager?.unregisterListener(deviceOrientation.eventListener)
             sensorManager?.unregisterListener(sensorEventListener)
+            previewUseCase?.setSurfaceProvider(null)
             super.onDestroyView()
         }
 }

@@ -32,6 +32,7 @@ import com.noque.svampeatlas.extensions.openSettings
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.services.LocationService
 import com.noque.svampeatlas.utilities.Geometry
+import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.view_models.*
 import com.noque.svampeatlas.view_models.factories.ObservationsViewModelFactory
 import com.noque.svampeatlas.view_models.factories.SpeciesViewModelFactory
@@ -74,41 +75,39 @@ class DetailsFragment : Fragment() {
 
     private val args: DetailsFragmentArgs by navArgs()
 
-    private val locationService by lazy {
-        val service = LocationService(requireContext().applicationContext)
-        service.setListener(object : LocationService.Listener {
-
-            override fun requestPermission(permissions: Array<out String>, requestCode: Int) {
-                mapFragment?.setError(LocationService.Error.PermissionsUndetermined(resources)) {
-                    if (it == RecoveryAction.ACTIVATE) requestPermissions(permissions, requestCode)
-                }
+    private val locationListener = object: LocationService.Listener {
+        override fun requestPermission(permissions: Array<out String>, requestCode: Int) {
+            mapFragment.setError(LocationService.Error.PermissionsUndetermined(resources)) {
+                if (it == RecoveryAction.ACTIVATE) requestPermissions(permissions, requestCode)
             }
+        }
 
-            override fun locationRetrievalError(error: LocationService.Error) {
-                mapFragment?.setError(error) {
-                    if (it == RecoveryAction.OPENSETTINGS) openSettings()
-                    else if (it == RecoveryAction.TRYAGAIN) service.start()
-                }
+        override fun locationRetrievalError(error: LocationService.Error) {
+            mapFragment.setError(error) {
+                if (it == RecoveryAction.OPENSETTINGS) openSettings()
+                else if (it == RecoveryAction.TRYAGAIN) locationService.start()
             }
+        }
 
-            override fun locationRetrieved(location: Location) {
-                val geometry = Geometry(
-                    LatLng(location.latitude, location.longitude),
-                    35000,
-                    Geometry.Type.RECTANGLE
-                )
+        override fun locationRetrieved(location: Location) {
+            val geometry = Geometry(
+                LatLng(location.latitude, location.longitude),
+                35000,
+                Geometry.Type.RECTANGLE
+            )
 
-                when (args.type) {
-                    Type.SPECIES -> {
-                        speciesViewModel.getHeatMapObservations(geometry)
-                        mapFragment?.setRegion(geometry.coordinate, geometry.radius)
-                    }
-                    else -> {}
+            when (args.type) {
+                Type.SPECIES -> {
+                    speciesViewModel.getHeatMapObservations(geometry)
+                    mapFragment.setRegion(geometry.coordinate, geometry.radius)
                 }
+                else -> {}
             }
-    })
+        }
+    }
 
-        service
+    private var locationService by autoCleared<LocationService> {
+        it?.setListener(null)
     }
 
     // Views
@@ -123,7 +122,9 @@ class DetailsFragment : Fragment() {
     private var informationViewHeader: TextView? = null
     private var informationView: InformationView? = null
     private var mapFragmentHeader: TextView? = null
-    private var mapFragment: MapFragment? = null
+    private var mapFragment by autoCleared<MapFragment> {
+        it?.setListener(null)
+    }
     private var mushroomViewHeaderTextView: TextView? = null
     private var mushroomView: MushroomView? = null
     private var recyclerViewHeader: TextView? = null
@@ -311,6 +312,10 @@ class DetailsFragment : Fragment() {
         initViews()
         setupViews()
         setupViewModels()
+
+        locationService = LocationService(requireContext().applicationContext).also {
+            it.setListener(locationListener)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -386,10 +391,12 @@ class DetailsFragment : Fragment() {
             )
         )
 
+
         appBarLayout?.setExpanded(false, false)
         imagesView?.visibility = View.GONE
         imagesView?.setOnClickedAtIndex(imagesViewOnClick)
-        mapFragment?.setListener(mapFragmentListener, true)
+        mapFragment.setListener(mapFragmentListener)
+        mapFragment.disableGestures()
         nestedScrollView?.visibility = View.GONE
 
         if (sessionViewModel.isLoggedIn) {
@@ -554,7 +561,6 @@ class DetailsFragment : Fragment() {
 
     private fun configureView(observation: Observation) {
         prepareViewsForContent()
-        fetchLocationIfNeeded()
         configureUpperLayout("Fund af: ${observation.speciesProperties.name.upperCased()}", observation.images)
 
         titlesView?.configure(
@@ -603,8 +609,8 @@ class DetailsFragment : Fragment() {
         recyclerViewHeader?.text = getString(R.string.observationDetailsScrollView_comments)
         commentsAdapter.configure(observation.comments, sessionViewModel.isLoggedIn)
         mapFragmentHeader?.setText(R.string.observationDetailsScrollView_location)
-        mapFragment?.addLocationMarker(observation.coordinate)
-        mapFragment?.setRegion(observation.coordinate, 80000)
+        mapFragment.addLocationMarker(observation.coordinate)
+        mapFragment.setRegion(observation.coordinate, 80000)
     }
 
     private fun configureView(mushroom: Mushroom) {
@@ -759,7 +765,6 @@ class DetailsFragment : Fragment() {
         informationViewHeader = null
         informationView = null
         mapFragmentHeader = null
-        mapFragment = null
         mushroomViewHeaderTextView = null
         mushroomView = null
         recyclerViewHeader = null

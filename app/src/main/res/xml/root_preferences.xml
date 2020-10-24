@@ -8,5 +8,10 @@
             app:summaryOn="@string/settings_language_on"
             app:summaryOff="@string/settings_language_off"
             app:title="Brug altid danske betegnelser" />
+        <SwitchPreferenceCompat
+            app:key="SAVE_IMAGES"
+            app:summaryOn="@string/prompt_shouldSaveImages_message"
+            app:summaryOff="@string/prompt_shouldSaveImages_negative"
+            app:title="@string/prompt_shouldSaveImages_title" />
     </PreferenceCategory>
 </PreferenceScreen>

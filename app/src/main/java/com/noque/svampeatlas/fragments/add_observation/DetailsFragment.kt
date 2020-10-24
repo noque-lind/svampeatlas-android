@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.adapters.add_observation.DetailsAdapter
 import com.noque.svampeatlas.R
+import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.view_models.NewObservationViewModel
 import kotlinx.android.synthetic.main.fragment_add_observation_details.*
 import java.util.*
@@ -41,7 +42,9 @@ class DetailsFragment : Fragment() {
 
     // Views
 
-    private var recyclerView: RecyclerView? = null
+    private var recyclerView by autoCleared<RecyclerView> {
+        it?.adapter = null
+    }
 
     // View Models
 
@@ -110,7 +113,7 @@ class DetailsFragment : Fragment() {
     }
 
     private fun setupView() {
-        recyclerView?.apply {
+        recyclerView.apply {
             adapter = this@DetailsFragment.adapter
             layoutManager = LinearLayoutManager(context)
 
@@ -182,13 +185,6 @@ class DetailsFragment : Fragment() {
         super.onStop()
     }
 
-    override fun onDestroyView() {
-        Log.d(DetailsFragment.TAG, "On DestroyView")
-        recyclerView?.adapter = null
-        recyclerView = null
-
-        super.onDestroyView()
-    }
 
     override fun onDestroy() {
         Log.d(DetailsFragment.TAG, "On Destroy")
