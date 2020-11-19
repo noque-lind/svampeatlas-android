@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -34,6 +35,7 @@ import com.noque.svampeatlas.services.LocationService
 import com.noque.svampeatlas.utilities.Geometry
 import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.view_models.*
+import com.noque.svampeatlas.view_models.factories.CameraViewModelFactory
 import com.noque.svampeatlas.view_models.factories.ObservationsViewModelFactory
 import com.noque.svampeatlas.view_models.factories.SpeciesViewModelFactory
 import com.noque.svampeatlas.views.*
@@ -134,25 +136,26 @@ class DetailsFragment : Fragment() {
 
     // View models
     private val speciesViewModel by lazy {
-        ViewModelProviders.of(this, SpeciesViewModelFactory(args.id, requireActivity().application))
+        ViewModelProvider(this, SpeciesViewModelFactory(args.id, requireActivity().application))
             .get(SpeciesViewModel::class.java)
     }
 
     private val observationViewModel by lazy {
-        ViewModelProviders.of(
+        ViewModelProvider(
             this, ObservationsViewModelFactory(
                 args.id,
-                args.type == Type.OBSERVATIONWITHSPECIES, requireActivity().application
+                args.type == Type.OBSERVATIONWITHSPECIES,
+                requireActivity().application
             )
         ).get(ObservationViewModel::class.java)
     }
 
     private val sessionViewModel by lazy {
-        ViewModelProviders.of(requireActivity()).get(SessionViewModel::class.java)
+        ViewModelProvider(this).get(SessionViewModel::class.java)
     }
 
     private val newObservationViewModel by lazy {
-        ViewModelProviders.of(requireActivity()).get(NewObservationViewModel::class.java)
+        ViewModelProvider(this).get(NewObservationViewModel::class.java)
     }
 
     // Adapters

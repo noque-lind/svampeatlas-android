@@ -13,6 +13,7 @@ import android.widget.Toolbar
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.heatmaps.HeatmapTileProvider
@@ -151,10 +152,9 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
         }
     }
 
-
     // Forced to put the whole fragment as listener, as it was impossible to remove just a listener var/object within the callback
     override fun onGlobalLayout() {
-        if (mapView.height != 0 && mapView.width != 0) {
+        if (viewLifecycleOwner.lifecycle.currentState != Lifecycle.State.DESTROYED && mapView.height != 0 && mapView.width != 0) {
             mapView.viewTreeObserver.removeOnGlobalLayoutListener(this)
             dispatchGroup.leave()
         }
@@ -213,6 +213,13 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
         super.onStop()
     }
 
+    override fun onLowMemory() {
+        super.onLowMemory()
+        dispatchGroup.notify(Runnable {
+            mapView.onLowMemory()
+        })
+    }
+
     private fun initViews() {
         styleSelector = mapFragment_tabLayout
         backgroundView = fragmentMap_backgroundView
@@ -224,8 +231,8 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
         dispatchGroup.enter()
         backgroundView.setLoading()
         mapView.viewTreeObserver.addOnGlobalLayoutListener(this)
+        mapView.onCreate(null)
         mapView.postDelayed({
-            mapView.onCreate(null)
             mapView.getMapAsync(onMapReadyCallBack)
         }, 10)
     }
@@ -379,7 +386,9 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
 
     @SuppressLint("MissingPermission")
     fun setShowMyLocation(show: Boolean) {
-        googleMap.isMyLocationEnabled = show
+        dispatchGroup.notify(Runnable {
+            googleMap.isMyLocationEnabled = show
+        })
     }
 
     fun addHeatMap(coordinates: List<LatLng>) {

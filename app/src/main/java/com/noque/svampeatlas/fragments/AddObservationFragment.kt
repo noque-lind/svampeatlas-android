@@ -150,7 +150,6 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         override fun locationRetrieved(location: Location) {
             newObservationViewModel.setCoordinateState(State.Items(com.noque.svampeatlas.models.Location(Date(), LatLng(location.latitude, location.longitude), location.accuracy)))
         }
-
     }
 
     private val imageSwipedCallback =

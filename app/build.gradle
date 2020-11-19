@@ -27,9 +27,9 @@ android {
         applicationId "com.noque.svampeatlas"
         minSdkVersion 21
         targetSdkVersion 29
-        versionName '1.4.1.1'
+        versionName '1.5'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        versionCode = 15
+        versionCode = 17
 
         kapt {
             arguments {

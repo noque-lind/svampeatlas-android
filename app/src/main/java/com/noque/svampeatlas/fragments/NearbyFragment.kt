@@ -25,6 +25,7 @@ import com.noque.svampeatlas.models.Observation
 import com.noque.svampeatlas.models.RecoveryAction
 import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.services.LocationService
+import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.view_models.NearbyObservationsViewModel
 import com.noque.svampeatlas.views.BlankActivity
 import com.noque.svampeatlas.views.ObservationView
@@ -68,6 +69,10 @@ class NearbyFragment : Fragment(), MapSettingsFragment.Listener {
 
     // Objects
 
+    private var locationService by autoCleared<LocationService> {
+        it?.setListener(null)
+    }
+
     private val rootConstraintSet by lazy {
         val constraintSet = ConstraintSet()
         constraintSet.clone(requireContext(), R.layout.fragment_nearby)
@@ -99,28 +104,23 @@ class NearbyFragment : Fragment(), MapSettingsFragment.Listener {
         ViewModelProviders.of(this).get(NearbyObservationsViewModel::class.java)
     }
 
-    private val locationService by lazy {
-        val locationService = LocationService(requireContext())
-        locationService.setListener(object: LocationService.Listener {
-            override fun locationRetrieved(location: Location) {
-                mapFragment?.setShowMyLocation(true)
-                nearbyObservationsViewModel.getObservationsNearby(LatLng(location.latitude, location.longitude), settings)
-            }
+    private val locationServiceListener = object: LocationService.Listener {
+        override fun locationRetrieved(location: Location) {
+            mapFragment?.setShowMyLocation(true)
+            nearbyObservationsViewModel.getObservationsNearby(LatLng(location.latitude, location.longitude), settings)
+        }
 
-            override fun locationRetrievalError(error: LocationService.Error) {
-                mapFragment?.setError(error) {
-                    if (error.recoveryAction == RecoveryAction.OPENSETTINGS) {
-                        openSettings()
-                    }
+        override fun locationRetrievalError(error: LocationService.Error) {
+            mapFragment?.setError(error) {
+                if (error.recoveryAction == RecoveryAction.OPENSETTINGS) {
+                    openSettings()
                 }
             }
+        }
 
-            override fun requestPermission(permissions: Array<out String>, requestCode: Int) {
-                requestPermissions(permissions, requestCode)
-            }
-        })
-
-        locationService
+        override fun requestPermission(permissions: Array<out String>, requestCode: Int) {
+            requestPermissions(permissions, requestCode)
+        }
     }
 
     private val mapFragmentListener by lazy {
@@ -218,6 +218,8 @@ class NearbyFragment : Fragment(), MapSettingsFragment.Listener {
         initViews()
         setupViews()
         setupViewModels()
+
+        locationService = LocationService(requireContext().applicationContext).apply { setListener(locationServiceListener) }
     }
 
     private fun initViews() {
