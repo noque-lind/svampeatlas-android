@@ -213,5 +213,19 @@
     <string name="settings_language_title">Brug altid danske betegnelser</string>
     <string name="settings_language_on">Brug altid danske navne og beskrivelser uanset telefonens sprogopsætning</string>
     <string name="settings_language_off">Hvis en oversættelse er tilgængelig, vil lokaliserede navne og beskrivelser vises</string>
+    <string name="determinationLabel_validating">Bestemmelsen valideres</string>
+    <string name="determinationLabel_approved">Bestemmelsen er godkendt</string>
+    <string name="determinationLabel_rejected">Bestemmelsen er afvist</string>
+    <string name="precisionLabel">Præcision: %.02f m</string>
+    <string name="detailsPickerFragment_vegetationTypesPicker">Vælg vegetationstype</string>
+    <string name="detailsPickerFragment_substratePicker">Vælg substrat</string>
+    <string name="detailsPickerFragment_hostsPicker">Vælg vært(er)</string>
+    <string name="addObservationVC_title_edit">Rediger fund</string>
+    <string name="observationDetailsScrollView_delete">Slet fund</string>
+    <string name="prompt_imagedeletion_error_title">Kunne ikke slette billede</string>
+    <string name="terms_whatsnew_message">Vi er så glade for at du stadig er her\n\nDin app er blevet opdateret og har fået nogle nye spændende funktioner:\n- Nyt design i svampe/og observations detajler\n- Du kan nu redigere en uploadet observation efter det er blevet uploaded\n- Du kan nu slette et fund (kun indenfor 48h efter upload)\n- En masse stabilitets forbedringer\n- Klargørelse til nye spændende funktioner (offline gem af et fund hvis der er dårligt internet, interaktiv validering, mm.)</string>
+    <string name="terms_whatsnew_title">Hvad er nyt?</string>
+    <string name="terms_imagedeletion_title">Sletning af billedet er permanent</string>
+    <string name="terms_imagedeletion_message">When editing an observation, deletions of images are final, even if you do not submit your other changes. This message will only be shown once, and if you still want to delete the image, you will have to delete the it again\" = \"Når du redigere en observation, er sletning af uploadede billeder permanente, også selvom du ikke uploader andre ændringer. Denne besked vises kun en gang, or du skal slette billedet igen hvis du ønsker at det skal slettes.</string>
 
 </resources>

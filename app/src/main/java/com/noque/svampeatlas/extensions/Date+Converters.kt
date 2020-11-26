@@ -33,6 +33,11 @@ fun Date.toISO8601(): String {
    return cm.format(this)
 }
 
+fun Date.difDays(): Long {
+    return TimeUnit.MILLISECONDS.toDays(
+        Calendar.getInstance().time.time - this.time
+    )
+}
 
 
 fun Date.toReadableDate(recentFormatting: Boolean = true, ignoreTime: Boolean = false): String {

@@ -9,30 +9,33 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.NavController
-import androidx.navigation.NavOptions
-import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.R
-import com.noque.svampeatlas.view_models.SessionViewModel
 import kotlinx.android.synthetic.main.activity_blank.*
 import kotlinx.android.synthetic.main.navigation_header.view.*
 import java.io.File
 import androidx.core.content.ContextCompat.startActivity
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import androidx.core.app.ComponentActivity.ExtraData
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.net.Uri
 import android.util.Log
 import android.view.View.*
-import androidx.navigation.Navigation
+import androidx.navigation.*
 import androidx.navigation.fragment.findNavController
+import com.noque.svampeatlas.fragments.AddObservationFragment
+import com.noque.svampeatlas.fragments.AddObservationFragmentArgs
+import com.noque.svampeatlas.fragments.TermsFragment
 import com.noque.svampeatlas.services.FileManager
+import com.noque.svampeatlas.utilities.SharedPreferences
+import com.noque.svampeatlas.view_models.Session
+import kotlinx.android.synthetic.main.fragment_settings.*
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
@@ -56,14 +59,14 @@ class BlankActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var userView: UserView
 
-    // View models
-
-    private lateinit var sessionViewModel: SessionViewModel
 
     // Listeners
 
     private val onDestinationChangedListener by lazy {
         NavController.OnDestinationChangedListener { _, destination, _ ->
+            if (destination.id != R.id.addObservationFragment || destination.id != R.id.cameraFragment) {
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+            }
             navigationView.setCheckedItem(destination.id)
         }
     }
@@ -139,12 +142,15 @@ class BlankActivity : AppCompatActivity() {
         navigationView.itemIconTintList = null
         navController.addOnDestinationChangedListener(onDestinationChangedListener)
         navigationView.setNavigationItemSelectedListener(onNavigationItemSelectedListener)
+        if (!SharedPreferences.hasSeenWhatsNew) {
+            val dialog = TermsFragment()
+            dialog.arguments = Bundle().apply { putSerializable(TermsFragment.KEY_TYPE, TermsFragment.Type.WHATSNEW) }
+            dialog.show(supportFragmentManager, null)
+        }
     }
 
     private fun setupViewModels() {
-        sessionViewModel = ViewModelProviders.of(this).get(SessionViewModel::class.java)
-
-        sessionViewModel.loggedInState.observe(this, Observer {
+        Session.loggedInState.observe(this, Observer {
 
             when (it) {
                 is State.Items -> {
@@ -170,7 +176,7 @@ class BlankActivity : AppCompatActivity() {
             }
         })
 
-        sessionViewModel.user.observe(this, Observer {
+        Session.user.observe(this, Observer {
             if (it != null) userView.configure(it) else userView.configureAsGuest()
         })
     }
@@ -196,8 +202,14 @@ class BlankActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp(AppBarConfiguration(setOf(R.id.loginFragment, R.id.myPageFragment, R.id.addObservationFragment, R.id.mushroomFragment, R.id.nearbyFragment, R.id.cameraFragment, R.id.settingsFragment, R.id.aboutFragment), drawerLayout)) || super.onSupportNavigateUp()
-    }
+       if (navController.currentDestination?.id == R.id.addObservationFragment && navController.previousBackStackEntry?.destination?.id == R.id.mushroomDetailsFragment) {
+           return navController.navigateUp(AppBarConfiguration(setOf(R.id.loginFragment, R.id.myPageFragment, R.id.mushroomFragment, R.id.nearbyFragment, R.id.cameraFragment, R.id.settingsFragment, R.id.aboutFragment), drawerLayout)) || super.onSupportNavigateUp()
+
+       } else  {
+           return navController.navigateUp(AppBarConfiguration(setOf(R.id.loginFragment, R.id.myPageFragment, R.id.addObservationFragment, R.id.mushroomFragment, R.id.nearbyFragment, R.id.cameraFragment, R.id.settingsFragment, R.id.aboutFragment), drawerLayout)) || super.onSupportNavigateUp()
+
+       }
+           }
 
     override fun onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {

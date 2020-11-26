@@ -1,67 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                   xmlns:tools="http://schemas.android.com/tools"
-                                                   android:layout_width="match_parent"
-    android:clipToPadding="false"
-    android:clipChildren="false"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@color/colorPrimary"
-                                                   android:layout_height="match_parent"
-                                                   tools:context=".fragments.AddObservationFragment">
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    tools:context=".fragments.AddObservationFragment">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/addObservationFragment_tabLayout"
-        android:layout_marginTop="8dp"
-        android:layout_width="match_parent"
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline7"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/addObservationFragment_addObservationImagesRecyclerView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:tabMode="fixed"
-        app:tabTextAppearance="@style/AppPrimary"
-        android:theme="@style/Light">
-
-    </com.google.android.material.tabs.TabLayout>
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.6666666666" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/addObservationFragment_addObservationImagesRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipChildren="false"
         android:clipToPadding="false"
         android:paddingTop="?attr/actionBarSize"
-        android:clipChildren="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.Toolbar
-        app:title="@string/addObservationVC_title"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:elevation="0dp"
         android:id="@+id/addObservationFragment_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
-        app:navigationIcon="@drawable/icon_menu_button" />
+        app:elevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="?attr/homeAsUpIndicator"
+        app:title="@string/addObservationVC_title" />
 
     <androidx.viewpager.widget.ViewPager
-            android:id="@+id/addObservationFragment_viewPager"
-            android:background="@drawable/gradient_background"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/addObservationFragment_tabLayout"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+        android:id="@+id/addObservationFragment_viewPager"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/gradient_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/addObservationFragment_tabLayout">
 
-<com.noque.svampeatlas.views.SpinnerView
-    android:id="@+id/addObservationFragment_spinner"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"/>
+    </androidx.viewpager.widget.ViewPager>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/addObservationFragment_tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@color/colorPrimary"
+        android:theme="@style/Light"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/addObservationFragment_addObservationImagesRecyclerView"
+        app:tabMode="fixed"
+        app:tabTextAppearance="@style/AppPrimary"/>
+
+    <com.noque.svampeatlas.views.SpinnerView
+        android:id="@+id/addObservationFragment_locationSpinner"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/addObservationFragment_tabLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline7"
+        app:layout_constraintTop_toTopOf="@+id/addObservationFragment_tabLayout" />
+
+    <com.noque.svampeatlas.views.SpinnerView
+        android:id="@+id/addObservationFragment_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

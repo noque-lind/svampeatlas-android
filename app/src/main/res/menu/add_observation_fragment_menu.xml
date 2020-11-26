@@ -12,7 +12,7 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/empty"
+        android:id="@+id/menu_addObservationFragment_overflow"
         android:icon="@drawable/ic_more_vertical"
         android:orderInCategory="101"
         app:showAsAction="always"

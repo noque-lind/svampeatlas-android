@@ -4,12 +4,14 @@ import android.content.pm.ActivityInfo
 import android.graphics.*
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -27,12 +29,14 @@ import com.noque.svampeatlas.extensions.pxToDp
 import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.services.LocationService
+import com.noque.svampeatlas.utilities.SharedPreferences
 import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.views.BlankActivity
 import com.noque.svampeatlas.views.SpinnerView
 import com.noque.svampeatlas.view_holders.AddImageViewHolder
+import com.noque.svampeatlas.view_holders.AddedImageViewHolder
 import com.noque.svampeatlas.view_models.NewObservationViewModel
-import com.noque.svampeatlas.view_models.SessionViewModel
+import com.noque.svampeatlas.view_models.Session
 import kotlinx.android.synthetic.main.custom_toast.*
 import kotlinx.android.synthetic.main.custom_toast.view.*
 import kotlinx.android.synthetic.main.fragment_add_observation.*
@@ -61,7 +65,8 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
 
     enum class Type {
         NEW_OBSERVATION,
-        IDENTIFYED_OBSERVATION
+        IDENTIFYED_OBSERVATION,
+        Edit
     }
 
     enum class Category {
@@ -88,18 +93,19 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
 
     // Views
     private var toolbar by autoCleared<androidx.appcompat.widget.Toolbar>()
-    private var viewPager by autoCleared<ViewPager> {
-        it?.adapter = null
-    }
+    private var viewPager by autoCleared<ViewPager> { it?.adapter = null }
     private var addImagesRecyclerView by autoCleared<RecyclerView> {
         it?.adapter = null
     }
-    private var tabLayout by autoCleared<TabLayout>()
+    private var tabLayout by autoCleared<TabLayout>() {
+        it?.setupWithViewPager(null)
+    }
     private var spinnerView by autoCleared<SpinnerView>()
+    private var locationSpinner by autoCleared<SpinnerView>()
+
 
     // View models
-    private val newObservationViewModel by lazy { ViewModelProvider(requireActivity()).get(NewObservationViewModel::class.java)}
-    private val sessionViewModel by lazy { ViewModelProvider(requireActivity()).get(SessionViewModel::class.java)}
+    private val newObservationViewModel  by lazy { ViewModelProvider(requireActivity()).get(NewObservationViewModel::class.java)}
 
     // Adapters
     private val addImagesAdapter by lazy {
@@ -116,31 +122,46 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     }
 
     private val informationAdapter by lazy {
-        InformationAdapter(
-            context,
-            Category.values,
-            childFragmentManager,
-            FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
-        )
+        if (args.type == Type.Edit) {
+            InformationAdapter(
+                context,
+                arrayOf(Category.DETAILS, Category.LOCALITY),
+                childFragmentManager,
+                FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
+            )
+        } else {
+            InformationAdapter(
+                context,
+                Category.values,
+                childFragmentManager,
+                FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
+            )
+        }
     }
 
     // Listeners
 
     override fun positiveButtonPressed() {
-        (newObservationViewModel.useImageLocationPromptState.value as? State.Items)?.items?.first?.let {
-            newObservationViewModel.setCoordinateState(State.Items(it))
-        }
+        newObservationViewModel.promptPositive()
+//        (newObservationViewModel.useImageLocationPromptState.value as? State.Items)?.items?.first?.let {
+//            newObservationViewModel.setCoordinateState(State.Items(it))
+//        }
     }
 
     override fun negativeButtonPressed() {
-        (newObservationViewModel.useImageLocationPromptState.value as? State.Items)?.items?.second?.let {
-            newObservationViewModel.setCoordinateState(State.Items(it))
-        }
+        newObservationViewModel.promptNegative()
+//        (newObservationViewModel.useImageLocationPromptState.value as? State.Items)?.items?.second?.let {
+//            newObservationViewModel.setCoordinateState(State.Items(it))
+//        }
     }
 
     private val locationServiceListener = object : LocationService.Listener {
         override fun requestPermission(permissions: Array<out String>, requestCode: Int) {
             requestPermissions(permissions, requestCode)
+        }
+
+        override fun isLocating() {
+            newObservationViewModel.setCoordinateState(State.Loading())
         }
 
         override fun locationRetrievalError(error: LocationService.Error) {
@@ -160,10 +181,11 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
             ): Int {
                 if (viewHolder is AddImageViewHolder) {
                     return 0
+                } else if (viewHolder is AddedImageViewHolder) {
+                     if (viewHolder.isLocked) return 0 else return super.getSwipeDirs(recyclerView, viewHolder)
                 } else {
                     return super.getSwipeDirs(recyclerView, viewHolder)
                 }
-
             }
 
             override fun onChildDraw(
@@ -210,27 +232,26 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-                newObservationViewModel.removeImageAt(position)
-                addImagesAdapter.notifyItemRemoved(viewHolder.adapterPosition)
+                if (SharedPreferences.hasSeenImageDeletion) {
+                    newObservationViewModel.removeImageAt(position)
+                } else {
+                    val dialog = TermsFragment()
+                    dialog.arguments = Bundle().apply { putSerializable(TermsFragment.KEY_TYPE, TermsFragment.Type.IMAGEDELETIONS) }
+                    dialog.show(childFragmentManager, null)
+                }
             }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         addImageShown = savedInstanceState?.getBoolean(KEY_ADDIMAGE_SHOWN) ?: false
         localityIdShown = savedInstanceState?.getInt(KEY_LOCALITY_ID_SHOWN) ?: DEFAULT_LOCALITY_ID
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        if (!addImageShown && args.type == Type.NEW_OBSERVATION) {
-            addImageShown = true
-            newObservationViewModel.reset()
-            val action =
-                AddObservationFragmentDirections.actionAddObservationFragmentToCameraFragment()
-            action.type = CameraFragment.Type.NEW_OBSERVATION
-            findNavController().navigate(action)
-        }
+
     }
 
     override fun onCreateView(
@@ -238,8 +259,18 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
-        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        return inflater.inflate(R.layout.fragment_add_observation, container, false)
+//        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        if (!addImageShown && args.type == Type.NEW_OBSERVATION) {
+            addImageShown = true
+            newObservationViewModel.reset()
+            val action =
+                AddObservationFragmentDirections.actionAddObservationFragmentToCameraFragment()
+            action.type = CameraFragment.Type.NEW_OBSERVATION
+            findNavController().navigate(action)
+            return null
+        } else {
+            return inflater.inflate(R.layout.fragment_add_observation, container, false)
+        }
     }
 
 
@@ -250,16 +281,14 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         setupViewModels()
     }
 
-    override fun onPause() {
-        super.onPause()
-        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
-    }
-
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.add_observation_fragment_menu, menu)
+        if (args.type == Type.Edit) {
+            menu.findItem(R.id.menu_addObservationFragment_overflow).isVisible = false
+        }
         super.onCreateOptionsMenu(menu, inflater)
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -285,13 +314,19 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         addImagesRecyclerView = addObservationFragment_addObservationImagesRecyclerView
         tabLayout = addObservationFragment_tabLayout
         spinnerView = addObservationFragment_spinner
+        locationSpinner = addObservationFragment_locationSpinner
     }
 
     private fun setupView() {
+        if (args.type != Type.Edit) {
+            toolbar.setNavigationIcon(R.drawable.icon_menu_button)
+            toolbar.setTitle(R.string.addObservationVC_title)
+        } else {
+            toolbar.setTitle(R.string.addObservationVC_title_edit)
+            toolbar.subtitle = "ID: ${args.id}"
+        }
         (requireActivity() as BlankActivity).setSupportActionBar(toolbar)
-
         tabLayout.setupWithViewPager(viewPager)
-
         addImagesRecyclerView.apply {
             val myHelper = ItemTouchHelper(imageSwipedCallback)
             myHelper.attachToRecyclerView(this)
@@ -308,104 +343,23 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     }
 
     private fun setupViewModels() {
-        sessionViewModel.observationUploadState.observe(viewLifecycleOwner, Observer {
+        Session.observationUploadState.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is State.Items -> {
-                    spinnerView.stopLoading()
+                    if (args.type == Type.Edit) {
+                        newObservationViewModel.reset()
+                        val action = AddObservationFragmentDirections.actionGlobalMyPageFragment()
+                        findNavController().navigate(action)
+                    } else {
+                        spinnerView.stopLoading()
 
-                    val bitmap = BitmapFactory.decodeResource(
-                        resources,
-                        R.drawable.icon_elmessageview_success
-                    )
-                    createToast(
-                        resources.getString(R.string.prompt_successRecordCreation_title),
-                        "ID: ${it.items.first}",
-                        bitmap.changeColor(
-                            ResourcesCompat.getColor(
-                                resources,
-                                R.color.colorGreen,
-                                null
-                            )
+                        val bitmap = BitmapFactory.decodeResource(
+                            resources,
+                            R.drawable.icon_elmessageview_success
                         )
-                    )
-                    reset()
-                }
-
-                is State.Loading -> {
-                    spinnerView.startLoading()
-                }
-
-                is State.Error -> {
-                    spinnerView.stopLoading()
-
-                    val bitmap = BitmapFactory.decodeResource(
-                        resources,
-                        R.drawable.icon_elmessageview_failure
-                    )
-                    createToast(
-                        it.error.title,
-                        it.error.message,
-                        bitmap.changeColor(
-                            ResourcesCompat.getColor(
-                                resources,
-                                R.color.colorRed,
-                                null
-                            )
-                        )
-                    )
-                }
-            }
-        })
-
-
-        newObservationViewModel.images.observe(viewLifecycleOwner, Observer {
-            addImagesAdapter.configure(it)
-        })
-
-        newObservationViewModel.coordinateState.observe(viewLifecycleOwner, Observer {
-            when (it) {
-
-                is State.Loading -> {
-                    locationService.setListener(locationServiceListener)
-                    locationService.start()
-                }
-
-                is State.Empty -> {
-                    newObservationViewModel.setCoordinateState(State.Loading())
-                }
-
-                is State.Error -> { }
-            }
-        })
-
-        newObservationViewModel.useImageLocationPromptState.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is State.Items -> {
-                    val dialog = PromptFragment()
-                    dialog.setTargetFragment(this, 10)
-                    val bundle = Bundle()
-                    bundle.putString(PromptFragment.KEY_TITLE, getString(R.string.prompt_useImageMetadata_title))
-                    bundle.putString(PromptFragment.KEY_MESSAGE, getString(R.string.prompt_useImageMetadata_message))
-                    bundle.putString(PromptFragment.KEY_POSITIVE, getString(R.string.prompt_useImageMetadata_positive))
-                    bundle.putString(PromptFragment.KEY_NEGATIVE, getString(R.string.prompt_useImageMetadata_negative))
-                    dialog.arguments = bundle
-                    dialog.show(requireFragmentManager(), null)
-                }
-            }
-        })
-
-        newObservationViewModel.locality.observe(viewLifecycleOwner, Observer {
-            if (viewPager.currentItem == Category.LOCALITY.ordinal) {
-                localityIdShown = it?.id ?: DEFAULT_LOCALITY_ID
-            } else {
-                it?.let {
-                    if (it.id != localityIdShown) {
-                        localityIdShown = it.id
-                        val bitmap =
-                            BitmapFactory.decodeResource(resources, R.drawable.icon_locality_pin)
                         createToast(
-                            resources.getString(R.string.prompt_localityDetermined_title),
-                            resources.getString(R.string.prompt_localityDetermined_message, it.name, it.location.latitude, it.location.longitude),
+                            resources.getString(R.string.prompt_successRecordCreation_title),
+                            "ID: ${it.items.first}",
                             bitmap.changeColor(
                                 ResourcesCompat.getColor(
                                     resources,
@@ -414,39 +368,74 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                                 )
                             )
                         )
+                        reset()
                     }
+                }
+
+                is State.Loading -> {
+                    spinnerView.startLoading()
+                }
+
+                is State.Error -> {
+                    spinnerView.stopLoading()
                 }
             }
         })
 
-        newObservationViewModel.localityState.observe(viewLifecycleOwner, Observer { state ->
-            if (viewPager.currentItem == Category.LOCALITY.ordinal) return@Observer
+        newObservationViewModel.images.observe(viewLifecycleOwner, Observer {
+            addImagesAdapter.configure(it ?: mutableListOf())
+        })
 
-            when (state) {
-                is State.Error -> {
-                    if (localityIdShown != LOCALITY_ID_FOR_ERROR) {
-                        localityIdShown = LOCALITY_ID_FOR_ERROR
-                        val bitmap =
-                            BitmapFactory.decodeResource(resources, R.drawable.icon_locality_pin)
-                        createToast(
-                            getString(R.string.prompt_localityDeterminedError_title),
-                            state.error.message,
-                            bitmap.changeColor(
-                                ResourcesCompat.getColor(
-                                    resources,
-                                    R.color.colorRed,
-                                    null
-                                )
-                            )
-                        )
-                    }
+
+        newObservationViewModel.removedImage.observe(viewLifecycleOwner, Observer {
+            addImagesAdapter.removeImage(it)
+        })
+
+        newObservationViewModel.coordinateState.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is State.Items, is State.Error -> locationSpinner.stopLoading()
+                is State.Loading -> locationSpinner.startLoading()
+                is State.Empty -> {
+                    locationService.setListener(locationServiceListener)
+                    locationService.start()
                 }
+            }
+        })
+
+        newObservationViewModel.showPrompt.observe(viewLifecycleOwner, Observer {
+            val dialog = PromptFragment()
+            dialog.setTargetFragment(this, 10)
+            dialog.arguments = Bundle().apply {
+                putString(PromptFragment.KEY_TITLE, it.title)
+                putString(PromptFragment.KEY_MESSAGE, it.message)
+                putString(PromptFragment.KEY_POSITIVE, it.yes)
+                putString(PromptFragment.KEY_NEGATIVE, it.no)
+            }
+            dialog.show(parentFragmentManager, null)
+        })
+
+        newObservationViewModel.showNotification.observe(viewLifecycleOwner, Observer {
+            val bitmap = when (it) {
+                is NewObservationViewModel.Notification.LocationFound -> BitmapFactory.decodeResource(resources, R.drawable.icon_locality_pin).changeColor(R.color.colorPrimary)
+                else -> BitmapFactory.decodeResource(
+                    resources,
+                    R.drawable.icon_elmessageview_success
+                )
+            }
+
+            createToast(it.title, it.message, bitmap)
+        })
+
+        newObservationViewModel.localitiesState.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is State.Items, is State.Empty, is State.Error -> locationSpinner.stopLoading()
+                is State.Loading -> locationSpinner.startLoading()
             }
         })
 }
 
     private fun uploadButtonPressed() {
-        val result = newObservationViewModel.prepareForUpload(sessionViewModel.user.value?.id ?: 0)
+        val result = newObservationViewModel.prepareForUpload(Session.user.value?.id ?: 0, args.type == Type.Edit)
 
         result.onError {
             when (it) {
@@ -473,7 +462,11 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
 
 
         result.onSuccess {
-            sessionViewModel.uploadObservation(it.first, it.second)
+            if (args.type == Type.Edit) {
+                Session.editObservation(args.id, it.first, it.second)
+            } else {
+                Session.uploadObservation(it.first, it.second)
+            }
         }
     }
 

@@ -40,8 +40,11 @@
         <item name="android:fontFamily">@font/avenir_next</item>
     </style>
 
-    <style name="AppPrimary.Small">
-
+    <style name="AppSmall">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">9sp</item>
+        <item name="color">@color/colorThird</item>
+        <item name="android:font">@font/avenir_text_ultra_light</item>
     </style>
 
     <style name="AppPrimaryHighlighted">

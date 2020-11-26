@@ -23,8 +23,8 @@ class DetailsAdapter(private val resources: Resources, private val categories: A
     var substrate: Pair<Substrate, Boolean>? = null
     var vegetationType: Pair<VegetationType, Boolean>? = null
     var hosts: Pair<List<Host>, Boolean>? = null
-    private var notes: String? = null
-    private var ecologyNotes: String? = null
+    var notes: String? = null
+    var ecologyNotes: String? = null
 
     fun updateCategory(category: DetailsFragment.Categories) {
         notifyItemChanged(category.ordinal)

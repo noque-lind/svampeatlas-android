@@ -83,6 +83,7 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     private var locationMarker: Marker? = null
     private var selectedMarker: Marker? = null
     private var tileOverlay: TileOverlay? = null
+    private var accuracyOverlay: Circle? = null
     private var circleOverlays = mutableListOf<Circle>()
 
     // Views
@@ -154,7 +155,7 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
 
     // Forced to put the whole fragment as listener, as it was impossible to remove just a listener var/object within the callback
     override fun onGlobalLayout() {
-        if (viewLifecycleOwner.lifecycle.currentState != Lifecycle.State.DESTROYED && mapView.height != 0 && mapView.width != 0) {
+        if (viewLifecycleOwnerLiveData.value?.lifecycle?.currentState != Lifecycle.State.DESTROYED && mapView.height != 0 && mapView.width != 0) {
             mapView.viewTreeObserver.removeOnGlobalLayoutListener(this)
             dispatchGroup.leave()
         }
@@ -448,12 +449,14 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     }
 
 
-    fun addLocationMarker(location: LatLng, title: String? = null) {
+    fun addLocationMarker(location: LatLng, title: String? = null, accuracy: Double? = null) {
         dispatchGroup.notify(Runnable {
             reset()
 
             locationMarker?.remove()
             locationMarker = null
+            accuracyOverlay?.remove()
+            accuracyOverlay = null
 
             val bitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_location)
 
@@ -476,6 +479,18 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
                 it.tag = LOCATION_TAG
                 markers.add(it)
                 locationMarker = it
+            }
+            accuracy?.let {
+                googleMap.addCircle(
+                    CircleOptions()
+                        .center(location)
+                        .strokeWidth(1F)
+                        .radius(it)
+                        .zIndex(10F)
+                        .fillColor(ColorUtils.setAlphaComponent(resources.getColor(R.color.colorGreen), 40))
+                )?.let {
+                    accuracyOverlay = it
+                }
             }
         })
     }

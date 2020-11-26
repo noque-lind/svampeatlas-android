@@ -95,11 +95,11 @@
     <string name="prompt_successRecordCreation_title">You observation has been created</string>
 
     <string name="prompt_useImageMetadata_title">Location suggestion</string>
-    <string name="prompt_useImageMetadata_message">An added image seems to have been taken in another location An added image seems to have been taken over 500 meters away from the current location of the observation. Would you like to use the GPS-information and date from the image instead?</string>
+    <string name="prompt_useImageMetadata_message">An added image seems to have been taken at a different time and place than now. Would you like to use the information from the image instead?\n\nThe GPS accuracy of the image: %.02f m</string>
     <string name="prompt_useImageMetadata_positive">Yes, use the image metadata</string>
     <string name="prompt_useImageMetadata_negative">No</string>
 
     <string name="prompt_localityDetermined_title">The location of your observation has been determined</string>
-    <string name="prompt_localityDetermined_message">Name: %1$s\nCoordinates: %2$.02f - %3$.02f</string>
+    <string name="prompt_localityDetermined_message">Name: %1$s Coordinates: %2$.02f - %3$.02f Accuracy: %4$.02f</string>
     <string name="prompt_localityDeterminedError_title">Couldn\'t find nearby location</string>
 </resources>

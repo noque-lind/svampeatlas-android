@@ -13,7 +13,7 @@ class SpeciesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     interface Listener {
         fun mushroomSelected(mushroom: Mushroom)
-        fun confidenceSet(confidence: NewObservationViewModel.DeterminationConfidence)
+        fun confidenceSet(confidence: DeterminationConfidence)
     }
 
     companion object {
@@ -30,7 +30,7 @@ class SpeciesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         class SelectableMushroom(val mushroom: Mushroom, val score: Double? = null) : Item(ViewType.SELECTABLE)
         class SelectedMushroom(
             val mushroom: Mushroom,
-            val confidence: NewObservationViewModel.DeterminationConfidence
+            val confidence: DeterminationConfidence
         ) : Item(ViewType.SELECTEDSPECIES)
 
         enum class ViewType : com.noque.svampeatlas.models.ViewType {

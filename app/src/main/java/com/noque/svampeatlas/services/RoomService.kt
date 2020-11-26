@@ -1,11 +1,13 @@
 package com.noque.svampeatlas.services
 
+import android.app.Application
 import android.content.Context
 import android.content.res.Resources
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.models.*
+import com.noque.svampeatlas.utilities.MyApplication
 
-class RoomService private constructor(context: Context) {
+object RoomService {
 
     sealed class Error(title: String, message: String) : AppError(title, message, null) {
         enum class DataType {
@@ -26,20 +28,9 @@ class RoomService private constructor(context: Context) {
         )
     }
 
-    companion object {
-        @Volatile
-        private var INSTANCE: RoomService? = null
-        val TAG = "RoomService"
+    private val database by lazy { Database.buildDatabase(MyApplication.applicationContext)  }
+    private val resources by lazy {  MyApplication.applicationContext.resources }
 
-        fun getInstance(context: Context): RoomService {
-            return INSTANCE ?: synchronized(this) {
-                return RoomService(context.applicationContext).also { INSTANCE = it }
-            }
-        }
-    }
-
-    private val database: Database = Database.buildDatabase(context)
-    private val resources: Resources = context.resources
 
     suspend fun saveUser(user: User) {
         database.UserDao().insert(user)
@@ -65,12 +56,22 @@ class RoomService private constructor(context: Context) {
         return if (substrate != null) Result.Success(substrate) else Result.Error(Error.NoData(resources, Error.DataType.SUBSTRATE))
     }
 
+    fun getSubstrateWithIDNow(id: Int): Result<Substrate, Error> {
+        val substrate = database.SubstratesDao().getSubstrateWithIDNow(id)
+        return if (substrate != null) Result.Success(substrate) else Result.Error(Error.NoData(resources, Error.DataType.SUBSTRATE))
+    }
+
     suspend fun saveVegetationType(vegetationType: VegetationType) {
         database.VegetationTypeDao().save(vegetationType)
     }
 
     suspend fun getVegetationTypeWithID(id: Int): Result<VegetationType, Error> {
         val vegetationType = database.VegetationTypeDao().getVegetationTypeWithID(id)
+        return if (vegetationType != null) Result.Success(vegetationType) else Result.Error(Error.NoData(resources, Error.DataType.VEGETATIONTYPE))
+    }
+
+    fun getVegetationTypewithIDNow(id: Int): Result<VegetationType, Error> {
+        val vegetationType = database.VegetationTypeDao().getVegetationTypeWithIDNow(id)
         return if (vegetationType != null) Result.Success(vegetationType) else Result.Error(Error.NoData(resources, Error.DataType.VEGETATIONTYPE))
     }
 
@@ -116,4 +117,6 @@ class RoomService private constructor(context: Context) {
             return Result.Success(mushroom)
         }
     }
+
+
 }

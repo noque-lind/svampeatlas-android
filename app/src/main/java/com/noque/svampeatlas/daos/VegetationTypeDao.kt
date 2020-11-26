@@ -14,6 +14,9 @@ interface VegetationTypeDao {
     @Query("SELECT * FROM vegetationType WHERE id = :id LIMIT 1")
     suspend fun getVegetationTypeWithID(id: Int): VegetationType?
 
+    @Query("SELECT * FROM vegetationType WHERE id = :id LIMIT 1")
+    fun getVegetationTypeWithIDNow(id: Int): VegetationType?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun save(vararg vegetationType: VegetationType)
 

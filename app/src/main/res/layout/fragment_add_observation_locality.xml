@@ -59,4 +59,17 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/localityFragment_precisionLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:paddingHorizontal="8dp"
+        style="@style/AppPrimary"
+        android:paddingVertical="2dp"
+        android:background="@drawable/zoom_controls_view_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

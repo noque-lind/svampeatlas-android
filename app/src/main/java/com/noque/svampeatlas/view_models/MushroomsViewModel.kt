@@ -85,7 +85,7 @@ class MushroomsViewModel(category: Category?, application: Application) :
         _mushroomsState.value = State.Loading()
 
         viewModelScope.launch {
-            val result = RoomService.getInstance(getApplication()).getFavoritedMushrooms()
+            val result = RoomService.getFavoritedMushrooms()
             result.onError {
                 _mushroomsState.value = State.Error(it)
             }
@@ -128,7 +128,7 @@ class MushroomsViewModel(category: Category?, application: Application) :
                 DataService.getInstance(getApplication()).getMushroom(TAG, it.id) {
                     it.onSuccess {
                         viewModelScope.launch {
-                            RoomService.getInstance(getApplication()).saveMushroom(it)
+                            RoomService.saveMushroom(it)
                             _favoringState.value = State.Items(it)
                         }
                     }
@@ -146,7 +146,7 @@ class MushroomsViewModel(category: Category?, application: Application) :
     fun unFavoriteMushroomAt(index: Int) {
         (mushroomsState.value as? State.Items)?.items?.getOrNull(index)?.let { mushroom ->
             viewModelScope.launch {
-                RoomService.getInstance(getApplication()).deleteMushroom(mushroom)
+                RoomService.deleteMushroom(mushroom)
                 _mushroomsState.value = (_mushroomsState.value as? State.Items)?.let { state ->
                     State.Items(state.items.minus(mushroom))
                 }

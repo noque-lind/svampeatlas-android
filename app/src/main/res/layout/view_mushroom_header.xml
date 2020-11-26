@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:theme="@style/Light">
+
+
+    <TextView
+            android:id="@+id/mushroomHeaderView_titleTextView"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/AppTitle"/>
+
+
+    <TextView
+            android:id="@+id/mushroomHeaderView_subtitleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="2dp"
+        style="@style/AppPrimaryHighlighted"
+            />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/mushroomHeaderView_redlistShortIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/AppSmall"
+            tools:text="LC"
+            android:background="@drawable/circle_view_color_red"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="2dp"/>
+
+        <TextView
+            android:id="@+id/mushroomHeaderView_redlistLabel"
+            style="@style/AppPrimary"
+            tools:text="Not endangered"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+</LinearLayout>

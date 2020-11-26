@@ -11,12 +11,12 @@ import java.util.*
 data class Host(
     @PrimaryKey
     @SerializedName("_id") val id: Int,
-    @SerializedName("DKname") val dkName: String,
+    @SerializedName("DKname") val dkName: String?,
     @SerializedName("LatinName") val latinName: String,
     @SerializedName("probability") val probability: Int?
 ) {
     val localizedName: String get() {
-        return if (Locale.getDefault().isDanish()) {
+        return if (Locale.getDefault().isDanish() && dkName != null) {
             dkName.capitalized()
         } else {
             latinName.capitalized()

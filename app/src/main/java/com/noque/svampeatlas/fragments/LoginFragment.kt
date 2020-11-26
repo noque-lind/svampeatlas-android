@@ -22,7 +22,6 @@ import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.views.BackgroundView
 import com.noque.svampeatlas.views.BlankActivity
-import com.noque.svampeatlas.view_models.SessionViewModel
 import kotlinx.android.synthetic.main.custom_toast.*
 import kotlinx.android.synthetic.main.custom_toast.view.*
 import kotlinx.android.synthetic.main.fragment_login.*
@@ -38,6 +37,7 @@ import android.widget.ImageView
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.noque.svampeatlas.utilities.GlideApp
 import com.noque.svampeatlas.utilities.MyGlideApp
+import com.noque.svampeatlas.view_models.Session
 import java.lang.Exception
 
 
@@ -55,10 +55,6 @@ class LoginFragment : Fragment() {
     private lateinit var createAccountButton: Button
     private lateinit var bg: ImageView
 
-    // View models
-
-    lateinit var sessionViewModel: SessionViewModel
-
     // Listeners
 
     private val loginButtonClickListener = View.OnClickListener {
@@ -68,7 +64,7 @@ class LoginFragment : Fragment() {
         } else if (passwordEditText.text.isNullOrEmpty()) {
             passwordEditText.setError(resources.getString(R.string.loginVC_passwordTextField_error))
         } else {
-            sessionViewModel.login(initialsEditText.text.toString(), passwordEditText.text.toString())
+            Session.login(initialsEditText.text.toString(), passwordEditText.text.toString())
         }
 
         getSystemService(requireContext(), InputMethodManager::class.java)?.let {
@@ -121,25 +117,21 @@ class LoginFragment : Fragment() {
     }
 
     private fun setupViewModels() {
-        activity?.let {
-            sessionViewModel = ViewModelProviders.of(it).get(SessionViewModel::class.java)
+        Session.loggedInState.observe(viewLifecycleOwner, Observer {
+            backgroundView.reset()
 
-            sessionViewModel.loggedInState.observe(viewLifecycleOwner, Observer {
-                backgroundView.reset()
+            when (it) {
+                is State.Error -> {
 
-                when (it) {
-                    is State.Error -> {
-
-                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_elmessageview_failure)
-                        createToast(it.error.title, it.error.message, bitmap.changeColor(ResourcesCompat.getColor(resources, R.color.colorRed, null)))
-                    }
-
-                    is State.Loading -> {
-                        backgroundView.setLoading()
-                    }
+                    val bitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_elmessageview_failure)
+                    createToast(it.error.title, it.error.message, bitmap.changeColor(ResourcesCompat.getColor(resources, R.color.colorRed, null)))
                 }
-            })
-        }
+
+                is State.Loading -> {
+                    backgroundView.setLoading()
+                }
+            }
+        })
     }
 
     private fun createToast(title: String, message: String, bitmap: Bitmap) {

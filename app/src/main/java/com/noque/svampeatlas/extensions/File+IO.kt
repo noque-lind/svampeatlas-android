@@ -4,7 +4,11 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.exifinterface.media.ExifInterface
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.SphericalUtil
 import com.noque.svampeatlas.models.AppError
+import com.noque.svampeatlas.models.Location
 import com.noque.svampeatlas.models.Result
 import com.noque.svampeatlas.views.BlankActivity
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +33,22 @@ suspend fun File.getBitmap(): Result<Bitmap, AppError> = withContext(Dispatchers
     } catch (exception: IllegalArgumentException) {
         Result.Error<Bitmap, AppError>(AppError("Sorry", "An error occurred while trying to upload image. It does not exist any longer.", null))
     }
+}
+
+fun File.getExifLocation(): Location? {
+ExifInterface(this.inputStream()).apply {
+    val lat = latLong?.first()
+    val lng = latLong?.last()
+    val date = getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL)?.let {
+        SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.getDefault()).parse(it)
+    }
+
+    if (lat != null && lng != null) {
+        return Location(date ?: Date(), LatLng(lat, lng), 65f)
+    } else {
+        return null
+    }
+}
 }
 
 //suspend fun File.copyTo(file: File) {

@@ -82,9 +82,9 @@
     <string name="prompt_useImageMetadata_positive">Ja, brug billedets informationer</string>
     <string name="prompt_useImageMetadata_negative">Nej</string>
     <string name="prompt_useImageMetadata_title">Forslag til placering</string>
-    <string name="prompt_useImageMetadata_message">Et tilføjet billede lader til at være blevet taget over 500 meter væk fra observationens nuværende placering. Vil du bruge billedets GPS-information og dato i stedet for?</string>
+    <string name="prompt_useImageMetadata_message">Et tilføjet billede har en anden placering og tid, end den nuværende. Vil du bruge billedets GPS-information og dato i stedet for?\n\nBilledets GPS-Præcision: %.02f m</string>
     <string name="prompt_localityDetermined_title">Fundets placering er blevet bestemt</string>
-    <string name="prompt_localityDetermined_message">Navn: %1$s\nKoordinater: %2$.02f - %3$.02f</string>
+    <string name="prompt_localityDetermined_message">Navn: %1$s\nKoordinater: %2$.02f - %3$.02f\nPræcision: %4$.02f</string>
     <string name="prompt_localityDeterminedError_title">Nærmeste placering kunne ikke findes.</string>
 
     <string name="prompt_favoritizingSucces_title">%s er nu markeret som favorit</string>

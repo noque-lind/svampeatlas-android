@@ -7,7 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,12 +19,18 @@ import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.fragments.AddObservationFragmentDirections
 import com.noque.svampeatlas.fragments.DetailsFragment
+import com.noque.svampeatlas.models.DeterminationConfidence
 import com.noque.svampeatlas.models.Mushroom
+import com.noque.svampeatlas.models.Observation
+import com.noque.svampeatlas.utilities.MyApplication
+import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.views.SearchBarListener
 import com.noque.svampeatlas.views.SearchBarView
 import com.noque.svampeatlas.view_models.MushroomsViewModel
 import com.noque.svampeatlas.view_models.factories.MushroomsViewModelFactory
 import com.noque.svampeatlas.view_models.NewObservationViewModel
+import com.noque.svampeatlas.view_models.SpeciesViewModel
+import com.noque.svampeatlas.view_models.factories.SpeciesViewModelFactory
 import kotlinx.android.synthetic.main.fragment_add_observation_specie.*
 
 class SpeciesFragment : Fragment() {
@@ -36,23 +44,21 @@ class SpeciesFragment : Fragment() {
     private var defaultState: Boolean = true
 
     // Views
-    private var recyclerView: RecyclerView? = null
-    private var searchBar: SearchBarView? = null
+    private var recyclerView by autoCleared<RecyclerView> {
+        it?.adapter = null
+    }
+    private var searchBar by autoCleared<SearchBarView>() {
+        it?.setListener(null)
+    }
 
     // View models
     private val mushroomViewModel by lazy {
-        ViewModelProviders.of(
-            this,
-            MushroomsViewModelFactory(
-                MushroomsViewModel.Category.FAVORITES,
-                requireActivity().application
-            )
-        ).get(MushroomsViewModel::class.java)
+        ViewModelProvider(this, MushroomsViewModelFactory(
+           MushroomsViewModel.Category.FAVORITES, requireActivity().application
+        )).get(MushroomsViewModel::class.java)
     }
 
-    private val newObservationViewModel by lazy {
-        ViewModelProviders.of(requireActivity()).get(NewObservationViewModel::class.java)
-    }
+    private val newObservationViewModel: NewObservationViewModel by activityViewModels()
 
     // Adapters
 
@@ -84,7 +90,7 @@ class SpeciesFragment : Fragment() {
                 }
             }
 
-            override fun confidenceSet(confidence: NewObservationViewModel.DeterminationConfidence) {
+            override fun confidenceSet(confidence: DeterminationConfidence) {
                 newObservationViewModel.setConfidence(confidence)
             }
         })
@@ -110,9 +116,9 @@ class SpeciesFragment : Fragment() {
             super.onScrolled(recyclerView, dx, dy)
 
             if (!recyclerView.canScrollVertically(-1)) {
-                searchBar?.expand()
+                searchBar.expand()
             } else if (dy > 0) {
-                searchBar?.collapse()
+                searchBar.collapse()
             }
         }
     }
@@ -138,11 +144,11 @@ class SpeciesFragment : Fragment() {
     }
 
     private fun setupView() {
-        searchBar?.apply {
+        searchBar.apply {
             setListener(searchBarListener)
         }
 
-        recyclerView?.apply {
+        recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = speciesAdapter
             addOnScrollListener(onScrollListener)
@@ -154,8 +160,8 @@ class SpeciesFragment : Fragment() {
 
             if (it != null) {
                 defaultState()
-                recyclerView?.setPadding(0, 0, 0, 0)
-                searchBar?.visibility = View.GONE
+                recyclerView.setPadding(0, 0, 0, 0)
+                searchBar.visibility = View.GONE
                 speciesAdapter.configureUpperSection(
                     State.Items(
                         listOf(
@@ -169,11 +175,11 @@ class SpeciesFragment : Fragment() {
                         R.string.observationSpeciesCell_choosenSpecies)
                 )
             } else {
-                recyclerView?.setPadding(0, (resources.getDimension(R.dimen.searchbar_view_height) + resources.getDimension(
+                recyclerView.setPadding(0, (resources.getDimension(R.dimen.searchbar_view_height) + resources.getDimension(
                         R.dimen.searchbar_top_margin
                     )).toInt(), 0, 0)
-                searchBar?.visibility = View.VISIBLE
-                searchBar?.expand()
+                searchBar.visibility = View.VISIBLE
+                searchBar.expand()
                 speciesAdapter.configureUpperSection(
                     State.Items(
                         listOf(
@@ -184,7 +190,7 @@ class SpeciesFragment : Fragment() {
                 )
             }
 
-            recyclerView?.scrollToPosition(0)
+            recyclerView.scrollToPosition(0)
         })
 
 
@@ -262,40 +268,8 @@ class SpeciesFragment : Fragment() {
     }
 
     private fun defaultState() {
-        searchBar?.resetText()
+        searchBar.resetText()
         defaultState = true
         mushroomViewModel.selectCategory(MushroomsViewModel.Category.FAVORITES, true)
     }
-
-    override fun onPause() {
-        Log.d(TAG, "On Pause")
-        super.onPause()
-    }
-
-    override fun onStop() {
-        Log.d(TAG, "On Stop")
-        super.onStop()
-    }
-
-    override fun onDestroyView() {
-        Log.d(TAG, "OnDestroy View")
-
-        recyclerView?.adapter = null
-        searchBar?.setListener(null)
-
-        recyclerView = null
-        searchBar = null
-        super.onDestroyView()
-    }
-
-    override fun onDestroy() {
-        Log.d(TAG, "On Destroy")
-        super.onDestroy()
-    }
-
-    override fun onDetach() {
-        Log.d(TAG, "On Detach")
-        super.onDetach()
-    }
-
 }

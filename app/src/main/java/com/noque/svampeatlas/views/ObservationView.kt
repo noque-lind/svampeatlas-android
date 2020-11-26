@@ -89,13 +89,13 @@ class ObservationView(context: Context?, attrs: AttributeSet?) : LinearLayout(co
             }
         }
 
-        primaryTextView.text = observation.speciesProperties.name.upperCased()
+        primaryTextView.text = observation.determination.localizedName ?: observation.determination.fullName
 
-        val date = observation.date
+        val date = observation.observationDate
         if (date != null) {
-            secondaryTextView.text = "${date.toReadableDate(true, true)}, ${observation.location}"
+            secondaryTextView.text = "${date.toReadableDate(true, true)}, ${observation.locality?.name}"
         } else {
-            secondaryTextView.text = observation.location
+            secondaryTextView.text = observation.locationName
         }
 
         userTextView.text = observation.observationBy

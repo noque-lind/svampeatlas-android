@@ -2,28 +2,49 @@ package com.noque.svampeatlas.view_models
 
 import android.app.Application
 import android.content.Context
+import android.content.res.Resources
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.*
+import com.bumptech.glide.load.engine.Resource
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.SphericalUtil
 import com.noque.svampeatlas.R
-import com.noque.svampeatlas.extensions.toSimpleString
+import com.noque.svampeatlas.extensions.*
+import com.noque.svampeatlas.extensions.Date
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.services.DataService
+import com.noque.svampeatlas.services.LocationService
 import com.noque.svampeatlas.services.RoomService
+import com.noque.svampeatlas.utilities.MyApplication
 import com.noque.svampeatlas.utilities.SharedPreferences
+import com.noque.svampeatlas.utilities.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
+import java.net.URL
 import java.util.*
 import java.text.SimpleDateFormat
 
 
 class NewObservationViewModel(application: Application) : AndroidViewModel(application) {
+
+    sealed class Notification(val title: String, val message: String) {
+        class LocationFound(resources: Resources, locality: Locality, location: Location): Notification(resources.getString(R.string.prompt_localityDetermined_title), resources.getString(R.string.prompt_localityDetermined_message, locality.name, location.latLng.latitude, location.latLng.longitude, location.accuracy))
+        class LocationInaccessible(resources: Resources, error: AppError): Notification(resources.getString(R.string.prompt_localityDeterminedError_title), error.message)
+        class LocalityInaccessible(resources: Resources): Notification(resources.getString(R.string.error_newObservation_noLocality_title), resources.getString(R.string.error_newObservation_noLocality_message))
+        class ObservationUploaded(resources: Resources, id: Int): Notification(resources.getString(R.string.prompt_successRecordCreation_title),
+            "ID: $id")
+        class ImageDeletionError(resources: Resources, error: AppError): Notification(resources.getString(R.string.prompt_imagedeletion_error_title), error.message)
+    }
+
+    sealed class Prompt(val title: String, val message: String, val yes: String, val no: String) {
+        class UseImageMetadata(resources: Resources, val imageLocation: Location, val userLocation: Location): Prompt(resources.getString(R.string.prompt_useImageMetadata_title), resources. getString(R.string.prompt_useImageMetadata_message, imageLocation.accuracy), resources.getString(R.string.prompt_useImageMetadata_positive), resources.getString(R.string.prompt_useImageMetadata_negative))
+    }
 
     sealed class Error(title: String, message: String, recoveryAction: RecoveryAction? = null): AppError(title, message, recoveryAction) {
         class NoMushroomError(context: Context): Error(context.getString(R.string.error_newObservation_missingInformation_title), context.getString(R.string.error_newObservation_noMushroom_message))
@@ -33,93 +54,73 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         class LocalityFetchError(context: Context): Error(context.getString(R.string.error_newObservation_noLocality_title), context.getString(R.string.error_newObservation_noLocality_message), RecoveryAction.TRYAGAIN)
     }
 
+    sealed class Image {
+        class New(val file: File): Image()
+        class Hosted(val id: Int, val url: String, val creationDate: Date?, val userIsValidator: Boolean): Image() {
+            val isDeletable: Boolean get() {
+                return when {
+                    userIsValidator -> true
+                    (creationDate != null && creationDate.difDays() <= 7) -> true
+                    else -> false
+                }
+            }
+        }
+    }
+
     companion object {
         private const val TAG = "NewObservationViewModel"
     }
 
-    enum class DeterminationConfidence(val databaseName: String) {
-        CONFIDENT("sikker"),
-        LIKELY("sandsynlig"),
-        POSSIBLE("mulig");
-
-        companion object {
-            val values = values()
-        }
-    }
-
-    private val _date by lazy {MutableLiveData<Date>()}
-    private val _locality by lazy {MutableLiveData<Locality?>()}
-    private val _substrate by lazy {MutableLiveData<Pair<Substrate, Boolean>?>()}
-    private val _vegetationType by lazy {MutableLiveData<Pair<VegetationType, Boolean>?>()}
-    private val _hosts by lazy { MutableLiveData<Pair<MutableList<Host>, Boolean>?>()}
-    private val _images by lazy {MutableLiveData<MutableList<File>?>()}
-    private val _mushroom by lazy {MutableLiveData<Pair<Mushroom, DeterminationConfidence>?>()}
-
-    private var _notes: String? = null
-    private var _ecologyNotes: String? = null
+    private val _date by lazy {MutableLiveData<Date>(Calendar.getInstance().time)}
+    private val _locality by lazy {MutableLiveData<Locality?>(null)}
+    private val _substrate by lazy {MutableLiveData<Pair<Substrate, Boolean>?>(null)}
+    private val _vegetationType by lazy {MutableLiveData<Pair<VegetationType, Boolean>?>(null)}
+    private val _hosts by lazy { MutableLiveData<Pair<MutableList<Host>, Boolean>?>(null)}
+    private val _images by lazy { MutableLiveData<MutableList<Image>>(mutableListOf())}
+    private val _mushroom by lazy {MutableLiveData<Pair<Mushroom, DeterminationConfidence>?>(null)}
+    private val _notes by lazy { MutableLiveData<Pair<Boolean, String?>>(null) }
+    private val _ecologyNotes by lazy { MutableLiveData<Pair<Boolean, String?>>(null) }
     private var _determinationNotes: String? = null
 
-    private val _coordinateState by lazy { MutableLiveData<State<com.noque.svampeatlas.models.Location>>() }
-    private val _localityState by lazy { MutableLiveData<State<List<Locality>>>() }
-    private val _predictionResultsState by lazy { MutableLiveData<State<List<PredictionResult>>>() }
-    private val _useImageLocationPromptState by lazy { MutableLiveData<State<Pair<com.noque.svampeatlas.models.Location, com.noque.svampeatlas.models.Location?>>>() }
+    private val _coordinateState by lazy { MutableLiveData<State<Location>>(State.Empty()) }
+    private val _localitiesState by lazy { MutableLiveData<State<List<Locality>>>(State.Empty()) }
+    private val _predictionResultsState by lazy { MutableLiveData<State<List<PredictionResult>>>(State.Empty()) }
 
     val date: LiveData<Date> get() = _date
     val substrate: LiveData<Pair<Substrate, Boolean>?> get() = _substrate
     val vegetationType: LiveData<Pair<VegetationType, Boolean>?> get() = _vegetationType
     val hosts: LiveData<Pair<MutableList<Host>, Boolean>?> get() = _hosts
     val locality: LiveData<Locality?> get() = _locality
-    val notes get() = _notes
-    val ecologyNotes get() = _ecologyNotes
-    val images: LiveData<MutableList<File>?> get() = _images
+    val notes: LiveData<Pair<Boolean, String?>> get() = _notes
+    val ecologyNotes: LiveData<Pair<Boolean, String?>> get() = _ecologyNotes
+    val images: LiveData<MutableList<Image>> get() = _images
     val mushroom: LiveData<Pair<Mushroom, DeterminationConfidence>?> get() = _mushroom
 
-    val coordinateState: LiveData<State<com.noque.svampeatlas.models.Location>> get() = _coordinateState
-    val localityState: LiveData<State<List<Locality>>> get() = _localityState
+    val coordinateState: LiveData<State<Location>> get() = _coordinateState
+    val localitiesState: LiveData<State<List<Locality>>> get() = _localitiesState
     val predictionResultsState: LiveData<State<List<PredictionResult>>> get() = _predictionResultsState
-    val useImageLocationPromptState: LiveData<State<Pair<com.noque.svampeatlas.models.Location, com.noque.svampeatlas.models.Location?>>> get() = _useImageLocationPromptState
 
+    val removedImage by lazy { SingleLiveEvent<Int>() }
 
-    init {
-        setup()
-    }
+    val showNotification by lazy { SingleLiveEvent<Notification>() }
+    val showPrompt by lazy { SingleLiveEvent<Prompt>() }
 
-    private fun setup() {
-        _date.value = Calendar.getInstance().time
-        _substrate.value = null
-        _vegetationType.value = null
-        _hosts.value = null
-        _locality.value = null
-        _notes = null
-        _ecologyNotes = null
-        _images.value = null
-        _mushroom.value = null
+    fun editObservation(observation: Observation, user: User) {
+        _date.value = observation.observationDate
+        _mushroom.value = Pair(Mushroom(observation.id, observation.determination.fullName, VernacularNameDK(observation.determination.localizedName, null)), observation.determination.confidence ?: DeterminationConfidence.CONFIDENT)
+        observation.substrate?.let { _substrate.value = Pair(it, false) }
+        observation.vegetationType?.let { _vegetationType.value = Pair(it, false) }
+        _hosts.value = Pair(observation.hosts.toMutableList(), false)
+        _locality.value = observation.locality
+        _notes.value = Pair(true, observation.note)
+        _ecologyNotes.value = Pair(true, observation.ecologyNote)
+        _images.value = observation.images.map {
+            Image.Hosted(it.id, it.url, Date(it.createdAt), user.isValidator)
+        }.toMutableList()
         _determinationNotes = null
-
-        _coordinateState.value = State.Empty()
-        _localityState.value = State.Empty()
+        observation.location?.let { _coordinateState.value = State.Items(it) }
+        observation.locality?.let { _localitiesState.value = State.Items(listOf(it)) }
         _predictionResultsState.value = State.Empty()
-        _useImageLocationPromptState.value = State.Empty()
-
-        viewModelScope.launch {
-        SharedPreferences.getSubstrateID()?.let {
-                RoomService.getInstance(getApplication()).getSubstrateWithID(it).onSuccess {
-                    _substrate.value = Pair(it, true)
-                }
-            }
-
-            SharedPreferences.getVegetationTypeID()?.let {
-                RoomService.getInstance(getApplication()).getVegetationTypeWithID(it).onSuccess {
-                    _vegetationType.value = Pair(it, true)
-                }
-            }
-
-            SharedPreferences.getHosts()?.let {
-                RoomService.getInstance(getApplication()).getHostsWithIds(it).onSuccess {
-                    _hosts.value = Pair(it.toMutableList(), true)
-                }
-            }
-        }
     }
 
     fun setDate(date: Date) {
@@ -130,35 +131,37 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         _locality.value = locality
     }
 
-    fun setCoordinateState(state: State<com.noque.svampeatlas.models.Location>) {
+    fun setCoordinateState(state: State<Location>) {
+        fun setLocation(location: Location) {
+            _date.value = location.date
+            _coordinateState.value = state
+            getLocalities(location)
+        }
+
+        fun promptToUseImageLocation(imageLocation: Location, userLocation: Location) {
+            showPrompt.postValue(Prompt.UseImageMetadata(getApplication<MyApplication>().resources, imageLocation, userLocation))
+        }
+
         when (state) {
-            is State.Loading -> {
-                _coordinateState.value = state
-            }
-
             is State.Error -> {
-                _localityState.value = State.Error(state.error)
+                _coordinateState.postValue(state)
+                showNotification.postValue(Notification.LocationInaccessible(getApplication<MyApplication>().resources, state.error))
             }
-
+            is State.Loading -> _coordinateState.postValue(state)
             is State.Items -> {
-                if (_useImageLocationPromptState.value == null || _useImageLocationPromptState.value is State.Empty) {
-                    val imageLocation = returnImageLocationIfNecessary(state.items)
-                    if (imageLocation != null) {
-                        _useImageLocationPromptState.value = State.Items(Pair(imageLocation, state.items))
-                    } else {
-                        _date.value = state.items.date
-                        _coordinateState.value = state
-                        getLocalities(state.items.latLng)
+                when (val image = images.value?.firstOrNull()) {
+                    is Image.New -> {
+                        val imageLocation = image.file.getExifLocation()
+                        if (imageLocation != null && SphericalUtil.computeDistanceBetween(imageLocation.latLng, state.items.latLng) > imageLocation.accuracy) {
+                            promptToUseImageLocation(imageLocation, state.items)
+                        } else {
+                            setLocation(state.items)
+                        }
                     }
-                } else {
-                    _date.value = state.items.date
-                    _coordinateState.value = state
-                    getLocalities(state.items.latLng)
-                    _useImageLocationPromptState.value = State.Empty()
+                    else -> setLocation(state.items)
                 }
             }
         }
-
     }
 
     fun setSubstrate(substrate: Substrate, isLocked: Boolean) {
@@ -167,7 +170,7 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         SharedPreferences.saveSubstrateID(if (isLocked) substrate.id else null)
         if (isLocked) {
             viewModelScope.launch {
-                RoomService.getInstance(getApplication()).saveSubstrate(substrate)
+                RoomService.saveSubstrate(substrate)
             }
         }
     }
@@ -179,7 +182,7 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
 
         if (isLocked) {
             viewModelScope.launch {
-                RoomService.getInstance(getApplication()).saveVegetationType(vegetationType)
+                RoomService.saveVegetationType(vegetationType)
             }
         }
     }
@@ -199,7 +202,7 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
 
         if (isLocked) {
             viewModelScope.launch {
-                RoomService.getInstance(getApplication()).saveHosts(hosts)
+                RoomService.saveHosts(hosts)
             }
         }
     }
@@ -218,88 +221,73 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
     }
 
     fun appendImage(imageFile: File) {
-        var images = images.value
-
-        if (images != null && images.isNotEmpty()) {
-            images.add(imageFile)
-        } else {
-            images = mutableListOf(imageFile)
-            if (mushroom.value?.first == null) getPredictions(imageFile)
-            returnImageLocationIfNecessary(imageFile)?.let {
-                _useImageLocationPromptState.value = State.Items(Pair(it, null))
-            }
+        Log.d(TAG, _images.value?.toString() ?: "")
+        if (images.value?.count() == 0 && mushroom.value == null) {
+            getPredictions(imageFile)
         }
 
-        _images.value = images
-    }
-
-    private fun returnImageLocationIfNecessary(imageFile: File): com.noque.svampeatlas.models.Location? {
-
-        val exif = ExifInterface(imageFile.inputStream())
-        val lat = exif.latLong?.first()
-        val lng = exif.latLong?.last()
-//            val accuracy =  exif.getAttribute(ExifInterface.TAG_GPS_DOP)
-        val date = exif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL)?.let {
-            SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.getDefault()).parse(it)
-        }?: kotlin.run {
-            Date()
-        }
-
-        when (val state = _coordinateState.value) {
-            is State.Items -> {
-                val location = state.items
-                return if (lat != null && lng != null) {
-                    if (SphericalUtil.computeDistanceBetween(location.latLng, LatLng(lat, lng)) > 500) Location(date, LatLng(lat, lng), -1F) else null
-                } else {
-                    null
+        _images.value?.add(Image.New(imageFile))
+        _images.value = _images.value
+        imageFile.getExifLocation()?.let { imageLocation ->
+            _coordinateState.value?.item?.let { coordinateLocation ->
+                if (SphericalUtil.computeDistanceBetween(imageLocation.latLng, coordinateLocation.latLng) > imageLocation.accuracy) {
+                    showPrompt.postValue(Prompt.UseImageMetadata(getApplication<MyApplication>().resources, imageLocation, coordinateLocation))
                 }
             }
-
-            is State.Error -> {
-                return if (lat != null && lng != null) {
-                    Location(date, LatLng(lat, lng), -1F)
-                } else {
-                    null
-                }
-            }
-
-            else -> { return null}
-        }
-    }
-
-    private fun returnImageLocationIfNecessary(location: com.noque.svampeatlas.models.Location): com.noque.svampeatlas.models.Location? {
-        val image = _images.value?.first()
-
-        return if (image != null) {
-            val exif = ExifInterface(image.inputStream())
-            val lat = exif.latLong?.first()
-            val lng = exif.latLong?.last()
-//            val accuracy =  exif.getAttribute(ExifInterface.TAG_GPS_DOP)
-            val date = exif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL)?.let {
-                SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.getDefault()).parse(it)
-            }?: kotlin.run {
-                Date()
-            }
-
-            return if (lat != null && lng != null) {
-                val latLng = LatLng(lat, lng)
-                return if (SphericalUtil.computeDistanceBetween(latLng, location.latLng) > 500) Location(date, latLng, -1F) else null
-            } else {
-                null
-            }
-        } else {
-             null
         }
     }
 
     fun removeImageAt(position: Int) {
-        if (_images.value != null && _images.value!!.lastIndex >= position) {
-            _images.value?.removeAt(position)?.delete()
-
-            if (_images.value?.count() == 0) {
-                _images.value = null
+        fun handleChange() {
+            removedImage.postValue(position)
+            if (images.value?.count() == 0) {
                 _predictionResultsState.value = State.Empty()
             }
+        }
+
+
+        _images.value?.getOrNull(position).let {
+            when (it) {
+                is Image.New -> {
+                    it.file.delete()
+                    _images.value?.removeAt(position)
+                    handleChange()
+                }
+                is Image.Hosted -> {
+                    Session.deleteImage(it.id) {
+                        it.onError {
+                            _images.postValue(_images.value)
+                            showNotification.postValue((Notification.ImageDeletionError(getApplication<MyApplication>().resources, it)))
+                        }
+                        it.onSuccess {
+                            _images.value?.removeAt(position)
+                            handleChange()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun promptPositive() {
+        when (val prompt = showPrompt.value) {
+            is Prompt.UseImageMetadata -> {
+                _date.value = prompt.imageLocation.date
+                _coordinateState.value = State.Items(prompt.imageLocation)
+                getLocalities(prompt.imageLocation)
+            }
+            null -> {}
+        }
+    }
+
+    fun promptNegative() {
+        when (val prompt = showPrompt.value) {
+            is Prompt.UseImageMetadata -> {
+                _date.value = prompt.userLocation.date
+                _coordinateState.value = State.Items(prompt.userLocation)
+                getLocalities(prompt.userLocation)
+            }
+            null -> {}
         }
     }
 
@@ -324,64 +312,95 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
     }
 
     fun setNotes(notes: String?) {
-        _notes = notes
+        _notes.value = Pair(false, notes)
     }
 
     fun setEcologyNotes(ecologyNotes: String?) {
-        _ecologyNotes = ecologyNotes
+        _ecologyNotes.value = Pair(false, ecologyNotes)
     }
 
     fun resetLocationData() {
-        _localityState.value = State.Empty()
+        _localitiesState.value = State.Empty()
         _coordinateState.value = State.Empty()
         _locality.value = null
     }
 
     fun reset() {
-        _date.value = null
-        _locality.value = null
+        _date.value = Calendar.getInstance().time
         _substrate.value = null
         _vegetationType.value = null
         _hosts.value = null
-        _images.value = null
+        _locality.value = null
+        _notes.value = Pair(true, null)
+        _ecologyNotes.value = Pair(true, null)
         _mushroom.value = null
-        _notes = null
-        _ecologyNotes = null
         _determinationNotes = null
+        _images.value = mutableListOf()
 
-        setup()
+        _coordinateState.value = State.Empty()
+        _localitiesState.value = State.Empty()
+        _predictionResultsState.value = State.Empty()
+
+        viewModelScope.launch {
+            SharedPreferences.getSubstrateID()?.let {
+                RoomService.getSubstrateWithID(it).onSuccess {
+                    _substrate.value = Pair(it, true)
+                }
+            }
+
+            SharedPreferences.getVegetationTypeID()?.let {
+                RoomService.getVegetationTypeWithID(it).onSuccess {
+                    _vegetationType.value = Pair(it, true)
+                }
+            }
+
+            SharedPreferences.getHosts()?.let {
+                RoomService.getHostsWithIds(it).onSuccess {
+                    _hosts.value = Pair(it.toMutableList(), true)
+                }
+            }
+        }
     }
 
-    private fun getLocalities(latLng: LatLng) {
-        _localityState.value = State.Loading()
 
-            DataService.getInstance(getApplication()).getLocalities(TAG, latLng) { result ->
-                result.onSuccess {
-                    if (it.isNotEmpty()) {
-                        _localityState.value = State.Items(it)
-                        assignClosestLocality(latLng, it)
-                    } else {
-                        _localityState.value = State.Error(Error.LocalityFetchError(getApplication()))
+    private fun getLocalities(location: Location) {
+        _localitiesState.value = State.Loading()
+        viewModelScope.launch {
+            DataService.getInstance(getApplication())
+                .getLocalities(TAG, location.latLng) { result ->
+                    result.onSuccess {
+                        _localitiesState.postValue(State.Items(it))
+                        val locality = it.maxWith(
+                            kotlin.Comparator { a, b ->
+                                SphericalUtil.computeDistanceBetween(
+                                    a.location,
+                                    b.location
+                                ).toInt()
+                            }
+                        )
+                        if (locality != null) {
+                            _locality.postValue(locality)
+                            showNotification.postValue(
+                                Notification.LocationFound(
+                                    MyApplication.applicationContext.resources,
+                                    locality,
+                                    location
+                                )
+                            )
+                        } else {
+                            _locality.postValue(null)
+                            showNotification.postValue(
+                                Notification.LocalityInaccessible(
+                                    MyApplication.applicationContext.resources
+                                )
+                            )
+                        }
+                    }
+                    result.onError {
+                        _localitiesState.value = State.Error(it)
+                        showNotification.postValue(Notification.LocalityInaccessible(MyApplication.applicationContext.resources))
                     }
                 }
-
-                result.onError {
-                    _localityState.value = State.Error(it)
-                }
-            }
-    }
-
-    private fun assignClosestLocality(location: LatLng, localities: List<Locality>) {
-        viewModelScope.launch {
-            withContext(Dispatchers.Default) {
-                var closest = localities.first()
-
-                localities.forEach {
-                    if (SphericalUtil.computeDistanceBetween(location, it.location) < SphericalUtil.computeDistanceBetween(location, closest.location)) { closest = it }
-                }
-
-                _locality.postValue(closest)
-            }
         }
     }
 
@@ -396,7 +415,7 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         }
     }
 
-    fun prepareForUpload(userID: Int): Result<Pair<JSONObject, List<File>?>, Error> {
+    fun prepareForUpload(userID: Int, isEdit: Boolean): Result<Pair<JSONObject, List<File>?>, Error> {
         val date = date.value
         val mushroom = mushroom.value
         val substrate = substrate.value?.first
@@ -405,31 +424,10 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         val locality = locality.value
         val hosts = hosts.value?.first
 
-        if (mushroom == null) {
-            return Result.Error(Error.NoMushroomError(getApplication()))
-        }
-
-        if (vegetationType == null) {
-            return Result.Error(Error.NoVegetationTypeError(getApplication()))
-        }
-
-        if (substrate == null) {
-            return Result.Error(Error.NoSubstrateError(getApplication()))
-        }
-
-        if (location == null) {
-            return Result.Error(Error.NoLocationDataError(getApplication()))
-        }
-
-        if (locality == null) {
-            return Result.Error(Error.NoLocationDataError(getApplication()))
-        }
-
-        if (predictionResultsState.value is State.Items && _determinationNotes == null) {
-            val predictionResults = predictionResultsState.value as State.Items
-            val selectedPrediction = predictionResults.items.firstOrNull { it.mushroom.id == mushroom.first.id }
-            _determinationNotes = PredictionResult.getNotes(selectedPrediction, predictionResults.items)
-        }
+        if (vegetationType == null) return Result.Error(Error.NoVegetationTypeError(getApplication()))
+        if (substrate == null) return Result.Error(Error.NoSubstrateError(getApplication()))
+        if (location == null) return Result.Error(Error.NoLocationDataError(getApplication()))
+        if (locality == null) return Result.Error(Error.NoLocationDataError(getApplication()))
 
        val jsonObject = JSONObject()
         jsonObject.put("observationDate", (date?.toSimpleString()) ?: Calendar.getInstance().time.toSimpleString())
@@ -442,8 +440,8 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         hosts?.forEach { hostArray.put(JSONObject().put("_id", it.id))}
 
         jsonObject.put("associatedOrganisms", hostArray)
-        jsonObject.put("ecologynote", ecologyNotes)
-        jsonObject.put("note", notes)
+        jsonObject.put("ecologynote", ecologyNotes.value?.second)
+        jsonObject.put("note", notes.value?.second)
         jsonObject.put("decimalLatitude", location.latLng.latitude)
         jsonObject.put("decimalLongitude", location.latLng.longitude)
         jsonObject.put("accuracy", location.accuracy)
@@ -465,15 +463,30 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
             jsonObject.put("locality_id", locality.id)
         }
 
+        if (!isEdit) {
+            if (mushroom == null) {
+                return Result.Error(Error.NoMushroomError(getApplication()))
+            }
+            if (predictionResultsState.value is State.Items && _determinationNotes == null) {
+                val predictionResults = predictionResultsState.value as State.Items
+                val selectedPrediction = predictionResults.items.firstOrNull { it.mushroom.id == mushroom.first.id }
+                _determinationNotes = PredictionResult.getNotes(selectedPrediction, predictionResults.items)
+            }
 
-        jsonObject.put("determination",
-            JSONObject()
-                .put("confidence", mushroom.second.databaseName)
-                .put("taxon_id", mushroom.first.id)
-                .put("user_id", userID)
-                .put("notes", _determinationNotes ?: ""))
+            jsonObject.put("determination",
+                JSONObject()
+                    .put("confidence", mushroom.second.databaseName)
+                    .put("taxon_id", mushroom.first.id)
+                    .put("user_id", userID)
+                    .put("notes", _determinationNotes ?: ""))
+        }
 
-        return Result.Success(Pair(jsonObject, images.value?.toList()))
+        return Result.Success(Pair(jsonObject, images.value?.mapNotNull {
+            when (it) {
+                is Image.New -> it.file
+                else -> null
+            }
+        }))
     }
 
 

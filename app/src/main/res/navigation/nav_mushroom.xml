@@ -48,6 +48,9 @@
             android:name="predictionResults"
             app:argType="string"
             app:nullable="true" />
+        <action
+            android:id="@+id/action_mushroomDetailsFragment_to_addObservationFragment_edit"
+            app:destination="@id/addObservationFragment" />
     </fragment>
 
     <fragment
@@ -68,6 +71,10 @@
             android:name="type"
             app:argType="com.noque.svampeatlas.fragments.AddObservationFragment$Type"
             android:defaultValue="NEW_OBSERVATION" />
+        <argument
+            android:name="id"
+            app:argType="integer"
+            android:defaultValue="0" />
     </fragment>
     <fragment
         android:id="@+id/cameraFragment"

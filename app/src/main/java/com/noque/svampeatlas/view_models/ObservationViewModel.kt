@@ -38,7 +38,7 @@ class ObservationViewModel(val id: Int, val getSpecies: Boolean,  application: A
                     _observationState.value = State.Items(it)
 
                     if (getSpecies) {
-                        getMushroom(it.speciesProperties.id)
+                        getMushroom(it.determination.id)
                     }
                 }
 

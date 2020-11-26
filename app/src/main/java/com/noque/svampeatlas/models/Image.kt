@@ -9,10 +9,11 @@ import com.google.gson.annotations.SerializedName
 
     data class Image(
         @PrimaryKey
-        @SerializedName("_id") val id: Int?,
+        @SerializedName("_id") val id: Int,
         @SerializedName("taxon_id") val mushroomID: Int,
         @SerializedName("uri") val uri: String?,
-        @SerializedName("photographer") val photographer: String?
+        @SerializedName("photographer") val photographer: String?,
+        @SerializedName("createdAt") val createdAt: String?
     ) : Parcelable {
 
         val url: String
@@ -21,18 +22,20 @@ import com.google.gson.annotations.SerializedName
             }
 
         constructor(parcel: Parcel) : this(
-            parcel.readValue(Int::class.java.classLoader) as? Int,
             parcel.readInt(),
+            parcel.readInt(),
+            parcel.readString(),
             parcel.readString(),
             parcel.readString()
         ) {
         }
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
-            parcel.writeValue(id)
+            parcel.writeInt(id)
             parcel.writeInt(mushroomID)
             parcel.writeString(uri)
             parcel.writeString(photographer)
+            parcel.writeString(createdAt)
         }
 
         override fun describeContents(): Int {
@@ -48,6 +51,5 @@ import com.google.gson.annotations.SerializedName
                 return arrayOfNulls(size)
             }
         }
-
 
     }

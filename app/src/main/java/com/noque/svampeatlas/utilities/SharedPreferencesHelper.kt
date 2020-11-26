@@ -15,6 +15,8 @@ object SharedPreferences {
     private const val ALWAYS_USE_DK = "ALWAYS_USE_DK"
     private const val SAVE_IMAGES = "SAVE_IMAGES"
     private const val SAVE_IMAGES_DECIDED = "SAVE_IMAGES_DECIDED"
+    private const val HAS_SEEN_WHATS_NEW = "HAS_SEEN_WHATS_NEW"
+    private const val HAS_SEEN_IMAGE_DELETION = "HAS_SEEN_IMAGE_DELETION"
 
     private lateinit var prefs: SharedPreferences
 
@@ -84,6 +86,18 @@ object SharedPreferences {
 
     fun getAlwaysUseDKNames(): Boolean {
         return prefs.getBoolean(ALWAYS_USE_DK, false)
+    }
+
+    var hasSeenWhatsNew: Boolean get() {
+        return prefs.getBoolean(HAS_SEEN_WHATS_NEW, false)
+    } set(value) {
+        prefs.edit().putBoolean(HAS_SEEN_WHATS_NEW, value).apply()
+    }
+
+    var hasSeenImageDeletion: Boolean get() {
+        return prefs.getBoolean(HAS_SEEN_IMAGE_DELETION, false)
+    } set(value) {
+        prefs.edit().putBoolean(HAS_SEEN_IMAGE_DELETION, value).apply()
     }
 
     fun getSaveImages(): Boolean? {

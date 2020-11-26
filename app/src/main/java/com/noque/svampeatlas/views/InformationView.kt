@@ -10,7 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.noque.svampeatlas.R
 import kotlinx.android.synthetic.main.view_information.view.*
 
-class InformationView(context: Context?, attrs: AttributeSet?) : LinearLayout(context, attrs) {
+class InformationView(context: Context?, val attrs: AttributeSet?) : LinearLayout(context, attrs) {
 
     init {
         val inflater = LayoutInflater.from(getContext())
@@ -28,7 +28,7 @@ class InformationView(context: Context?, attrs: AttributeSet?) : LinearLayout(co
 
                 this.orientation = HORIZONTAL
 
-                val textViewLeft = TextView(context).apply {
+                val textViewLeft = TextView(context, attrs).apply {
                     this.layoutParams = ConstraintLayout.LayoutParams(
                         ConstraintLayout.LayoutParams.WRAP_CONTENT,
                         ConstraintLayout.LayoutParams.WRAP_CONTENT
@@ -38,7 +38,7 @@ class InformationView(context: Context?, attrs: AttributeSet?) : LinearLayout(co
                     this.maxLines = 1
                 }
 
-                val textViewRight = TextView(context).apply {
+                val textViewRight = TextView(context, attrs).apply {
                     this.layoutParams = ConstraintLayout.LayoutParams(
                         ConstraintLayout.LayoutParams.MATCH_PARENT,
                         ConstraintLayout.LayoutParams.WRAP_CONTENT

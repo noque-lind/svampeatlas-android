@@ -11,5 +11,7 @@ class ObservationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
 
     fun configure(observation: Observation, showValidationStatus: Boolean = false) {
         observationView.configure(observation, showValidationStatus)
+
+
     }
 }

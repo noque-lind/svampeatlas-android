@@ -55,7 +55,7 @@ class SpeciesViewModel(val id: Int, application: Application) : AndroidViewModel
 
 
         viewModelScope.launch {
-           val result = RoomService.getInstance(getApplication()).getMushroomWithID(id)
+           val result = RoomService.getMushroomWithID(id)
             result.onSuccess {
                 _mushroomState.value = State.Items(it)
             }

@@ -27,6 +27,7 @@ import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -137,9 +138,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         )
     ).get(CameraViewModel::class.java) }
 
-    private val newObservationViewModel by lazy { ViewModelProvider(requireActivity()).get(
-        NewObservationViewModel::class.java
-    ) }
+    private val newObservationViewModel by activityViewModels<NewObservationViewModel>()
 
     // Listeners
     override fun positiveButtonPressed() {
@@ -232,12 +231,13 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
 
             override fun actionButtonPressed(state: CameraControlsView.State) {
                 when (state) {
-                    CameraControlsView.State.CONFIRM -> {
+                    CameraControlsView.State.CONFIRM, CameraControlsView.State.CAPTURE_NEW -> {
                         val imageFileState = cameraViewModel.imageFileState.value
-                        if (imageFileState is State.Items) newObservationViewModel.appendImage(imageFileState.items)
+                        if (imageFileState is State.Items) newObservationViewModel.appendImage(
+                            imageFileState.items
+                        )
                         findNavController().navigateUp()
                     }
-                    CameraControlsView.State.CAPTURE_NEW -> findNavController().navigateUp()
                     else -> return
                 }
             }
@@ -325,13 +325,18 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
             super.onActivityResult(requestCode, resultCode, data)
         }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    }
+
         @SuppressLint("SourceLockedOrientationActivity")
         override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
         ): View? {
             setHasOptionsMenu(true)
-            requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
             return inflater.inflate(R.layout.fragment_camera, container, false)
         }
 

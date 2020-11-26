@@ -34,6 +34,7 @@ data class API(val apiType: APIType) {
             is APIType.Request -> createGetURL(apiType)
             is APIType.Post -> createPostURL(apiType)
             is APIType.Put -> createPutURL(apiType)
+            is APIType.Delete -> createDeleteURL(apiType)
             else -> ""
         }
     }
@@ -43,6 +44,7 @@ data class API(val apiType: APIType) {
             is APIType.Request -> Request.Method.GET
             is APIType.Post -> Request.Method.POST
             is APIType.Put -> Request.Method.PUT
+            is APIType.Delete -> Request.Method.DELETE
             else -> Request.Method.GET
         }
     }
@@ -244,6 +246,30 @@ data class API(val apiType: APIType) {
                 builder.appendPath("feed")
                 builder.appendPath(request.notificationID.toString())
                 builder.appendPath("lastread")
+            }
+            is APIType.Put.Observation -> {
+                builder.appendPath("observations")
+                builder.appendPath(request.id.toString())
+            }
+        }
+
+        return builder.build().toString()
+    }
+
+    private fun createDeleteURL(request: APIType.Delete): String {
+        val builder = Uri.Builder()
+        builder.scheme("https")
+            .authority("svampe.databasen.org")
+            .appendPath("api")
+
+        when (request) {
+            is APIType.Delete.Image -> {
+                builder.appendPath("observationimages")
+                builder.appendPath(request.id.toString())
+            }
+            is APIType.Delete.Observation -> {
+                builder.appendPath("observations")
+                builder.appendPath(request.id.toString())
             }
         }
 
@@ -469,5 +495,11 @@ sealed class APIType {
 
     sealed class Put: APIType() {
         class NotificationLastRead(val notificationID: Int): Put()
+        class Observation(val id: Int): Put()
+    }
+
+    sealed class Delete: APIType() {
+        class Image(val id: Int): Delete()
+        class Observation(val id: Int): Delete()
     }
 }

@@ -43,6 +43,7 @@ class LocationService(private val applicationContext: Context) {
     interface Listener {
         fun locationRetrieved(location: Location)
         fun locationRetrievalError(error: Error)
+        fun isLocating()
         fun requestPermission(permissions: Array<out String>, requestCode: Int)
     }
 
@@ -55,6 +56,7 @@ class LocationService(private val applicationContext: Context) {
     private var state: State by Delegates.observable(State.STOPPED) { _, _, newValue ->
         when (newValue) {
             State.LOCATING -> {
+                listener?.isLocating()
                 locationClient = LocationServices.getFusedLocationProviderClient(applicationContext)
                 val locationRequest = LocationRequest.create()
                 locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
