@@ -232,12 +232,15 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-                if (SharedPreferences.hasSeenImageDeletion) {
+                if (newObservationViewModel.images.value?.getOrNull(position) is NewObservationViewModel.Image.New) {
                     newObservationViewModel.removeImageAt(position)
-                } else {
+                } else if (!SharedPreferences.hasSeenImageDeletion) {
+                    addImagesAdapter.notifyItemChanged(viewHolder.adapterPosition)
                     val dialog = TermsFragment()
                     dialog.arguments = Bundle().apply { putSerializable(TermsFragment.KEY_TYPE, TermsFragment.Type.IMAGEDELETIONS) }
                     dialog.show(childFragmentManager, null)
+                } else {
+                    newObservationViewModel.removeImageAt(position)
                 }
             }
         }

@@ -119,7 +119,9 @@ class DetailsFragment : Fragment() {
     // Views
 
     private var nestedScrollView by autoCleared<NestedScrollView>()
-    private var appBarLayout by autoCleared<AppBarLayout>()
+    private var appBarLayout by autoCleared<AppBarLayout>() {
+        it?.removeOnOffsetChangedListener(appBarLayoutOnOffsetChangedListener)
+    }
     private var collapsibleToolBarLayout by autoCleared<CollapsingToolbarLayout>()
     private var toolbar by autoCleared<Toolbar>()
     private var imagesView by autoCleared<ImagesView>()

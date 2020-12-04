@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.noque.svampeatlas.R
+import com.noque.svampeatlas.extensions.toReadableDate
 import com.noque.svampeatlas.models.Observation
 import kotlinx.android.synthetic.main.view_observation_header.view.*
 import kotlinx.android.synthetic.main.view_mushroom_header.view.*
@@ -31,7 +32,7 @@ class ObservationHeaderView(context: Context, attrs: AttributeSet?) :
 
     fun configure(observation: Observation, listener: Listener) {
         this.listener = listener
-        observationHeaderView_idLabel.text = "DMS: ${observation.id} | ${observation.observationBy}"
+        observationHeaderView_idLabel.text = "DMS: ${observation.id} | ${observation.observationBy} | ${observation.observationDate?.toReadableDate(true, true)}"
         observationHeaderView_titleLabel.text = observation.determination.localizedName ?: observation.determination.fullName
 
         when (observation.validationStatus) {

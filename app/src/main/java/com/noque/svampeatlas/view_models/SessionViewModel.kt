@@ -280,8 +280,7 @@ object Session {
                         val notifications = it.first.toMutableList()
                         notifications.removeAll { it.observationID == notification.observationID }
                         notificationsCount -= it.first.count() - notifications.count()
-                        _notificationsState.value =
-                            State.Items(Pair(notifications, notificationsCount))
+                        _notificationsState.postValue(State.Items(Pair(notifications, notificationsCount)))
                     }
                 }
             }

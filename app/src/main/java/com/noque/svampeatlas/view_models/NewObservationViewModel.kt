@@ -283,9 +283,10 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
     fun promptNegative() {
         when (val prompt = showPrompt.value) {
             is Prompt.UseImageMetadata -> {
-                _date.value = prompt.userLocation.date
-                _coordinateState.value = State.Items(prompt.userLocation)
-                getLocalities(prompt.userLocation)
+                if (_coordinateState.value?.item?.latLng?.latitude != prompt.userLocation.latLng.latitude && _coordinateState.value?.item?.latLng?.longitude != prompt.userLocation.latLng.longitude) {
+                    _coordinateState.value = State.Items(prompt.userLocation)
+                    getLocalities(prompt.userLocation)
+                }
             }
             null -> {}
         }

@@ -40,7 +40,7 @@
             android:id="@+id/mushroomHeaderView_redlistShortIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/AppSmall"
+            style="@style/AppPrimary"
             tools:text="LC"
             android:background="@drawable/circle_view_color_red"
             android:paddingHorizontal="6dp"

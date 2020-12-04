@@ -497,20 +497,20 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         }
 
         private fun startSessionIfNeeded() {
-            Log.d(TAG, "StartSession if needed")
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
-                cameraProviderFuture.addListener(Runnable {
-                    val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-                    previewUseCase =
-                        Preview.Builder()
-                            .setTargetAspectRatio(AspectRatio.RATIO_4_3)
-                            .setTargetRotation(Surface.ROTATION_0)
+            context?.let {
+                if (ContextCompat.checkSelfPermission(it, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    val cameraProviderFuture = ProcessCameraProvider.getInstance(it)
+                    cameraProviderFuture.addListener(Runnable {
+                        val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+                        previewUseCase =
+                            Preview.Builder()
+                                .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+                                .setTargetRotation(Surface.ROTATION_0)
 
-                            .build()
-                    imageCaptureUseCase = ImageCapture.Builder().build()
-                    cameraProvider.unbindAll()
-                    try {
+                                .build()
+                        imageCaptureUseCase = ImageCapture.Builder().build()
+                        cameraProvider.unbindAll()
+                        try {
 
                             val camera = cameraProvider.bindToLifecycle(
                                 this,
@@ -524,7 +524,8 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                             cameraViewModel.setImageFileError(Error.CaptureError(resources))
                         }
 
-                },  ContextCompat.getMainExecutor(requireContext()))
+                    },  ContextCompat.getMainExecutor(it))
+            }
             }
         }
 

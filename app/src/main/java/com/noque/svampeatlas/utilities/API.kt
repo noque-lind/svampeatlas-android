@@ -304,7 +304,7 @@ data class API(val apiType: APIType) {
                     string += "{\"model\":\"TaxonStatistics\",\"as\":\"Statistics\", \"attributes\":[\"accepted_count\", \"last_accepted_record\", \"first_accepted_record\"]}"
                 }
                 is SpeciesQueries.RedlistData -> {
-                    string += "{\"model\":\"TaxonRedListData\",\"as\":\"redlistdata\",\"required\":false,\"attributes\":[\"status\"],\"where\":\"{\\\"year\\\":2009}\"}"
+                    string += "{\"model\":\"TaxonRedListData\",\"as\":\"redlistdata\",\"required\":false,\"attributes\":[\"status\"],\"where\":\"{\\\"year\\\":2019}\"}"
                 }
 
                 is SpeciesQueries.Tag -> {

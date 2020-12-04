@@ -19,7 +19,6 @@ class InformationView(context: Context?, val attrs: AttributeSet?) : LinearLayou
 
     fun configure(information: List<Pair<String, String>>) {
         fun addInformation(info: Pair<String, String>) {
-
             val linearLayout = LinearLayout(context).apply {
                 this.layoutParams = ConstraintLayout.LayoutParams(
                     ConstraintLayout.LayoutParams.MATCH_PARENT,
