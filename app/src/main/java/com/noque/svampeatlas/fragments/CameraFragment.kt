@@ -206,7 +206,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
 
                 if (ContextCompat.checkSelfPermission(
                         requireContext(),
-                        android.Manifest.permission.ACCESS_FINE_LOCATION
+                        Manifest.permission.ACCESS_FINE_LOCATION
                     ) == PackageManager.PERMISSION_GRANTED
                 ) {
                     locationManager.lastLocation.addOnCompleteListener {

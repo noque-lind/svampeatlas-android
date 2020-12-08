@@ -29,7 +29,7 @@ object RoomService {
     }
 
     private val database by lazy { Database.buildDatabase(MyApplication.applicationContext)  }
-    private val resources by lazy {  MyApplication.applicationContext.resources }
+    private val resources by lazy {  MyApplication.resources }
 
 
     suspend fun saveUser(user: User) {
