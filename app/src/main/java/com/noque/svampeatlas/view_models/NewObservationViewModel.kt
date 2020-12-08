@@ -78,8 +78,8 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
     private val _hosts by lazy { MutableLiveData<Pair<MutableList<Host>, Boolean>?>(null)}
     private val _images by lazy { MutableLiveData<MutableList<Image>>(mutableListOf())}
     private val _mushroom by lazy {MutableLiveData<Pair<Mushroom, DeterminationConfidence>?>(null)}
-    private val _notes by lazy { MutableLiveData<Pair<Boolean, String?>>(null) }
-    private val _ecologyNotes by lazy { MutableLiveData<Pair<Boolean, String?>>(null) }
+    private val _notes by lazy { MutableLiveData<String?>(null) }
+    private val _ecologyNotes by lazy { MutableLiveData<String?>(null) }
     private var _determinationNotes: String? = null
 
     private val _coordinateState by lazy { MutableLiveData<State<Location>>(State.Empty()) }
@@ -91,8 +91,8 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
     val vegetationType: LiveData<Pair<VegetationType, Boolean>?> get() = _vegetationType
     val hosts: LiveData<Pair<MutableList<Host>, Boolean>?> get() = _hosts
     val locality: LiveData<Locality?> get() = _locality
-    val notes: LiveData<Pair<Boolean, String?>> get() = _notes
-    val ecologyNotes: LiveData<Pair<Boolean, String?>> get() = _ecologyNotes
+    val notes: LiveData<String?> get() = _notes
+    val ecologyNotes: LiveData<String?> get() = _ecologyNotes
     val images: LiveData<MutableList<Image>> get() = _images
     val mushroom: LiveData<Pair<Mushroom, DeterminationConfidence>?> get() = _mushroom
 
@@ -112,8 +112,8 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         observation.vegetationType?.let { _vegetationType.value = Pair(it, false) }
         _hosts.value = Pair(observation.hosts.toMutableList(), false)
         _locality.value = observation.locality
-        _notes.value = Pair(true, observation.note)
-        _ecologyNotes.value = Pair(true, observation.ecologyNote)
+        _notes.value = observation.note
+        _ecologyNotes.value = observation.ecologyNote
         _images.value = observation.images.map {
             Image.Hosted(it.id, it.url, Date(it.createdAt), user.isValidator)
         }.toMutableList()
@@ -313,11 +313,11 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
     }
 
     fun setNotes(notes: String?) {
-        _notes.value = Pair(false, notes)
+        _notes.value = notes
     }
 
     fun setEcologyNotes(ecologyNotes: String?) {
-        _ecologyNotes.value = Pair(false, ecologyNotes)
+        _ecologyNotes.value = ecologyNotes
     }
 
     fun resetLocationData() {
@@ -332,8 +332,8 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         _vegetationType.value = null
         _hosts.value = null
         _locality.value = null
-        _notes.value = Pair(true, null)
-        _ecologyNotes.value = Pair(true, null)
+        _notes.value = null
+        _ecologyNotes.value = null
         _mushroom.value = null
         _determinationNotes = null
         _images.value = mutableListOf()
@@ -441,8 +441,8 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         hosts?.forEach { hostArray.put(JSONObject().put("_id", it.id))}
 
         jsonObject.put("associatedOrganisms", hostArray)
-        jsonObject.put("ecologynote", ecologyNotes.value?.second)
-        jsonObject.put("note", notes.value?.second)
+        jsonObject.put("ecologynote", ecologyNotes.value)
+        jsonObject.put("note", notes.value)
         jsonObject.put("decimalLatitude", location.latLng.latitude)
         jsonObject.put("decimalLongitude", location.latLng.longitude)
         jsonObject.put("accuracy", location.accuracy)

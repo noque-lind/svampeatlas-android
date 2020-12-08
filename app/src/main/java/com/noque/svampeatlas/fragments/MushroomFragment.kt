@@ -18,6 +18,7 @@ import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -62,14 +63,9 @@ class MushroomFragment : Fragment() {
     // View models
 
     private val mushroomsViewModel by lazy {
-        ViewModelProviders.of(
-            this,
-            MushroomsViewModelFactory(
-                MushroomsViewModel.Category.SPECIES,
-                requireActivity().application
-            )
-        ).get(MushroomsViewModel::class.java)
+        ViewModelProvider(this, MushroomsViewModelFactory(MushroomsViewModel.Category.SPECIES, requireActivity().application)).get(MushroomsViewModel::class.java)
     }
+
 
     // Adapters
 

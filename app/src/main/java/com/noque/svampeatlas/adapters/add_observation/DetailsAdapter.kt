@@ -41,6 +41,11 @@ class DetailsAdapter(private val resources: Resources, private val categories: A
 
     private val onInputTypeChanged: ((view: View, text: String?) -> Unit) = { view, text ->
         (view.tag as? ViewHolder)?.adapterPosition?.let {
+            when (categories[it]) {
+                DetailsFragment.Categories.ECOLOGYNOTES -> ecologyNotes = text
+                DetailsFragment.Categories.NOTES -> notes = text
+                else -> {}
+            }
             onTextInputChanged?.invoke(categories[it], text)
         }
     }
@@ -55,7 +60,6 @@ class DetailsAdapter(private val resources: Resources, private val categories: A
         val view: View
         val viewHolder: ViewHolder
         val layoutInflater = LayoutInflater.from(parent.context)
-
 
         when (categories[viewType]) {
             DetailsFragment.Categories.DATE,

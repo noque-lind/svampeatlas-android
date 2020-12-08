@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.widget.TextViewCompat
 import com.noque.svampeatlas.R
 import kotlinx.android.synthetic.main.view_information.view.*
 
@@ -27,25 +28,26 @@ class InformationView(context: Context?, val attrs: AttributeSet?) : LinearLayou
 
                 this.orientation = HORIZONTAL
 
-                val textViewLeft = TextView(context, attrs).apply {
+                val textViewLeft = TextView(context).apply {
                     this.layoutParams = ConstraintLayout.LayoutParams(
                         ConstraintLayout.LayoutParams.WRAP_CONTENT,
                         ConstraintLayout.LayoutParams.WRAP_CONTENT
                     )
-
+                    TextViewCompat.setTextAppearance(this, R.style.AppPrimary)
                     this.text = info.first
                     this.maxLines = 1
                 }
 
-                val textViewRight = TextView(context, attrs).apply {
+                val textViewRight = TextView(context).apply {
                     this.layoutParams = ConstraintLayout.LayoutParams(
                         ConstraintLayout.LayoutParams.MATCH_PARENT,
                         ConstraintLayout.LayoutParams.WRAP_CONTENT
                     )
 
+                    TextViewCompat.setTextAppearance(this, R.style.AppPrimary)
                     this.text = info.second
                     this.maxLines = 1
-                    this.gravity = Gravity.RIGHT
+                    this.gravity = Gravity.END
                 }
 
                 this.addView(textViewLeft)

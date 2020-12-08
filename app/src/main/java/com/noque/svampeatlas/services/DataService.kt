@@ -361,7 +361,7 @@ class DataService private constructor(context: Context) {
         searchString: String?,
         completion: (Result<List<Host>, Error>) -> Unit
     ) {
-        val api = API(APIType.Request.Host(null))
+        val api = API(APIType.Request.Host(searchString))
         val request = AppRequest<List<Host>>(
             object : TypeToken<List<Host>>() {}.type,
             api,

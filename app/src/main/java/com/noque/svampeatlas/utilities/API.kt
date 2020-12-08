@@ -144,7 +144,9 @@ data class API(val apiType: APIType) {
             }
 
             is APIType.Request.Host -> {
-                builder.appendEncodedPath("planttaxa?limit=30&order=probability+DESC")
+                builder.appendPath("planttaxa")
+                builder.encodedQuery("order=probability+DESC")
+                builder.appendQueryParameter("limit", "30")
                 request.searchString?.let {
                     builder.appendQueryParameter(
                         "where",
@@ -287,10 +289,6 @@ data class API(val apiType: APIType) {
                     } else {
                         string += "{\"model\":\"TaxonAttributes\",\"as\":\"attributes\",\"attributes\":[\"valideringsrapport\",\"PresentInDK\", \"diagnose\", \"beskrivelse\", \"forvekslingsmuligheder\", \"oekologi\", \"bogtekst_gyldendal_en\", \"vernacular_name_GB\", \"spiselighedsrapport\"]}"
                     }
-
-
-
-
                 }
                 is SpeciesQueries.Images -> {
                     string += "{\"model\":\"TaxonImages\",\"as\":\"Images\",\"required\":${it.required}}"

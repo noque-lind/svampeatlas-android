@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -151,15 +150,15 @@ class DetailsFragment : Fragment() {
             })
 
         newObservationViewModel.notes.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-            if (it.first) {
-                adapter.notes = it.second
+            if (it != adapter.notes) {
+                adapter.notes = it
                 adapter.updateCategory(Categories.NOTES)
             }
         })
 
         newObservationViewModel.ecologyNotes.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-            if (it.first) {
-                adapter.ecologyNotes = it.second
+            if (it != adapter.ecologyNotes) {
+                adapter.ecologyNotes = it
                 adapter.updateCategory(Categories.ECOLOGYNOTES)
             }
         })
@@ -181,7 +180,7 @@ class DetailsFragment : Fragment() {
 
     private fun showPicker(type: DetailsPickerFragment.Type) {
         val bundle = Bundle()
-        bundle.putSerializable(DetailsPickerFragment.TYPEKEY, type)
+        bundle.putSerializable(DetailsPickerFragment.TYPE_KEY, type)
 
         val dialog = DetailsPickerFragment()
         dialog.arguments = bundle

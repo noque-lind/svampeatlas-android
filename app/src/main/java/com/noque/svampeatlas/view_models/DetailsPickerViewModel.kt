@@ -32,7 +32,7 @@ class DetailsPickerViewModel(private val type: DetailsPickerFragment.Type, appli
         when (type) {
             DetailsPickerFragment.Type.SUBSTRATEPICKER -> getSubstrateGroups()
             DetailsPickerFragment.Type.VEGETATIONTYPEPICKER -> getVegetationTypes()
-            DetailsPickerFragment.Type.HOSTPICKER -> getHosts()
+            DetailsPickerFragment.Type.HOSTPICKER -> getHosts(null)
         }
     }
 
@@ -69,11 +69,11 @@ class DetailsPickerViewModel(private val type: DetailsPickerFragment.Type, appli
     }
 
 
-    private fun getHosts() {
+    fun getHosts(searchTerm: String?) {
         _hostsState.value = State.Loading()
 
         viewModelScope.launch {
-            DataService.getInstance(getApplication()).getHosts(TAG,null) { result ->
+            DataService.getInstance(getApplication()).getHosts(TAG, searchTerm) { result ->
                 result.onSuccess {
                     _hostsState.value = State.Items(it)
                 }

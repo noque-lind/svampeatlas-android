@@ -4,12 +4,10 @@ import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import android.graphics.Point
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.widget.Toolbar
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
@@ -31,8 +29,6 @@ import com.noque.svampeatlas.extensions.dpToPx
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.utilities.*
 import com.noque.svampeatlas.views.BackgroundView
-import kotlinx.android.synthetic.main.activity_maps.*
-
 
 data class ObservationItem(val observation: Observation) : ClusterItem {
     override fun getSnippet(): String? {
@@ -541,7 +537,6 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     }
 
     fun getCoordinatesFor(x: Float, y: Float): LatLng? {
-
             val location: IntArray = IntArray(2)
             mapView?.getLocationInWindow(location)
             return googleMap.projection?.fromScreenLocation(Point(x.toInt() - location.first(), y.toInt() - location.last()))

@@ -54,10 +54,10 @@ class SearchBarView(context: Context, attrs: AttributeSet?) : ConstraintLayout(c
     private var rootLayout = ConstraintSet()
     private var iconifiedLayout = ConstraintSet()
 
-    lateinit var editText: TextInputEditText
-    lateinit var textInputLayout: TextInputLayout
-    lateinit var searchButton: ImageButton
-    lateinit var progressBar: ProgressBar
+    private lateinit var editText: TextInputEditText
+    private lateinit var textInputLayout: TextInputLayout
+    private lateinit var searchButton: ImageButton
+    private lateinit var progressBar: ProgressBar
 
     // Listeners
 
@@ -194,6 +194,10 @@ class SearchBarView(context: Context, attrs: AttributeSet?) : ConstraintLayout(c
             setExpanded(false)
             resetProgressbar()
         }
+    }
+
+    fun setPlaceholder(hint: String) {
+        editText.hint = hint
     }
 
     private fun setExpanded(isExpanded: Boolean) {

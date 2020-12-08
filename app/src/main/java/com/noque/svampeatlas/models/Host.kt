@@ -15,11 +15,11 @@ data class Host(
     @SerializedName("LatinName") val latinName: String,
     @SerializedName("probability") val probability: Int?
 ) {
-    val localizedName: String get() {
+    val localizedName: String? get() {
         return if (Locale.getDefault().isDanish() && dkName != null) {
             dkName.capitalized()
         } else {
-            latinName.capitalized()
+            null
         }
     }
 }

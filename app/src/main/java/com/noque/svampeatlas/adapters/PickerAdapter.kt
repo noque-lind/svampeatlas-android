@@ -60,7 +60,7 @@ open class PickerAdapter<T>() : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
         selectedPositions: MutableList<Int>? = null
     ) {
         selectedPositions?.let { this.selectedPositions = it }
-        sections.forEach { this.sections.addSection(it) }
+        this.sections.setSections(sections.toMutableList())
         notifyDataSetChanged()
     }
 
