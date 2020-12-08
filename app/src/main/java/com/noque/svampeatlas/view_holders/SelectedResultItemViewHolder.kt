@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.models.Mushroom
 import com.noque.svampeatlas.R
+import com.noque.svampeatlas.models.DeterminationConfidence
 import com.noque.svampeatlas.views.ResultView
 import com.noque.svampeatlas.view_models.NewObservationViewModel
 import kotlinx.android.synthetic.main.item_selected_result.view.*
@@ -19,7 +20,7 @@ class SelectedResultItemViewHolder(itemView: View) : RecyclerView.ViewHolder(ite
     private var radioButtonGuessing: RadioButton
     private var radioButtonDetermined: RadioButton
     private var confidenceTitleTextView: TextView
-    var confidenceSet: ((NewObservationViewModel.DeterminationConfidence) -> Unit)? = null
+    var confidenceSet: ((DeterminationConfidence) -> Unit)? = null
 
 
     init {
@@ -37,7 +38,7 @@ class SelectedResultItemViewHolder(itemView: View) : RecyclerView.ViewHolder(ite
         resultView.setOnClickListener(listener)
     }
 
-    fun configure(mushroom: Mushroom, confidence: NewObservationViewModel.DeterminationConfidence?) {
+    fun configure(mushroom: Mushroom, confidence: DeterminationConfidence?) {
             resultView.configure(mushroom)
 
             if (mushroom.isGenus) {
@@ -53,16 +54,16 @@ class SelectedResultItemViewHolder(itemView: View) : RecyclerView.ViewHolder(ite
             radioGroup.setOnCheckedChangeListener(null)
 
             when (confidence) {
-                NewObservationViewModel.DeterminationConfidence.CONFIDENT -> { radioGroup.check(R.id.selectedResultItem_radioButton_determined) }
-                NewObservationViewModel.DeterminationConfidence.LIKELY -> { radioGroup.check(R.id.selectedResultItem_radioButton_unsure) }
-                NewObservationViewModel.DeterminationConfidence.POSSIBLE -> { radioGroup.check(R.id.selectedResultItem_radioButton_guessing) }
+                DeterminationConfidence.CONFIDENT -> { radioGroup.check(R.id.selectedResultItem_radioButton_determined) }
+                DeterminationConfidence.LIKELY -> { radioGroup.check(R.id.selectedResultItem_radioButton_unsure) }
+                DeterminationConfidence.POSSIBLE -> { radioGroup.check(R.id.selectedResultItem_radioButton_guessing) }
             }
 
             radioGroup.setOnCheckedChangeListener { _, i ->
                 when (i) {
-                    R.id.selectedResultItem_radioButton_guessing -> {confidenceSet?.invoke(NewObservationViewModel.DeterminationConfidence.POSSIBLE)}
-                    R.id.selectedResultItem_radioButton_unsure -> {confidenceSet?.invoke(NewObservationViewModel.DeterminationConfidence.LIKELY)}
-                    R.id.selectedResultItem_radioButton_determined -> {confidenceSet?.invoke(NewObservationViewModel.DeterminationConfidence.CONFIDENT)}
+                    R.id.selectedResultItem_radioButton_guessing -> {confidenceSet?.invoke(DeterminationConfidence.POSSIBLE)}
+                    R.id.selectedResultItem_radioButton_unsure -> {confidenceSet?.invoke(DeterminationConfidence.LIKELY)}
+                    R.id.selectedResultItem_radioButton_determined -> {confidenceSet?.invoke(DeterminationConfidence.CONFIDENT)}
                 }
             }
         }

@@ -66,99 +66,110 @@
                 android:id="@+id/detailsFragment_nestedScrollView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
                 android:clipToPadding="false"
                 android:clipChildren="false"
-                android:paddingTop="16dp"
                 android:paddingBottom="16dp"
                 android:theme="@style/Light"
                 app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
                 <LinearLayout
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clipChildren="false"
-                    android:clipToPadding="false"
-                    android:orientation="vertical">
+                    android:layout_height="wrap_content">
 
-                    <com.noque.svampeatlas.views.TitlesView
-                        android:id="@+id/detailsFragment_titlesView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                    <LinearLayout
-                        android:layout_marginTop="24dp"
-                        android:layout_marginBottom="24dp"
-                        android:id="@+id/detailsFragment_descriptionViewLinearLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical" />
-
-                    <TextView
-                        android:id="@+id/detailsFragment_informationViewHeader"
-                        style="@style/AppDivider"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="2dp"
-                        android:text="Information" />
-
-                    <com.noque.svampeatlas.views.InformationView
-                        android:id="@+id/detailsFragment_informationView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:theme="@style/AppPrimary"
-                        android:layout_marginBottom="24dp"/>
-
-
-                    <TextView
-                        android:id="@+id/detailsFragment_mapFragmentHeader"
-                        style="@style/AppDivider"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"/>
-
-                    <fragment
-                        android:id="@+id/detailsFragment_mapFragment"
-                        android:name="com.noque.svampeatlas.fragments.MapFragment"
-                        android:layout_width="match_parent"
-                        android:layout_height="300dp"
-                        android:layout_marginBottom="24dp"/>
-
-                    <TextView
-                        android:id="@+id/detailsFragment_mushroomViewHeader"
-                        style="@style/AppDivider"
-                        android:visibility="gone"
-                        android:text="Art"
-                        android:layout_marginBottom="2dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                    <com.noque.svampeatlas.views.MushroomView
-                        android:foreground="?android:attr/selectableItemBackground"
-                        android:visibility="gone"
-                        android:id="@+id/detailsFragment_mushroomView"
+                    <com.noque.svampeatlas.views.ObservationHeaderView
+                        android:id="@+id/detailsFragment_observationHeaderView"
+                        android:background="@color/colorPrimary"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
-
-                    <TextView
-                        android:id="@+id/detailsFragment_recyclerViewHeader"
-                        style="@style/AppDivider"
-                        android:layout_marginTop="24dp"
-                        android:layout_marginBottom="2dp"
+                    <com.noque.svampeatlas.views.MushroomDetailsHeaderView
+                        android:id="@+id/detailsFragment_mushroomDetailsHeaderView"
+                        android:background="@color/colorPrimary"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"/>
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/detailsFragment_recyclerView"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:clipToPadding="false"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
                         android:clipChildren="false"
-                        android:nestedScrollingEnabled="false"
-                        android:layout_height="wrap_content">
-                    </androidx.recyclerview.widget.RecyclerView>
+                        android:clipToPadding="false"
+                        android:orientation="vertical">
 
+                        <LinearLayout
+                            android:layout_marginTop="24dp"
+                            android:layout_marginBottom="24dp"
+                            android:id="@+id/detailsFragment_descriptionViewLinearLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" />
+
+                        <TextView
+                            android:id="@+id/detailsFragment_informationViewHeader"
+                            style="@style/AppDivider"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="2dp"
+                            android:text="Information" />
+
+                        <com.noque.svampeatlas.views.InformationView
+                            android:id="@+id/detailsFragment_informationView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/AppPrimary"
+                            android:layout_marginBottom="24dp"/>
+
+
+                        <TextView
+                            android:id="@+id/detailsFragment_mapFragmentHeader"
+                            style="@style/AppDivider"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"/>
+
+                        <fragment
+                            android:id="@+id/detailsFragment_mapFragment"
+                            android:name="com.noque.svampeatlas.fragments.MapFragment"
+                            android:layout_width="match_parent"
+                            android:layout_height="300dp"
+                            android:layout_marginBottom="24dp"/>
+
+                        <TextView
+                            android:id="@+id/detailsFragment_mushroomViewHeader"
+                            style="@style/AppDivider"
+                            android:visibility="gone"
+                            android:text="Art"
+                            android:layout_marginBottom="2dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <com.noque.svampeatlas.views.MushroomView
+                            android:foreground="?android:attr/selectableItemBackground"
+                            android:visibility="gone"
+                            android:id="@+id/detailsFragment_mushroomView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/detailsFragment_recyclerViewHeader"
+                            style="@style/AppDivider"
+                            android:layout_marginTop="24dp"
+                            android:layout_marginBottom="2dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/detailsFragment_recyclerView"
+                            android:layout_width="match_parent"
+                            android:clipToPadding="false"
+                            android:clipChildren="false"
+                            android:nestedScrollingEnabled="false"
+                            android:layout_height="wrap_content">
+                        </androidx.recyclerview.widget.RecyclerView>
+
+                    </LinearLayout>
                 </LinearLayout>
             </androidx.core.widget.NestedScrollView>
         </androidx.coordinatorlayout.widget.CoordinatorLayout>

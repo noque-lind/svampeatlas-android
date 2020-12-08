@@ -83,12 +83,12 @@
     <string name="recovery_action_openSettings">Otevřít nastavení</string>
     <string name="recovery_action_tryAgain">Zkusit znovu</string>
 
-    <string name="prompt_localityDetermined_message">Název: %1$s\nPoloha: %2$.02f - %3$.02f</string>
+    <string name="prompt_localityDetermined_message">Název: %1$s\nPoloha: %2$.02f - %3$.02f\nAccuracy: %4$.02f</string>
     <string name="prompt_localityDetermined_title">Místo vašeho pozorování bylo určeno</string>
     <string name="prompt_localityDeterminedError_title">V blízkosti nic nenalezeno</string>
 
     <string name="prompt_successRecordCreation_title">Vaše pozorování bylo vytvořeno</string>
-    <string name="prompt_useImageMetadata_message">Zdá se, že přidaný obrázek byl pořízen více než 500 metrů od aktuálního umístění pozorování. Chcete použít informace o GPS a datu z obrázku?</string>
+    <string name="prompt_useImageMetadata_message">An added image seems to have been taken at a different time and place than now. Would you like to use the information from the image instead?\n\nThe GPS accuracy of the image: %.02f m</string>
     <string name="prompt_useImageMetadata_negative">Ne</string>
     <string name="prompt_useImageMetadata_positive">Ano, použijte metadata obrázku</string>
     <string name="prompt_useImageMetadata_title">Návrh umístění</string>

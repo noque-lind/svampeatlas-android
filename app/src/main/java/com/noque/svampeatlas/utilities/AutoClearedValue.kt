@@ -14,6 +14,34 @@ import kotlin.reflect.KProperty
  *
  * Accessing this variable while the fragment's view is destroyed will throw NPE.
  */
+
+class SafeAutoClearedValue<T : Any>(val onDestroyView: ((T?) -> Unit)?, val fragment: Fragment) : ReadWriteProperty<Fragment, T?> {
+    private var _value: T? = null
+
+    init {
+        fragment.lifecycle.addObserver(object: DefaultLifecycleObserver {
+            override fun onCreate(owner: LifecycleOwner) {
+                fragment.viewLifecycleOwnerLiveData.observe(fragment) { viewLifecycleOwner ->
+                    viewLifecycleOwner?.lifecycle?.addObserver(object: DefaultLifecycleObserver {
+                        override fun onDestroy(owner: LifecycleOwner) {
+                            onDestroyView?.invoke(_value)
+                            _value = null
+                        }
+                    })
+                }
+            }
+        })
+    }
+
+    override fun getValue(thisRef: Fragment, property: KProperty<*>): T? {
+        return _value
+    }
+
+    override fun setValue(thisRef: Fragment, property: KProperty<*>, value: T?) {
+        _value = value
+    }
+}
+
 class AutoClearedValue<T : Any>(val onDestroyView: ((T?) -> Unit)?, val fragment: Fragment) : ReadWriteProperty<Fragment, T> {
     private var _value: T? = null
 
@@ -47,3 +75,4 @@ class AutoClearedValue<T : Any>(val onDestroyView: ((T?) -> Unit)?, val fragment
  * Creates an [AutoClearedValue] associated with this fragment.
  */
 fun <T : Any> Fragment.autoCleared(onDestroyView: ((T?) -> Unit)? = null) = AutoClearedValue<T>(onDestroyView, this)
+fun <T : Any> Fragment.safeAutoCleared(onDestroyView: ((T?) -> Unit)? = null) = SafeAutoClearedValue<T>(onDestroyView, this)

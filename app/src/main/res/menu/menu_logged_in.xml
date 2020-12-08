@@ -53,5 +53,20 @@
             android:title="Facebook"
             android:id="@+id/facebook"
             android:icon="@drawable/icon_fb"/>
+
+        <item
+            android:id="@+id/section3Disabled"
+            android:enabled="false"
+            android:checkable="false"
+            android:title=""/>
+
+        <item
+            android:id="@+id/Version"
+            android:title="@string/versionName"
+            android:enabled="false"
+            android:checkable="false"
+            />
+
+
     </group>
 </menu>

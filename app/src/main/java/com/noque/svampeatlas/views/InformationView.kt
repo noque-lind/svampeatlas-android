@@ -7,10 +7,11 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.widget.TextViewCompat
 import com.noque.svampeatlas.R
 import kotlinx.android.synthetic.main.view_information.view.*
 
-class InformationView(context: Context?, attrs: AttributeSet?) : LinearLayout(context, attrs) {
+class InformationView(context: Context?, val attrs: AttributeSet?) : LinearLayout(context, attrs) {
 
     init {
         val inflater = LayoutInflater.from(getContext())
@@ -19,7 +20,6 @@ class InformationView(context: Context?, attrs: AttributeSet?) : LinearLayout(co
 
     fun configure(information: List<Pair<String, String>>) {
         fun addInformation(info: Pair<String, String>) {
-
             val linearLayout = LinearLayout(context).apply {
                 this.layoutParams = ConstraintLayout.LayoutParams(
                     ConstraintLayout.LayoutParams.MATCH_PARENT,
@@ -33,7 +33,7 @@ class InformationView(context: Context?, attrs: AttributeSet?) : LinearLayout(co
                         ConstraintLayout.LayoutParams.WRAP_CONTENT,
                         ConstraintLayout.LayoutParams.WRAP_CONTENT
                     )
-
+                    TextViewCompat.setTextAppearance(this, R.style.AppPrimary)
                     this.text = info.first
                     this.maxLines = 1
                 }
@@ -44,9 +44,10 @@ class InformationView(context: Context?, attrs: AttributeSet?) : LinearLayout(co
                         ConstraintLayout.LayoutParams.WRAP_CONTENT
                     )
 
+                    TextViewCompat.setTextAppearance(this, R.style.AppPrimary)
                     this.text = info.second
                     this.maxLines = 1
-                    this.gravity = Gravity.RIGHT
+                    this.gravity = Gravity.END
                 }
 
                 this.addView(textViewLeft)

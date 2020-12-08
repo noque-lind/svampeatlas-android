@@ -11,6 +11,30 @@ import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 import java.nio.charset.Charset
 
+class AppEmptyRequest(
+    private val api: API,
+    private val token: String?,
+    private val listener: Response.Listener<Void>,
+    errorListener: Response.ErrorListener
+): Request<Void>(api.volleyMethod(), api.url(), errorListener) {
+    override fun getHeaders(): MutableMap<String, String> {
+        val mutableMap = mutableMapOf(Pair("Content-Type", "application/json"))
+
+        token?.let {
+            mutableMap.put("Authorization", "Bearer $it")
+        }
+
+        return mutableMap
+    }
+
+    override fun parseNetworkResponse(response: NetworkResponse?): Response<Void> {
+        return Response.success(null, HttpHeaderParser.parseCacheHeaders(response))
+    }
+
+    override fun deliverResponse(response: Void?) {
+        listener.onResponse(response)
+    }
+}
 
 class AppJSONObjectRequest(private val endpoint: API,
                            private val token: String?,

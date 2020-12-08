@@ -9,7 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -48,9 +48,7 @@ class DetailsFragment : Fragment() {
 
     // View Models
 
-    private val newObservationViewModel by lazy {
-        ViewModelProviders.of(requireActivity()).get(NewObservationViewModel::class.java)
-    }
+    private val newObservationViewModel: NewObservationViewModel by activityViewModels()
 
     // Adapters
 
@@ -150,6 +148,20 @@ class DetailsFragment : Fragment() {
                 adapter.date = it
                 adapter.updateCategory(Categories.DATE)
             })
+
+        newObservationViewModel.notes.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+            if (it != adapter.notes) {
+                adapter.notes = it
+                adapter.updateCategory(Categories.NOTES)
+            }
+        })
+
+        newObservationViewModel.ecologyNotes.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+            if (it != adapter.ecologyNotes) {
+                adapter.ecologyNotes = it
+                adapter.updateCategory(Categories.ECOLOGYNOTES)
+            }
+        })
     }
 
     private fun showDatePicker() {
@@ -168,7 +180,7 @@ class DetailsFragment : Fragment() {
 
     private fun showPicker(type: DetailsPickerFragment.Type) {
         val bundle = Bundle()
-        bundle.putSerializable(DetailsPickerFragment.TYPEKEY, type)
+        bundle.putSerializable(DetailsPickerFragment.TYPE_KEY, type)
 
         val dialog = DetailsPickerFragment()
         dialog.arguments = bundle

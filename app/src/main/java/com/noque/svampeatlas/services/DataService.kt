@@ -361,7 +361,7 @@ class DataService private constructor(context: Context) {
         searchString: String?,
         completion: (Result<List<Host>, Error>) -> Unit
     ) {
-        val api = API(APIType.Request.Host(null))
+        val api = API(APIType.Request.Host(searchString))
         val request = AppRequest<List<Host>>(
             object : TypeToken<List<Host>>() {}.type,
             api,
@@ -386,15 +386,35 @@ class DataService private constructor(context: Context) {
         jsonObject: JSONObject,
         completion: (Result<Int, Error>) -> Unit
     ) {
-
-        Log.d(TAG, jsonObject.toString())
-
         val request = AppJSONObjectRequest(
             API(APIType.Post.Observation()),
             token,
             jsonObject,
             Response.Listener {
                 val id = it.getInt("_id")
+                completion(Result.Success(id))
+            },
+            Response.ErrorListener {
+                completion(Result.Error(parseVolleyError(it)))
+            })
+
+        request.tag = tag
+        addToRequestQueue(request)
+
+    }
+
+    fun editObservation(
+        tag: String,
+        id: Int,
+        token: String,
+        jsonObject: JSONObject,
+        completion: (Result<Int, Error>) -> Unit
+    ) {
+        val request = AppJSONObjectRequest(
+            API(APIType.Put.Observation(id)),
+            token,
+            jsonObject,
+            Response.Listener {
                 completion(Result.Success(id))
             },
             Response.ErrorListener {
@@ -433,6 +453,47 @@ class DataService private constructor(context: Context) {
         dispatchGroup.notify (Runnable {
             completion(Result.Success(completedUploads))
         })
+    }
+
+    suspend fun deleteObservation(
+        tag: String,
+        id: Int,
+        token: String,
+        completion: (Result<Void?, Error>) -> Unit) = withContext(Dispatchers.IO) {
+        val api = API(APIType.Delete.Observation(id))
+        val request = AppEmptyRequest(
+            api,
+            token,
+            Response.Listener<Void> {
+                completion(Result.Success(null))
+            },
+            Response.ErrorListener {
+                completion(Result.Error(parseVolleyError(it)))
+            }
+        )
+        request.tag = tag
+        addToRequestQueue(request)
+    }
+
+    suspend fun deleteImage(
+        tag: String,
+        id: Int,
+        token: String,
+        completion: (Result<Void?, Error>) -> Unit
+    ) = withContext(Dispatchers.IO) {
+        val api = API(APIType.Delete.Image(id))
+        val request = AppEmptyRequest(
+            api,
+            token,
+            Response.Listener<Void> {
+                completion(Result.Success(null))
+            },
+            Response.ErrorListener {
+                completion(Result.Error(parseVolleyError(it)))
+            }
+        )
+        request.tag = tag
+        addToRequestQueue(request)
     }
 
     private suspend fun uploadImage(

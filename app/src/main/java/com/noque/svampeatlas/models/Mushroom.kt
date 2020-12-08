@@ -111,6 +111,8 @@ class Mushroom(
     @SerializedName("Images") val images: List<Image>?
 ) {
 
+    constructor(id: Int, fullName: String, vernacularNameDK: VernacularNameDK?) : this(id, fullName, null, null, null, null, vernacularNameDK, null, null, null, null)
+
     val localizedName: String? get() {
         return if (Locale.getDefault().isDanish()) {
             return if (_vernacularNameDK?._vernacularNameDK != null && _vernacularNameDK._vernacularNameDK != "") {

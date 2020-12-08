@@ -6,7 +6,6 @@
     android:background="@color/colorWhite"
     android:theme="@style/Light">
 
-
     <LinearLayout
         android:id="@+id/detailsPickerFragment_headerLinearLayout"
         android:layout_width="match_parent"
@@ -48,15 +47,13 @@
 
 
 
-        <Switch
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/detailsPickerFragment_switch"
             style="@style/AppPrimary"
             android:layout_width="match_parent"
-
             android:layout_height="match_parent"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
             android:layout_weight="0"
@@ -79,6 +76,7 @@
         android:id="@+id/detailsPickerFragment_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:paddingTop="66dp"
         android:clipToPadding="false"
         android:clipChildren="false"
         android:theme="@style/Dark"
@@ -86,5 +84,16 @@
         app:layout_constraintTop_toBottomOf="@+id/detailsPickerFragment_headerLinearLayout">
     </androidx.recyclerview.widget.RecyclerView>
 
-
+    <com.noque.svampeatlas.views.SearchBarView
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:id="@+id/detailsPickerFragment_searchBarView"
+        android:layout_marginTop="8dp"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/detailsPickerFragment_headerLinearLayout"
+        android:layout_marginEnd="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="8dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

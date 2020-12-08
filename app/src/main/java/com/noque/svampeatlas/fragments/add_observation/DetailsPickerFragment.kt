@@ -1,23 +1,18 @@
 package com.noque.svampeatlas.fragments.add_observation
 
 import android.content.pm.ActivityInfo
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Switch
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.adapters.add_observation.details_picker.HostsAdapter
 import com.noque.svampeatlas.adapters.add_observation.details_picker.SubstratesAdapter
 import com.noque.svampeatlas.adapters.add_observation.details_picker.VegetationTypesAdapter
-
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.views.BackgroundView
@@ -25,16 +20,20 @@ import com.noque.svampeatlas.view_models.NewObservationViewModel
 import com.noque.svampeatlas.view_models.DetailsPickerViewModel
 import kotlinx.android.synthetic.main.fragment_details_picker.*
 import android.widget.ImageButton
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.noque.svampeatlas.adapters.PickerAdapter
 import com.noque.svampeatlas.extensions.capitalized
-import com.noque.svampeatlas.extensions.upperCased
 import com.noque.svampeatlas.view_models.factories.DetailsPickerViewModelFactory
+import com.noque.svampeatlas.views.SearchBarListener
+import com.noque.svampeatlas.views.SearchBarView
 
 
 class DetailsPickerFragment() : DialogFragment() {
 
     companion object {
-        const val TYPEKEY = "DETAILSPICKERFRAGMENT_TYPEKEY"
+        const val TYPE_KEY = "DETAILSPICKERFRAGMENT_TYPEKEY"
     }
 
     enum class Type {
@@ -47,18 +46,17 @@ class DetailsPickerFragment() : DialogFragment() {
 
     private lateinit var type: Type
 
-
     // Views
 
     private lateinit var backgroundView: BackgroundView
     private lateinit var recyclerView: RecyclerView
     private lateinit var titleTextView: TextView
-    private lateinit var switch: Switch
+    private lateinit var switch: SwitchMaterial
     private lateinit var cancelButton: ImageButton
+    private lateinit var searchBarView: SearchBarView
 
 
     // Adapters
-
 
     private val substratesAdapter: SubstratesAdapter by lazy {
         val adapter = SubstratesAdapter()
@@ -104,15 +102,10 @@ class DetailsPickerFragment() : DialogFragment() {
 
 
     // View models
-
-    private val newObservationViewModel by lazy {
-        ViewModelProviders.of(requireActivity()).get(NewObservationViewModel::class.java)
-    }
-
+    private val newObservationViewModel by activityViewModels<NewObservationViewModel>()
     private val observationDetailsPickerViewModel by lazy {
-            ViewModelProviders.of(this, DetailsPickerViewModelFactory(type, requireActivity().application)).get(DetailsPickerViewModel::class.java)
+        ViewModelProvider(this, DetailsPickerViewModelFactory(type, requireActivity().application)).get(DetailsPickerViewModel::class.java)
     }
-
 
     private val onExitButtonPressed by lazy {
         View.OnClickListener {
@@ -122,7 +115,6 @@ class DetailsPickerFragment() : DialogFragment() {
                 }
                 else -> {}
             }
-
             dismiss()
         }
     }
@@ -138,7 +130,7 @@ class DetailsPickerFragment() : DialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        type = arguments?.getSerializable(TYPEKEY) as Type
+        type = arguments?.getSerializable(TYPE_KEY) as Type
         super.onViewCreated(view, savedInstanceState)
         initViews()
         setupViews()
@@ -159,6 +151,7 @@ class DetailsPickerFragment() : DialogFragment() {
         titleTextView = detailsPickerFragment_headerTextView
         switch = detailsPickerFragment_switch
         cancelButton = detailsPickerFragment_cancelButton
+        searchBarView = detailsPickerFragment_searchBarView
     }
 
     private fun setupViews() {
@@ -168,24 +161,54 @@ class DetailsPickerFragment() : DialogFragment() {
 
         recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
-        }
+            addOnScrollListener(object: RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    if (!recyclerView.canScrollVertically(-1)) {
+                        searchBarView.expand()
+                    } else if (dy > 0) {
+                        searchBarView.collapse()
+                    }
+                }
 
+            })
+        }
 
         when (type) {
             Type.VEGETATIONTYPEPICKER -> {
                 recyclerView.adapter = vegetationTypesAdapter
                 titleTextView.text = resources.getString(R.string.detailsPickerFragment_vegetationTypesPicker)
+                searchBarView.visibility = View.GONE
+                recyclerView.setPadding(0,0, 0, 0)
             }
 
             Type.SUBSTRATEPICKER -> {
                 recyclerView.adapter = substratesAdapter
                 titleTextView.text = resources.getString(R.string.detailsPickerFragment_substratePicker)
+                searchBarView.visibility = View.GONE
+                recyclerView.setPadding(0,0, 0, 0)
             }
 
             Type.HOSTPICKER -> {
                 cancelButton.setImageResource(R.drawable.glyph_checkmark)
                 recyclerView.adapter = hostsAdapter
                 titleTextView.text = resources.getString(R.string.detailsPickerFragment_hostsPicker)
+                recyclerView.setPadding(0, (resources.getDimension(R.dimen.searchbar_view_height) + resources.getDimension(
+                    R.dimen.searchbar_top_margin
+                ) * 2).toInt(), 0, 0)
+                searchBarView.apply {
+                    visibility = View.VISIBLE
+                    setPlaceholder(resources.getString(R.string.searchVC_searchBar_placeholder))
+                    setListener(object: SearchBarListener {
+                        override fun newSearch(entry: String) {
+                            observationDetailsPickerViewModel.getHosts(entry)
+                        }
+
+                        override fun clearedSearchEntry() {
+                            observationDetailsPickerViewModel.getHosts(null)
+                        }
+                    })
+                }
             }
         }
     }
@@ -204,16 +227,19 @@ class DetailsPickerFragment() : DialogFragment() {
             }
         }
 
-
-
         observationDetailsPickerViewModel.hostsState.observe(viewLifecycleOwner, Observer { state ->
             backgroundView.reset()
             when (state) {
-                is State.Loading -> { backgroundView.setLoading() }
-                is State.Error -> backgroundView.setError(state.error)
+                is State.Loading -> {
+                    hostsAdapter.configure(listOf())
+                    backgroundView.setLoading()
+                }
+                is State.Error -> {
+                    hostsAdapter.configure(listOf())
+                    backgroundView.setError(state.error)
+                }
                 is State.Items -> {
                     val selectedPositions = mutableListOf<Int>()
-
                     newObservationViewModel.hosts.value?.first?.forEach {
                         val index = state.items.indexOf(it)
                         if (index != -1) selectedPositions.add(index)
@@ -256,5 +282,4 @@ class DetailsPickerFragment() : DialogFragment() {
                 }
             })
     }
-
 }

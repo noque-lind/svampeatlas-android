@@ -118,6 +118,8 @@ class NearbyFragment : Fragment(), MapSettingsFragment.Listener {
             }
         }
 
+        override fun isLocating() {}
+
         override fun requestPermission(permissions: Array<out String>, requestCode: Int) {
             requestPermissions(permissions, requestCode)
         }

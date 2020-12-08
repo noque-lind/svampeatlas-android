@@ -32,7 +32,7 @@ class DispatchGroup(private val name: String?) {
             runnables.clear()
         }
     }
-
+    @Synchronized
     fun clear() {
         runnables.clear()
     }

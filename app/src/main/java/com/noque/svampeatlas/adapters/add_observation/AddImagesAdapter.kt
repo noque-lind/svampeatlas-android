@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.view_holders.AddImageViewHolder
 import com.noque.svampeatlas.view_holders.AddedImageViewHolder
+import com.noque.svampeatlas.view_models.NewObservationViewModel
 import java.io.File
 
 class AddImagesAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -29,7 +30,7 @@ class AddImagesAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var addImageButtonClicked: (() -> Unit)? = null
 
-    private var images = listOf<File>()
+    private var images = mutableListOf<NewObservationViewModel.Image>()
 
     private val onClickListener = object: View.OnClickListener {
         override fun onClick(view: View?) {
@@ -37,9 +38,19 @@ class AddImagesAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 
-    fun configure(images: List<File>?) {
-        this.images = images ?: listOf()
+    fun configure(images: List<NewObservationViewModel.Image>) {
+        this.images = images.toMutableList()
         notifyDataSetChanged()
+    }
+
+    fun addImage(image: NewObservationViewModel.Image) {
+        this.images.add(image)
+        this.notifyItemInserted(images.lastIndex)
+    }
+
+    fun removeImage(atIndex: Int) {
+        this.images.removeAt(atIndex)
+        this.notifyItemRemoved(atIndex)
     }
 
 

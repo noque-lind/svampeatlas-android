@@ -24,7 +24,9 @@ class TermsFragment: DialogFragment() {
 
     enum class Type {
         IDENTIFICATION,
-        CAMERAHELPER
+        CAMERAHELPER,
+        WHATSNEW,
+        IMAGEDELETIONS
     }
 
     interface Listener {
@@ -50,6 +52,12 @@ class TermsFragment: DialogFragment() {
             when (type) {
                 Type.IDENTIFICATION -> {
                     SharedPreferences.setHasAcceptedIdentificationTerms(true)
+                }
+                Type.IMAGEDELETIONS -> {
+                    SharedPreferences.hasSeenImageDeletion = true
+                }
+                Type.WHATSNEW -> {
+                    SharedPreferences.hasSeenWhatsNew = true
                 }
             }
 
@@ -100,6 +108,14 @@ class TermsFragment: DialogFragment() {
             Type.CAMERAHELPER -> {
                 headerView.configure(getString(R.string.termsVC_cameraHelper_title))
                 contentTextView.text = getString(R.string.termsVC_cameraHelper_message)
+            }
+            Type.WHATSNEW -> {
+                headerView.configure(getString(R.string.terms_whatsnew_title))
+                contentTextView.text = getString(R.string.terms_whatsnew_message)
+            }
+            Type.IMAGEDELETIONS -> {
+                headerView.configure(getString(R.string.terms_imagedeletion_title))
+                contentTextView.text = getString(R.string.terms_imagedeletion_message)
             }
         }
     }

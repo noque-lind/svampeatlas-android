@@ -4,12 +4,10 @@ import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import android.graphics.Point
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.widget.Toolbar
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
@@ -29,12 +27,8 @@ import com.google.maps.android.clustering.ClusterManager
 import com.noque.svampeatlas.extensions.changeColor
 import com.noque.svampeatlas.extensions.dpToPx
 import com.noque.svampeatlas.models.*
-import com.noque.svampeatlas.utilities.DispatchGroup
-import com.noque.svampeatlas.utilities.OpenStreetMapTileProvider
-import com.noque.svampeatlas.utilities.autoCleared
+import com.noque.svampeatlas.utilities.*
 import com.noque.svampeatlas.views.BackgroundView
-import kotlinx.android.synthetic.main.activity_maps.*
-
 
 data class ObservationItem(val observation: Observation) : ClusterItem {
     override fun getSnippet(): String? {
@@ -73,7 +67,9 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     }
 
     // Objects
-    private var dispatchGroup = DispatchGroup("MapFragment")
+    private var dispatchGroup by safeAutoCleared<DispatchGroup>() {
+        it?.clear()
+    }
     private var listener: Listener? = null
     private var clusterManager: ClusterManager<ObservationItem>? = null
 
@@ -83,12 +79,13 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     private var locationMarker: Marker? = null
     private var selectedMarker: Marker? = null
     private var tileOverlay: TileOverlay? = null
+    private var accuracyOverlay: Circle? = null
     private var circleOverlays = mutableListOf<Circle>()
 
     // Views
     private var styleSelector by autoCleared<TabLayout>()
     private var backgroundView by autoCleared<BackgroundView>()
-    private var mapView by autoCleared<MapView> {
+    private var mapView by safeAutoCleared<MapView> {
         it?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
         it?.onDestroy()
     }
@@ -154,9 +151,9 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
 
     // Forced to put the whole fragment as listener, as it was impossible to remove just a listener var/object within the callback
     override fun onGlobalLayout() {
-        if (viewLifecycleOwner.lifecycle.currentState != Lifecycle.State.DESTROYED && mapView.height != 0 && mapView.width != 0) {
-            mapView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-            dispatchGroup.leave()
+        if (viewLifecycleOwnerLiveData.value?.lifecycle?.currentState != Lifecycle.State.DESTROYED && mapView?.height != 0 && mapView?.width != 0) {
+            mapView?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
+            dispatchGroup?.leave()
         }
     }
 
@@ -170,7 +167,7 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
                 setOnMapClickListener(onClickListener)
             }
             setType(Category.REGULAR)
-            dispatchGroup.leave()
+            dispatchGroup?.leave()
         }
     }
 
@@ -181,42 +178,43 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dispatchGroup = DispatchGroup("MapFragment")
         initViews()
         setupViews()
     }
 
     override fun onStart() {
         super.onStart()
-        dispatchGroup.notify(Runnable {
-            mapView.onStart()
+        dispatchGroup?.notify(Runnable {
+            mapView?.onStart()
         })
     }
 
     override fun onResume() {
         super.onResume()
-        dispatchGroup.notify(Runnable {
-            mapView.onResume()
+        dispatchGroup?.notify(Runnable {
+            mapView?.onResume()
         })
     }
 
     override fun onPause() {
-        dispatchGroup.notify(Runnable {
-            mapView.onPause()
+        dispatchGroup?.notify(Runnable {
+            mapView?.onPause()
         })
         super.onPause()
     }
 
     override fun onStop() {
-        dispatchGroup.notify(Runnable {
-            mapView.onStop()
+        dispatchGroup?.notify(Runnable {
+            mapView?.onStop()
         })
         super.onStop()
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        dispatchGroup.notify(Runnable {
-            mapView.onLowMemory()
+        dispatchGroup?.notify(Runnable {
+            mapView?.onLowMemory()
         })
     }
 
@@ -227,13 +225,14 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     }
 
     private fun setupViews() {
-        dispatchGroup.enter()
-        dispatchGroup.enter()
+
+        dispatchGroup?.enter()
+        dispatchGroup?.enter()
         backgroundView.setLoading()
-        mapView.viewTreeObserver.addOnGlobalLayoutListener(this)
-        mapView.onCreate(null)
-        mapView.postDelayed({
-            mapView.getMapAsync(onMapReadyCallBack)
+        mapView?.viewTreeObserver?.addOnGlobalLayoutListener(this)
+        mapView?.onCreate(null)
+        mapView?.postDelayed({
+            mapView?.getMapAsync(onMapReadyCallBack)
         }, 10)
     }
 
@@ -243,7 +242,7 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     }
 
     fun setType(category: Category) {
-        dispatchGroup.notify(Runnable {
+        dispatchGroup?.notify(Runnable {
             tileOverlay?.remove()
             tileOverlay = null
             when (category) {
@@ -260,7 +259,7 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     }
 
     fun disableGestures() {
-        dispatchGroup.notify(Runnable {
+        dispatchGroup?.notify(Runnable {
             googleMap.apply {
                 uiSettings.isRotateGesturesEnabled = false
                 uiSettings.isScrollGesturesEnabled = false
@@ -279,16 +278,16 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     fun setLoading() {
 //         Putting this in notify, as the fragment itself shows a spinner before Google map is ready.
 //         By putting it in notify, this function called by the developer is not stopped in OnMapReadyCallback.
-        dispatchGroup.notify(Runnable {
+        dispatchGroup?.notify(Runnable {
             backgroundView.reset()
             backgroundView.setLoading()
         })
     }
 
     fun setError(error: AppError, handler: ((RecoveryAction?) -> Unit)?) {
-        dispatchGroup.notify(Runnable {
+        dispatchGroup?.notify(Runnable {
             backgroundView.reset()
-            mapView.alpha = 0.3f
+            mapView?.alpha = 0.3f
             if (error.recoveryAction != null && handler != null) {
                 backgroundView.setErrorWithHandler(error, error.recoveryAction, handler)
             } else {
@@ -298,14 +297,14 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     }
 
     fun setPadding(leftPx: Int, topPx: Int, rightPx: Int, bottomPx: Int) {
-        dispatchGroup.notify(Runnable {
+        dispatchGroup?.notify(Runnable {
             googleMap.setPadding(leftPx, topPx, rightPx, bottomPx)
         })
     }
 
 
     fun setRegion(coordinate: LatLng, radius: Int) {
-        dispatchGroup.notify(Runnable {
+        dispatchGroup?.notify(Runnable {
             reset()
             val bounds = LatLngBounds.Builder().apply {
                 coordinate.toRectanglePolygon(radius).forEach { include(it) }
@@ -315,7 +314,7 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     }
 
     fun setRegion(coordinate: LatLng) {
-        dispatchGroup.notify(Runnable {
+        dispatchGroup?.notify(Runnable {
             reset()
             if ((googleMap.cameraPosition?.zoom ?: 0f) <= 13) {
                 googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(coordinate, 13f)))
@@ -326,7 +325,7 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     }
 
     fun setRegionToShowMarkers() {
-        dispatchGroup.notify(Runnable {
+        dispatchGroup?.notify(Runnable {
             reset()
             if (markers.count() > 0) {
                 view?.let { view ->
@@ -348,7 +347,7 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     }
 
     fun setSelectedLocalityAnnotation(latLng: LatLng) {
-        dispatchGroup.notify(Runnable {
+        dispatchGroup?.notify(Runnable {
             reset()
             when (selectedMarker?.tag) {
                 LOCALITY_TAG -> {
@@ -386,13 +385,13 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
 
     @SuppressLint("MissingPermission")
     fun setShowMyLocation(show: Boolean) {
-        dispatchGroup.notify(Runnable {
+        dispatchGroup?.notify(Runnable {
             googleMap.isMyLocationEnabled = show
         })
     }
 
     fun addHeatMap(coordinates: List<LatLng>) {
-        dispatchGroup.notify(Runnable {
+        dispatchGroup?.notify(Runnable {
             reset()
 
             if (coordinates.isNotEmpty()) {
@@ -417,7 +416,7 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     }
 
     fun addLocalities(localities: List<Locality>) {
-        dispatchGroup.notify(Runnable {
+        dispatchGroup?.notify(Runnable {
             reset()
 
             localities.forEach { locality ->
@@ -448,12 +447,14 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     }
 
 
-    fun addLocationMarker(location: LatLng, title: String? = null) {
-        dispatchGroup.notify(Runnable {
+    fun addLocationMarker(location: LatLng, title: String? = null, accuracy: Double? = null) {
+        dispatchGroup?.notify(Runnable {
             reset()
 
             locationMarker?.remove()
             locationMarker = null
+            accuracyOverlay?.remove()
+            accuracyOverlay = null
 
             val bitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_location)
 
@@ -477,11 +478,23 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
                 markers.add(it)
                 locationMarker = it
             }
+            accuracy?.let {
+                googleMap.addCircle(
+                    CircleOptions()
+                        .center(location)
+                        .strokeWidth(1F)
+                        .radius(it)
+                        .zIndex(10F)
+                        .fillColor(ColorUtils.setAlphaComponent(resources.getColor(R.color.colorGreen), 40))
+                )?.let {
+                    accuracyOverlay = it
+                }
+            }
         })
     }
 
     fun addObservationMarkers(observations: List<Observation>) {
-        dispatchGroup.notify(Runnable {
+        dispatchGroup?.notify(Runnable {
             reset()
 
             if (clusterManager != null) {
@@ -503,7 +516,7 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     }
 
     fun addCircleOverlay(center: LatLng, radius: Int) {
-        dispatchGroup.notify(Runnable {
+        dispatchGroup?.notify(Runnable {
             reset()
             googleMap.addCircle(
                 CircleOptions()
@@ -524,9 +537,8 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     }
 
     fun getCoordinatesFor(x: Float, y: Float): LatLng? {
-
             val location: IntArray = IntArray(2)
-            mapView.getLocationInWindow(location)
+            mapView?.getLocationInWindow(location)
             return googleMap.projection?.fromScreenLocation(Point(x.toInt() - location.first(), y.toInt() - location.last()))
     }
 
@@ -545,7 +557,7 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
 
     private fun reset() {
         backgroundView.reset()
-        mapView.alpha = 1f
+        mapView?.alpha = 1f
     }
 
     override fun onDestroyView() {
@@ -559,7 +571,6 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
 
         markers.clear()
         localities.clear()
-        dispatchGroup.clear()
         circleOverlays.clear()
         super.onDestroyView()
     }

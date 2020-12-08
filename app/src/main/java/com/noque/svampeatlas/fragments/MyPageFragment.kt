@@ -19,9 +19,9 @@ import com.noque.svampeatlas.adapters.MyPageAdapter
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.services.DataService
+import com.noque.svampeatlas.view_models.Session
 import com.noque.svampeatlas.views.BlankActivity
 import com.noque.svampeatlas.views.ProfileImageView
-import com.noque.svampeatlas.view_models.SessionViewModel
 import kotlinx.android.synthetic.main.fragment_my_page.*
 
 class MyPageFragment : Fragment() {
@@ -38,12 +38,6 @@ class MyPageFragment : Fragment() {
     private var collapsingToolbar: CollapsingToolbarLayout? = null
     private var swipeRefreshLayout: SwipeRefreshLayout? = null
 
-
-    // View models
-
-    private val sessionViewModel by lazy {
-        ViewModelProviders.of(requireActivity()).get(SessionViewModel::class.java)
-    }
 
     // Adapters
 
@@ -66,17 +60,17 @@ class MyPageFragment : Fragment() {
 
             override fun getAdditionalData(category: MyPageAdapter.Item.Category, atOffset: Int) {
                 when (category) {
-                    MyPageAdapter.Item.Category.NOTIFICATIONS -> sessionViewModel.getAdditionalNotifications(
+                    MyPageAdapter.Item.Category.NOTIFICATIONS -> Session.getAdditionalNotifications(
                         atOffset
                     )
-                    MyPageAdapter.Item.Category.OBSERVATIONS -> sessionViewModel.getAdditionalObservations(
+                    MyPageAdapter.Item.Category.OBSERVATIONS -> Session.getAdditionalObservations(
                         atOffset
                     )
                 }
             }
 
             override fun notificationSelected(notification: Notification) {
-                sessionViewModel.markNotificationAsRead(notification)
+                Session.markNotificationAsRead(notification)
                 val action = MyPageFragmentDirections.actionGlobalMushroomDetailsFragment(
                     notification.observationID,
                     DetailsFragment.TakesSelection.NO,
@@ -89,7 +83,7 @@ class MyPageFragment : Fragment() {
             }
 
             override fun logoutButtonSelected() {
-                sessionViewModel.logout()
+                Session.logout()
             }
 
         })
@@ -100,7 +94,7 @@ class MyPageFragment : Fragment() {
     // Listeners
 
     private val onRefreshListener = SwipeRefreshLayout.OnRefreshListener {
-        sessionViewModel.reloadData(true)
+        Session.reloadData(true)
     }
 
     override fun onCreateView(
@@ -116,7 +110,7 @@ class MyPageFragment : Fragment() {
         setupViews()
         setupViewModels()
 
-        sessionViewModel.reloadData(false)
+        Session.reloadData(false)
     }
 
     private fun initViews() {
@@ -142,12 +136,12 @@ class MyPageFragment : Fragment() {
     }
 
     private fun setupViewModels() {
-            sessionViewModel.user.observe(viewLifecycleOwner, Observer {
+            Session.user.observe(viewLifecycleOwner, Observer {
                 collapsingToolbar?.title = it?.name
                 if (it != null) userView?.configure(it.initials, it.imageURL, DataService.ImageSize.FULL)
             })
 
-            sessionViewModel.notificationsState.observe(viewLifecycleOwner, Observer { state ->
+            Session.notificationsState.observe(viewLifecycleOwner, Observer { state ->
                 when (state) {
                     is State.Loading -> {
                         swipeRefreshLayout?.isRefreshing = true
@@ -172,7 +166,7 @@ class MyPageFragment : Fragment() {
                 evaluateIfFinishedLoading()
             })
 
-            sessionViewModel.observationsState.observe(viewLifecycleOwner, Observer { state ->
+            Session.observationsState.observe(viewLifecycleOwner, Observer { state ->
                 when (state) {
                     is State.Loading -> {
                         swipeRefreshLayout?.isRefreshing = true
@@ -203,7 +197,7 @@ class MyPageFragment : Fragment() {
     }
 
     private fun evaluateIfFinishedLoading() {
-        if (sessionViewModel.observationsState.value !is State.Loading && sessionViewModel.notificationsState.value !is State.Loading) {
+        if (Session.observationsState.value !is State.Loading && Session.notificationsState.value !is State.Loading) {
             swipeRefreshLayout?.isRefreshing = false
         }
     }
