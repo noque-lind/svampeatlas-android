@@ -656,8 +656,11 @@ class DetailsFragment : Fragment() {
 
         observation.hosts.let {
             var string = ""
-            it.forEach { string += "${it.localizedName},"}
-            information.add(Pair(getString(R.string.observationDetailsCell_host), string ))
+            it.forEach { string += if (it.localizedName != null) "${it.localizedName}, " else "${it.latinName}, "}
+            if (string.isNotBlank()) {
+                string = string.dropLast(2)
+                information.add(Pair(getString(R.string.observationDetailsCell_host), string ))
+            }
         }
 
         informationView.configure(information)
