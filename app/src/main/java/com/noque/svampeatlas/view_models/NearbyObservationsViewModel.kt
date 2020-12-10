@@ -6,11 +6,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.maps.model.LatLng
 import com.noque.svampeatlas.fragments.NearbyFragment
-import com.noque.svampeatlas.models.Geom
 import com.noque.svampeatlas.models.Observation
 import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.services.DataService
-import com.noque.svampeatlas.utilities.Geometry
+import com.noque.svampeatlas.utilities.api.Geometry
 
 class NearbyObservationsViewModel(application: Application) : AndroidViewModel(application) {
 

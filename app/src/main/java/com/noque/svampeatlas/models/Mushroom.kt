@@ -6,8 +6,9 @@ import com.google.gson.annotations.SerializedName
 import com.noque.svampeatlas.extensions.Date
 import java.util.*
 import com.google.gson.reflect.TypeToken
+import com.noque.svampeatlas.extensions.AppLanguage
+import com.noque.svampeatlas.extensions.appLanguage
 import com.noque.svampeatlas.extensions.capitalized
-import com.noque.svampeatlas.extensions.isDanish
 import java.util.Collections.emptyList
 
 object RedListDataTypeConverters {
@@ -114,16 +115,10 @@ class Mushroom(
     constructor(id: Int, fullName: String, vernacularNameDK: VernacularNameDK?) : this(id, fullName, null, null, null, null, vernacularNameDK, null, null, null, null)
 
     val localizedName: String? get() {
-        return if (Locale.getDefault().isDanish()) {
-            return if (_vernacularNameDK?._vernacularNameDK != null && _vernacularNameDK._vernacularNameDK != "") {
-                _vernacularNameDK._vernacularNameDK.capitalized()
-            } else {
-                null
-            }
-        } else if (attributes?.vernacularNameEn != null && attributes.vernacularNameEn != "") {
-            attributes.vernacularNameEn.capitalized()
-        } else {
-            null
+        return when (Locale.getDefault().appLanguage()) {
+            AppLanguage.Danish -> _vernacularNameDK?._vernacularNameDK?.capitalized()
+            AppLanguage.English -> attributes?.vernacularNameEn?.capitalized()
+            AppLanguage.Czech -> attributes?.vernacularNameCz?.capitalized()
         }
     }
 
@@ -158,47 +153,39 @@ data class Attributes(
     @SerializedName("oekologi") val ecology: String?,
     @SerializedName("valideringsrapport") val validationTips: String?,
     @SerializedName("vernacular_name_GB") val vernacularNameEn: String?,
+    @SerializedName("vernacular_name_CZ") val vernacularNameCz: String?,
     @SerializedName("PresentInDK") val presentInDenmark: Boolean?
 ) {
 
     val localizedDescription: String? get() {
-        return if (Locale.getDefault().isDanish()) {
-            diagnosis
-        } else {
-            return diagnosisEn
+        return when (Locale.getDefault().appLanguage()) {
+            AppLanguage.Danish -> diagnosis?.capitalized()
+            AppLanguage.English -> diagnosisEn?.capitalized()
+            AppLanguage.Czech -> diagnosisEn?.capitalized()
         }
     }
 
-
     val localizedEdibility: String? get() {
-        return if (Locale.getDefault().isDanish()) {
-            edibility
-        } else {
-            return null
+        return when (Locale.getDefault().appLanguage()) {
+            AppLanguage.Danish -> edibility?.capitalized()
+            AppLanguage.English -> null
+            AppLanguage.Czech -> null
         }
     }
 
     val localizedSimilarities: String? get() {
-        return if (Locale.getDefault().isDanish()) {
-            similarities
-        } else {
-            null
+        return when (Locale.getDefault().appLanguage()) {
+            AppLanguage.Danish -> similarities?.capitalized()
+            AppLanguage.English -> null
+            AppLanguage.Czech -> null
         }
     }
 
     val localizedEcology: String? get() {
-        return if (Locale.getDefault().isDanish()) {
-            ecology
-        } else {
-            return null
-        }
-    }
-
-    val localizedValidationTips: String? get() {
-        return if (Locale.getDefault().isDanish()) {
-            validationTips
-        } else {
-            return null
+        return when (Locale.getDefault().appLanguage()) {
+            AppLanguage.Danish -> ecology?.capitalized()
+            AppLanguage.English -> null
+            AppLanguage.Czech -> null
         }
     }
 

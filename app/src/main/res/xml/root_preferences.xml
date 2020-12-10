@@ -1,17 +1,20 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory app:title="@string/settings_general_title">
-
-        <SwitchPreferenceCompat
-            app:key="ALWAYS_USE_DK"
-            app:summaryOn="@string/settings_language_on"
-            app:summaryOff="@string/settings_language_off"
-            app:title="Brug altid danske betegnelser" />
+    <PreferenceCategory
+        android:layout_width="match_parent"
+        app:title="@string/settings_general_title">
         <SwitchPreferenceCompat
             app:key="SAVE_IMAGES"
-            app:summaryOn="@string/prompt_shouldSaveImages_message"
             app:summaryOff="@string/prompt_shouldSaveImages_negative"
+            app:summaryOn="@string/prompt_shouldSaveImages_message"
             app:title="@string/prompt_shouldSaveImages_title" />
     </PreferenceCategory>
+    <ListPreference
+        android:defaultValue="not_set"
+        android:entries="@array/language_entries"
+        android:entryValues="@array/language_values"
+        android:key="PREFERRED_LANGUAGE"
+        android:summary="@string/settings_language_message"
+        android:title="@string/settings_language_title" />
 </PreferenceScreen>

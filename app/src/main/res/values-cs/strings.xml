@@ -324,9 +324,7 @@
     <string name="settingsVC_title">Settings</string>
     <string name="navigationItem_SettingsVC">Settings</string>
     <string name="settings_general_title">General</string>
-    <string name="settings_language_title">Always use Danish names</string>
-    <string name="settings_language_on">Will always use Danish names and descriptions without regard for the phone language</string>
-    <string name="settings_language_off">If a translation is present, the app will use localized names and descriptions</string>
+    <string name="settings_language_title">Content language</string>
     <string name="precisionLabel">Precision: %.02f m</string>
     <string name="detailsPickerFragment_vegetationTypesPicker">Choose vegetationtype</string>
     <string name="detailsPickerFragment_substratePicker">Choose substrate</string>
@@ -339,8 +337,12 @@
     <string name="prompt_imagedeletion_error_title">Could not delete image</string>
     <string name="terms_imagedeletion_message">When editing an observation, deletions of images are final, even if you do not submit your other changes. This message will only be shown once, and if you still want to delete the image, you will have to delete the it again</string>
     <string name="terms_imagedeletion_title">Deletions are final</string>
-    <string name="terms_whatsnew_message">We\'re so happy that you are still here!\n\nYour app has been updated with some new exciting features:\n- New design in mushroom and observation details\n- You can now edit an observation after it has been uploaded\n- You can delete observations (only within the firt 48h of the upload)\n- Major stability improvements\n- Prepareness for more exiciting features such as: Local storage of observations when internet is limited, interactive validation of observations, add extra finders to an observation</string>
+    <string name="terms_whatsnew_message">We\'re so happy that you are still here!  \nYour app has been updated with some new exciting features: \n\n- New design in mushroom and observation details \n- You can now edit an observation after it has been uploaded \n- You can delete observations (only within the first 48h of the upload)\n- Major stability improvements - Prepareness for more exiciting features such as: Local storage of observations when internet is limited, interactive validation of observations, add extra finders to an observation</string>
     <string name="terms_whatsnew_title">Whats new?</string>
+    <string name="language_danish">Danish</string>
+    <string name="language_czech">Czech</string>
+    <string name="language_english">English</string>
+    <string name="settings_language_message">Some content is not translated to all languages: %s</string>
 
 
 </resources>

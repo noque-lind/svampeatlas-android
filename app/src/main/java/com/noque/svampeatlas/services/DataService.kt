@@ -1,7 +1,6 @@
 package com.noque.svampeatlas.services
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.util.Log
 import com.android.volley.*
 import com.android.volley.toolbox.*
@@ -15,12 +14,10 @@ import com.noque.svampeatlas.extensions.rotate
 import com.noque.svampeatlas.extensions.toBase64
 import com.noque.svampeatlas.extensions.toJPEG
 import com.noque.svampeatlas.utilities.*
-import kotlinx.coroutines.CoroutineScope
+import com.noque.svampeatlas.utilities.api.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import kotlin.coroutines.suspendCoroutine
 
 class DataService private constructor(context: Context) {
 
@@ -136,10 +133,10 @@ class DataService private constructor(context: Context) {
             APIType.Request.Observation(
                 geometry,
                 listOf(
-                    ObservationQueries.Locality(),
+                    ObservationQueries.Locality,
                     ObservationQueries.DeterminationView(taxonID),
-                    ObservationQueries.Images(),
-                    ObservationQueries.GeomNames(),
+                    ObservationQueries.Images,
+                    ObservationQueries.GeomNames,
                     ObservationQueries.User(null)
                 ),
                 ageInYear,
@@ -174,10 +171,10 @@ class DataService private constructor(context: Context) {
             APIType.Request.Observation(
                 null,
                 listOf(
-                    ObservationQueries.Images(),
+                    ObservationQueries.Images,
                     ObservationQueries.DeterminationView(taxonID),
-                    ObservationQueries.GeomNames(),
-                    ObservationQueries.Locality(),
+                    ObservationQueries.GeomNames,
+                    ObservationQueries.Locality,
                     ObservationQueries.User(null)
                 ),
                 null,
@@ -319,6 +316,7 @@ class DataService private constructor(context: Context) {
                             SubstrateGroup(
                                 substrate.groupDkName,
                                 substrate.groupEnName,
+                                substrate.czName,
                                 mutableListOf(substrate)
                             )
                         )
@@ -735,11 +733,11 @@ class DataService private constructor(context: Context) {
                 null,
                 listOf(
                     ObservationQueries.User(userId),
-                    ObservationQueries.Images(),
-                    ObservationQueries.GeomNames(),
-                    ObservationQueries.Locality(),
+                    ObservationQueries.Images,
+                    ObservationQueries.GeomNames,
+                    ObservationQueries.Locality,
                     ObservationQueries.DeterminationView(null),
-                    ObservationQueries.Comments()
+                    ObservationQueries.Comments
                 )
                 , null,
                 limit, offset

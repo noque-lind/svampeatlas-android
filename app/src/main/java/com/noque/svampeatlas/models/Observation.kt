@@ -1,14 +1,10 @@
 package com.noque.svampeatlas.models
 
-import androidx.room.Database
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.annotations.SerializedName
 import com.noque.svampeatlas.extensions.*
 import com.noque.svampeatlas.extensions.Date
 import com.noque.svampeatlas.services.RoomService
-import com.noque.svampeatlas.utilities.SpeciesQueries
-import com.noque.svampeatlas.view_models.NewObservationViewModel
-import org.intellij.lang.annotations.Subst
 import java.util.*
 
 data class Observation(
@@ -257,10 +253,10 @@ data class Determination(
     val confidence: DeterminationConfidence?
 ) {
     val localizedName: String? get() {
-        return if (Locale.getDefault().isDanish()) {
-            return danishName?.capitalized()
-        } else {
-            null
+        return when (Locale.getDefault().appLanguage()) {
+            AppLanguage.Danish -> danishName?.capitalized()
+            AppLanguage.English -> null
+            AppLanguage.Czech -> null
         }
     }
 }
