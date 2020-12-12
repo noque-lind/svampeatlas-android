@@ -12,11 +12,11 @@ object SharedPreferences {
     private const val LOCKED_VEGETATIONTYPE_ID = "LOCKED_VEGETATIONTYPE_ID"
     private const val LOCKED_HOSTS = "LOCKED_HOSTS"
     private const val HAS_ACCEPTED_IDENTIFCATION_TERMS = "HAS_ACCEPTED_IDENTIFCATION_TERMS"
-    private const val ALWAYS_USE_DK = "ALWAYS_USE_DK"
     private const val SAVE_IMAGES = "SAVE_IMAGES"
     private const val SAVE_IMAGES_DECIDED = "SAVE_IMAGES_DECIDED"
     private const val HAS_SEEN_WHATS_NEW = "HAS_SEEN_WHATS_NEW"
     private const val HAS_SEEN_IMAGE_DELETION = "HAS_SEEN_IMAGE_DELETION"
+    private const val PREFERRED_LANGUAGE = "PREFERRED_LANGUAGE"
 
     private lateinit var prefs: SharedPreferences
 
@@ -84,10 +84,6 @@ object SharedPreferences {
         prefs.edit().putBoolean(HAS_ACCEPTED_IDENTIFCATION_TERMS, value).apply()
     }
 
-    fun getAlwaysUseDKNames(): Boolean {
-        return prefs.getBoolean(ALWAYS_USE_DK, false)
-    }
-
     var hasSeenWhatsNew: Boolean get() {
         return prefs.getBoolean(HAS_SEEN_WHATS_NEW, false)
     } set(value) {
@@ -98,6 +94,12 @@ object SharedPreferences {
         return prefs.getBoolean(HAS_SEEN_IMAGE_DELETION, false)
     } set(value) {
         prefs.edit().putBoolean(HAS_SEEN_IMAGE_DELETION, value).apply()
+    }
+
+    var preferredLanguage: String get() {
+        return prefs.getString(PREFERRED_LANGUAGE, "not_set") ?: "not_set"
+    } set(value) {
+        prefs.edit().putString(PREFERRED_LANGUAGE, value).apply()
     }
 
     fun getSaveImages(): Boolean? {

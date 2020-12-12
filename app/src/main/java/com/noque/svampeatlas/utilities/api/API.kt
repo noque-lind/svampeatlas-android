@@ -1,16 +1,10 @@
-package com.noque.svampeatlas.utilities
+package com.noque.svampeatlas.utilities.api
 
 import android.net.Uri
 import android.util.Log
 import com.android.volley.Request
 import com.google.android.gms.maps.model.LatLng
-import com.noque.svampeatlas.extensions.toBounds
-import com.noque.svampeatlas.extensions.toCircularPolygon
-import com.noque.svampeatlas.extensions.toRectanglePolygon
-import com.noque.svampeatlas.extensions.toSimpleString
-import java.net.URLEncoder
-import java.sql.Date
-import java.time.LocalDateTime
+import com.noque.svampeatlas.extensions.*
 import java.util.*
 
 data class API(val apiType: APIType) {
@@ -71,7 +65,7 @@ data class API(val apiType: APIType) {
                         .appendQueryParameter("order", "FullName ASC")
                     queries.add(SpeciesQueries.Tag(16))
                 }
-                        builder.appendQueryParameter("include", speciesIncludeQuery(queries))
+                builder.appendQueryParameter("include", speciesIncludeQuery(queries))
             }
 
             is APIType.Request.Mushroom -> {
@@ -83,9 +77,9 @@ data class API(val apiType: APIType) {
                         listOf(
                             SpeciesQueries.Images(false),
                             SpeciesQueries.Attributes(null),
-                            SpeciesQueries.RedlistData(),
-                            SpeciesQueries.Statistics(),
-                            SpeciesQueries.DanishNames()
+                            SpeciesQueries.RedlistData,
+                            SpeciesQueries.Statistics,
+                            SpeciesQueries.DanishNames
                         )
                     )
                 )
@@ -222,7 +216,12 @@ data class API(val apiType: APIType) {
 
             is APIType.Post.ImagePrediction -> {
                 builder.appendPath("imagevision")
-                builder.appendQueryParameter("include", speciesIncludeQuery(listOf(SpeciesQueries.AcceptedTaxon(), SpeciesQueries.Images(false), SpeciesQueries.DanishNames(), SpeciesQueries.Attributes(null))))
+                builder.appendQueryParameter("include", speciesIncludeQuery(listOf(
+                    SpeciesQueries.AcceptedTaxon,
+                    SpeciesQueries.Images(false),
+                    SpeciesQueries.DanishNames,
+                    SpeciesQueries.Attributes(null)
+                )))
             }
 
             is APIType.Post.OffensiveContentComment -> {
@@ -282,38 +281,7 @@ data class API(val apiType: APIType) {
         var string = "["
 
         queries.forEach {
-            when (it) {
-                is SpeciesQueries.Attributes -> {
-                    if (it.presentInDenmark != null) {
-                        string += "{\"model\":\"TaxonAttributes\",\"as\":\"attributes\",\"attributes\":[\"valideringsrapport\",\"PresentInDK\", \"diagnose\", \"beskrivelse\", \"forvekslingsmuligheder\", \"oekologi\", \"bogtekst_gyldendal_en\", \"vernacular_name_GB\", \"spiselighedsrapport\"],\"where\":\"{\\\"PresentInDK\\\":${it.presentInDenmark}}\"}"
-                    } else {
-                        string += "{\"model\":\"TaxonAttributes\",\"as\":\"attributes\",\"attributes\":[\"valideringsrapport\",\"PresentInDK\", \"diagnose\", \"beskrivelse\", \"forvekslingsmuligheder\", \"oekologi\", \"bogtekst_gyldendal_en\", \"vernacular_name_GB\", \"spiselighedsrapport\"]}"
-                    }
-                }
-                is SpeciesQueries.Images -> {
-                    string += "{\"model\":\"TaxonImages\",\"as\":\"Images\",\"required\":${it.required}}"
-                }
-
-                is SpeciesQueries.DanishNames -> {
-                    string += "{\"model\":\"TaxonDKnames\",\"as\":\"Vernacularname_DK\", \"attributes\":[\"vernacularname_dk\", \"source\"]}"
-                }
-
-                is SpeciesQueries.Statistics -> {
-                    string += "{\"model\":\"TaxonStatistics\",\"as\":\"Statistics\", \"attributes\":[\"accepted_count\", \"last_accepted_record\", \"first_accepted_record\"]}"
-                }
-                is SpeciesQueries.RedlistData -> {
-                    string += "{\"model\":\"TaxonRedListData\",\"as\":\"redlistdata\",\"required\":false,\"attributes\":[\"status\"],\"where\":\"{\\\"year\\\":2019}\"}"
-                }
-
-                is SpeciesQueries.Tag -> {
-                    string += "{\"model\":\"TaxonomyTagView\",\"as\":\"tags0\",\"where\":\"{\\\"tag_id\\\":${it.id}}\"}"
-                }
-
-                is SpeciesQueries.AcceptedTaxon -> {
-                    string += "{\"model\":\"Taxon\",\"as\":\"acceptedTaxon\"}"
-                }
-            }
-
+            string += it.queryString()
             string += ","
         }
 
@@ -345,44 +313,18 @@ data class API(val apiType: APIType) {
             }
         }
 
-        return "{\"RankID\":{\"gt\":4999},\"\$or\":[{\"FullName\":{\"like\":\"%${fullSearchTerm}%\"}},{\"\$Vernacularname_DK.vernacularname_dk\$\":{\"like\":\"%${fullSearchTerm}%\"}},{\"FullName\":{\"like\":\"${genus}%\"},\"TaxonName\":{\"like\":\"${taxonName}%\"}}]}"
+        return when (Locale.getDefault().appLanguage()) {
+            AppLanguage.Danish -> "{\"RankID\":{\"gt\":4999},\"\$or\":[{\"FullName\":{\"like\":\"%${fullSearchTerm}%\"}},{\"\$Vernacularname_DK.vernacularname_dk\$\":{\"like\":\"%${fullSearchTerm}%\"}},{\"FullName\":{\"like\":\"${genus}%\"},\"TaxonName\":{\"like\":\"${taxonName}%\"}}]}"
+            AppLanguage.English -> "{\"RankID\":{\"gt\":4999},\"\$or\":[{\"FullName\":{\"like\":\"%${fullSearchTerm}%\"}},{\"\$attributes.vernacular_name_GB\$\":{\"like\":\"%${fullSearchTerm}%\"}},{\"FullName\":{\"like\":\"${genus}%\"},\"TaxonName\":{\"like\":\"${taxonName}%\"}}]}"
+            AppLanguage.Czech -> "{\"RankID\":{\"gt\":4999},\"\$or\":[{\"FullName\":{\"like\":\"%${fullSearchTerm}%\"}},{\"\$attributes.vernacular_name_CZ\$\":{\"like\":\"%${fullSearchTerm}%\"}},{\"FullName\":{\"like\":\"${genus}%\"},\"TaxonName\":{\"like\":\"${taxonName}%\"}}]}"
+        }
     }
 
     private fun observationIncludeQuery(observationQueries: List<ObservationQueries>): String {
         var string = "["
 
         observationQueries.forEach {
-            when (it) {
-                is ObservationQueries.Images -> {
-                    string += "\"{\\\"model\\\":\\\"ObservationImage\\\",\\\"as\\\":\\\"Images\\\",\\\"where\\\":{},\\\"required\\\":false}\""
-                }
-                is ObservationQueries.Comments -> {
-                    string += "\"{\\\"model\\\":\\\"ObservationForum\\\",\\\"as\\\":\\\"Forum\\\",\\\"where\\\":{},\\\"required\\\":false}\""
-                }
-                is ObservationQueries.DeterminationView -> {
-                    if (it.taxonID != null) {
-                        string += "\"{\\\"model\\\":\\\"DeterminationView\\\",\\\"as\\\":\\\"DeterminationView\\\",\\\"attributes\\\":[\\\"taxon_id\\\",\\\"recorded_as_id\\\",\\\"taxon_FullName\\\",\\\"taxon_vernacularname_dk\\\",\\\"determination_validation\\\",\\\"recorded_as_FullName\\\",\\\"determination_user_id\\\",\\\"determination_score\\\",\\\"determination_validator_id\\\",\\\"determination_species_hypothesis\\\"],\\\"where\\\":{\\\"Taxon_id\\\":${it.taxonID}}}\""
-                    } else {
-                        string += "\"{\\\"model\\\":\\\"DeterminationView\\\",\\\"as\\\":\\\"DeterminationView\\\",\\\"attributes\\\":[\\\"taxon_id\\\",\\\"recorded_as_id\\\",\\\"taxon_FullName\\\",\\\"taxon_vernacularname_dk\\\",\\\"determination_validation\\\",\\\"recorded_as_FullName\\\",\\\"determination_user_id\\\",\\\"determination_score\\\",\\\"determination_validator_id\\\",\\\"determination_species_hypothesis\\\"]}\""
-                    }
-                }
-                is ObservationQueries.User -> {
-                    if (it.responseFilteredByUserID != null) {
-                        string += "\"{\\\"model\\\":\\\"User\\\",\\\"as\\\":\\\"PrimaryUser\\\",\\\"required\\\":true,\\\"where\\\":{\\\"_id\\\":${it.responseFilteredByUserID}}}\""
-                    } else {
-                        string += "\"{\\\"model\\\":\\\"User\\\",\\\"as\\\":\\\"PrimaryUser\\\",\\\"required\\\":true}\""
-                    }
-                }
-
-                is ObservationQueries.Locality -> {
-                    string += "\"{\\\"model\\\":\\\"Locality\\\",\\\"as\\\":\\\"Locality\\\",\\\"attributes\\\":[\\\"_id\\\",\\\"name\\\"]}\""
-                }
-
-                is ObservationQueries.GeomNames -> {
-                    string += "\"{\\\"model\\\":\\\"GeoNames\\\",\\\"as\\\":\\\"GeoNames\\\",\\\"where\\\":{},\\\"required\\\":false}\""
-                }
-            }
-
+            string += it.queryString()
             string += ","
         }
 
@@ -393,23 +335,65 @@ data class API(val apiType: APIType) {
 
 }
 
-sealed class SpeciesQueries : APIType() {
+sealed class SpeciesQueries: APIType() {
     class Attributes(val presentInDenmark: Boolean?) : SpeciesQueries()
     class Images(val required: Boolean) : SpeciesQueries()
-    class DanishNames() : SpeciesQueries()
-    class Statistics() : SpeciesQueries()
-    class RedlistData() : SpeciesQueries()
     class Tag(val id: Int): SpeciesQueries()
-    class AcceptedTaxon: SpeciesQueries()
+    object DanishNames : SpeciesQueries()
+    object Statistics : SpeciesQueries()
+    object RedlistData : SpeciesQueries()
+    object AcceptedTaxon : SpeciesQueries()
+
+    fun queryString(): String {
+        return when (this) {
+            is Attributes -> {
+                if (this.presentInDenmark != null) {
+                    "{\"model\":\"TaxonAttributes\",\"as\":\"attributes\",\"attributes\":[\"valideringsrapport\",\"PresentInDK\", \"diagnose\", \"beskrivelse\", \"forvekslingsmuligheder\", \"oekologi\", \"bogtekst_gyldendal_en\", \"vernacular_name_GB\", \"vernacular_name_CZ\", \"spiselighedsrapport\"],\"where\":\"{\\\"PresentInDK\\\":${this.presentInDenmark}}\"}"
+                } else {
+                    "{\"model\":\"TaxonAttributes\",\"as\":\"attributes\",\"attributes\":[\"valideringsrapport\",\"PresentInDK\", \"diagnose\", \"beskrivelse\", \"forvekslingsmuligheder\", \"oekologi\", \"bogtekst_gyldendal_en\", \"vernacular_name_GB\", \"vernacular_name_CZ\", \"spiselighedsrapport\"]}"
+                }
+            }
+            is Images -> "{\"model\":\"TaxonImages\",\"as\":\"Images\",\"required\":${this.required}}"
+            is DanishNames -> "{\"model\":\"TaxonDKnames\",\"as\":\"Vernacularname_DK\", \"attributes\":[\"vernacularname_dk\", \"source\"]}"
+            is Statistics -> "{\"model\":\"TaxonStatistics\",\"as\":\"Statistics\", \"attributes\":[\"accepted_count\", \"last_accepted_record\", \"first_accepted_record\"]}"
+            is RedlistData -> "{\"model\":\"TaxonRedListData\",\"as\":\"redlistdata\",\"required\":false,\"attributes\":[\"status\"],\"where\":\"{\\\"year\\\":2019}\"}"
+            is Tag -> "{\"model\":\"TaxonomyTagView\",\"as\":\"tags0\",\"where\":\"{\\\"tag_id\\\":${this.id}}\"}"
+            is AcceptedTaxon -> "{\"model\":\"Taxon\",\"as\":\"acceptedTaxon\"}"
+        }
+    }
 }
 
-sealed class ObservationQueries : APIType() {
-    class Images() : ObservationQueries()
-    class Comments() : ObservationQueries()
+sealed class ObservationQueries: APIType() {
+    object Images : ObservationQueries()
+    object Comments : ObservationQueries()
+    object Locality : ObservationQueries()
+    object GeomNames : ObservationQueries()
     class DeterminationView(val taxonID: Int?) : ObservationQueries()
     class User(val responseFilteredByUserID: Int?) : ObservationQueries()
-    class Locality : ObservationQueries()
-    class GeomNames : ObservationQueries()
+
+    fun queryString(): String {
+       return when (this) {
+            is Images -> "\"{\\\"model\\\":\\\"ObservationImage\\\",\\\"as\\\":\\\"Images\\\",\\\"where\\\":{},\\\"required\\\":false}\""
+            is Comments -> "\"{\\\"model\\\":\\\"ObservationForum\\\",\\\"as\\\":\\\"Forum\\\",\\\"where\\\":{},\\\"required\\\":false}\""
+            is DeterminationView -> {
+                if (this.taxonID != null) {
+                    "\"{\\\"model\\\":\\\"DeterminationView\\\",\\\"as\\\":\\\"DeterminationView\\\",\\\"attributes\\\":[\\\"taxon_id\\\",\\\"recorded_as_id\\\",\\\"taxon_FullName\\\",\\\"taxon_vernacularname_dk\\\",\\\"determination_validation\\\",\\\"recorded_as_FullName\\\",\\\"determination_user_id\\\",\\\"determination_score\\\",\\\"determination_validator_id\\\",\\\"determination_species_hypothesis\\\"],\\\"where\\\":{\\\"Taxon_id\\\":${this.taxonID}}}\""
+                } else {
+                    "\"{\\\"model\\\":\\\"DeterminationView\\\",\\\"as\\\":\\\"DeterminationView\\\",\\\"attributes\\\":[\\\"taxon_id\\\",\\\"recorded_as_id\\\",\\\"taxon_FullName\\\",\\\"taxon_vernacularname_dk\\\",\\\"determination_validation\\\",\\\"recorded_as_FullName\\\",\\\"determination_user_id\\\",\\\"determination_score\\\",\\\"determination_validator_id\\\",\\\"determination_species_hypothesis\\\"]}\""
+                }
+            }
+            is User -> {
+                if (this.responseFilteredByUserID != null) {
+                    "\"{\\\"model\\\":\\\"User\\\",\\\"as\\\":\\\"PrimaryUser\\\",\\\"required\\\":true,\\\"where\\\":{\\\"_id\\\":${this.responseFilteredByUserID}}}\""
+                } else {
+                     "\"{\\\"model\\\":\\\"User\\\",\\\"as\\\":\\\"PrimaryUser\\\",\\\"required\\\":true}\""
+                }
+            }
+
+            is Locality -> "\"{\\\"model\\\":\\\"Locality\\\",\\\"as\\\":\\\"Locality\\\",\\\"attributes\\\":[\\\"_id\\\",\\\"name\\\"]}\""
+            is GeomNames -> "\"{\\\"model\\\":\\\"GeoNames\\\",\\\"as\\\":\\\"GeoNames\\\",\\\"where\\\":{},\\\"required\\\":false}\""
+        }
+    }
 }
 
 data class Geometry(
@@ -451,7 +435,8 @@ data class Geometry(
     }
 }
 
-sealed class APIType {
+sealed class APIType() {
+
     sealed class Request : APIType() {
         class Mushrooms(
             val searchString: String?,

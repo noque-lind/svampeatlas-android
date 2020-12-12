@@ -6,9 +6,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,6 +19,7 @@ import com.noque.svampeatlas.adapters.MyPageAdapter
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.services.DataService
+import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.view_models.Session
 import com.noque.svampeatlas.views.BlankActivity
 import com.noque.svampeatlas.views.ProfileImageView
@@ -32,11 +33,11 @@ class MyPageFragment : Fragment() {
 
     // Views
 
-    private var toolbar: androidx.appcompat.widget.Toolbar? = null
-    private var recyclerView: RecyclerView? = null
-    private var userView: ProfileImageView? = null
-    private var collapsingToolbar: CollapsingToolbarLayout? = null
-    private var swipeRefreshLayout: SwipeRefreshLayout? = null
+    private var toolbar by autoCleared<Toolbar>()
+    private var recyclerView by autoCleared<RecyclerView> { it?.adapter = null }
+    private var userView by autoCleared<ProfileImageView>()
+    private var collapsingToolbar by autoCleared<CollapsingToolbarLayout>()
+    private var swipeRefreshLayout by autoCleared<SwipeRefreshLayout>()
 
 
     // Adapters
@@ -106,45 +107,37 @@ class MyPageFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initViews()
-        setupViews()
-        setupViewModels()
-
-        Session.reloadData(false)
-    }
-
-    private fun initViews() {
         toolbar = mypageFragment_toolbar
         recyclerView = myPageFragment_recyclerView
         userView = myPageFragment_profileImageView
         collapsingToolbar = myPageFragment_collapsingToolbarLayout
         swipeRefreshLayout = myPageFragment_swipeRefreshLayout
+        setupViews()
+        setupViewModels()
+        Session.reloadData(false)
     }
 
     private fun setupViews() {
         (requireActivity() as BlankActivity).setSupportActionBar(toolbar)
-        collapsingToolbar?.setCollapsedTitleTextColor(ResourcesCompat.getColor(resources, R.color.colorWhite, null))
-        collapsingToolbar?.setExpandedTitleColor(ResourcesCompat.getColor(resources, R.color.colorWhite, null))
-        swipeRefreshLayout?.setOnRefreshListener(onRefreshListener)
-
-        recyclerView?.apply {
+        collapsingToolbar.setCollapsedTitleTextColor(ResourcesCompat.getColor(resources, R.color.colorWhite, null))
+        collapsingToolbar.setExpandedTitleColor(ResourcesCompat.getColor(resources, R.color.colorWhite, null))
+        swipeRefreshLayout.setOnRefreshListener(onRefreshListener)
+        recyclerView.apply {
             adapter = this@MyPageFragment.adapter
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         }
-
-
     }
 
     private fun setupViewModels() {
             Session.user.observe(viewLifecycleOwner, Observer {
-                collapsingToolbar?.title = it?.name
-                if (it != null) userView?.configure(it.initials, it.imageURL, DataService.ImageSize.FULL)
+                collapsingToolbar.title = it?.name
+                if (it != null) userView.configure(it.initials, it.imageURL, DataService.ImageSize.FULL)
             })
 
             Session.notificationsState.observe(viewLifecycleOwner, Observer { state ->
                 when (state) {
                     is State.Loading -> {
-                        swipeRefreshLayout?.isRefreshing = true
+                        swipeRefreshLayout.isRefreshing = true
                     }
 
                     is State.Items -> {
@@ -169,7 +162,7 @@ class MyPageFragment : Fragment() {
             Session.observationsState.observe(viewLifecycleOwner, Observer { state ->
                 when (state) {
                     is State.Loading -> {
-                        swipeRefreshLayout?.isRefreshing = true
+                        swipeRefreshLayout.isRefreshing = true
                     }
 
                     is State.Items -> {
@@ -198,17 +191,7 @@ class MyPageFragment : Fragment() {
 
     private fun evaluateIfFinishedLoading() {
         if (Session.observationsState.value !is State.Loading && Session.notificationsState.value !is State.Loading) {
-            swipeRefreshLayout?.isRefreshing = false
+            swipeRefreshLayout.isRefreshing = false
         }
-    }
-
-    override fun onDestroyView() {
-        recyclerView?.adapter = null
-        recyclerView = null
-        userView = null
-        swipeRefreshLayout = null
-        toolbar = null
-        collapsingToolbar = null
-        super.onDestroyView()
     }
 }

@@ -11,13 +11,9 @@ import com.noque.svampeatlas.models.AppError
 import com.noque.svampeatlas.models.Mushroom
 import com.noque.svampeatlas.models.Observation
 import com.noque.svampeatlas.models.State
-import com.noque.svampeatlas.R
-import com.noque.svampeatlas.extensions.copyTo
-import com.noque.svampeatlas.models.Result
 import com.noque.svampeatlas.services.DataService
 import com.noque.svampeatlas.services.RoomService
-import com.noque.svampeatlas.utilities.Geometry
-import com.noque.svampeatlas.views.BlankActivity
+import com.noque.svampeatlas.utilities.api.Geometry
 import kotlinx.coroutines.launch
 import java.io.File
 

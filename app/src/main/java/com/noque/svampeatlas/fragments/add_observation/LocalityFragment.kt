@@ -93,11 +93,11 @@ class LocalityFragment: Fragment() {
                     MotionEvent.ACTION_MOVE -> {
                         if ((x - originX > 500 || y - originY > 500) || hasStarted) {
                             hasStarted = true
-                            markerImageView.translationX = x - (originX + ((markerImageView.width.toFloat() ?: 0.toFloat())))
-                            markerImageView.translationY = y - (originY + ((markerImageView.height.toFloat() ?: 0.toFloat()) * 2))
+                            markerImageView.translationX = x - (originX + ((markerImageView.width.toFloat())))
+                            markerImageView.translationY = y - (originY + ((markerImageView.height.toFloat()) * 2))
                         } else {
                             markerImageView.translationX = x / 4 - originX
-                            markerImageView.translationY = (y - (originY + ((markerImageView.height.toFloat() ?: 0.toFloat())))) * 0.2.toFloat()
+                            markerImageView.translationY = (y - (originY + ((markerImageView.height.toFloat())))) * 0.2.toFloat()
                         }
                     }
 

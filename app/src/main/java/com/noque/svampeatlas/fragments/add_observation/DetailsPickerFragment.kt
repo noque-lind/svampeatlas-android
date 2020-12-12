@@ -2,6 +2,7 @@ package com.noque.svampeatlas.fragments.add_observation
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -89,6 +90,7 @@ class DetailsPickerFragment() : DialogFragment() {
         val adapter = HostsAdapter()
         adapter.setListener(object: PickerAdapter.Listener<Host> {
             override fun itemSelected(item: Host) {
+                Log.d("Hosts", item.toString())
                 newObservationViewModel.appendHost(item, switch.isChecked)
             }
 

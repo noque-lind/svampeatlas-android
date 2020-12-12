@@ -1,10 +1,14 @@
 package com.noque.svampeatlas.models
 
-import com.noque.svampeatlas.extensions.isDanish
+
+import com.noque.svampeatlas.extensions.AppLanguage
+import com.noque.svampeatlas.extensions.appLanguage
+import com.noque.svampeatlas.extensions.capitalized
 import java.util.*
 
 data class SubstrateGroup(val dkName: String,
                           val enName: String,
+                          val czName: String?,
                           val substrates: MutableList<Substrate>) {
 
     val id: Int get() {
@@ -21,10 +25,10 @@ data class SubstrateGroup(val dkName: String,
     }
 
     val localizedName: String get() {
-        return if (Locale.getDefault().isDanish()) {
-            dkName
-        } else {
-            enName
+        return when (Locale.getDefault().appLanguage()) {
+            AppLanguage.Danish -> dkName.capitalized()
+            AppLanguage.English -> enName.capitalized()
+            AppLanguage.Czech -> czName?.capitalized() ?: enName.capitalized()
         }
     }
 

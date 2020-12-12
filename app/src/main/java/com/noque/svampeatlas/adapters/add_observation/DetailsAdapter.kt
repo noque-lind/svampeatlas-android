@@ -120,7 +120,7 @@ class DetailsAdapter(private val resources: Resources, private val categories: A
                 } else {
                     hostsString = if (hosts?.second == true) "\uD83D\uDD12 " else ""
                     hosts?.first?.forEach {
-                        hostsString += "${it.localizedName}, "
+                        hostsString += if (it.localizedName != null) "${it.localizedName}, " else "${it.latinName}, "
                     }
                    hostsString = hostsString.dropLast(2)
 

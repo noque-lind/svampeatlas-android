@@ -10,7 +10,7 @@ import com.noque.svampeatlas.models.Mushroom
 import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.services.DataService
 import com.noque.svampeatlas.services.RoomService
-import com.noque.svampeatlas.utilities.SpeciesQueries
+import com.noque.svampeatlas.utilities.api.SpeciesQueries
 import kotlinx.coroutines.launch
 
 
@@ -65,8 +65,8 @@ class MushroomsViewModel(category: Category?, application: Application) :
                 null,
                 listOf(
                     SpeciesQueries.Attributes(true),
-                    SpeciesQueries.DanishNames(),
-                    SpeciesQueries.Statistics(),
+                    SpeciesQueries.DanishNames,
+                    SpeciesQueries.Statistics,
                     SpeciesQueries.Images(true)
                 )
             ) {
@@ -100,9 +100,9 @@ class MushroomsViewModel(category: Category?, application: Application) :
     fun search(entry: String, detailed: Boolean, allowGenus: Boolean = false) {
         _mushroomsState.value = State.Loading()
 
-        val queries = mutableListOf(SpeciesQueries.DanishNames(), SpeciesQueries.Images(false))
+        val queries = mutableListOf(SpeciesQueries.DanishNames, SpeciesQueries.Images(false), SpeciesQueries.Attributes(null))
 
-        if (detailed) queries.add(SpeciesQueries.Statistics())
+        if (detailed) queries.add(SpeciesQueries.Statistics)
 
         viewModelScope.launch {
             DataService.getInstance(getApplication()).getMushrooms(TAG, entry, queries) {

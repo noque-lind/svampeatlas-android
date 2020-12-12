@@ -50,7 +50,10 @@
             app:nullable="true" />
         <action
             android:id="@+id/action_mushroomDetailsFragment_to_addObservationFragment_edit"
-            app:destination="@id/addObservationFragment" />
+            app:destination="@id/addObservationFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/addObservationFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -111,6 +114,7 @@
     <action
         android:id="@+id/action_global_myPageFragment"
         app:destination="@id/myPageFragment"
+        app:launchSingleTop="true"
         app:popUpTo="@id/myPageFragment"
         app:popUpToInclusive="true" />
     <action

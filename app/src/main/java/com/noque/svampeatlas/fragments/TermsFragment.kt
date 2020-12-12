@@ -59,6 +59,7 @@ class TermsFragment: DialogFragment() {
                 Type.WHATSNEW -> {
                     SharedPreferences.hasSeenWhatsNew = true
                 }
+                else -> {}
             }
 
             listener?.onDismiss(termsAccepted = true)

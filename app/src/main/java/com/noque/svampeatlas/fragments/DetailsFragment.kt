@@ -4,7 +4,6 @@ package com.noque.svampeatlas.fragments
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.*
@@ -33,7 +32,7 @@ import com.noque.svampeatlas.R
 import com.noque.svampeatlas.extensions.openSettings
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.services.LocationService
-import com.noque.svampeatlas.utilities.Geometry
+import com.noque.svampeatlas.utilities.api.Geometry
 import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.view_models.*
 import com.noque.svampeatlas.view_models.factories.ObservationsViewModelFactory
@@ -634,15 +633,6 @@ class DetailsFragment : Fragment() {
 
 
         val information = mutableListOf<Pair<String, String>>()
-        observation.observationDate?.let {
-            information.add(
-                Pair(
-                    "Fundets dato:",
-                    it.toReadableDate(recentFormatting = true, ignoreTime = true)
-                )
-            )
-        }
-
         observation.locality?.let {
             information.add(Pair(getString(R.string.observationDetailsScrollView_location), it.name))
         }
@@ -656,8 +646,11 @@ class DetailsFragment : Fragment() {
 
         observation.hosts.let {
             var string = ""
-            it.forEach { string += "${it.localizedName},"}
-            information.add(Pair(getString(R.string.observationDetailsCell_host), string ))
+            it.forEach { string += if (it.localizedName != null) "${it.localizedName}, " else "${it.latinName}, "}
+            if (string.isNotBlank()) {
+                string = string.dropLast(2)
+                information.add(Pair(getString(R.string.observationDetailsCell_host), string ))
+            }
         }
 
         informationView.configure(information)
