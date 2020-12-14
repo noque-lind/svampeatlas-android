@@ -1,8 +1,6 @@
 package com.noque.svampeatlas.models
 
 
-import android.util.Log
-
 interface ViewType
 
 open class Item<V>(private val viewType: V) where V : ViewType, V: Enum<V> {

@@ -22,6 +22,13 @@ fun Date(ISO8601: String?): Date? {
     return null
 }
 
+fun Date(minusMonths: Int): Date {
+    val cal = Calendar.getInstance()
+    cal.setTime(Date())
+    cal.add(Calendar.MONTH, -minusMonths)
+    return cal.time
+}
+
 fun Date.toSimpleString(): String {
     val sf = SimpleDateFormat("yyyy-MM-dd")
     return sf.format(this)
@@ -45,7 +52,9 @@ fun Date.toReadableDate(recentFormatting: Boolean = true, ignoreTime: Boolean = 
         return if (ignoreTime) {
             SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM).format(this)
         } else {
-            SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.SHORT).format(this)
+            SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.SHORT).format(
+                this
+            )
         }
     } else {
         val diff = Calendar.getInstance().time.time - this.time
@@ -66,7 +75,10 @@ fun Date.toReadableDate(recentFormatting: Boolean = true, ignoreTime: Boolean = 
             return if (ignoreTime) {
                 SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM).format(this)
             } else {
-                SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.SHORT).format(this)
+                SimpleDateFormat.getDateTimeInstance(
+                    SimpleDateFormat.MEDIUM,
+                    SimpleDateFormat.SHORT
+                ).format(this)
             }
         }
     }

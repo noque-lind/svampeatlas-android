@@ -1,21 +1,15 @@
 package com.noque.svampeatlas.view_models
 
-import android.app.Application
-import android.provider.Settings
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.services.DataService
 import com.noque.svampeatlas.services.RoomService
 import com.noque.svampeatlas.utilities.MyApplication
 import com.noque.svampeatlas.utilities.SharedPreferences
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File

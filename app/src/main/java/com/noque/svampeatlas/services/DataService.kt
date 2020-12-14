@@ -1,7 +1,11 @@
 package com.noque.svampeatlas.services
 
+import android.app.DownloadManager
 import android.content.Context
+import android.content.Context.DOWNLOAD_SERVICE
+import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
 import com.android.volley.*
 import com.android.volley.toolbox.*
 import com.google.gson.reflect.TypeToken
@@ -15,6 +19,10 @@ import com.noque.svampeatlas.extensions.toBase64
 import com.noque.svampeatlas.extensions.toJPEG
 import com.noque.svampeatlas.utilities.*
 import com.noque.svampeatlas.utilities.api.*
+import com.noque.svampeatlas.utilities.volleyRequests.AppEmptyRequest
+import com.noque.svampeatlas.utilities.volleyRequests.AppJSONObjectRequest
+import com.noque.svampeatlas.utilities.volleyRequests.AppMultipartPost
+import com.noque.svampeatlas.utilities.volleyRequests.AppRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -88,6 +96,21 @@ class DataService private constructor(context: Context) {
         addToRequestQueue(request)
     }
 
+    fun testDownload(): Long {
+        val api = API(APIType.Request.Mushrooms(null, listOf(SpeciesQueries.Attributes(null), SpeciesQueries.Images(false), SpeciesQueries.Statistics, SpeciesQueries.DanishNames), 0, null))
+       var request = DownloadManager.Request(Uri.parse(api.url()))
+        request.setAllowedOverRoaming(false)
+        val file = FileManager.createDocumentFile(api.url(), applicationContext).toUri()
+        Log.d(TAG, file.toString())
+        request.setDestinationUri(file)
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+        request.setTitle("Test mushroom")
+        request.setDescription("Henter alle svampene")
+        val downloadService = applicationContext.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+       return downloadService.enqueue(request)
+
+    }
+
     fun getMushrooms(
         tag: String,
         searchString: String?,
@@ -117,7 +140,6 @@ class DataService private constructor(context: Context) {
             Response.ErrorListener {
                 completion(Result.Error(parseVolleyError(it)))
             })
-
         request.tag = tag
         addToRequestQueue(request)
     }

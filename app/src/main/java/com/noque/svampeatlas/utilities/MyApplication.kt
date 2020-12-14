@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.util.Log
 import com.bumptech.glide.load.engine.Resource
+import com.downloader.PRDownloader
 import com.noque.svampeatlas.services.FileManager
 
 class MyApplication: Application() {
@@ -21,6 +22,7 @@ class MyApplication: Application() {
         MyApplication.applicationContext = applicationContext
         MyApplication.resources = resources
         SharedPreferences.init(applicationContext)
+        PRDownloader.initialize(applicationContext);
         super.onCreate()
     }
 

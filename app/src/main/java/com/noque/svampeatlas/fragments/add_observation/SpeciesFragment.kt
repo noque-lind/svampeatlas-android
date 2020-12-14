@@ -2,7 +2,6 @@ package com.noque.svampeatlas.fragments.add_observation
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,16 +19,12 @@ import com.noque.svampeatlas.fragments.AddObservationFragmentDirections
 import com.noque.svampeatlas.fragments.DetailsFragment
 import com.noque.svampeatlas.models.DeterminationConfidence
 import com.noque.svampeatlas.models.Mushroom
-import com.noque.svampeatlas.models.Observation
-import com.noque.svampeatlas.utilities.MyApplication
 import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.views.SearchBarListener
 import com.noque.svampeatlas.views.SearchBarView
 import com.noque.svampeatlas.view_models.MushroomsViewModel
 import com.noque.svampeatlas.view_models.factories.MushroomsViewModelFactory
 import com.noque.svampeatlas.view_models.NewObservationViewModel
-import com.noque.svampeatlas.view_models.SpeciesViewModel
-import com.noque.svampeatlas.view_models.factories.SpeciesViewModelFactory
 import kotlinx.android.synthetic.main.fragment_add_observation_specie.*
 
 class SpeciesFragment : Fragment() {

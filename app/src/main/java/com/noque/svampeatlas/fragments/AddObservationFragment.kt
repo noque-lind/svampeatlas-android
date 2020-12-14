@@ -4,14 +4,12 @@ import android.content.pm.ActivityInfo
 import android.graphics.*
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -169,7 +167,8 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         }
 
         override fun locationRetrieved(location: Location) {
-            newObservationViewModel.setCoordinateState(State.Items(com.noque.svampeatlas.models.Location(Date(), LatLng(location.latitude, location.longitude), location.accuracy)))
+            newObservationViewModel.setCoordinateState(State.Items(com.noque.svampeatlas.models.Location(
+                Date(), LatLng(location.latitude, location.longitude), location.accuracy)))
         }
     }
 

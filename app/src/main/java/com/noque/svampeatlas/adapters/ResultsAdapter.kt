@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.R
-import com.noque.svampeatlas.adapters.add_observation.SpeciesAdapter
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.view_holders.*
 

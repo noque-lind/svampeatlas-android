@@ -16,12 +16,30 @@ object FileManager {
     private val temporaryFiles = mutableListOf<File>()
 
     fun createTempFile(context: Context): File {
-        val file = File.createTempFile(SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.getDefault()).format(System.currentTimeMillis()), ".jpg", getCacheDir(context))
+        val file = File.createTempFile(
+            SimpleDateFormat(
+                "yyyy-MM-dd-HH-mm-ss-SSS",
+                Locale.getDefault()
+            ).format(System.currentTimeMillis()), ".jpg", getCacheDir(context)
+        )
         temporaryFiles.add(file)
         return file
     }
 
-    fun createFile(context: Context): File = File(getOutputDirectory(context), SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.getDefault()).format(System.currentTimeMillis()) + ".jpg")
+    fun createDocumentFile(name: String, context: Context): File {
+        return File.createTempFile( SimpleDateFormat(
+            "yyyy-MM-dd",
+            Locale.getDefault()
+        ).format(System.currentTimeMillis()) + " - $name", ".json", getCacheDir(context))
+    }
+
+
+    fun createFile(context: Context): File = File(
+        getOutputDirectory(context), SimpleDateFormat(
+            "yyyy-MM-dd-HH-mm-ss-SSS",
+            Locale.getDefault()
+        ).format(System.currentTimeMillis()) + ".jpg"
+    )
 
     fun clearTemporaryFiles() {
         temporaryFiles.forEach { it.delete() }
@@ -47,7 +65,12 @@ object FileManager {
         val result = tempImageFile.copyTo(toNewFile)
         result.onSuccess {
             val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(it.extension)
-            MediaScannerConnection.scanFile(context, arrayOf(it.absolutePath), arrayOf(mimeType), null)
+            MediaScannerConnection.scanFile(
+                context,
+                arrayOf(it.absolutePath),
+                arrayOf(mimeType),
+                null
+            )
         }
         return result
     }

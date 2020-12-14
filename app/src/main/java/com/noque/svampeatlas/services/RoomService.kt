@@ -92,7 +92,10 @@ object RoomService {
 
     suspend fun saveMushroom(mushroom: Mushroom) {
         database.mushroomsDao().saveFavorites(mushroom)
+    }
 
+    suspend fun saveMushrooms(mushrooms: List<Mushroom>) {
+        database.mushroomsDao().saveFavorites(*mushrooms.toTypedArray())
     }
 
     suspend fun deleteMushroom(mushroom: Mushroom) {

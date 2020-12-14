@@ -343,6 +343,9 @@
     <string name="language_czech">Czech</string>
     <string name="language_english">English</string>
     <string name="settings_language_message">Some content is not translated to all languages: %s</string>
+    <string name="download_taxon_title">Would you like an offline taxon list?</string>
+    <string name="download_taxon_message">If you do, you can always search the entire taxon list, even without internet. This way you can easily prepare your sightings</string>
+    <string name="notes_fragment_title">Notebook</string>
 
 
 </resources>

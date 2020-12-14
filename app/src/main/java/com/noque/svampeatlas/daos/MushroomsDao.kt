@@ -17,6 +17,9 @@ interface MushroomsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveFavorites(vararg mushroom: Mushroom)
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun saveMushrooms(vararg mushrooms: Mushroom)
+
     @Delete
     suspend fun deleteMushroom(mushroom: Mushroom)
 }

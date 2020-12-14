@@ -1,4 +1,4 @@
-package com.noque.svampeatlas.utilities
+package com.noque.svampeatlas.utilities.volleyRequests
 
 import com.android.volley.NetworkResponse
 import com.android.volley.ParseError
@@ -33,6 +33,26 @@ class AppEmptyRequest(
 
     override fun deliverResponse(response: Void?) {
         listener.onResponse(response)
+    }
+}
+
+open class AppBaseRequest<T>(private val endpoint: API, private val token: String?, private val listener: Response.Listener<T>, errorListener: Response.ErrorListener): Request<Void>(endpoint.volleyMethod(), endpoint.url(), errorListener) {
+    override fun getHeaders(): MutableMap<String, String> {
+        val mutableMap = mutableMapOf(Pair("Content-Type", "application/json"))
+
+        token?.let {
+            mutableMap.put("Authorization", "Bearer $it")
+        }
+
+        return mutableMap
+    }
+
+    override fun parseNetworkResponse(response: NetworkResponse?): Response<Void> {
+        return Response.success(null, HttpHeaderParser.parseCacheHeaders(response))
+    }
+
+    override fun deliverResponse(response: Void?) {
+        TODO("Not yet implemented")
     }
 }
 

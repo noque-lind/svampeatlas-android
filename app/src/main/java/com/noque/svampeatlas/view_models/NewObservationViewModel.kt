@@ -3,32 +3,23 @@ package com.noque.svampeatlas.view_models
 import android.app.Application
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.BitmapFactory
 import android.util.Log
-import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.*
-import com.bumptech.glide.load.engine.Resource
-import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.SphericalUtil
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.extensions.*
 import com.noque.svampeatlas.extensions.Date
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.services.DataService
-import com.noque.svampeatlas.services.LocationService
 import com.noque.svampeatlas.services.RoomService
 import com.noque.svampeatlas.utilities.MyApplication
 import com.noque.svampeatlas.utilities.SharedPreferences
 import com.noque.svampeatlas.utilities.SingleLiveEvent
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
-import java.net.URL
 import java.util.*
-import java.text.SimpleDateFormat
 
 
 class NewObservationViewModel(application: Application) : AndroidViewModel(application) {

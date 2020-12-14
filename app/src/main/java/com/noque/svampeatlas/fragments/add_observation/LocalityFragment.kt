@@ -2,7 +2,6 @@ package com.noque.svampeatlas.fragments.add_observation
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -11,7 +10,6 @@ import androidx.core.view.marginBottom
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.adapters.add_observation.LocalityAdapter

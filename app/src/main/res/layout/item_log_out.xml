@@ -12,7 +12,7 @@
         android:layout_marginTop="32dp"
         android:layout_marginBottom="4dp"
         android:gravity="center"
-        android:text="@string/myPageScrollView_logout"
+        android:text=""
         style="@style/AppPrimary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
