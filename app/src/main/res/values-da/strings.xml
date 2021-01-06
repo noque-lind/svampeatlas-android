@@ -232,5 +232,11 @@
     <string name="settings_language_message">Det er ikke alt indhold som er oversat til alle sprog: %s</string>
     <string name="download_taxon_title">Vil du hente taxon listen til offline brug?</string>
     <string name="download_taxon_message">If you do, you can always search the entire taxon list, even without internet. This way you can easily prepare your sightings</string>
+    <string name="downloader_taxon_downloading">Henter artsliste</string>
+    <string name="downloader_taxon_readingFile">Læser fil</string>
+    <string name="downloader_taxon_savingFile">Gemmer til databasen</string>
+    <string name="downloader_taxon_error">Der skete en fejl</string>
+    <string name="common_addEntry">Add</string>
+    <string name="addObservationFragment_title_note">New notebook entry</string>
 
 </resources>

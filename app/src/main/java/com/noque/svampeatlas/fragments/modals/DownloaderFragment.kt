@@ -8,10 +8,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.database.Cursor
 import android.os.Bundle
+import android.text.Layout
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -41,23 +43,6 @@ class DownloaderFragment: DialogFragment() {
     private var spinner by autoCleared<ProgressBar>()
     private var backgroundView by autoCleared<BackgroundView>()
 
-
-    private var downloadID: Long? = null
-
-    // Listeners
-
-//    private val onDownloadComplete: BroadcastReceiver = object : BroadcastReceiver() {
-//        override fun onReceive(context: Context?, intent: Intent) {
-//            //Fetching the download id received with the broadcast
-//            val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-//            val some = intent.getLongExtra(DownloadManager.EXTR, -1)
-//            //Checking if the received broadcast is for our enqueued download by matching download id
-//            if (downloadID == id) {
-//                Toast.makeText(requireContext(), "Download Completed", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//    }
-
     private val viewModel by viewModels<DownloaderViewModel>()
 
 
@@ -72,36 +57,27 @@ class DownloaderFragment: DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        context?.registerReceiver(onDownloadComplete, IntentFilter(ACTION_DOWNLOAD_COMPLETE))
-////        type = arguments?.getSerializable(KEY_TYPE) as Type
-        spinner = downloaderFragment_progressBar
         titleTextView = downloaderFragment_titleTextView
         messageTextView = downloaderFragment_messageTextView
         backgroundView = downloaderFragment_errorView
-        initViews()
+        setupViews()
         setupViewModels()
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 
     override fun onStart() {
         super.onStart()
         val width = (resources.displayMetrics.widthPixels * 0.85).toInt()
         val height = (resources.displayMetrics.heightPixels * 0.70).toInt()
-        dialog?.window?.setLayout(width, height)
+        dialog?.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
-    private fun initViews() {
-
-
-
-        titleTextView.text = "Henter alle taxon"
-
+    private fun setupViews() {
+        titleTextView.text = getString(R.string.download_taxon_title)
+        messageTextView.text = getString(R.string.download_taxon_message)
     }
 
     private fun setupViewModels() {
+
         viewModel.state.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is State.Items -> {
@@ -109,20 +85,18 @@ class DownloaderFragment: DialogFragment() {
                 }
                 is State.Empty -> {}
                 is State.Loading -> {
-                    backgroundView.visibility = View.GONE
-                    spinner.visibility = View.VISIBLE}
+                    backgroundView.setLoading()
+                }
                 is State.Error -> {
-                    backgroundView.visibility = View.VISIBLE
                     backgroundView.setErrorWithHandler(it.error, it.error.recoveryAction) {
-
+                        viewModel.startDownload()
                     }
-                    spinner.visibility = View.GONE
                 }
             }
         })
 
         viewModel.loadingState.observe(viewLifecycleOwner, Observer {
-            messageTextView.text = it.message
+            messageTextView.text = getString(it.resID)
         })
     }
 

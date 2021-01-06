@@ -164,6 +164,14 @@
     <action
         android:id="@+id/action_global_emptyFragment"
         app:destination="@id/emptyFragment" />
+    <fragment
+        android:id="@+id/notesFragment"
+        android:name="com.noque.svampeatlas.fragments.NotesFragment"
+        android:label="NotesFragment" >
+        <action
+            android:id="@+id/action_notesFragment_to_addObservationFragment"
+            app:destination="@id/addObservationFragment" />
+    </fragment>
 
 
 </navigation>

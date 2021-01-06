@@ -9,6 +9,10 @@
             android:icon="@drawable/icon_profile"
             android:title="@string/navigationItem_myPageVC"/>
         <item
+            android:id="@+id/notesFragment"
+            android:icon="@drawable/icon_plus"
+            android:title="@string/notes_fragment_title"/>
+        <item
             android:id="@+id/addObservationFragment"
             android:icon="@drawable/icon_plus"
             android:title="@string/navigationItem_newObservationVC"/>

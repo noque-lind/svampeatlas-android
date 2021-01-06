@@ -64,7 +64,8 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     enum class Type {
         NEW_OBSERVATION,
         IDENTIFYED_OBSERVATION,
-        Edit
+        Edit,
+        Note;
     }
 
     enum class Category {
@@ -320,12 +321,14 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     }
 
     private fun setupView() {
-        if (args.type != Type.Edit) {
-            toolbar.setNavigationIcon(R.drawable.icon_menu_button)
-            toolbar.setTitle(R.string.addObservationVC_title)
-        } else {
+        if (args.type == Type.Edit) {
             toolbar.setTitle(R.string.addObservationVC_title_edit)
             toolbar.subtitle = "ID: ${args.id}"
+        } else if (args.type == Type.Note) {
+            toolbar.setTitle(R.string.addObservationFragment_title_note)
+        } else {
+            toolbar.setNavigationIcon(R.drawable.icon_menu_button)
+            toolbar.setTitle(R.string.addObservationVC_title)
         }
         (requireActivity() as BlankActivity).setSupportActionBar(toolbar)
         tabLayout.setupWithViewPager(viewPager)

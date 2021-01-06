@@ -3,7 +3,7 @@ package com.noque.svampeatlas.models
 import com.google.android.gms.maps.model.LatLng
 import java.util.*
 
-data class NewObservation(private val observationDate: Date = Date(),
+data class NewObservation(val observationDate: Date = Date(),
         private val observationDateAccuracy: String = "day",
                           var substrate: Int? = null,
                           var vegetationType: Int? = null,

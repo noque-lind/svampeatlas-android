@@ -242,4 +242,10 @@
     <string name="notes_fragment_title">Notebook</string>
     <string name="download_taxon_title">Would you like an offline taxon list?</string>
     <string name="download_taxon_message">If you do, you can always search the entire taxon list, even without internet. This way you can easily prepare your sightings</string>
+    <string name="downloader_taxon_downloading">Downloading species list</string>
+    <string name="downloader_taxon_readingFile">Reading file</string>
+    <string name="downloader_taxon_savingFile">Saving to database</string>
+    <string name="downloader_taxon_error">An error occured</string>
+    <string name="common_addEntry">Add</string>
+    <string name="addObservationFragment_title_note">New notebook entry</string>
 </resources>

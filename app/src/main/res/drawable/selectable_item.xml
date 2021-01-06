@@ -20,9 +20,6 @@
         android:drawable="@color/colorThird">
     </item>
 
-
-
-
     <item
         android:state_enabled="true"
         android:drawable="@color/colorThird">

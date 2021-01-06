@@ -202,11 +202,12 @@ class BlankActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-       if (navController.currentDestination?.id == R.id.addObservationFragment && navController.previousBackStackEntry?.destination?.id == R.id.mushroomDetailsFragment) {
-           return navController.navigateUp(AppBarConfiguration(setOf(R.id.loginFragment, R.id.myPageFragment, R.id.mushroomFragment, R.id.nearbyFragment, R.id.cameraFragment, R.id.settingsFragment, R.id.aboutFragment), drawerLayout)) || super.onSupportNavigateUp()
-
+        val sharedSet = mutableSetOf(R.id.loginFragment, R.id.myPageFragment, R.id.notesFragment, R.id.mushroomFragment, R.id.nearbyFragment, R.id.cameraFragment, R.id.settingsFragment, R.id.aboutFragment)
+       if (navController.currentDestination?.id == R.id.addObservationFragment && (navController.previousBackStackEntry?.destination?.id == R.id.mushroomDetailsFragment || navController.previousBackStackEntry?.destination?.id == R.id.notesFragment)) {
+           return navController.navigateUp(AppBarConfiguration(sharedSet, drawerLayout)) || super.onSupportNavigateUp()
        } else  {
-           return navController.navigateUp(AppBarConfiguration(setOf(R.id.loginFragment, R.id.myPageFragment, R.id.addObservationFragment, R.id.mushroomFragment, R.id.nearbyFragment, R.id.cameraFragment, R.id.settingsFragment, R.id.aboutFragment), drawerLayout)) || super.onSupportNavigateUp()
+           sharedSet.add(R.id.addObservationFragment)
+           return navController.navigateUp(AppBarConfiguration(sharedSet, drawerLayout)) || super.onSupportNavigateUp()
 
        }
            }
