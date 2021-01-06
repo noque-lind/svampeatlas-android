@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -25,7 +26,6 @@ class DetailsFragment : Fragment() {
     companion object {
         val TAG = "AddObs.DetailsFragment"
     }
-
 
     enum class Categories {
         DATE,
@@ -101,13 +101,9 @@ class DetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initViews()
+        recyclerView = addObservationFragment_details_recyclerView
         setupView()
         setupViewModels()
-    }
-
-    private fun initViews() {
-        recyclerView = addObservationFragment_details_recyclerView
     }
 
     private fun setupView() {
@@ -117,7 +113,7 @@ class DetailsFragment : Fragment() {
 
             val dividerItemDecoration =
                 DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
-            dividerItemDecoration.setDrawable(ColorDrawable(resources.getColor(R.color.colorWhite)))
+            dividerItemDecoration.setDrawable(ColorDrawable(ResourcesCompat.getColor(resources, R.color.colorWhite, null)))
             addItemDecoration(dividerItemDecoration)
         }
     }
@@ -186,27 +182,4 @@ class DetailsFragment : Fragment() {
         dialog.arguments = bundle
         dialog.show(childFragmentManager, null)
     }
-
-    override fun onPause() {
-        Log.d(TAG, "On Pause")
-        super.onPause()
-    }
-
-    override fun onStop() {
-        Log.d(TAG, "On Stop")
-        super.onStop()
-    }
-
-
-    override fun onDestroy() {
-        Log.d(DetailsFragment.TAG, "On Destroy")
-        super.onDestroy()
-    }
-
-    override fun onDetach() {
-        Log.d(DetailsFragment.TAG, "On Detach")
-        super.onDetach()
-    }
-
-
 }

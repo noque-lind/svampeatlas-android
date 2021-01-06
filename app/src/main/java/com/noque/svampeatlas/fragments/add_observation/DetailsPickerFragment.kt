@@ -44,7 +44,6 @@ class DetailsPickerFragment() : DialogFragment() {
     }
 
     // Objects
-
     private lateinit var type: Type
 
     // Views
@@ -134,7 +133,12 @@ class DetailsPickerFragment() : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         type = arguments?.getSerializable(TYPE_KEY) as Type
         super.onViewCreated(view, savedInstanceState)
-        initViews()
+        backgroundView = detailsPickerFragment_backgroundView
+        recyclerView = detailsPickerFragment_recyclerView
+        titleTextView = detailsPickerFragment_headerTextView
+        switch = detailsPickerFragment_switch
+        cancelButton = detailsPickerFragment_cancelButton
+        searchBarView = detailsPickerFragment_searchBarView
         setupViews()
         setupViewModels()
     }
@@ -147,15 +151,6 @@ class DetailsPickerFragment() : DialogFragment() {
         dialog?.window?.setLayout(width, height)
     }
 
-    private fun initViews() {
-        backgroundView = detailsPickerFragment_backgroundView
-        recyclerView = detailsPickerFragment_recyclerView
-        titleTextView = detailsPickerFragment_headerTextView
-        switch = detailsPickerFragment_switch
-        cancelButton = detailsPickerFragment_cancelButton
-        searchBarView = detailsPickerFragment_searchBarView
-    }
-
     private fun setupViews() {
         cancelButton.apply {
             setOnClickListener(onExitButtonPressed)
@@ -163,53 +158,63 @@ class DetailsPickerFragment() : DialogFragment() {
 
         recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
-            addOnScrollListener(object: RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-                    if (!recyclerView.canScrollVertically(-1)) {
-                        searchBarView.expand()
-                    } else if (dy > 0) {
-                        searchBarView.collapse()
+            if (type == Type.HOSTPICKER) {
+                addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
+                        if (!recyclerView.canScrollVertically(-1)) {
+                            searchBarView.expand()
+                        } else if (dy > 0) {
+                            searchBarView.collapse()
+                        }
                     }
+                })
+
+            }
+
+            when (type) {
+                Type.VEGETATIONTYPEPICKER -> {
+                    recyclerView.adapter = vegetationTypesAdapter
+                    titleTextView.text =
+                        resources.getString(R.string.detailsPickerFragment_vegetationTypesPicker)
+                    searchBarView.visibility = View.GONE
+                    recyclerView.setPadding(0, 0, 0, 0)
                 }
 
-            })
-        }
+                Type.SUBSTRATEPICKER -> {
+                    recyclerView.adapter = substratesAdapter
+                    titleTextView.text =
+                        resources.getString(R.string.detailsPickerFragment_substratePicker)
+                    searchBarView.visibility = View.GONE
+                    recyclerView.setPadding(0, 0, 0, 0)
+                }
 
-        when (type) {
-            Type.VEGETATIONTYPEPICKER -> {
-                recyclerView.adapter = vegetationTypesAdapter
-                titleTextView.text = resources.getString(R.string.detailsPickerFragment_vegetationTypesPicker)
-                searchBarView.visibility = View.GONE
-                recyclerView.setPadding(0,0, 0, 0)
-            }
+                Type.HOSTPICKER -> {
+                    cancelButton.setImageResource(R.drawable.glyph_checkmark)
+                    recyclerView.adapter = hostsAdapter
+                    titleTextView.text =
+                        resources.getString(R.string.detailsPickerFragment_hostsPicker)
+                    recyclerView.setPadding(
+                        0,
+                        (resources.getDimension(R.dimen.searchbar_view_height) + resources.getDimension(
+                            R.dimen.searchbar_top_margin
+                        ) * 2).toInt(),
+                        0,
+                        0
+                    )
+                    searchBarView.apply {
+                        visibility = View.VISIBLE
+                        setPlaceholder(resources.getString(R.string.searchVC_searchBar_placeholder))
+                        setListener(object : SearchBarListener {
+                            override fun newSearch(entry: String) {
+                                observationDetailsPickerViewModel.getHosts(entry)
+                            }
 
-            Type.SUBSTRATEPICKER -> {
-                recyclerView.adapter = substratesAdapter
-                titleTextView.text = resources.getString(R.string.detailsPickerFragment_substratePicker)
-                searchBarView.visibility = View.GONE
-                recyclerView.setPadding(0,0, 0, 0)
-            }
-
-            Type.HOSTPICKER -> {
-                cancelButton.setImageResource(R.drawable.glyph_checkmark)
-                recyclerView.adapter = hostsAdapter
-                titleTextView.text = resources.getString(R.string.detailsPickerFragment_hostsPicker)
-                recyclerView.setPadding(0, (resources.getDimension(R.dimen.searchbar_view_height) + resources.getDimension(
-                    R.dimen.searchbar_top_margin
-                ) * 2).toInt(), 0, 0)
-                searchBarView.apply {
-                    visibility = View.VISIBLE
-                    setPlaceholder(resources.getString(R.string.searchVC_searchBar_placeholder))
-                    setListener(object: SearchBarListener {
-                        override fun newSearch(entry: String) {
-                            observationDetailsPickerViewModel.getHosts(entry)
-                        }
-
-                        override fun clearedSearchEntry() {
-                            observationDetailsPickerViewModel.getHosts(null)
-                        }
-                    })
+                            override fun clearedSearchEntry() {
+                                observationDetailsPickerViewModel.getHosts(null)
+                            }
+                        })
+                    }
                 }
             }
         }

@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.android.volley.Header
 import com.noque.svampeatlas.models.Section
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.models.Item
@@ -20,9 +19,9 @@ open class PickerAdapter<T>() : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
         fun itemDeselected(item: T)
     }
 
-    class Item<T>(val item: T) :
-        com.noque.svampeatlas.models.Item<Item.ViewType>(Item.ViewType.ITEM) {
-        enum class ViewType : com.noque.svampeatlas.models.ViewType {
+    class Items<T>(val item: T) :
+        Item<Item.ViewType>(Item.ViewType.ITEM) {
+        enum class ViewTypes : ViewType {
             ITEM
         }
     }
