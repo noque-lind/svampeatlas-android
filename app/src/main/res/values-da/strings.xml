@@ -229,5 +229,7 @@
     <string name="language_czech">Tjekkisk</string>
     <string name="language_english">Engelsk</string>
     <string name="settings_language_message">Det er ikke alt indhold som er oversat til alle sprog: %s</string>
+    <string name="common_mostUsed">Most used</string>
+    <string name="common_previouslyUsed">Previously used</string>
 
 </resources>

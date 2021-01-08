@@ -239,4 +239,6 @@
     <string name="language_czech">Czech</string>
     <string name="language_english">English</string>
     <string name="settings_language_message">Some content is not translated to all languages: %s</string>
+    <string name="common_mostUsed">Most used</string>
+    <string name="common_previouslyUsed">Previously used</string>
 </resources>

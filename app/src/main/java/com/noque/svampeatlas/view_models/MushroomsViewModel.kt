@@ -10,6 +10,7 @@ import com.noque.svampeatlas.models.Mushroom
 import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.services.DataService
 import com.noque.svampeatlas.services.RoomService
+import com.noque.svampeatlas.utilities.MyApplication
 import com.noque.svampeatlas.utilities.api.SpeciesQueries
 import kotlinx.coroutines.launch
 
@@ -85,9 +86,9 @@ class MushroomsViewModel(category: Category?, application: Application) :
         _mushroomsState.value = State.Loading()
 
         viewModelScope.launch {
-            val result = RoomService.getFavoritedMushrooms()
+            val result = RoomService.mushrooms.getFavoritedMushrooms()
             result.onError {
-                _mushroomsState.value = State.Error(it)
+                _mushroomsState.value = State.Error(it.toAppError(getApplication<MyApplication>().resources))
             }
 
             result.onSuccess {
@@ -128,7 +129,7 @@ class MushroomsViewModel(category: Category?, application: Application) :
                 DataService.getInstance(getApplication()).getMushroom(TAG, it.id) {
                     it.onSuccess {
                         viewModelScope.launch {
-                            RoomService.saveMushroom(it)
+                            RoomService.mushrooms.saveMushroom(it)
                             _favoringState.value = State.Items(it)
                         }
                     }
@@ -146,7 +147,7 @@ class MushroomsViewModel(category: Category?, application: Application) :
     fun unFavoriteMushroomAt(index: Int) {
         (mushroomsState.value as? State.Items)?.items?.getOrNull(index)?.let { mushroom ->
             viewModelScope.launch {
-                RoomService.deleteMushroom(mushroom)
+                RoomService.mushrooms.deleteMushroom(mushroom)
                 _mushroomsState.value = (_mushroomsState.value as? State.Items)?.let { state ->
                     State.Items(state.items.minus(mushroom))
                 }

@@ -162,7 +162,7 @@ data class Observation(
                 _vegetationType
             }
             vegetationTypeID != null -> {
-                when (val result = RoomService.getVegetationTypewithIDNow(vegetationTypeID)) {
+                when (val result = RoomService.vegetationTypes.getVegetationTypewithIDNow(vegetationTypeID)) {
                     is Result.Success -> result.value
                     is Result.Error -> null
                 }
@@ -179,7 +179,7 @@ data class Observation(
                 _substrate
             }
             substrateID != null -> {
-                when (val result = RoomService.getSubstrateWithIDNow(substrateID)) {
+                when (val result = RoomService.substrates.getSubstrateWithIDNow(substrateID)) {
                     is Result.Success -> result.value
                     is Result.Error -> null
                 }

@@ -16,6 +16,8 @@ import com.noque.svampeatlas.extensions.toJPEG
 import com.noque.svampeatlas.utilities.*
 import com.noque.svampeatlas.utilities.api.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
@@ -303,27 +305,11 @@ class DataService private constructor(context: Context) {
             null,
             null,
             Response.Listener {
-                var substrateGroups = mutableListOf<SubstrateGroup>()
-
-                it.forEach { substrate ->
-                    val substrateGroup =
-                        substrateGroups.firstOrNull { it.dkName == substrate.groupDkName }
-
-                    if (substrateGroup != null) {
-                        substrateGroup.appendSubstrate(substrate)
-                    } else {
-                        substrateGroups.add(
-                            SubstrateGroup(
-                                substrate.groupDkName,
-                                substrate.groupEnName,
-                                substrate.czName,
-                                mutableListOf(substrate)
-                            )
-                        )
-                    }
+                GlobalScope.launch {
+                    RoomService.substrates.save(it)
                 }
 
-                completion(Result.Success(substrateGroups.sortedBy { it.id }))
+                completion(Result.Success(SubstrateGroup.createFromSubstrates(it)))
             },
             Response.ErrorListener {
                 completion(Result.Error(parseVolleyError(it)))
@@ -343,6 +329,9 @@ class DataService private constructor(context: Context) {
             null,
             Response.Listener {
                 completion(Result.Success(it.sortedBy { it.id }))
+                GlobalScope.launch {
+                    RoomService.vegetationTypes.save(it)
+                }
             },
 
             Response.ErrorListener {
@@ -366,7 +355,14 @@ class DataService private constructor(context: Context) {
             null,
             null,
             Response.Listener {
-                completion(Result.Success(it))
+                if (searchString == null) {
+                    GlobalScope.launch {
+                        RoomService.hosts.saveHosts(it)
+                    }
+                    completion(Result.Success(it))
+                } else {
+                    completion(Result.Success(it.map { Host(it.id, it.dkName, it.latinName, it.probability, true) }))
+                }
             },
 
             Response.ErrorListener {

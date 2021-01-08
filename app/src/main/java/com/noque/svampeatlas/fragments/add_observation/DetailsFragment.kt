@@ -47,7 +47,6 @@ class DetailsFragment : Fragment() {
     }
 
     // View Models
-
     private val newObservationViewModel: NewObservationViewModel by activityViewModels()
 
     // Adapters

@@ -69,13 +69,13 @@ object Session {
 
     fun getUser(token: String) {
         GlobalScope.launch {
-            val result = RoomService.getUser()
+            val result = RoomService.users.getUser()
 
             result.onError {
                     DataService.getInstance(MyApplication.applicationContext).getUser(TAG, token) {
                         it.onSuccess {
                             GlobalScope.launch {
-                                RoomService.saveUser(it)
+                                RoomService.users.saveUser(it)
                             }
 
                             _user.postValue(it)
@@ -403,7 +403,7 @@ object Session {
     fun logout() {
         SharedPreferences.removeToken()
         GlobalScope.launch {
-            RoomService.clearUser()
+            RoomService.users.clearUser()
         }
 
         token = null

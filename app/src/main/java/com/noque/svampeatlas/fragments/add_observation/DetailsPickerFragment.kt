@@ -24,7 +24,7 @@ import android.widget.ImageButton
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.switchmaterial.SwitchMaterial
-import com.noque.svampeatlas.adapters.PickerAdapter
+import com.noque.svampeatlas.adapters.add_observation.details_picker.PickerAdapter
 import com.noque.svampeatlas.extensions.capitalized
 import com.noque.svampeatlas.view_models.factories.DetailsPickerViewModelFactory
 import com.noque.svampeatlas.views.SearchBarListener
@@ -47,8 +47,6 @@ class DetailsPickerFragment() : DialogFragment() {
     private lateinit var type: Type
 
     // Views
-
-    private lateinit var backgroundView: BackgroundView
     private lateinit var recyclerView: RecyclerView
     private lateinit var titleTextView: TextView
     private lateinit var switch: SwitchMaterial
@@ -89,7 +87,6 @@ class DetailsPickerFragment() : DialogFragment() {
         val adapter = HostsAdapter()
         adapter.setListener(object: PickerAdapter.Listener<Host> {
             override fun itemSelected(item: Host) {
-                Log.d("Hosts", item.toString())
                 newObservationViewModel.appendHost(item, switch.isChecked)
             }
 
@@ -108,19 +105,6 @@ class DetailsPickerFragment() : DialogFragment() {
         ViewModelProvider(this, DetailsPickerViewModelFactory(type, requireActivity().application)).get(DetailsPickerViewModel::class.java)
     }
 
-    private val onExitButtonPressed by lazy {
-        View.OnClickListener {
-            when (type) {
-                Type.HOSTPICKER -> {
-                    newObservationViewModel.setHostsLockedState(switch.isChecked)
-                }
-                else -> {}
-            }
-            dismiss()
-        }
-    }
-
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -133,7 +117,6 @@ class DetailsPickerFragment() : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         type = arguments?.getSerializable(TYPE_KEY) as Type
         super.onViewCreated(view, savedInstanceState)
-        backgroundView = detailsPickerFragment_backgroundView
         recyclerView = detailsPickerFragment_recyclerView
         titleTextView = detailsPickerFragment_headerTextView
         switch = detailsPickerFragment_switch
@@ -153,7 +136,15 @@ class DetailsPickerFragment() : DialogFragment() {
 
     private fun setupViews() {
         cancelButton.apply {
-            setOnClickListener(onExitButtonPressed)
+            setOnClickListener {
+                when (type) {
+                    Type.HOSTPICKER -> {
+                        newObservationViewModel.setHostsLockedState(switch.isChecked)
+                    }
+                    else -> {}
+                }
+                dismiss()
+            }
         }
 
         recyclerView.apply {
@@ -235,24 +226,24 @@ class DetailsPickerFragment() : DialogFragment() {
         }
 
         observationDetailsPickerViewModel.hostsState.observe(viewLifecycleOwner, Observer { state ->
-            backgroundView.reset()
             when (state) {
                 is State.Loading -> {
-                    hostsAdapter.configure(listOf())
-                    backgroundView.setLoading()
+                    hostsAdapter.configure(listOf(Section(null, State.Loading())))
                 }
                 is State.Error -> {
-                    hostsAdapter.configure(listOf())
-                    backgroundView.setError(state.error)
+                    hostsAdapter.configure(listOf(Section(null, State.Error(state.error))))
                 }
                 is State.Items -> {
-                    val selectedPositions = mutableListOf<Int>()
-                    newObservationViewModel.hosts.value?.first?.forEach {
-                        val index = state.items.indexOf(it)
-                        if (index != -1) selectedPositions.add(index)
+                    if (state.items.second) {
+                        val defaultList = state.items.first.filterNot { it.isUserSelected }
+                        val previouslyUsed = state.items.first.filter { it.isUserSelected }
+                        hostsAdapter.configure(listOf(
+                            Section(if (previouslyUsed.isNotEmpty()) getString(R.string.common_previouslyUsed) else null, State.Items(previouslyUsed.map { PickerAdapter.PickerItem(it) })),
+                            Section(getString(R.string.common_mostUsed), State.Items(defaultList.map { PickerAdapter.PickerItem(it) }))
+                        ), newObservationViewModel.hosts.value?.first ?: listOf())
+                    } else {
+                        hostsAdapter.configure(listOf(Section(null, State.Items(state.items.first.map { PickerAdapter.PickerItem(it) }))), newObservationViewModel.hosts.value?.first ?: mutableListOf())
                     }
-
-                    hostsAdapter.configure(listOf(Section.Builder<PickerAdapter.Item<Host>>().items(state.items.map { PickerAdapter.Item(it) }).build()), selectedPositions)
                 }
             }
         })
@@ -260,13 +251,12 @@ class DetailsPickerFragment() : DialogFragment() {
         observationDetailsPickerViewModel.substrateGroupsState.observe(
             viewLifecycleOwner,
             Observer { state ->
-                backgroundView.reset()
                 when (state) {
-                    is State.Loading -> { backgroundView.setLoading() }
-                    is State.Error -> backgroundView.setError(state.error)
+                    is State.Loading -> { substratesAdapter.configure(listOf(Section(null, State.Loading()))) }
+                    is State.Error -> { substratesAdapter.configure(listOf(Section(null, State.Error(state.error)))) }
                     is State.Items -> {
                         val sections = state.items.map {
-                            Section.Builder<PickerAdapter.Item<Substrate>>().title(it.localizedName.capitalized()).items(it.substrates.map { PickerAdapter.Item(it) }).build()
+                            Section.Builder<PickerAdapter.PickerItem<Substrate>>().title(it.localizedName.capitalized()).items(it.substrates.map { PickerAdapter.PickerItem(it) }).build()
                         }
 
                         substratesAdapter.configure(sections)
@@ -277,13 +267,12 @@ class DetailsPickerFragment() : DialogFragment() {
         observationDetailsPickerViewModel.vegetationTypesState.observe(
             viewLifecycleOwner,
             Observer { state ->
-                backgroundView.reset()
                 when (state) {
-                    is State.Loading -> { backgroundView.setLoading() }
-                    is State.Error -> backgroundView.setError(state.error)
+                    is State.Loading -> vegetationTypesAdapter.configure(listOf(Section(null, State.Loading())))
+                    is State.Error -> vegetationTypesAdapter.configure(listOf(Section(null, State.Error(state.error))))
                     is State.Items -> {
                         vegetationTypesAdapter.configure(
-                            listOf(Section.Builder<PickerAdapter.Item<VegetationType>>().items(state.items.map { PickerAdapter.Item(it) }).build())
+                            listOf(Section.Builder<PickerAdapter.PickerItem<VegetationType>>().items(state.items.map { PickerAdapter.PickerItem(it) }).build())
                         )
                     }
                 }

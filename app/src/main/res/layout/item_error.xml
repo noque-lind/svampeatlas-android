@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_marginTop="64dp"
-    android:layout_marginBottom="64dp"
-    android:layout_marginEnd="16dp"
+    android:layout_height="wrap_content"
     android:layout_marginStart="16dp"
-    android:layout_height="wrap_content">
+    android:layout_marginEnd="16dp"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    android:paddingTop="64dp"
+    android:paddingBottom="64dp">
 
     <TextView
         android:id="@+id/errorItem_title"
+        style="@style/AppPrimaryHighlighted"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
 
-        style="@style/AppPrimaryHighlighted"/>
+        android:gravity="center_horizontal" />
 
     <TextView
         android:id="@+id/errorItem_secondary"
+        style="@style/AppPrimary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        style="@style/AppPrimary"/>
+        android:gravity="center_horizontal" />
 
 </LinearLayout>

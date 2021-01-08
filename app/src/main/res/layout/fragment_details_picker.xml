@@ -20,7 +20,6 @@
 
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -61,16 +60,6 @@
             android:textColor="@color/colorWhite"
             android:theme="@style/AppSwitch" />
     </LinearLayout>
-
-    <com.noque.svampeatlas.views.BackgroundView
-        android:id="@+id/detailsPickerFragment_backgroundView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:theme="@style/Dark"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/detailsPickerFragment_headerLinearLayout"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/detailsPickerFragment_recyclerView"
