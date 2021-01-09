@@ -41,6 +41,7 @@ data class SubstrateGroup(val dkName: String,
             val substrateGroups = mutableListOf<SubstrateGroup>()
 
             substrates.forEach { substrate ->
+                if (substrate.hide) return@forEach
                 val substrateGroup =
                     substrateGroups.firstOrNull { it.dkName == substrate.groupDkName }
 

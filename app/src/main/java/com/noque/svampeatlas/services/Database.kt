@@ -35,15 +35,17 @@ val MIGRATION_14_15 = object: Migration(14,15) {
     }
 }
 
-val MIGRATION_15_17 = object: Migration(15,17) {
+val MIGRATION_15_18 = object: Migration(15,17) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("DROP TABLE hosts")
         database.execSQL("CREATE TABLE IF NOT EXISTS `hosts` (`id` INTEGER NOT NULL, `dkName` TEXT, `latinName` TEXT NOT NULL, `probability` INTEGER, `isUserSelected` INTEGER NOT NULL, PRIMARY KEY(`id`))")
+        database.execSQL("DROP TABLE substrates")
+        database.execSQL("CREATE TABLE IF NOT EXISTS `substrates` (`id` INTEGER NOT NULL, `dkName` TEXT NOT NULL, `enName` TEXT NOT NULL, `czName` TEXT, `groupDkName` TEXT NOT NULL, `groupEnName` TEXT NOT NULL, `groupCzName` TEXT, `hide` INTEGER NOT NULL, PRIMARY KEY(`id`))")
     }
 }
 
 @Database(entities = [User::class, Substrate::class, VegetationType::class, Host::class, Mushroom::class],
-    version = 17)
+    version = 18)
 
 @TypeConverters(ImagesTypeConverters::class, RedListDataTypeConverters::class, UserRolesTypeConverters::class)
 
@@ -62,7 +64,7 @@ abstract class Database: RoomDatabase() {
             .addMigrations(MIGRATION_12_13)
             .addMigrations(MIGRATION_13_14)
             .addMigrations(MIGRATION_14_15)
-            .addMigrations(MIGRATION_15_17)
+            .addMigrations(MIGRATION_15_18)
             .fallbackToDestructiveMigration()
             .build()
     }
