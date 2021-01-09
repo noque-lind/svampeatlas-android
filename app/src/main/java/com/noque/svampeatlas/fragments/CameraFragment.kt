@@ -312,7 +312,9 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                     handleImageSaving(photoFile)
                 } else cameraViewModel.setImageFileError(Error.CaptureError(resources))
             }
-            override fun onError(exception: ImageCaptureException) = cameraViewModel.setImageFileError(Error.CaptureError(resources))
+            override fun onError(exception: ImageCaptureException) {
+                activity?.let { cameraViewModel.setImageFileError(Error.CaptureError(resources)) }
+            }
         }
     }
 
