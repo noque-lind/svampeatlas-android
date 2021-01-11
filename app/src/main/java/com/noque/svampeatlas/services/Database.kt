@@ -35,7 +35,7 @@ val MIGRATION_14_15 = object: Migration(14,15) {
     }
 }
 
-val MIGRATION_15_18 = object: Migration(15,17) {
+val MIGRATION_15_18 = object: Migration(15,18) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("DROP TABLE hosts")
         database.execSQL("CREATE TABLE IF NOT EXISTS `hosts` (`id` INTEGER NOT NULL, `dkName` TEXT, `latinName` TEXT NOT NULL, `probability` INTEGER, `isUserSelected` INTEGER NOT NULL, PRIMARY KEY(`id`))")

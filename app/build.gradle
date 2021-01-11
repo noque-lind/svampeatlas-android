@@ -37,7 +37,7 @@ android {
         targetSdkVersion 29
         versionName '1.6.3'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        versionCode = 23
+        versionCode = 24
         signingConfig signingConfigs.signing
 
         kapt {
