@@ -14,10 +14,11 @@ data class Substrate(
     @SerializedName("_id") val id: Int,
     @SerializedName("name") val dkName: String,
     @SerializedName("name_uk") val enName: String,
-    @SerializedName("name_cz") val czName: String,
+    @SerializedName("name_cz") val czName: String?,
     @SerializedName("group_dk") val groupDkName: String,
     @SerializedName("group_uk") val groupEnName: String,
-    @SerializedName("group_cz") val groupCzName: String?) {
+    @SerializedName("group_cz") val groupCzName: String?,
+    @SerializedName("hide") val hide: Boolean = false) {
 
     val localizedName: String get() {
         return when (Locale.getDefault().appLanguage()) {

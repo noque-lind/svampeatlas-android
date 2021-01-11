@@ -1,9 +1,11 @@
 package com.noque.svampeatlas.adapters
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.NonNull
+import androidx.core.view.doOnLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.models.Item
@@ -16,6 +18,13 @@ abstract class BaseAdapter<I, V>: RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
     val sections = Sections<V,I>()
     abstract val onClickListener: View.OnClickListener
+
+    private var recyclerView: RecyclerView? = null
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        this.recyclerView = recyclerView
+        super.onAttachedToRecyclerView(recyclerView)
+    }
 
     final override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -31,8 +40,8 @@ abstract class BaseAdapter<I, V>: RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 viewHolder = ErrorViewHolder(view)
             }
             Section.ViewType.LOADER -> {
-                view = layoutInflater.inflate(R.layout.item_reloader, parent, false)
-                viewHolder = ReloaderViewHolder(view)
+                view = layoutInflater.inflate(R.layout.item_loader, parent, false)
+                viewHolder = LoaderViewHolder(view)
             }
             Section.ViewType.ITEM -> {
                 createViewTypeViewHolder(layoutInflater, parent, viewType - Section.ViewType.values.count()).also {
@@ -50,15 +59,34 @@ abstract class BaseAdapter<I, V>: RecyclerView.Adapter<RecyclerView.ViewHolder>(
     abstract fun createViewTypeViewHolder(inflater: LayoutInflater, parent: ViewGroup, viewTypeOrdinal: Int): Pair<View, RecyclerView.ViewHolder>
 
     final override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        fun expandUtil(position: Int, itemView: View) {
+            if (itemCount == 1 && position == 0) {
+                itemView.doOnLayout {
+                    recyclerView?.doOnLayout { recyclerView ->
+                        val heightDifference = recyclerView.height - it.bottom
+                        if (heightDifference > 0) {
+                            val layoutParams = it.layoutParams
+                            layoutParams.height = it.height + heightDifference
+                            it.layoutParams = layoutParams
+                        }
+                    }
+                }
+            }
+        }
+
         when (holder) {
             is HeaderViewHolder -> { sections.getTitle(position)?.let { holder.configure(it) } }
-            is ErrorViewHolder -> { sections.getError(position)?.let { holder.configure(it) } }
+            is ErrorViewHolder -> {
+                sections.getError(position)?.let { holder.configure(it) }
+                expandUtil(position, holder.itemView)
+            }
             is ReloaderViewHolder -> { holder.configure(ReloaderViewHolder.Type.LOAD) }
+            is LoaderViewHolder -> { expandUtil(position, holder.itemView) }
             else -> bindViewHolder(holder, sections.getItem(position))
         }
     }
 
-    abstract fun bindViewHolder(holder: RecyclerView.ViewHolder, item: Item<V>)
+    abstract fun bindViewHolder(holder: RecyclerView.ViewHolder, item: I)
 
     final override fun getItemCount(): Int {
         return sections.getCount()

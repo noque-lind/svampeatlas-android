@@ -184,7 +184,6 @@ class Section<T>(private var title: String?, private var state: State<List<T>> =
             }
             else -> { throw IllegalAccessError("Should not access item while state is not items.") }
         }
-
     }
 
     data class Builder<T>(

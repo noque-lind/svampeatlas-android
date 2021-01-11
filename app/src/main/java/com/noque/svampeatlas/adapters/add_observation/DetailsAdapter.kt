@@ -1,6 +1,7 @@
 package com.noque.svampeatlas.adapters.add_observation
 
 import android.content.res.Resources
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +23,9 @@ class DetailsAdapter(private val resources: Resources, private val categories: A
     var date: Date? = null
     var substrate: Pair<Substrate, Boolean>? = null
     var vegetationType: Pair<VegetationType, Boolean>? = null
+
     var hosts: Pair<List<Host>, Boolean>? = null
+
     var notes: String? = null
     var ecologyNotes: String? = null
 
@@ -112,6 +115,10 @@ class DetailsAdapter(private val resources: Resources, private val categories: A
         }
 
             DetailsFragment.Categories.HOST -> {
+                val hosts = hosts
+
+                Log.d("Some", "Onbind, ${hosts.toString()}")
+
                 var hostsString: String
 
 

@@ -6,6 +6,7 @@ import android.location.Location
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -91,7 +92,9 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     private var toast: Toast? = null
 
     // Views
-    private var toolbar by autoCleared<androidx.appcompat.widget.Toolbar>()
+    private var spinnerView by autoCleared<SpinnerView>()
+    private var locationSpinner by autoCleared<SpinnerView>()
+    private var toolbar by autoCleared<Toolbar>()
     private var viewPager by autoCleared<ViewPager> { it?.adapter = null }
     private var addImagesRecyclerView by autoCleared<RecyclerView> {
         it?.adapter = null
@@ -99,9 +102,6 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     private var tabLayout by autoCleared<TabLayout>() {
         it?.setupWithViewPager(null)
     }
-    private var spinnerView by autoCleared<SpinnerView>()
-    private var locationSpinner by autoCleared<SpinnerView>()
-
 
     // View models
     private val newObservationViewModel  by lazy { ViewModelProvider(requireActivity()).get(NewObservationViewModel::class.java)}
@@ -252,17 +252,11 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         localityIdShown = savedInstanceState?.getInt(KEY_LOCALITY_ID_SHOWN) ?: DEFAULT_LOCALITY_ID
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
-//        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         if (!addImageShown && args.type == Type.NEW_OBSERVATION) {
             addImageShown = true
             newObservationViewModel.reset()
@@ -279,7 +273,13 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initViews()
+        toolbar = addObservationFragment_toolbar
+        viewPager = addObservationFragment_viewPager
+        addImagesRecyclerView = addObservationFragment_addObservationImagesRecyclerView
+        tabLayout = addObservationFragment_tabLayout
+        spinnerView = addObservationFragment_spinner
+        locationSpinner = addObservationFragment_locationSpinner
+
         setupView()
         setupViewModels()
     }
@@ -309,15 +309,6 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         outState.putInt(KEY_LOCALITY_ID_SHOWN, localityIdShown)
         outState.putBoolean(KEY_ADDIMAGE_SHOWN, addImageShown)
         super.onSaveInstanceState(outState)
-    }
-
-    private fun initViews() {
-        toolbar = addObservationFragment_toolbar
-        viewPager = addObservationFragment_viewPager
-        addImagesRecyclerView = addObservationFragment_addObservationImagesRecyclerView
-        tabLayout = addObservationFragment_tabLayout
-        spinnerView = addObservationFragment_spinner
-        locationSpinner = addObservationFragment_locationSpinner
     }
 
     private fun setupView() {

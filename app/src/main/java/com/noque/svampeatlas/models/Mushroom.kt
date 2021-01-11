@@ -116,9 +116,9 @@ class Mushroom(
 
     val localizedName: String? get() {
         return when (Locale.getDefault().appLanguage()) {
-            AppLanguage.Danish -> _vernacularNameDK?._vernacularNameDK?.capitalized()
-            AppLanguage.English -> attributes?.vernacularNameEn?.capitalized()
-            AppLanguage.Czech -> attributes?.vernacularNameCz?.capitalized()
+            AppLanguage.Danish -> _vernacularNameDK?._vernacularNameDK?.ifBlank { null }?.capitalized()
+            AppLanguage.English -> attributes?.vernacularNameEn?.ifBlank { null }?.capitalized()
+            AppLanguage.Czech -> attributes?.vernacularNameCz?.ifBlank { null }?.capitalized()
         }
     }
 

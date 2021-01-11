@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 15,
-    "identityHash": "21324e4b81fd5717ea3d2685a0aae9e1",
+    "version": 16,
+    "identityHash": "610acdbf19bfb69a246d9f67c505cdc0",
     "entities": [
       {
         "tableName": "user",
@@ -150,7 +150,7 @@
       },
       {
         "tableName": "hosts",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `dkName` TEXT, `latinName` TEXT NOT NULL, `probability` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `dkName` TEXT, `latinName` TEXT NOT NULL, `probability` INTEGER, `isUserSelected` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -175,6 +175,12 @@
             "columnName": "probability",
             "affinity": "INTEGER",
             "notNull": false
+          },
+          {
+            "fieldPath": "isUserSelected",
+            "columnName": "isUserSelected",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -336,7 +342,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '21324e4b81fd5717ea3d2685a0aae9e1')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '610acdbf19bfb69a246d9f67c505cdc0')"
     ]
   }
 }

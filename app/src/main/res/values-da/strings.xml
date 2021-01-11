@@ -230,6 +230,8 @@
     <string name="language_czech">Tjekkisk</string>
     <string name="language_english">Engelsk</string>
     <string name="settings_language_message">Det er ikke alt indhold som er oversat til alle sprog: %s</string>
+    <string name="common_mostUsed">Most used</string>
+    <string name="common_previouslyUsed">Previously used</string>
     <string name="download_taxon_title">Vil du hente taxon listen til offline brug?</string>
     <string name="download_taxon_message">If you do, you can always search the entire taxon list, even without internet. This way you can easily prepare your sightings</string>
     <string name="downloader_taxon_downloading">Henter artsliste</string>

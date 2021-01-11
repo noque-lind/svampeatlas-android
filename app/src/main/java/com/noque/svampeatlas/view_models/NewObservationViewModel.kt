@@ -15,6 +15,8 @@ import com.noque.svampeatlas.services.RoomService
 import com.noque.svampeatlas.utilities.MyApplication
 import com.noque.svampeatlas.utilities.SharedPreferences
 import com.noque.svampeatlas.utilities.SingleLiveEvent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
@@ -66,7 +68,7 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
     private val _locality by lazy {MutableLiveData<Locality?>(null)}
     private val _substrate by lazy {MutableLiveData<Pair<Substrate, Boolean>?>(null)}
     private val _vegetationType by lazy {MutableLiveData<Pair<VegetationType, Boolean>?>(null)}
-    private val _hosts by lazy { MutableLiveData<Pair<MutableList<Host>, Boolean>?>(null)}
+    private val _hosts by lazy { MutableLiveData<Pair<List<Host>, Boolean>?>(null)}
     private val _images by lazy { MutableLiveData<MutableList<Image>>(mutableListOf())}
     private val _mushroom by lazy {MutableLiveData<Pair<Mushroom, DeterminationConfidence>?>(null)}
     private val _notes by lazy { MutableLiveData<String?>(null) }
@@ -80,7 +82,7 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
     val date: LiveData<Date> get() = _date
     val substrate: LiveData<Pair<Substrate, Boolean>?> get() = _substrate
     val vegetationType: LiveData<Pair<VegetationType, Boolean>?> get() = _vegetationType
-    val hosts: LiveData<Pair<MutableList<Host>, Boolean>?> get() = _hosts
+    val hosts: LiveData<Pair<List<Host>, Boolean>?> get() = _hosts
     val locality: LiveData<Locality?> get() = _locality
     val notes: LiveData<String?> get() = _notes
     val ecologyNotes: LiveData<String?> get() = _ecologyNotes
@@ -161,7 +163,7 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         SharedPreferences.saveSubstrateID(if (isLocked) substrate.id else null)
         if (isLocked) {
             viewModelScope.launch {
-                RoomService.saveSubstrate(substrate)
+                RoomService.substrates.saveSubstrate(substrate)
             }
         }
     }
@@ -173,28 +175,22 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
 
         if (isLocked) {
             viewModelScope.launch {
-                RoomService.saveVegetationType(vegetationType)
+                RoomService.vegetationTypes.saveVegetationType(vegetationType)
             }
         }
     }
 
     fun appendHost(host: Host, isLocked: Boolean) {
-        var hosts = hosts.value?.first
+        val value = _hosts.value?.first ?: listOf()
+        _hosts.value = Pair(value + listOf(host), isLocked)
 
-        if (hosts == null) {
-            hosts = mutableListOf(host)
-        } else {
-            hosts.add(host)
+        GlobalScope.launch {
+            RoomService.hosts.saveHosts(listOf(host))
         }
-
-        _hosts.value = Pair(hosts, isLocked)
-
-        SharedPreferences.saveHostsID(hosts.map { it.id })
-
         if (isLocked) {
-            viewModelScope.launch {
-                RoomService.saveHosts(hosts)
-            }
+            SharedPreferences.saveHostsID(_hosts.value?.first?.map { it.id })
+        } else {
+            SharedPreferences.saveHostsID(null)
         }
     }
 
@@ -204,11 +200,14 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
     }
 
     fun removeHost(host: Host, isLocked: Boolean) {
-        _hosts.value?.let {
-            if (it.first.remove(host)) _hosts.value = Pair(it.first, isLocked)
-        }
+        val value = _hosts.value?.first
+        _hosts.value = Pair(value?.filter { it.id != host.id } ?: listOf(), isLocked)
 
-        SharedPreferences.saveHostsID(hosts.value?.first?.map { it.id })
+        if (isLocked) {
+            SharedPreferences.saveHostsID(_hosts.value?.first?.map { it.id })
+        } else {
+            SharedPreferences.saveHostsID(null)
+        }
     }
 
     fun appendImage(imageFile: File) {
@@ -335,19 +334,19 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
 
         viewModelScope.launch {
             SharedPreferences.getSubstrateID()?.let {
-                RoomService.getSubstrateWithID(it).onSuccess {
+                RoomService.substrates.getSubstrateWithID(it).onSuccess {
                     _substrate.value = Pair(it, true)
                 }
             }
 
             SharedPreferences.getVegetationTypeID()?.let {
-                RoomService.getVegetationTypeWithID(it).onSuccess {
+                RoomService.vegetationTypes.getVegetationTypeWithID(it).onSuccess {
                     _vegetationType.value = Pair(it, true)
                 }
             }
 
             SharedPreferences.getHosts()?.let {
-                RoomService.getHostsWithIds(it).onSuccess {
+                RoomService.hosts.getHostsWithIds(it).onSuccess {
                     _hosts.value = Pair(it.toMutableList(), true)
                 }
             }

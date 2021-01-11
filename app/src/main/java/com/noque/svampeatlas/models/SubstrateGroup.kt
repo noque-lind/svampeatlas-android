@@ -35,4 +35,30 @@ data class SubstrateGroup(val dkName: String,
     fun appendSubstrate(substrate: Substrate) {
         substrates.add(substrate)
     }
+
+    companion object {
+        fun createFromSubstrates(substrates: List<Substrate>): List<SubstrateGroup> {
+            val substrateGroups = mutableListOf<SubstrateGroup>()
+
+            substrates.forEach { substrate ->
+                if (substrate.hide) return@forEach
+                val substrateGroup =
+                    substrateGroups.firstOrNull { it.dkName == substrate.groupDkName }
+
+                if (substrateGroup != null) {
+                    substrateGroup.appendSubstrate(substrate)
+                } else {
+                    substrateGroups.add(
+                        SubstrateGroup(
+                            substrate.groupDkName,
+                            substrate.groupEnName,
+                            substrate.czName,
+                            mutableListOf(substrate)
+                        )
+                    )
+                }
+            }
+            return substrateGroups.sortedBy { it.id }
+        }
+    }
 }
