@@ -159,8 +159,6 @@ class DetailsFragment : Fragment() {
         ).get(ObservationViewModel::class.java)
     }
 
-    private val newObservationViewModel by activityViewModels<NewObservationViewModel>()
-
     // Adapters
     private val commentsAdapter: CommentsAdapter by lazy {
         val adapter = CommentsAdapter()
@@ -275,15 +273,11 @@ class DetailsFragment : Fragment() {
                         }
                         R.id.menu_detailsFragment_edit -> {
                             observationViewModel.observationState.value?.item?.let { observation ->
-                                Session.user.value?.let { user ->
-                                    newObservationViewModel.editObservation(observation, user)
-                                    val action =
-                                        DetailsFragmentDirections.actionMushroomDetailsFragmentToAddObservationFragmentEdit()
-                                    action.type = AddObservationFragment.Type.Edit
-                                    action.id = observation.id
-                                    findNavController().navigate(action)
-                                }
-
+                                val action =
+                                    DetailsFragmentDirections.actionMushroomDetailsFragmentToAddObservationFragmentEdit()
+                                action.type = AddObservationFragment.Type.Edit
+                                action.id = observation.id.toLong()
+                                findNavController().navigate(action)
                             }
                         }
                         R.id.menu_detailsFragment_delete -> {
@@ -317,24 +311,23 @@ class DetailsFragment : Fragment() {
         when (args.takesSelection) {
             TakesSelection.SELECT -> {
                 if (args.type == Type.SPECIES) {
-                    newObservationViewModel.setMushroom((speciesViewModel.mushroomState.value as? State.Items)?.items)
-
                     if (args.predictionResults != null && args.imageFilePath != null) {
-                        newObservationViewModel.setDeterminationNotes(args.predictionResults)
-                        newObservationViewModel.appendImage(File(args.imageFilePath))
-
                         val action =
                             DetailsFragmentDirections.actionMushroomDetailsFragmentToAddObservationFragment()
-                        action.type = AddObservationFragment.Type.IDENTIFYED_OBSERVATION
+                        action.imageFilePath = args.imageFilePath
+                        action.mushroomId = args.id
+                        action.type = AddObservationFragment.Type.FromRecognition
+                        action.predictionNotes = args.predictionResults
                         findNavController().navigate(action)
                     } else {
+                        findNavController().previousBackStackEntry?.savedStateHandle?.set(AddObservationFragment.SAVED_STATE_TAXON_ID, args.id)
                         findNavController().navigateUp()
                     }
                 }
             }
 
             TakesSelection.DESELECT -> {
-                newObservationViewModel.setMushroom(null)
+                findNavController().previousBackStackEntry?.savedStateHandle?.set(AddObservationFragment.SAVED_STATE_TAXON_ID, 0)
                 findNavController().navigateUp()
             }
             TakesSelection.NO -> {

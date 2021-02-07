@@ -138,8 +138,6 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         )
     ).get(CameraViewModel::class.java) }
 
-    private val newObservationViewModel by activityViewModels<NewObservationViewModel>()
-
     // Listeners
     override fun positiveButtonPressed() {
         SharedPreferences.setSaveImages(true)
@@ -233,9 +231,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                 when (state) {
                     CameraControlsView.State.CONFIRM, CameraControlsView.State.CAPTURE_NEW -> {
                         val imageFileState = cameraViewModel.imageFileState.value
-                        if (imageFileState is State.Items) newObservationViewModel.appendImage(
-                            imageFileState.items
-                        )
+                        if (imageFileState is State.Items) findNavController().previousBackStackEntry?.savedStateHandle?.set(AddObservationFragment.SAVED_STATE_FILE_PATH, imageFileState.items.absolutePath)
                         findNavController().navigateUp()
                     }
                     else -> return

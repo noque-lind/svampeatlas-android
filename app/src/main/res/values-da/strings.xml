@@ -240,5 +240,9 @@
     <string name="downloader_taxon_error">Der skete en fejl</string>
     <string name="common_addEntry">Add</string>
     <string name="addObservationFragment_title_note">New notebook entry</string>
+    <string name="common_save">SAVE</string>
+    <string name="common_delete">Delete</string>
+    <string name="common_unknown_locality">Unknown location</string>
+    <string name="addObservationVC_title_edit_note">Edit notebook entry</string>
 
 </resources>

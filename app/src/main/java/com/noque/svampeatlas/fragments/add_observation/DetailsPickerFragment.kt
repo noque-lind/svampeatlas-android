@@ -22,6 +22,7 @@ import com.noque.svampeatlas.view_models.DetailsPickerViewModel
 import kotlinx.android.synthetic.main.fragment_details_picker.*
 import android.widget.ImageButton
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.noque.svampeatlas.adapters.add_observation.details_picker.PickerAdapter
@@ -100,7 +101,7 @@ class DetailsPickerFragment() : DialogFragment() {
 
 
     // View models
-    private val newObservationViewModel by activityViewModels<NewObservationViewModel>()
+    private val newObservationViewModel by viewModels<NewObservationViewModel>({requireParentFragment().requireParentFragment()})
     private val observationDetailsPickerViewModel by lazy {
         ViewModelProvider(this, DetailsPickerViewModelFactory(type, requireActivity().application)).get(DetailsPickerViewModel::class.java)
     }

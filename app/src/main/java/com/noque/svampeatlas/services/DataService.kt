@@ -13,10 +13,8 @@ import com.noque.svampeatlas.models.*
 import org.json.JSONObject
 import com.google.android.gms.maps.model.LatLng
 import com.noque.svampeatlas.R
-import com.noque.svampeatlas.extensions.getBitmap
-import com.noque.svampeatlas.extensions.rotate
-import com.noque.svampeatlas.extensions.toBase64
-import com.noque.svampeatlas.extensions.toJPEG
+import com.noque.svampeatlas.extensions.*
+import com.noque.svampeatlas.repositories.MushroomRepository
 import com.noque.svampeatlas.utilities.*
 import com.noque.svampeatlas.utilities.api.*
 import com.noque.svampeatlas.utilities.volleyRequests.AppEmptyRequest
@@ -72,31 +70,16 @@ class DataService private constructor(context: Context) {
         Volley.newRequestQueue(context.applicationContext)
     }
 
+    val mushroomsRepository by lazy {MushroomRepository(requestQueue)}
+
     private fun <RequestType> addToRequestQueue(request: Request<RequestType>) {
         requestQueue.add(request)
     }
 
+
     private val applicationContext = context.applicationContext
 
-    fun getMushroom(tag: String, id: Int, completion: (Result<Mushroom, Error>) -> Unit) {
-        val api = API(APIType.Request.Mushroom(id))
-        val request = AppRequest<List<Mushroom>>(object : TypeToken<List<Mushroom>>() {}.type,
-            api,
-            null,
-            null,
-            Response.Listener {
-                if (it.firstOrNull() != null) completion(Result.Success(it.first())) else completion(
-                    Result.Error(Error.NotFound(applicationContext))
-                )
-            },
 
-            Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
-            })
-
-        request.tag = tag
-        addToRequestQueue(request)
-    }
 
     fun testDownload(): Long {
         val api = API(APIType.Request.Mushrooms(null, listOf(SpeciesQueries.Attributes(null), SpeciesQueries.Images(false), SpeciesQueries.Statistics, SpeciesQueries.DanishNames), 0, null))
@@ -140,7 +123,7 @@ class DataService private constructor(context: Context) {
                 }
             },
             Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
+                completion(Result.Error(it.toAppError()))
             })
         request.tag = tag
         addToRequestQueue(request)
@@ -178,7 +161,7 @@ class DataService private constructor(context: Context) {
                 completion(Result.Success(it))
             },
             Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
+                completion(Result.Error(it.toAppError()))
             })
 
         request.tag = tag
@@ -217,7 +200,7 @@ class DataService private constructor(context: Context) {
             },
 
             Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
+                completion(Result.Error(it.toAppError()))
             }
         )
 
@@ -254,7 +237,7 @@ class DataService private constructor(context: Context) {
                     completion(Result.Success(localities))
                 },
                 Response.ErrorListener {
-                    completion(Result.Error(parseVolleyError(it)))
+                    completion(Result.Error(it.toAppError()))
                 }
             )
 
@@ -309,7 +292,7 @@ class DataService private constructor(context: Context) {
                     }
                 },
                 Response.ErrorListener {
-                    completion(Result.Error(parseVolleyError(it)))
+                    completion(Result.Error(it.toAppError()))
                 }
             )
 
@@ -334,7 +317,7 @@ class DataService private constructor(context: Context) {
                 completion(Result.Success(SubstrateGroup.createFromSubstrates(it)))
             },
             Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
+                completion(Result.Error(it.toAppError()))
             }
         )
 
@@ -357,7 +340,7 @@ class DataService private constructor(context: Context) {
             },
 
             Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
+                completion(Result.Error(it.toAppError()))
             }
         )
 
@@ -388,7 +371,7 @@ class DataService private constructor(context: Context) {
             },
 
             Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
+                completion(Result.Error(it.toAppError()))
             }
         )
 
@@ -411,7 +394,7 @@ class DataService private constructor(context: Context) {
                 completion(Result.Success(id))
             },
             Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
+                completion(Result.Error(it.toAppError()))
             })
 
         request.tag = tag
@@ -434,7 +417,7 @@ class DataService private constructor(context: Context) {
                 completion(Result.Success(id))
             },
             Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
+                completion(Result.Error(it.toAppError()))
             })
 
         request.tag = tag
@@ -484,7 +467,7 @@ class DataService private constructor(context: Context) {
                 completion(Result.Success(null))
             },
             Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
+                completion(Result.Error(it.toAppError()))
             }
         )
         request.tag = tag
@@ -505,7 +488,7 @@ class DataService private constructor(context: Context) {
                 completion(Result.Success(null))
             },
             Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
+                completion(Result.Error(it.toAppError()))
             }
         )
         request.tag = tag
@@ -534,7 +517,7 @@ class DataService private constructor(context: Context) {
                 },
                 Response.ErrorListener {
                     image.delete()
-                    completion(Result.Error(parseVolleyError(it)))
+                    completion(Result.Error(it.toAppError()))
                 }
             )
 
@@ -579,7 +562,7 @@ class DataService private constructor(context: Context) {
                 },
 
                 Response.ErrorListener {
-                    completion(Result.Error(parseVolleyError(it)))
+                    completion(Result.Error(it.toAppError()))
                 })
 
 
@@ -615,7 +598,7 @@ class DataService private constructor(context: Context) {
                             applicationContext
                         )
                     )
-                ) else completion(Result.Error(parseVolleyError(it)))
+                ) else completion(Result.Error(it.toAppError()))
             })
 
         addToRequestQueue(request)
@@ -633,7 +616,7 @@ class DataService private constructor(context: Context) {
             },
 
             Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
+                completion(Result.Error(it.toAppError()))
             })
 
         request.tag = tag
@@ -655,7 +638,7 @@ class DataService private constructor(context: Context) {
                 completion(Result.Success(count))
             },
             Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
+                completion(Result.Error(it.toAppError()))
             }) {
 
             override fun getHeaders(): MutableMap<String, String> {
@@ -685,7 +668,7 @@ class DataService private constructor(context: Context) {
                 completion(Result.Success(it.results))
             },
             Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
+                completion(Result.Error(it.toAppError()))
             }
         )
 
@@ -706,7 +689,7 @@ class DataService private constructor(context: Context) {
             },
 
             Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
+                completion(Result.Error(it.toAppError()))
             }
         )
 
@@ -730,7 +713,7 @@ class DataService private constructor(context: Context) {
             },
 
             {
-                completion(Result.Error(parseVolleyError(it)))
+                completion(Result.Error(it.toAppError()))
             }
         )
 
@@ -772,7 +755,7 @@ class DataService private constructor(context: Context) {
             },
 
             Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
+                completion(Result.Error(it.toAppError()))
             }
         )
 
@@ -812,7 +795,7 @@ class DataService private constructor(context: Context) {
             },
 
             Response.ErrorListener {
-                completion(Result.Error(parseVolleyError(it)))
+                completion(Result.Error(it.toAppError()))
             }
         )
 
@@ -849,46 +832,5 @@ class DataService private constructor(context: Context) {
 
         request.tag = tag
         addToRequestQueue(request)
-    }
-
-    private fun parseVolleyError(error: VolleyError): Error {
-        when (error) {
-            is AuthFailureError -> {
-                return Error.VolleyError(
-                    applicationContext.getString(R.string.error_network_unAuthorized_title),
-                    applicationContext.getString(R.string.error_network_unAuthorized_message)
-                )
-            }
-
-            is NoConnectionError -> {
-                return Error.VolleyError(
-                    applicationContext.getString(R.string.error_network_noInternet_title),
-                    applicationContext.getString(R.string.error_network_noInternet_message)
-                )
-            }
-
-            is TimeoutError -> {
-                return Error.VolleyError(
-                    applicationContext.getString(R.string.error_network_timeout_title),
-                    applicationContext.getString(R.string.error_network_timeout_message)
-                )
-            }
-
-            is ServerError -> {
-                return Error.VolleyError(
-                    applicationContext.getString(R.string.error_network_serverError_title),
-                    applicationContext.getString(R.string.error_network_serverError_message)
-                )
-            }
-
-            is ParseError -> {
-                return Error.VolleyError(
-                    applicationContext.getString(R.string.error_network_invalidResponse_title),
-                    applicationContext.getString(R.string.error_network_invalidResponse_message)
-                )
-            }
-        }
-
-        return Error.UnknownError(applicationContext)
     }
 }

@@ -16,15 +16,29 @@ import com.noque.svampeatlas.view_holders.*
 
 abstract class BaseAdapter<I, V>: RecyclerView.Adapter<RecyclerView.ViewHolder>() where I: Item<V>, V : ViewType, V: Enum<V>  {
 
-    val sections = Sections<V,I>()
+    internal var sections = Sections<V, I>()
     abstract val onClickListener: View.OnClickListener
 
     private var recyclerView: RecyclerView? = null
 
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+    fun setSections(sections: List<Section<I>>) {
+        this.sections.setSections(sections)
+        notifyDataSetChanged()
+    }
+
+    final override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         this.recyclerView = recyclerView
         super.onAttachedToRecyclerView(recyclerView)
     }
+
+    final override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        this.recyclerView = null
+        super.onDetachedFromRecyclerView(recyclerView)
+    }
+
+//    fun setSections(sections: Sections<V,I>) {
+//        this.sections = sections
+//    }
 
     final override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)

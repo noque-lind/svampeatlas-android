@@ -110,9 +110,12 @@ class MyPageFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_myPageFragment_logOut -> Session.logout()
+            R.id.menu_myPageFragment_logOut -> {
+                Session.logout()
+                return true
+            }
+            else -> return false
         }
-        return true
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -77,7 +77,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             val mushrooms = GsonBuilder().create().fromJson<List<Mushroom>>(json, object : TypeToken<List<Mushroom>>() {}.type)
             _loadingState.postValue(LoadingState.SavingFile)
             file.delete()
-            RoomService.saveMushrooms(mushrooms)
+            RoomService.mushrooms.save(mushrooms)
             _state.postValue(State.Items(null))
         } catch (error: FileNotFoundException) {
             _state.postValue(State.Error(AppError(getApplication<MyApplication>().resources.getString(R.string.downloader_taxon_error), error.localizedMessage ?: "", RecoveryAction.TRYAGAIN)))

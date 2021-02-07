@@ -1,6 +1,6 @@
 package com.noque.svampeatlas.models
 
-sealed class Result<Success, Error>() {
+sealed class Result<out Success, out Error>() {
 
     inline fun onError(action: (error: Error) -> Unit) {
         when (this) {
@@ -17,6 +17,6 @@ sealed class Result<Success, Error>() {
 
     }
 
-    class Success<Success, Error>(val value: Success): Result<Success, Error>()
-    class Error<Success, Error>(val error: Error): Result<Success, Error>()
+    class Success<out Success, out Error>(val value: Success): Result<Success, Error>()
+    class Error<out Success, out Error>(val error: Error): Result<Success, Error>()
 }

@@ -11,20 +11,29 @@ import com.noque.svampeatlas.view_holders.NotificationViewHolder
 
 class NotebookAdapter: BaseAdapter<NotebookAdapter.Items, NotebookAdapter.Items.ViewTypes>() {
 
+    interface Listener {
+        fun newObservationSelected(newObservation: NewObservation)
+    }
+
+
     sealed class Items(viewType: ViewTypes) : Item<Items.ViewTypes>(viewType) {
         enum class ViewTypes: ViewType {
             NewObservation
         }
 
-        class Observation(val newObservation: NewObservation): Items(ViewTypes.NewObservation)
+        class Note(val newObservation: NewObservation): Items(ViewTypes.NewObservation)
     }
 
-    init {
-        sections.addSection(Section("Notesbog d. 23/4", State.Loading()))
-    }
+    var listener: Listener? = null
 
     override val onClickListener: View.OnClickListener
-        get() = TODO("Not yet implemented")
+        get() = View.OnClickListener {
+            when (val tag = it.tag) {
+                is NewObservationViewHolder -> {
+                    (sections.getItem(tag.adapterPosition) as? Items.Note)?.let { listener?.newObservationSelected(it.newObservation) }
+                }
+            }
+        }
 
     override fun createViewTypeViewHolder(
         inflater: LayoutInflater,
@@ -33,7 +42,7 @@ class NotebookAdapter: BaseAdapter<NotebookAdapter.Items, NotebookAdapter.Items.
     ): Pair<View, RecyclerView.ViewHolder> {
         when (Items.ViewTypes.values()[viewTypeOrdinal]) {
             Items.ViewTypes.NewObservation -> {
-                val view = inflater.inflate(R.layout.item_observation, parent, false)
+                val view = inflater.inflate(R.layout.item_new_observation, parent, false)
                 return Pair(
                     view,
                     NewObservationViewHolder(view)
@@ -43,9 +52,9 @@ class NotebookAdapter: BaseAdapter<NotebookAdapter.Items, NotebookAdapter.Items.
         }
     }
 
-    override fun bindViewHolder(holder: RecyclerView.ViewHolder, item: Item<Items.ViewTypes>) {
-        when (item) {
-            is Items.Observation -> (holder as? NewObservationViewHolder)?.configure(item.newObservation)
+    override fun bindViewHolder(holder: RecyclerView.ViewHolder, item: Items) {
+        when (holder) {
+            is NewObservationViewHolder -> (item as? Items.Note)?.let { holder.configure(item.newObservation) }
         }
     }
 }

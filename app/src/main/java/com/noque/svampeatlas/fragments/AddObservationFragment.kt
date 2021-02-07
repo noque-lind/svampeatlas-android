@@ -4,15 +4,17 @@ import android.content.pm.ActivityInfo
 import android.graphics.*
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.*
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -23,11 +25,11 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.tabs.TabLayout
 import com.noque.svampeatlas.adapters.add_observation.AddImagesAdapter
 import com.noque.svampeatlas.adapters.add_observation.InformationAdapter
-import com.noque.svampeatlas.extensions.changeColor
-import com.noque.svampeatlas.extensions.pxToDp
 import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.R
+import com.noque.svampeatlas.extensions.*
 import com.noque.svampeatlas.services.LocationService
+import com.noque.svampeatlas.utilities.MyApplication
 import com.noque.svampeatlas.utilities.SharedPreferences
 import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.views.BlankActivity
@@ -36,9 +38,13 @@ import com.noque.svampeatlas.view_holders.AddImageViewHolder
 import com.noque.svampeatlas.view_holders.AddedImageViewHolder
 import com.noque.svampeatlas.view_models.NewObservationViewModel
 import com.noque.svampeatlas.view_models.Session
+import com.noque.svampeatlas.view_models.factories.NewObservationViewModelFactory
+import kotlinx.android.synthetic.main.action_view_add_notebook_entry.view.*
+import kotlinx.android.synthetic.main.action_view_save_notebook_entry.view.*
 import kotlinx.android.synthetic.main.custom_toast.*
 import kotlinx.android.synthetic.main.custom_toast.view.*
 import kotlinx.android.synthetic.main.fragment_add_observation.*
+import java.io.File
 import java.util.*
 
 
@@ -54,19 +60,20 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     }
 
     companion object {
-        private const val TAG = "AddObservationFragment"
         private const val KEY_LOCALITY_ID_SHOWN = "KEY_LOCALITY_ID_SHOWN"
         private const val KEY_ADDIMAGE_SHOWN = "KEY_ADDIMAGE_SHOWN"
         private const val DEFAULT_LOCALITY_ID = 0
         private const val LOCALITY_ID_FOR_ERROR = 1921
-
+        const val SAVED_STATE_FILE_PATH = "SAVED_STATE_FILE_PATH"
+        const val SAVED_STATE_TAXON_ID = "SAVED_STATE_TAXON_ID"
     }
 
     enum class Type {
-        NEW_OBSERVATION,
-        IDENTIFYED_OBSERVATION,
+        New,
+        FromRecognition,
         Edit,
-        Note;
+        Note,
+        EditNote;
     }
 
     enum class Category {
@@ -93,18 +100,13 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
 
     // Views
     private var spinnerView by autoCleared<SpinnerView>()
-    private var locationSpinner by autoCleared<SpinnerView>()
     private var toolbar by autoCleared<Toolbar>()
     private var viewPager by autoCleared<ViewPager> { it?.adapter = null }
-    private var addImagesRecyclerView by autoCleared<RecyclerView> {
-        it?.adapter = null
-    }
-    private var tabLayout by autoCleared<TabLayout>() {
-        it?.setupWithViewPager(null)
-    }
+    private var addImagesRecyclerView by autoCleared<RecyclerView> { it?.adapter = null }
+    private var tabLayout by autoCleared<TabLayout>() { it?.setupWithViewPager(null) }
 
     // View models
-    private val newObservationViewModel  by lazy { ViewModelProvider(requireActivity()).get(NewObservationViewModel::class.java)}
+    private val newObservationViewModel by viewModels<NewObservationViewModel> { NewObservationViewModelFactory(args.type, args.id, args.mushroomId, args.imageFilePath,  requireActivity().application) }
 
     // Adapters
     private val addImagesAdapter by lazy {
@@ -257,16 +259,15 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
-        if (!addImageShown && args.type == Type.NEW_OBSERVATION) {
+        return if (!addImageShown && args.type == Type.New) {
             addImageShown = true
-            newObservationViewModel.reset()
             val action =
                 AddObservationFragmentDirections.actionAddObservationFragmentToCameraFragment()
             action.type = CameraFragment.Type.NEW_OBSERVATION
             findNavController().navigate(action)
-            return null
+            null
         } else {
-            return inflater.inflate(R.layout.fragment_add_observation, container, false)
+            inflater.inflate(R.layout.fragment_add_observation, container, false)
         }
     }
 
@@ -278,17 +279,49 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         addImagesRecyclerView = addObservationFragment_addObservationImagesRecyclerView
         tabLayout = addObservationFragment_tabLayout
         spinnerView = addObservationFragment_spinner
-        locationSpinner = addObservationFragment_locationSpinner
 
         setupView()
         setupViewModels()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.add_observation_fragment_menu, menu)
-        if (args.type == Type.Edit) {
-            menu.findItem(R.id.menu_addObservationFragment_overflow).isVisible = false
+        when (args.type) {
+            Type.New -> inflater.inflate(R.menu.add_observation_fragment_menu, menu)
+            Type.Edit -> {
+                inflater.inflate(R.menu.add_observation_fragment_menu, menu)
+                menu.findItem(R.id.menu_addObservationFragment_overflow).isVisible = false
+            }
+            Type.Note -> {
+                inflater.inflate(R.menu.add_observation_fragment_menu_notes, menu)
+                menu.findItem(R.id.menu_addObservationFragment_note_save)?.let {
+                    (it.actionView as? LinearLayout)?.apply {
+                        actionView_saveNotebookEntry.setOnClickListener {
+                            newObservationViewModel.saveToLocal()
+                        }
+                    }
+                }
+            }
+            Type.EditNote -> {
+                inflater.inflate(R.menu.menu_add_observation_menu_edit_note, menu)
+                menu.findItem(R.id.menu_addObservationFragment_note_save)?.let {
+                    (it.actionView as? LinearLayout)?.apply {
+                        actionView_saveNotebookEntry.setOnClickListener {
+                            newObservationViewModel.saveToLocal()
+                        }
+                    }
+                }
+            }
         }
+
+
+//        menu.findItem(R.id.addObser)?.let {
+//            (it.actionView as? LinearLayout)?.apply {
+//                actionView_addNotebookEntry.setOnClickListener {
+//                    val action = NotesFragmentDirections.actionNotesFragmentToAddObservationFragment().setType(AddObservationFragment.Type.Note)
+//                    findNavController().navigate(action)
+//                }
+//            }
+//        }
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -296,7 +329,13 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_addObservationFragment_uploadButton -> {
-                uploadButtonPressed()
+                if (Type.Note == args.type) {
+                    newObservationViewModel.saveToLocal()
+                } else {
+                    uploadButtonPressed()
+                }
+
+
             }
             R.id.menu_addObservationFragment_resetButton -> {
                 reset()
@@ -317,6 +356,9 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
             toolbar.subtitle = "ID: ${args.id}"
         } else if (args.type == Type.Note) {
             toolbar.setTitle(R.string.addObservationFragment_title_note)
+        } else if (args.type == Type.EditNote) {
+            toolbar.setTitle(R.string.addObservationVC_title_edit_note)
+            toolbar.subtitle = Date(args.id).toReadableDate(false, ignoreTime = false)
         } else {
             toolbar.setNavigationIcon(R.drawable.icon_menu_button)
             toolbar.setTitle(R.string.addObservationVC_title)
@@ -336,6 +378,16 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         viewPager.apply {
             adapter = informationAdapter
         }
+
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>(SAVED_STATE_FILE_PATH)?.observe(viewLifecycleOwner, Observer {
+            newObservationViewModel.appendImage(File(it))
+            findNavController().currentBackStackEntry?.savedStateHandle?.remove<String>(SAVED_STATE_FILE_PATH)
+        })
+
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Int>(SAVED_STATE_TAXON_ID)?.observe(viewLifecycleOwner, Observer {
+            newObservationViewModel.setMushroom(it)
+            findNavController().currentBackStackEntry?.savedStateHandle?.remove<Int>(SAVED_STATE_TAXON_ID)
+        })
     }
 
     private fun setupViewModels() {
@@ -378,6 +430,21 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
             }
         })
 
+        newObservationViewModel.saveLocallyState.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is State.Items -> {
+                    findNavController().previousBackStackEntry?.savedStateHandle?.set(NotesFragment.RELOAD_DATA_KEY, true)
+                    findNavController().navigateUp()
+                }
+                is State.Empty -> {}
+                is State.Loading -> spinnerView.startLoading()
+                is State.Error -> createToast(it.error.title, it.error.message, BitmapFactory.decodeResource(
+                    resources,
+                    R.drawable.icon_elmessageview_failure
+                ).changeColor(R.color.colorRed))
+            }
+        })
+
         newObservationViewModel.images.observe(viewLifecycleOwner, Observer {
             addImagesAdapter.configure(it ?: mutableListOf())
         })
@@ -389,12 +456,23 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
 
         newObservationViewModel.coordinateState.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is State.Items, is State.Error -> locationSpinner.stopLoading()
-                is State.Loading -> locationSpinner.startLoading()
+                is State.Items, is State.Error -> {
+                    tabLayout.getTabAt(Category.LOCALITY.ordinal)?.setCustomView(null)
+                }
+                is State.Loading -> {
+                    tabLayout.getTabAt(Category.LOCALITY.ordinal)?.setCustomView(R.layout.view_spinner_small)
+                }
                 is State.Empty -> {
                     locationService.setListener(locationServiceListener)
                     locationService.start()
                 }
+            }
+        })
+
+         newObservationViewModel.localitiesState.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is State.Items, is State.Empty, is State.Error ->  tabLayout.getTabAt(Category.LOCALITY.ordinal)?.setCustomView(null)
+                is State.Loading ->   tabLayout.getTabAt(Category.LOCALITY.ordinal)?.setCustomView(R.layout.view_spinner_small)
             }
         })
 
@@ -412,21 +490,14 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
 
         newObservationViewModel.showNotification.observe(viewLifecycleOwner, Observer {
             val bitmap = when (it) {
-                is NewObservationViewModel.Notification.LocationFound -> BitmapFactory.decodeResource(resources, R.drawable.icon_locality_pin).changeColor(R.color.colorPrimary)
+                is NewObservationViewModel.Notification.LocationFound, is NewObservationViewModel.Notification.ObservationUploaded -> BitmapFactory.decodeResource(resources, R.drawable.icon_locality_pin).changeColor(R.color.colorPrimary)
                 else -> BitmapFactory.decodeResource(
                     resources,
-                    R.drawable.icon_elmessageview_success
-                )
+                    R.drawable.icon_elmessageview_failure
+                ).changeColor(R.color.colorRed)
             }
 
             createToast(it.title, it.message, bitmap)
-        })
-
-        newObservationViewModel.localitiesState.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is State.Items, is State.Empty, is State.Error -> locationSpinner.stopLoading()
-                is State.Loading -> locationSpinner.startLoading()
-            }
         })
 }
 
@@ -459,7 +530,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
 
         result.onSuccess {
             if (args.type == Type.Edit) {
-                Session.editObservation(args.id, it.first, it.second)
+                Session.editObservation(args.id.toInt(), it.first, it.second)
             } else {
                 Session.uploadObservation(it.first, it.second)
             }

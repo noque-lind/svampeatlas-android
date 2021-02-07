@@ -44,10 +44,10 @@ val MIGRATION_15_18 = object: Migration(15,18) {
     }
 }
 
-@Database(entities = [User::class, Substrate::class, VegetationType::class, Host::class, Mushroom::class],
-    version = 18)
+@Database(entities = [User::class, Substrate::class, VegetationType::class, Host::class, Mushroom::class, NewObservation::class],
+    version = 21)
 
-@TypeConverters(ImagesTypeConverters::class, RedListDataTypeConverters::class, UserRolesTypeConverters::class)
+@TypeConverters(ImagesConverter::class, RedListDataConverter::class, UserRolesTypeConverters::class, IDsConverter::class, StringsConverter::class, DateConverter::class, LatLngConverter::class)
 
 
 abstract class Database: RoomDatabase() {
@@ -56,6 +56,7 @@ abstract class Database: RoomDatabase() {
     abstract fun VegetationTypeDao(): VegetationTypeDao
     abstract fun HostsDao(): HostsDao
     abstract fun mushroomsDao(): MushroomsDao
+    abstract fun notesDao(): NotesDao
 
 
     companion object {

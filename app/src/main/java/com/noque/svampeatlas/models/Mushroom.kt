@@ -11,62 +11,6 @@ import com.noque.svampeatlas.extensions.appLanguage
 import com.noque.svampeatlas.extensions.capitalized
 import java.util.Collections.emptyList
 
-object RedListDataTypeConverters {
-
-    val gson by lazy { Gson() }
-
-    @TypeConverter
-    @JvmStatic
-    fun toRedListData(data: String?): List<RedListData> {
-        if (data == null) {
-            return emptyList()
-        } else {
-            val listType = object: TypeToken<List<RedListData>>() {}.type
-            return gson.fromJson(data, listType)
-        }
-    }
-
-    @TypeConverter
-    @JvmStatic
-    fun toString(redListData: List<RedListData>?): String? {
-        redListData?.let {
-            return gson.toJson(redListData)
-        }
-
-        return null
-    }
-}
-
-
-object ImagesTypeConverters {
-
-    val gson = Gson()
-
-    @TypeConverter
-    @JvmStatic
-    fun toImages(data: String?): List<Image> {
-        if (data == null) {
-            return emptyList()
-        }
-
-        val listType = object : TypeToken<List<Image>>() {
-
-        }.type
-
-        return gson.fromJson(data, listType)
-    }
-
-    @TypeConverter
-    @JvmStatic
-    fun toString(images: List<Image>?): String? {
-        images?.let {
-            return gson.toJson(images)
-        }
-            return null
-    }
-}
-
-
 //data class RoomMushroom(
 //    @PrimaryKey
 //    @SerializedName("_id") val id: Int,

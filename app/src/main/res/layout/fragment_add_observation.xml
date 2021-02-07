@@ -9,15 +9,6 @@
     android:clipToPadding="false"
     tools:context=".fragments.AddObservationFragment">
 
-
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline7"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.6666666666" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/addObservationFragment_addObservationImagesRecyclerView"
         android:layout_width="match_parent"
@@ -52,7 +43,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/addObservationFragment_tabLayout">
-
     </androidx.viewpager.widget.ViewPager>
 
     <com.google.android.material.tabs.TabLayout
@@ -68,14 +58,6 @@
         app:tabMode="fixed"
         app:tabTextAppearance="@style/AppPrimary"/>
 
-    <com.noque.svampeatlas.views.SpinnerView
-        android:id="@+id/addObservationFragment_locationSpinner"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="@+id/addObservationFragment_tabLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/guideline7"
-        app:layout_constraintTop_toTopOf="@+id/addObservationFragment_tabLayout" />
 
     <com.noque.svampeatlas.views.SpinnerView
         android:id="@+id/addObservationFragment_spinner"

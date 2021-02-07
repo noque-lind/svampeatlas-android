@@ -1,5 +1,6 @@
 package com.noque.svampeatlas.daos
 
+import com.noque.svampeatlas.models.Host
 import com.noque.svampeatlas.models.Mushroom
 import com.noque.svampeatlas.models.Result
 import com.noque.svampeatlas.services.RoomService
@@ -7,6 +8,10 @@ import com.noque.svampeatlas.services.RoomService
 class MushroomsDaoInterface(private val dao: MushroomsDao) {
     suspend fun saveMushroom(mushroom: Mushroom) {
         dao.saveFavorites(mushroom)
+    }
+
+    suspend fun save(mushrooms: List<Mushroom>) {
+        dao.saveMushrooms(*mushrooms.toTypedArray())
     }
 
     suspend fun deleteMushroom(mushroom: Mushroom) {

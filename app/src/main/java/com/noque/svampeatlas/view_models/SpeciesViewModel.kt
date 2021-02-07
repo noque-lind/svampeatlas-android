@@ -49,22 +49,14 @@ class SpeciesViewModel(val id: Int, application: Application) : AndroidViewModel
     private fun getMushroom(id: Int) {
         _mushroomState.value = State.Loading()
 
-
         viewModelScope.launch {
-           val result = RoomService.mushrooms.getMushroomWithID(id)
-            result.onSuccess {
-                _mushroomState.value = State.Items(it)
-            }
+            DataService.getInstance(getApplication()).mushroomsRepository.getMushroom(id).apply {
+                onError {
+                    _mushroomState.value = State.Error(it)
+                }
 
-            result.onError {
-                DataService.getInstance(getApplication()).getMushroom(TAG, id) { result ->
-                    result.onError {
-                        _mushroomState.value = State.Error(it)
-                    }
-
-                    result.onSuccess {
-                        _mushroomState.value = State.Items(it)
-                    }
+                onSuccess {
+                    _mushroomState.value = State.Items(it)
                 }
             }
         }

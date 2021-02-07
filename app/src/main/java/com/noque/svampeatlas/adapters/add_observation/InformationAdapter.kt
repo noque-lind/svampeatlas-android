@@ -2,6 +2,7 @@ package com.noque.svampeatlas.adapters.add_observation
 
 import android.content.Context
 import androidx.fragment.app.*
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.fragments.AddObservationFragment
 import com.noque.svampeatlas.fragments.add_observation.DetailsFragment

@@ -1,6 +1,4 @@
 package com.noque.svampeatlas.views
-
-import android.content.Context
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -8,37 +6,25 @@ import android.view.View
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.R
 import kotlinx.android.synthetic.main.activity_blank.*
 import kotlinx.android.synthetic.main.navigation_header.view.*
-import java.io.File
-import androidx.core.content.ContextCompat.startActivity
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.net.Uri
 import android.util.Log
 import android.view.View.*
 import androidx.navigation.*
 import androidx.navigation.fragment.findNavController
-import com.noque.svampeatlas.fragments.AddObservationFragment
-import com.noque.svampeatlas.fragments.AddObservationFragmentArgs
 import com.noque.svampeatlas.fragments.TermsFragment
 import com.noque.svampeatlas.services.FileManager
 import com.noque.svampeatlas.utilities.SharedPreferences
 import com.noque.svampeatlas.view_models.Session
-import kotlinx.android.synthetic.main.fragment_settings.*
 import java.lang.Exception
-import java.text.SimpleDateFormat
-import java.util.*
 
 
 class BlankActivity : AppCompatActivity() {
@@ -208,9 +194,8 @@ class BlankActivity : AppCompatActivity() {
        } else  {
            sharedSet.add(R.id.addObservationFragment)
            return navController.navigateUp(AppBarConfiguration(sharedSet, drawerLayout)) || super.onSupportNavigateUp()
-
        }
-           }
+    }
 
     override fun onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {

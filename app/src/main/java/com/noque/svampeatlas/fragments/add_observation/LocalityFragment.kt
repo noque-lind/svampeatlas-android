@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.core.view.marginBottom
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,11 +29,15 @@ class LocalityFragment: Fragment() {
         const val TAG = "LocalityFragment"
     }
 
+    private var onGlobalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
+
     // Views
     private var mapFragment by autoCleared<MapFragment> {
         it?.setListener(null)
     }
     private var recyclerView  by autoCleared<RecyclerView>() {
+        it?.viewTreeObserver?.removeOnGlobalLayoutListener(onGlobalLayoutListener)
+        onGlobalLayoutListener = null
         it?.adapter = null
     }
     private var retryButton by autoCleared<ImageButton>()
@@ -40,7 +45,7 @@ class LocalityFragment: Fragment() {
     private var precisionLabel by autoCleared<TextView>()
 
     // View models
-    private val newObservationViewModel: NewObservationViewModel by activityViewModels()
+    private val newObservationViewModel: NewObservationViewModel by viewModels({ requireParentFragment() })
 
     // Adapters
     private val localityAdapter by lazy {
@@ -148,14 +153,14 @@ class LocalityFragment: Fragment() {
 
     private fun setupViews() {
         recyclerView.apply {
-            this.viewTreeObserver.addOnGlobalLayoutListener(object: ViewTreeObserver.OnGlobalLayoutListener {
+            onGlobalLayoutListener = object: ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
                     mapFragment.setPadding(0, 0, 0, this@apply.height + this@apply.marginBottom)
                     mapFragment.setRegionToShowMarkers()
                     this@apply.viewTreeObserver.removeOnGlobalLayoutListener(this)
                 }
-            })
-
+            }
+            viewTreeObserver.addOnGlobalLayoutListener(onGlobalLayoutListener)
             adapter = localityAdapter
             layoutManager = LinearLayoutManager(context).apply { orientation = RecyclerView.HORIZONTAL }
         }

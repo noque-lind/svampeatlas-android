@@ -353,7 +353,11 @@
     <string name="downloader_taxon_savingFile">Saving to database</string>
     <string name="downloader_taxon_error">An error occured</string>
     <string name="common_addEntry">Indtast</string>
-    <string name="addObservationFragment_title_note">Ny tilføje til notesbog</string>
+    <string name="addObservationFragment_title_note">Ny note til notesbog</string>
+    <string name="common_save">Gem</string>
+    <string name="common_delete">Slet</string>
+    <string name="common_unknown_locality">Ukendt lokation</string>
+    <string name="addObservationVC_title_edit_note">Redigering af note</string>
 
 
 </resources>

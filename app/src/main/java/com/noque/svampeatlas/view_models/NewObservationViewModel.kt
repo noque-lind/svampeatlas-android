@@ -3,12 +3,14 @@ package com.noque.svampeatlas.view_models
 import android.app.Application
 import android.content.Context
 import android.content.res.Resources
+import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.*
 import com.google.maps.android.SphericalUtil
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.extensions.*
 import com.noque.svampeatlas.extensions.Date
+import com.noque.svampeatlas.fragments.AddObservationFragment
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.services.DataService
 import com.noque.svampeatlas.services.RoomService
@@ -22,9 +24,10 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.util.*
+import kotlin.coroutines.CoroutineContext
 
 
-class NewObservationViewModel(application: Application) : AndroidViewModel(application) {
+class NewObservationViewModel(application: Application, val type: AddObservationFragment.Type, val id: Long, mushroomId: Int, imageFilePath: String?) : AndroidViewModel(application) {
 
     sealed class Notification(val title: String, val message: String) {
         class LocationFound(resources: Resources, locality: Locality, location: Location): Notification(resources.getString(R.string.prompt_localityDetermined_title), resources.getString(R.string.prompt_localityDetermined_message, locality.name, location.latLng.latitude, location.latLng.longitude, location.accuracy))
@@ -70,14 +73,16 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
     private val _vegetationType by lazy {MutableLiveData<Pair<VegetationType, Boolean>?>(null)}
     private val _hosts by lazy { MutableLiveData<Pair<List<Host>, Boolean>?>(null)}
     private val _images by lazy { MutableLiveData<MutableList<Image>>(mutableListOf())}
-    private val _mushroom by lazy {MutableLiveData<Pair<Mushroom, DeterminationConfidence>?>(null)}
+    private val _mushroom by lazy{ MutableLiveData<Pair<Mushroom, DeterminationConfidence>?>(null)}
     private val _notes by lazy { MutableLiveData<String?>(null) }
     private val _ecologyNotes by lazy { MutableLiveData<String?>(null) }
     private var _determinationNotes: String? = null
 
-    private val _coordinateState by lazy { MutableLiveData<State<Location>>(State.Empty()) }
-    private val _localitiesState by lazy { MutableLiveData<State<List<Locality>>>(State.Empty()) }
+    private val _setupState by lazy {MutableLiveData<State<Void?>>(State.Empty())}
+    private val _coordinateState by lazy { MutableLiveData<State<Location>>() }
+    private val _localitiesState by lazy {MutableLiveData<State<List<Locality>>>(State.Empty()) }
     private val _predictionResultsState by lazy { MutableLiveData<State<List<PredictionResult>>>(State.Empty()) }
+    private val _saveLocallyState by lazy { MutableLiveData<State<Void?>>(State.Empty()) }
 
     val date: LiveData<Date> get() = _date
     val substrate: LiveData<Pair<Substrate, Boolean>?> get() = _substrate
@@ -89,16 +94,88 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
     val images: LiveData<MutableList<Image>> get() = _images
     val mushroom: LiveData<Pair<Mushroom, DeterminationConfidence>?> get() = _mushroom
 
+    val setupState: LiveData<State<Void?>> get() = _setupState
     val coordinateState: LiveData<State<Location>> get() = _coordinateState
     val localitiesState: LiveData<State<List<Locality>>> get() = _localitiesState
     val predictionResultsState: LiveData<State<List<PredictionResult>>> get() = _predictionResultsState
+    val saveLocallyState: LiveData<State<Void?>> get() = _saveLocallyState
 
     val removedImage by lazy { SingleLiveEvent<Int>() }
 
     val showNotification by lazy { SingleLiveEvent<Notification>() }
     val showPrompt by lazy { SingleLiveEvent<Prompt>() }
 
-    fun editObservation(observation: Observation, user: User) {
+
+    init {
+        when (type) {
+            AddObservationFragment.Type.New -> {
+                _coordinateState.value = State.Empty()
+            }
+            AddObservationFragment.Type.FromRecognition -> {
+                _coordinateState.value = State.Empty()
+                if (mushroomId != 0) {
+                    setMushroom(mushroomId)
+                }
+                imageFilePath?.let { appendImage(File(imageFilePath)) }
+            }
+            AddObservationFragment.Type.Edit -> {
+                if (id != 0L) {
+                    DataService.getInstance(getApplication()).getObservation(TAG, id.toInt()) {
+                        it.onSuccess {
+                            editObservation(it, Session.user.value!!)
+                        }
+                    }
+                }
+            }
+            AddObservationFragment.Type.Note -> {
+                _coordinateState.value = State.Empty()
+            }
+            AddObservationFragment.Type.EditNote -> {
+                _setupState.value = State.Loading()
+                viewModelScope.launch {
+                    RoomService.notesDao.getById(id).apply {
+                        onSuccess {
+                            _setupState.value = State.Empty()
+                            setupFrom(it)
+                        }
+                        onError {
+                            _setupState.value = State.Error(it.toAppError(application.resources))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupFrom(newObservation: NewObservation) {
+        _date.value = newObservation.observationDate
+        newObservation.species?.let { _mushroom.value = Pair(it, DeterminationConfidence.fromDatabaseName(newObservation.confidence ?: DeterminationConfidence.CONFIDENT.databaseName)) }
+        newObservation.substrate?.let { _substrate.value = Pair(it, false) }
+        newObservation.vegetationType?.let { _vegetationType.value = Pair(it, false) }
+        _locality.value = newObservation.locality
+        _notes.value = newObservation.note
+        _ecologyNotes.value = newObservation.ecologyNote
+
+
+
+        viewModelScope.launch {
+            RoomService.hosts.getHostsWithIds(newObservation.hostIDs).apply {
+                onSuccess {
+                    _hosts.value = Pair(it, false)
+                }
+            }
+        }
+
+        _images.value = newObservation.images.map {
+            Image.New(File(it))
+        }.toMutableList()
+
+        newObservation.coordinate?.let { _coordinateState.value = State.Items(it) }
+        newObservation.locality?.let { _localitiesState.value = State.Items(listOf(it)) }
+
+    }
+
+    private fun editObservation(observation: Observation, user: User) {
         _date.value = observation.observationDate
         _mushroom.value = Pair(Mushroom(observation.id, observation.determination.fullName, VernacularNameDK(observation.determination.localizedName, null)), observation.determination.confidence ?: DeterminationConfidence.CONFIDENT)
         observation.substrate?.let { _substrate.value = Pair(it, false) }
@@ -282,13 +359,18 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
         }
     }
 
-    fun setMushroom(mushroom: Mushroom?) {
-        if (this.mushroom.value?.first != mushroom) {
-            if (mushroom != null) {
-                _mushroom.value = Pair(mushroom, DeterminationConfidence.CONFIDENT)
-            } else {
-                _mushroom.value = null
+    fun setMushroom(taxonID: Int?) {
+        if (taxonID != null && taxonID != 0) {
+            viewModelScope.launch(Dispatchers.IO) {
+                DataService.getInstance(getApplication()).mushroomsRepository.getMushroom(taxonID).apply {
+                    onSuccess {
+                        _mushroom.postValue(Pair(it, DeterminationConfidence.CONFIDENT))
+                    }
+                    onError {}
+                }
             }
+        } else {
+            _mushroom.value = null
         }
     }
 
@@ -484,5 +566,37 @@ class NewObservationViewModel(application: Application) : AndroidViewModel(appli
     override fun onCleared() {
         DataService.getInstance(getApplication()).clearRequestsWithTag(TAG)
         super.onCleared()
+    }
+
+    fun saveToLocal() {
+        _saveLocallyState.value = State.Loading()
+
+        val creationDate = if (type == AddObservationFragment.Type.EditNote) Date(id) else Date()
+        val newObservation = NewObservation(
+            creationDate,
+            date.value ?: Date(),
+            mushroom.value?.first,
+            locality.value,
+            substrate.value?.first,
+            vegetationType.value?.first,
+            coordinateState.value?.item,
+            ecologyNotes.value,
+            notes.value,
+            mushroom.value?.second?.databaseName,
+            hosts.value?.first?.map { it.id } ?: listOf(),
+            images.value?.mapNotNull { (it as? Image.New)?.file?.absolutePath } ?: listOf()
+        )
+
+        viewModelScope.launch {
+            RoomService.notesDao.save(newObservation).apply {
+                onError {
+                    _saveLocallyState.postValue(State.Error(it.toAppError(getApplication<MyApplication>().resources)))
+                }
+
+                onSuccess {
+                    _saveLocallyState.postValue(State.Items(null))
+                }
+            }
+        }
     }
 }

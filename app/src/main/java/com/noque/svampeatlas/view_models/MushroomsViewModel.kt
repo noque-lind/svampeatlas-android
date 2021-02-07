@@ -126,15 +126,15 @@ class MushroomsViewModel(category: Category?, application: Application) :
         (mushroomsState.value as? State.Items)?.items?.getOrNull(index)?.let {
             _favoringState.value = State.Loading()
             viewModelScope.launch {
-                DataService.getInstance(getApplication()).getMushroom(TAG, it.id) {
-                    it.onSuccess {
+                DataService.getInstance(getApplication()).mushroomsRepository.getMushroom(it.id).apply {
+                    onSuccess {
                         viewModelScope.launch {
                             RoomService.mushrooms.saveMushroom(it)
                             _favoringState.value = State.Items(it)
                         }
                     }
 
-                    it.onError {
+                    onError {
                         _favoringState.value = State.Error(it)
                     }
                 }

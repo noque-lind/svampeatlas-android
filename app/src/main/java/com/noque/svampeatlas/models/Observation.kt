@@ -243,6 +243,15 @@ enum class DeterminationConfidence(val databaseName: String) {
 
     companion object {
         val values = values()
+
+        fun fromDatabaseName(name: String): DeterminationConfidence {
+            return when (name) {
+                "sikker" -> CONFIDENT
+                "sandsynlig" -> LIKELY
+                "mulig" -> POSSIBLE
+                else -> CONFIDENT
+            }
+        }
     }
 }
 

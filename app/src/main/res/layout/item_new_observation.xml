@@ -1,35 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:background="@color/colorSecondary"
     android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:background="@color/colorPrimary"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/newObservationItem_imageLayout"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="16dp">
 
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/icon_missing_image" />
+        <com.noque.svampeatlas.views.RoundedImageView
+            android:id="@+id/newObservationItem_imageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/rounded_view_color_primary"
+            android:scaleType="fitXY"
+            />
+
+        <TextView
+            android:id="@+id/newObservationItem_imageLabel"
+            style="@style/AppSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"
+            android:background="@drawable/rounded_view_dark_opacity"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="0dp"
+            app:layout_constraintBottom_toBottomOf="@+id/newObservationItem_imageView"
+            app:layout_constraintEnd_toEndOf="@+id/newObservationItem_imageView" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="32dp"
         android:layout_marginBottom="32dp"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imageView"
-        app:layout_constraintTop_toTopOf="parent">
+      >
 
         <TextView
             android:id="@+id/newObservationItem_smallLabel"
@@ -43,4 +61,4 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
