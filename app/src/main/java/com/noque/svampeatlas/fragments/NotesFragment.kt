@@ -3,13 +3,11 @@ package com.noque.svampeatlas.fragments
 import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.*
 import android.widget.LinearLayout
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -19,18 +17,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.adapters.NotebookAdapter
-import com.noque.svampeatlas.extensions.dpToPx
-import com.noque.svampeatlas.extensions.toSimpleString
+import com.noque.svampeatlas.extensions.*
+import com.noque.svampeatlas.fragments.modals.DownloaderFragment
 import com.noque.svampeatlas.models.NewObservation
 import com.noque.svampeatlas.models.Section
 import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.utilities.autoCleared
-import com.noque.svampeatlas.view_models.MushroomsViewModel
 import com.noque.svampeatlas.view_models.NotesFragmentViewModel
 import com.noque.svampeatlas.views.BlankActivity
 import kotlinx.android.synthetic.main.action_view_add_notebook_entry.view.*
 import kotlinx.android.synthetic.main.fragment_notebook.*
-import java.io.File
 
 class NotesFragment: Fragment() {
 
@@ -54,9 +50,16 @@ class NotesFragment: Fragment() {
                     action.id = newObservation.creationDate.time
                     findNavController().navigate(action)
                 }
+
+                override fun downloadForOfflinePressed() {
+                    DownloaderFragment().show(parentFragmentManager, null)
+                    this@apply.sections.deleteItem(0)
+                    this@apply.notifyItemRemoved(0)
+                }
             }
         }
     }
+
     private val viewModel by viewModels<NotesFragmentViewModel>()
 
 
@@ -200,13 +203,13 @@ class NotesFragment: Fragment() {
                 is State.Items -> {
                     val dateSortedNotes = mutableMapOf<String, MutableList<NewObservation>>()
                     it.items.forEach {
-                        if (dateSortedNotes.containsKey(it.creationDate.toSimpleString())) {
-                            dateSortedNotes[it.creationDate.toSimpleString()]?.add(it)
+                        if (dateSortedNotes.containsKey(it.creationDate.toDatabaseName())) {
+                            dateSortedNotes[it.creationDate.toDatabaseName()]?.add(it)
                         } else {
-                            dateSortedNotes[it.creationDate.toSimpleString()] = mutableListOf(it)
+                            dateSortedNotes[it.creationDate.toDatabaseName()] = mutableListOf(it)
                         }
                     }
-                    notebookAdapter.setSections(dateSortedNotes.map { Section(it.key, State.Items<List<NotebookAdapter.Items>>(it.value.map { NotebookAdapter.Items.Note(it) }))})
+                    notebookAdapter.setSections(dateSortedNotes.map { Section(it.key.toDate().toReadableDate(true, true), State.Items<List<NotebookAdapter.Items>>(it.value.map { NotebookAdapter.Items.Note(it) }))})
                 }
                 is State.Empty -> notebookAdapter.setSections(listOf(Section(null, State.Empty())))
                 is State.Loading -> notebookAdapter.setSections(listOf(Section(null, State.Loading())))

@@ -45,7 +45,7 @@ val MIGRATION_15_18 = object: Migration(15,18) {
 }
 
 @Database(entities = [User::class, Substrate::class, VegetationType::class, Host::class, Mushroom::class, NewObservation::class],
-    version = 21)
+    version = 22)
 
 @TypeConverters(ImagesConverter::class, RedListDataConverter::class, UserRolesTypeConverters::class, IDsConverter::class, StringsConverter::class, DateConverter::class, LatLngConverter::class)
 

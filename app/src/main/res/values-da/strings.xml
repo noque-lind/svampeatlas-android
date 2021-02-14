@@ -232,8 +232,6 @@
     <string name="settings_language_message">Det er ikke alt indhold som er oversat til alle sprog: %s</string>
     <string name="common_mostUsed">Most used</string>
     <string name="common_previouslyUsed">Previously used</string>
-    <string name="download_taxon_title">Vil du hente taxon listen til offline brug?</string>
-    <string name="download_taxon_message">If you do, you can always search the entire taxon list, even without internet. This way you can easily prepare your sightings</string>
     <string name="downloader_taxon_downloading">Henter artsliste</string>
     <string name="downloader_taxon_readingFile">Læser fil</string>
     <string name="downloader_taxon_savingFile">Gemmer til databasen</string>
@@ -244,5 +242,10 @@
     <string name="common_delete">Delete</string>
     <string name="common_unknown_locality">Unknown location</string>
     <string name="addObservationVC_title_edit_note">Edit notebook entry</string>
+    <string name="download_taxon_title">Vil du hente data til offline brug?</string>
+    <string name="download_taxon_message">Ved at hente al data, kan du forberede dine fund uden internet - og så blot uploade dem når du kommer hjem fra din tur.</string>
+    <string name="downloader_metadata_downloading">Henter substrater, vegetationstyper og værter</string>
+    <string name="downloader_cleaning_up">Rydder op</string>
+    <string name="downloader_downloading">Henter data</string>
 
 </resources>

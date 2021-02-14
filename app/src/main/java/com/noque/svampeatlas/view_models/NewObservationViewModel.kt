@@ -3,7 +3,6 @@ package com.noque.svampeatlas.view_models
 import android.app.Application
 import android.content.Context
 import android.content.res.Resources
-import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.*
 import com.google.maps.android.SphericalUtil
@@ -24,7 +23,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.util.*
-import kotlin.coroutines.CoroutineContext
 
 
 class NewObservationViewModel(application: Application, val type: AddObservationFragment.Type, val id: Long, mushroomId: Int, imageFilePath: String?) : AndroidViewModel(application) {
@@ -67,14 +65,14 @@ class NewObservationViewModel(application: Application, val type: AddObservation
         private const val TAG = "NewObservationViewModel"
     }
 
-    private val _date by lazy {MutableLiveData<Date>(Calendar.getInstance().time)}
-    private val _locality by lazy {MutableLiveData<Locality?>(null)}
-    private val _substrate by lazy {MutableLiveData<Pair<Substrate, Boolean>?>(null)}
-    private val _vegetationType by lazy {MutableLiveData<Pair<VegetationType, Boolean>?>(null)}
-    private val _hosts by lazy { MutableLiveData<Pair<List<Host>, Boolean>?>(null)}
-    private val _images by lazy { MutableLiveData<MutableList<Image>>(mutableListOf())}
-    private val _mushroom by lazy{ MutableLiveData<Pair<Mushroom, DeterminationConfidence>?>(null)}
-    private val _notes by lazy { MutableLiveData<String?>(null) }
+    private val _date by lazy { MutableLiveData<Date>() }
+    private val _locality by lazy {MutableLiveData<Locality?>()}
+    private val _substrate by lazy {MutableLiveData<Pair<Substrate, Boolean>?>()}
+    private val _vegetationType by lazy {MutableLiveData<Pair<VegetationType, Boolean>?>()}
+    private val _hosts by lazy { MutableLiveData<Pair<List<Host>, Boolean>?>()}
+    private val _images by lazy { MutableLiveData<MutableList<Image>>()}
+    private val _mushroom by lazy{ MutableLiveData<Pair<Mushroom, DeterminationConfidence>?>()}
+    private val _notes by lazy { MutableLiveData<String?>() }
     private val _ecologyNotes by lazy { MutableLiveData<String?>(null) }
     private var _determinationNotes: String? = null
 
@@ -108,89 +106,128 @@ class NewObservationViewModel(application: Application, val type: AddObservation
 
     init {
         when (type) {
-            AddObservationFragment.Type.New -> {
-                _coordinateState.value = State.Empty()
+            AddObservationFragment.Type.New, AddObservationFragment.Type.Note -> {
+                setupAsNew()
             }
             AddObservationFragment.Type.FromRecognition -> {
-                _coordinateState.value = State.Empty()
+                setupAsNew()
                 if (mushroomId != 0) {
                     setMushroom(mushroomId)
                 }
                 imageFilePath?.let { appendImage(File(imageFilePath)) }
             }
             AddObservationFragment.Type.Edit -> {
-                if (id != 0L) {
-                    DataService.getInstance(getApplication()).getObservation(TAG, id.toInt()) {
-                        it.onSuccess {
-                            editObservation(it, Session.user.value!!)
-                        }
-                    }
-                }
-            }
-            AddObservationFragment.Type.Note -> {
-                _coordinateState.value = State.Empty()
+               editObservation(id)
             }
             AddObservationFragment.Type.EditNote -> {
-                _setupState.value = State.Loading()
-                viewModelScope.launch {
-                    RoomService.notesDao.getById(id).apply {
-                        onSuccess {
-                            _setupState.value = State.Empty()
-                            setupFrom(it)
-                        }
-                        onError {
-                            _setupState.value = State.Error(it.toAppError(application.resources))
-                        }
-                    }
+               editNote(id)
+            }
+        }
+    }
+
+    private fun editObservation(id: Long) {
+        _setupState.value = State.Loading()
+        if (id != 0L) {
+            DataService.getInstance(getApplication()).getObservation(TAG, id.toInt()) {
+                it.onSuccess {observation ->
+                    _date.value = observation.observationDate
+                    _mushroom.value = Pair(Mushroom(observation.id, observation.determination.fullName, VernacularNameDK(observation.determination.localizedName, null)), observation.determination.confidence ?: DeterminationConfidence.CONFIDENT)
+                    observation.substrate?.let { _substrate.value = Pair(it, false) }
+                    observation.vegetationType?.let { _vegetationType.value = Pair(it, false) }
+                    _hosts.value = Pair(observation.hosts.toMutableList(), false)
+                    _locality.value = observation.locality
+                    _notes.value = observation.note
+                    _ecologyNotes.value = observation.ecologyNote
+                    _images.value = observation.images.map {
+                        Image.Hosted(it.id, it.url, Date(it.createdAt), Session.user.value!!.isValidator)
+                    }.toMutableList()
+                    _determinationNotes = null
+                    observation.location?.let { _coordinateState.value = State.Items(it) }
+                    observation.locality?.let { _localitiesState.value = State.Items(listOf(it)) }
+                    _predictionResultsState.value = State.Empty()
+
+                    _setupState.value = State.Items(null)
+                }
+                it.onError {
+                    _setupState.value = State.Error(it)
                 }
             }
         }
     }
 
-    private fun setupFrom(newObservation: NewObservation) {
-        _date.value = newObservation.observationDate
-        newObservation.species?.let { _mushroom.value = Pair(it, DeterminationConfidence.fromDatabaseName(newObservation.confidence ?: DeterminationConfidence.CONFIDENT.databaseName)) }
-        newObservation.substrate?.let { _substrate.value = Pair(it, false) }
-        newObservation.vegetationType?.let { _vegetationType.value = Pair(it, false) }
-        _locality.value = newObservation.locality
-        _notes.value = newObservation.note
-        _ecologyNotes.value = newObservation.ecologyNote
-
-
+    private fun editNote(id: Long) {
+        _setupState.value = State.Loading()
 
         viewModelScope.launch {
-            RoomService.hosts.getHostsWithIds(newObservation.hostIDs).apply {
-                onSuccess {
-                    _hosts.value = Pair(it, false)
+            RoomService.notesDao.getById(id).apply {
+                onSuccess {newObservation ->
+                    _setupState.value = State.Items(null)
+                    _date.value = newObservation.observationDate
+                    newObservation.species?.let { _mushroom.value = Pair(it, DeterminationConfidence.fromDatabaseName(newObservation.confidence ?: DeterminationConfidence.CONFIDENT.databaseName)) }
+                    newObservation.substrate?.let { _substrate.value = Pair(it, false) }
+                    newObservation.vegetationType?.let { _vegetationType.value = Pair(it, false) }
+                    _locality.value = newObservation.locality
+                    _notes.value = newObservation.note
+                    _ecologyNotes.value = newObservation.ecologyNote
+
+
+                    viewModelScope.launch {
+                        RoomService.hosts.getHostsWithIds(newObservation.hostIDs).apply {
+                            onSuccess {
+                                _hosts.value = Pair(it, false)
+                            }
+                        }
+                    }
+
+                    _images.value = newObservation.images.map {
+                        Image.New(File(it))
+                    }.toMutableList()
+
+                    newObservation.coordinate?.let { _coordinateState.value = State.Items(it) }
+                    newObservation.locality?.let { _localitiesState.value = State.Items(listOf(it)) }
+                }
+                onError {
+                    _setupState.value = State.Error(it.toAppError(getApplication<MyApplication>().resources))
                 }
             }
         }
-
-        _images.value = newObservation.images.map {
-            Image.New(File(it))
-        }.toMutableList()
-
-        newObservation.coordinate?.let { _coordinateState.value = State.Items(it) }
-        newObservation.locality?.let { _localitiesState.value = State.Items(listOf(it)) }
-
     }
 
-    private fun editObservation(observation: Observation, user: User) {
-        _date.value = observation.observationDate
-        _mushroom.value = Pair(Mushroom(observation.id, observation.determination.fullName, VernacularNameDK(observation.determination.localizedName, null)), observation.determination.confidence ?: DeterminationConfidence.CONFIDENT)
-        observation.substrate?.let { _substrate.value = Pair(it, false) }
-        observation.vegetationType?.let { _vegetationType.value = Pair(it, false) }
-        _hosts.value = Pair(observation.hosts.toMutableList(), false)
-        _locality.value = observation.locality
-        _notes.value = observation.note
-        _ecologyNotes.value = observation.ecologyNote
-        _images.value = observation.images.map {
-            Image.Hosted(it.id, it.url, Date(it.createdAt), user.isValidator)
-        }.toMutableList()
+    fun setupAsNew() {
+        _date.value = Calendar.getInstance().time
+        _locality.value = null
+        _substrate.value = null
+        _vegetationType.value = null
+        _hosts.value = null
+        _images.value = mutableListOf()
+        _mushroom.value = null
+        _notes.value = null
+        _ecologyNotes.value = null
         _determinationNotes = null
-        observation.location?.let { _coordinateState.value = State.Items(it) }
-        observation.locality?.let { _localitiesState.value = State.Items(listOf(it)) }
+
+        _coordinateState.value = State.Empty()
+        _localitiesState.value = State.Empty()
         _predictionResultsState.value = State.Empty()
+
+        viewModelScope.launch {
+            SharedPreferences.getSubstrateID()?.let {
+                RoomService.substrates.getSubstrateWithID(it).onSuccess {
+                    _substrate.value = Pair(it, true)
+                }
+            }
+
+            SharedPreferences.getVegetationTypeID()?.let {
+                RoomService.vegetationTypes.getVegetationTypeWithID(it).onSuccess {
+                    _vegetationType.value = Pair(it, true)
+                }
+            }
+
+            SharedPreferences.getHosts()?.let {
+                RoomService.hosts.getHostsWithIds(it).onSuccess {
+                    _hosts.value = Pair(it.toMutableList(), true)
+                }
+            }
+        }
     }
 
     fun setDate(date: Date) {
@@ -398,44 +435,6 @@ class NewObservationViewModel(application: Application, val type: AddObservation
         _locality.value = null
     }
 
-    fun reset() {
-        _date.value = Calendar.getInstance().time
-        _substrate.value = null
-        _vegetationType.value = null
-        _hosts.value = null
-        _locality.value = null
-        _notes.value = null
-        _ecologyNotes.value = null
-        _mushroom.value = null
-        _determinationNotes = null
-        _images.value = mutableListOf()
-
-        _coordinateState.value = State.Empty()
-        _localitiesState.value = State.Empty()
-        _predictionResultsState.value = State.Empty()
-
-        viewModelScope.launch {
-            SharedPreferences.getSubstrateID()?.let {
-                RoomService.substrates.getSubstrateWithID(it).onSuccess {
-                    _substrate.value = Pair(it, true)
-                }
-            }
-
-            SharedPreferences.getVegetationTypeID()?.let {
-                RoomService.vegetationTypes.getVegetationTypeWithID(it).onSuccess {
-                    _vegetationType.value = Pair(it, true)
-                }
-            }
-
-            SharedPreferences.getHosts()?.let {
-                RoomService.hosts.getHostsWithIds(it).onSuccess {
-                    _hosts.value = Pair(it.toMutableList(), true)
-                }
-            }
-        }
-    }
-
-
     private fun getLocalities(location: Location) {
         _localitiesState.value = State.Loading()
         viewModelScope.launch {
@@ -503,7 +502,7 @@ class NewObservationViewModel(application: Application, val type: AddObservation
         if (locality == null) return Result.Error(Error.NoLocationDataError(getApplication()))
 
        val jsonObject = JSONObject()
-        jsonObject.put("observationDate", (date?.toSimpleString()) ?: Calendar.getInstance().time.toSimpleString())
+        jsonObject.put("observationDate", (date?.toDatabaseName()) ?: Calendar.getInstance().time.toDatabaseName())
         jsonObject.put("os", "Android")
         jsonObject.put("browser", "Native App")
         jsonObject.put("substrate_id", substrate.id)

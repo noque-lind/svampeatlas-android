@@ -395,7 +395,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
             when (it) {
                 is State.Items -> {
                     if (args.type == Type.Edit) {
-                        newObservationViewModel.reset()
+                        newObservationViewModel.setupAsNew()
                         val action = AddObservationFragmentDirections.actionGlobalMyPageFragment()
                         findNavController().navigate(action)
                     } else {
@@ -560,7 +560,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     private fun reset() {
         viewPager.currentItem = Category.SPECIES.ordinal
         if (localityIdShown == LOCALITY_ID_FOR_ERROR) localityIdShown = DEFAULT_LOCALITY_ID
-        newObservationViewModel.reset()
+        newObservationViewModel.setupAsNew()
     }
 
     override fun onDestroyView() {

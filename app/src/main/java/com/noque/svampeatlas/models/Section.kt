@@ -204,7 +204,7 @@ class Section<T>(private var title: String?, private var state: State<List<T>> =
                     setState(State.Items(items))
                 } else {
                     val items = state.items.toMutableList()
-                    items.removeAt(position - 1)
+                    items.removeAt(position)
                     setState(State.Items(items))
                 }
             }

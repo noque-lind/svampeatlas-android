@@ -15,6 +15,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.extensions.*
 import com.noque.svampeatlas.repositories.MushroomRepository
+import com.noque.svampeatlas.repositories.SubstratesRepository
+import com.noque.svampeatlas.repositories.VegetationTypeRepository
 import com.noque.svampeatlas.utilities.*
 import com.noque.svampeatlas.utilities.api.*
 import com.noque.svampeatlas.utilities.volleyRequests.AppEmptyRequest
@@ -71,6 +73,8 @@ class DataService private constructor(context: Context) {
     }
 
     val mushroomsRepository by lazy {MushroomRepository(requestQueue)}
+    val substratesRepository by lazy { SubstratesRepository(requestQueue) }
+    val vegetationTypeRepository by lazy { VegetationTypeRepository(requestQueue) }
 
     private fun <RequestType> addToRequestQueue(request: Request<RequestType>) {
         requestQueue.add(request)
@@ -79,22 +83,6 @@ class DataService private constructor(context: Context) {
 
     private val applicationContext = context.applicationContext
 
-
-
-    fun testDownload(): Long {
-        val api = API(APIType.Request.Mushrooms(null, listOf(SpeciesQueries.Attributes(null), SpeciesQueries.Images(false), SpeciesQueries.Statistics, SpeciesQueries.DanishNames), 0, null))
-       var request = DownloadManager.Request(Uri.parse(api.url()))
-        request.setAllowedOverRoaming(false)
-        val file = FileManager.createDocumentFile(api.url(), applicationContext).toUri()
-        Log.d(TAG, file.toString())
-        request.setDestinationUri(file)
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
-        request.setTitle("Test mushroom")
-        request.setDescription("Henter alle svampene")
-        val downloadService = applicationContext.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-       return downloadService.enqueue(request)
-
-    }
 
     fun getMushrooms(
         tag: String,
@@ -299,53 +287,6 @@ class DataService private constructor(context: Context) {
             request.tag = tag
             addToRequestQueue(request)
         }
-    }
-
-    fun getSubstrateGroups(tag: String, completion: (Result<List<SubstrateGroup>, Error>) -> Unit) {
-        val api = API(APIType.Request.Substrate())
-
-        val request = AppRequest<List<Substrate>>(
-            object : TypeToken<List<Substrate>>() {}.type,
-            api,
-            null,
-            null,
-            Response.Listener {
-                GlobalScope.launch {
-                    RoomService.substrates.save(it)
-                }
-
-                completion(Result.Success(SubstrateGroup.createFromSubstrates(it)))
-            },
-            Response.ErrorListener {
-                completion(Result.Error(it.toAppError()))
-            }
-        )
-
-        request.tag = tag
-        addToRequestQueue(request)
-    }
-
-    fun getVegetationTypes(tag: String, completion: (Result<List<VegetationType>, Error>) -> Unit) {
-        val api = API(APIType.Request.VegetationType())
-        val request = AppRequest<List<VegetationType>>(
-            object : TypeToken<List<VegetationType>>() {}.type,
-            api,
-            null,
-            null,
-            Response.Listener {
-                completion(Result.Success(it.sortedBy { it.id }))
-                GlobalScope.launch {
-                    RoomService.vegetationTypes.save(it)
-                }
-            },
-
-            Response.ErrorListener {
-                completion(Result.Error(it.toAppError()))
-            }
-        )
-
-        request.tag = tag
-        addToRequestQueue(request)
     }
 
     fun getHosts(

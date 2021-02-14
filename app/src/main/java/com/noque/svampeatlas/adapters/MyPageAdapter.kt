@@ -28,7 +28,6 @@ class MyPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     sealed class Item(viewType: ViewType) : com.noque.svampeatlas.models.Item<Item.ViewType>(viewType) {
 
         enum class ViewType : com.noque.svampeatlas.models.ViewType {
-            DownloadTaxonList,
             NOTIFICATION,
             OBSERVATION,
             LOADMORE;
@@ -50,7 +49,6 @@ class MyPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             Item(ViewType.OBSERVATION)
 
         class LoadMore(val category: Category, val offset: Int) : Item(ViewType.LOADMORE)
-        class DownloadTaxonList : Item(ViewType.DownloadTaxonList)
     }
 
     private val sections = Sections<Item.ViewType, Item>()
@@ -92,13 +90,8 @@ class MyPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     init {
-        if (SharedPreferences.lastDownloadOfTaxon == null) {
-            sections.addSection(Section.Builder<Item>().items(listOf(Item.DownloadTaxonList())).build())
-        }
-
         sections.addSection(notifications)
         sections.addSection(observations)
-//        sections.addSection(Section.Builder<Item>().items(listOf(Item.Logout())).build())
     }
 
     fun setListener(listener: Listener?) {
@@ -156,10 +149,6 @@ class MyPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     Item.ViewType.LOADMORE -> {
                         view = layoutInflater.inflate(R.layout.item_reloader, parent, false)
                         viewHolder = ReloaderViewHolder(view)
-                    }
-                    Item.ViewType.DownloadTaxonList -> {
-                        view = layoutInflater.inflate(R.layout.item_download_taxon, parent, false)
-                        viewHolder = DownloadTaxonViewHolder(view)
                     }
                 }
 

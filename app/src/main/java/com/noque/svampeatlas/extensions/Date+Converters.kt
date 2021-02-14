@@ -7,6 +7,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 
+
 fun Date(ISO8601: String?): Date? {
     ISO8601?.let {
         val cm = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
@@ -29,10 +30,16 @@ fun Date(minusMonths: Int): Date {
     return cal.time
 }
 
-fun Date.toSimpleString(): String {
+fun Date.toDatabaseName(): String {
     val sf = SimpleDateFormat("yyyy-MM-dd")
     return sf.format(this)
 }
+
+fun String.toDate(): Date {
+    val sf = SimpleDateFormat("yyyy-MM-dd")
+    return sf.parse(this)
+}
+
 
 fun Date.toISO8601(): String {
     val cm = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())

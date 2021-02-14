@@ -345,7 +345,7 @@
     <string name="settings_language_message">Some content is not translated to all languages: %s</string>
     <string name="common_mostUsed">Mest brugte</string>
     <string name="common_previouslyUsed">Tidligere brugte</string>
-    <string name="download_taxon_title">Would you like an offline taxon list?</string>
+    <string name="download_taxon_title">Download data for offline usage??</string>
     <string name="download_taxon_message">If you do, you can always search the entire taxon list, even without internet. This way you can easily prepare your sightings</string>
     <string name="notes_fragment_title">Notebook</string>
     <string name="downloader_taxon_downloading">Downloading species list</string>
@@ -358,6 +358,9 @@
     <string name="common_delete">Slet</string>
     <string name="common_unknown_locality">Ukendt lokation</string>
     <string name="addObservationVC_title_edit_note">Redigering af note</string>
+    <string name="downloader_metadata_downloading">Downloading substrates, vegetationtypes and hosts</string>
+    <string name="downloader_cleaning_up">Cleaning up</string>
+    <string name="downloader_downloading">Downloading data</string>
 
 
 </resources>

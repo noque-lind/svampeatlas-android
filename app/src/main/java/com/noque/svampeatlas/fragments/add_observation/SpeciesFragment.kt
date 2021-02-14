@@ -97,7 +97,9 @@ class SpeciesFragment : Fragment() {
     private val searchBarListener = object : SearchBarListener {
         override fun newSearch(entry: String) {
             defaultState = false
-            mushroomViewModel.search(entry, detailed = false, allowGenus = true)
+
+           mushroomViewModel.searchOffline(entry)
+//            mushroomViewModel.search(entry, detailed = false, allowGenus = true)
         }
 
         override fun clearedSearchEntry() {

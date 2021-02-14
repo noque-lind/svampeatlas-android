@@ -53,7 +53,8 @@ class Mushroom(
     @SerializedName("Statistics") val statistics: Statistics?,
 
     @SerializedName("redlistdata") val _redListData: List<RedListData>?,
-    @SerializedName("Images") val images: List<Image>?
+    @SerializedName("Images") val images: List<Image>?,
+    var isUserFavorite: Boolean = false
 ) {
 
     constructor(id: Int, fullName: String, vernacularNameDK: VernacularNameDK?) : this(id, fullName, null, null, null, null, vernacularNameDK, null, null, null, null)

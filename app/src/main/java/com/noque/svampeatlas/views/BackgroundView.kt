@@ -39,6 +39,7 @@ class BackgroundView(context: Context, attrs: AttributeSet?) : ConstraintLayout(
     }
 
     fun setErrorWithHandler(error: AppError, recoveryAction: RecoveryAction?, handler: ((RecoveryAction?) -> Unit)) {
+        spinnerView.stopLoading()
         errorLinearLayout.visibility = View.VISIBLE
 
         titleTextView.text = error.title

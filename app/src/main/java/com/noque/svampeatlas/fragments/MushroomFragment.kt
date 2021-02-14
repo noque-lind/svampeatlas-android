@@ -74,18 +74,14 @@ class MushroomFragment : Fragment() {
         val adapter = MushroomListAdapter()
 
         adapter.setOnClickListener { mushroom ->
-//
-            DownloaderFragment().show(parentFragmentManager, null)
-
-//
-//            val action = MushroomFragmentDirections.actionGlobalMushroomDetailsFragment(
-//                mushroom.id,
-//                DetailsFragment.TakesSelection.NO,
-//                DetailsFragment.Type.SPECIES,
-//                null,
-//                null
-//            )
-//            findNavController().navigate(action)
+            val action = MushroomFragmentDirections.actionGlobalMushroomDetailsFragment(
+                mushroom.id,
+                DetailsFragment.TakesSelection.NO,
+                DetailsFragment.Type.SPECIES,
+                null,
+                null
+            )
+            findNavController().navigate(action)
         }
 
         adapter

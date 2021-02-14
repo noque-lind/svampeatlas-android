@@ -242,8 +242,7 @@
     <string name="common_mostUsed">Most used</string>
     <string name="common_previouslyUsed">Previously used</string>
     <string name="notes_fragment_title">Notebook</string>
-    <string name="download_taxon_title">Would you like an offline taxon list?</string>
-    <string name="download_taxon_message">If you do, you can always search the entire taxon list, even without internet. This way you can easily prepare your sightings</string>
+    <string name="download_taxon_message">If you do, you do not need internet to find and attach attributes to your sightings.</string>
     <string name="downloader_taxon_downloading">Downloading species list</string>
     <string name="downloader_taxon_readingFile">Reading file</string>
     <string name="downloader_taxon_savingFile">Saving to database</string>
@@ -254,4 +253,8 @@
     <string name="common_delete">Delete</string>
     <string name="common_unknown_locality">Unknown location</string>
     <string name="addObservationVC_title_edit_note">Edit notebook entry</string>
+    <string name="download_taxon_title">Download data for offline usage?</string>
+    <string name="downloader_metadata_downloading">Downloading substrates, vegetationtypes and hosts</string>
+    <string name="downloader_cleaning_up">Cleaning up</string>
+    <string name="downloader_downloading">Downloading data</string>
 </resources>

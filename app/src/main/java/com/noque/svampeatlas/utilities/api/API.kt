@@ -102,7 +102,7 @@ data class API(val apiType: APIType) {
                 request.ageInYear?.let {
                     val calendar = Calendar.getInstance()
                     calendar.add(Calendar.MONTH, -it * 12)
-                    val dateString = calendar.time.toSimpleString()
+                    val dateString = calendar.time.toDatabaseName()
                     builder.appendQueryParameter("where", "{\"observationDate\":{\"\$gte\":\"$dateString\"}}")
                 }
 

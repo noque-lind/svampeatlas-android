@@ -21,7 +21,7 @@ abstract class BaseAdapter<I, V>: RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
     private var recyclerView: RecyclerView? = null
 
-    fun setSections(sections: List<Section<I>>) {
+    open fun setSections(sections: List<Section<I>>) {
         this.sections.setSections(sections)
         notifyDataSetChanged()
     }

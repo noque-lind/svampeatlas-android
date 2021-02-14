@@ -8,7 +8,7 @@ class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     private val headerView = itemView.headerItem_headerView
 
-    fun configure(title: String) {
-        headerView.configure(title)
+    fun configure(title: String, extraMessage: String? = null) {
+        headerView.configure(title, extraMessage)
     }
 }
