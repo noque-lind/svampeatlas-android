@@ -14,6 +14,7 @@ class SpeciesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     interface Listener {
         fun mushroomSelected(mushroom: Mushroom)
         fun confidenceSet(confidence: DeterminationConfidence)
+        fun deselectPressed()
     }
 
     companion object {
@@ -115,8 +116,8 @@ class SpeciesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        var view: View
-        var viewHolder: RecyclerView.ViewHolder
+        val view: View
+        val viewHolder: RecyclerView.ViewHolder
 
         when (sections.getSectionViewType(viewType)) {
             Section.ViewType.HEADER -> {
@@ -145,7 +146,10 @@ class SpeciesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                             listener?.confidenceSet(it)
                         }
 
-                        selectedResultItemViewHolder.setOnClickListener(onClickListener)
+                        selectedResultItemViewHolder.deselectClicked = {
+                            listener?.deselectPressed()
+                        }
+
                         viewHolder = selectedResultItemViewHolder
                     }
 

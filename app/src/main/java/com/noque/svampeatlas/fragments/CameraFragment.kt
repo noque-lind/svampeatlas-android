@@ -52,6 +52,7 @@ import com.noque.svampeatlas.view_models.NewObservationViewModel
 import com.noque.svampeatlas.view_models.factories.CameraViewModelFactory
 import com.noque.svampeatlas.views.*
 import kotlinx.android.synthetic.main.fragment_camera.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
@@ -195,8 +196,6 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
        }
    }
 
-    private val onExitButtonPressed = View.OnClickListener { findNavController().navigateUp() }
-
     private val cameraControlsViewListener by lazy {
         object: CameraControlsView.Listener {
             override fun captureButtonPressed() {
@@ -293,7 +292,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                 it.show(parentFragmentManager, null)
             }
         } else {
-            GlobalScope.launch {
+            GlobalScope.launch(Dispatchers.IO) {
                 if (saveImages) FileManager.saveTempImage(photoFile, FileManager.createFile(requireContext()), requireContext())
             }
         }
@@ -417,7 +416,9 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
             when (args.type) {
                 Type.IMAGE_CAPTURE -> {
                     toolbar.setNavigationIcon(R.drawable.glyph_cancel)
-                    toolbar.setNavigationOnClickListener(onExitButtonPressed)
+                    toolbar.setNavigationOnClickListener {
+                        findNavController().navigateUp()
+                    }
                 }
                 Type.IDENTIFY -> {
                     (requireActivity() as BlankActivity).setSupportActionBar(toolbar)

@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.extensions.*
 import com.noque.svampeatlas.repositories.MushroomRepository
+import com.noque.svampeatlas.repositories.ObservationsRepository
 import com.noque.svampeatlas.repositories.SubstratesRepository
 import com.noque.svampeatlas.repositories.VegetationTypeRepository
 import com.noque.svampeatlas.utilities.*
@@ -75,6 +76,7 @@ class DataService private constructor(context: Context) {
     val mushroomsRepository by lazy {MushroomRepository(requestQueue)}
     val substratesRepository by lazy { SubstratesRepository(requestQueue) }
     val vegetationTypeRepository by lazy { VegetationTypeRepository(requestQueue) }
+    val observationsRepository by lazy { ObservationsRepository(requestQueue) }
 
     private fun <RequestType> addToRequestQueue(request: Request<RequestType>) {
         requestQueue.add(request)
@@ -319,6 +321,8 @@ class DataService private constructor(context: Context) {
         request.tag = tag
         addToRequestQueue(request)
     }
+
+
 
     fun uploadObservation(
         tag: String,

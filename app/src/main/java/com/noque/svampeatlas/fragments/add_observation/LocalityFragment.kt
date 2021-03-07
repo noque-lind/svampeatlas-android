@@ -19,6 +19,7 @@ import com.noque.svampeatlas.extensions.openSettings
 import com.noque.svampeatlas.fragments.MapFragment
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.utilities.autoCleared
+import com.noque.svampeatlas.utilities.safeAutoCleared
 import com.noque.svampeatlas.view_models.NewObservationViewModel
 import kotlinx.android.synthetic.main.fragment_add_observation_locality.*
 import java.util.*
@@ -32,7 +33,7 @@ class LocalityFragment: Fragment() {
     private var onGlobalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
     // Views
-    private var mapFragment by autoCleared<MapFragment> {
+    private var mapFragment by safeAutoCleared<MapFragment> {
         it?.setListener(null)
     }
     private var recyclerView  by autoCleared<RecyclerView>() {
@@ -111,7 +112,7 @@ class LocalityFragment: Fragment() {
                             val finalX = location.first().toFloat()
                             val finalY = location.last().toFloat()
 
-                            mapFragment.getCoordinatesFor(finalX + (view.width / 2), finalY + view.height)?.let { newObservationViewModel.setCoordinateState(
+                            mapFragment?.getCoordinatesFor(finalX + (view.width / 2), finalY + view.height)?.let { newObservationViewModel.setCoordinateState(
                                 State.Items(Location(Date(), it, 5F))
                             ) }
                         }
@@ -155,8 +156,8 @@ class LocalityFragment: Fragment() {
         recyclerView.apply {
             onGlobalLayoutListener = object: ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
-                    mapFragment.setPadding(0, 0, 0, this@apply.height + this@apply.marginBottom)
-                    mapFragment.setRegionToShowMarkers()
+                    mapFragment?.setPadding(0, 0, 0, this@apply.height + this@apply.marginBottom)
+                    mapFragment?.setRegionToShowMarkers()
                     this@apply.viewTreeObserver.removeOnGlobalLayoutListener(this)
                 }
             }
@@ -165,8 +166,8 @@ class LocalityFragment: Fragment() {
             layoutManager = LinearLayoutManager(context).apply { orientation = RecyclerView.HORIZONTAL }
         }
 
-        mapFragment.setListener(mapFragmentListener)
-        mapFragment.setType(MapFragment.Category.REGULAR)
+        mapFragment?.setListener(mapFragmentListener)
+        mapFragment?.setType(MapFragment.Category.REGULAR)
         retryButton.setOnClickListener(retryButtonClicked)
         markerImageView.setOnTouchListener(markerOnTouchListener)
     }
@@ -176,13 +177,13 @@ class LocalityFragment: Fragment() {
             when (it) {
                 is State.Items -> {
                     localityAdapter.configure(it.items)
-                    mapFragment.addLocalities(it.items)
+                    mapFragment?.addLocalities(it.items)
                 }
 
-                is State.Loading -> mapFragment.setLoading()
+                is State.Loading -> mapFragment?.setLoading()
 
                 is State.Error -> {
-                    mapFragment.setError(it.error) {
+                    mapFragment?.setError(it.error) {
                         when (it) {
                             RecoveryAction.OPENSETTINGS -> openSettings()
                             RecoveryAction.TRYAGAIN -> newObservationViewModel.resetLocationData()
@@ -198,25 +199,25 @@ class LocalityFragment: Fragment() {
             newObservationViewModel.locality.observe(viewLifecycleOwner, Observer {
                 it?.let {
                     recyclerView.scrollToPosition(localityAdapter.setSelected(it))
-                    mapFragment.setSelectedLocalityAnnotation(it.location)
+                    mapFragment?.setSelectedLocalityAnnotation(it.location)
                 }
             })
 
             newObservationViewModel.coordinateState.observe(viewLifecycleOwner, Observer {
                 when (it) {
                     is State.Items -> {
-                        mapFragment.addLocationMarker(it.items.latLng, resources.getString(R.string.locationAnnotation_title), it.items.accuracy.toDouble())
-                        mapFragment.setRegion(it.items.latLng)
+                        mapFragment?.addLocationMarker(it.items.latLng, resources.getString(R.string.locationAnnotation_title), it.items.accuracy.toDouble())
+                        mapFragment?.setRegion(it.items.latLng)
                         precisionLabel.text = resources.getString(R.string.precisionLabel, it.items.accuracy)
                     }
 
                     is State.Loading -> {
-                        mapFragment.setLoading()
+                        mapFragment?.setLoading()
                         precisionLabel.text = "Finder placering"
                     }
 
                     is State.Empty -> {
-                        mapFragment.removeAllMarkers()
+                        mapFragment?.removeAllMarkers()
                     }
                 }
             })

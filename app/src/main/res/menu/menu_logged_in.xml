@@ -10,7 +10,7 @@
             android:title="@string/navigationItem_myPageVC"/>
         <item
             android:id="@+id/notesFragment"
-            android:icon="@drawable/icon_plus"
+            android:icon="@drawable/icon_walk"
             android:title="@string/notes_fragment_title"/>
         <item
             android:id="@+id/addObservationFragment"

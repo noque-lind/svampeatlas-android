@@ -8,4 +8,20 @@
     app:showAsAction="always"
     app:actionLayout="@layout/action_view_add_notebook_entry"
     />
+
+    <item
+        android:id="@+id/menu_notebookFragment_overflow"
+        android:icon="@drawable/ic_more_vertical"
+        android:orderInCategory="101"
+        app:showAsAction="always"
+        android:title="">
+        <menu>
+            <item
+                android:id="@+id/menu_notebookFragment_redownloadOffline"
+                android:icon="@drawable/glyph_reload"
+                android:title="@string/common_redownload"
+                app:showAsAction="ifRoom" />
+        </menu>
+
+    </item>
 </menu>

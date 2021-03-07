@@ -54,7 +54,7 @@ fun Date.difDays(): Long {
 }
 
 fun Date.toTimeString(): String {
-    return SimpleDateFormat.getTimeInstance(SimpleDateFormat.MEDIUM).format(this)
+    return SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT).format(this)
 }
 
 fun Date.toReadableDate(recentFormatting: Boolean = true, ignoreTime: Boolean = false): String {

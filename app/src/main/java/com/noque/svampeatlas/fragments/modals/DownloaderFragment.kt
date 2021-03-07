@@ -2,10 +2,7 @@ package com.noque.svampeatlas.fragments.modals
 
 import android.app.DownloadManager
 import android.app.DownloadManager.ACTION_DOWNLOAD_COMPLETE
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.database.Cursor
 import android.os.Bundle
 import android.text.Layout
@@ -24,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.services.DataService
+import com.noque.svampeatlas.utilities.SharedPreferences
 import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.view_models.DownloaderViewModel
 import com.noque.svampeatlas.views.BackgroundView
@@ -32,6 +30,7 @@ import kotlinx.android.synthetic.main.item_loader.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.*
 
 
 class DownloaderFragment: DialogFragment() {
@@ -78,6 +77,7 @@ class DownloaderFragment: DialogFragment() {
             isCancelable = true
             when (it) {
                 is State.Items -> {
+                    SharedPreferences.lastDownloadOfTaxon = Date()
                     dismiss()
                 }
                 is State.Empty -> {}

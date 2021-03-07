@@ -4,7 +4,6 @@
     <string name="error_dataService_decodingError_title">Decoding error</string>
     <string name="error_dataService_empty_message">The server response contained no data</string>
     <string name="error_dataService_empty_title">Invalid empty response</string>
-    <string name="error_dataService_encodingError_message"/>
     <string name="error_dataService_encodingError_title">Error</string>
     <string name="error_dataService_loginError_message">Try using a different username or password</string>
     <string name="error_dataService_loginError_title">Login error</string>

@@ -17,6 +17,7 @@ class NotebookAdapter: BaseAdapter<NotebookAdapter.Items, NotebookAdapter.Items.
     interface Listener {
         fun newObservationSelected(newObservation: NewObservation)
         fun downloadForOfflinePressed()
+        fun uploadNewObservation(newObservation: NewObservation)
     }
 
 
@@ -79,7 +80,9 @@ class NotebookAdapter: BaseAdapter<NotebookAdapter.Items, NotebookAdapter.Items.
 
     override fun bindViewHolder(holder: RecyclerView.ViewHolder, item: Items) {
         when (holder) {
-            is NewObservationViewHolder -> (item as? Items.Note)?.let { holder.configure(item.newObservation) }
+            is NewObservationViewHolder -> (item as? Items.Note)?.let { holder.configure(item.newObservation) {
+                listener?.uploadNewObservation(item.newObservation)
+            } }
         }
     }
 }

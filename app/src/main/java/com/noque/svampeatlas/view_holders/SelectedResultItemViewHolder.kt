@@ -14,17 +14,18 @@ import kotlinx.android.synthetic.main.item_selected_result.view.*
 
 class SelectedResultItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    private var resultView: ResultView
+    private var resultView: ResultView = itemView.selectedResultItem_resultView
+    private var deselectButton = itemView.selectedResultItem_deSelectButton
     private var radioGroup: RadioGroup
     private var radioButtonUnsure: RadioButton
     private var radioButtonGuessing: RadioButton
     private var radioButtonDetermined: RadioButton
     private var confidenceTitleTextView: TextView
     var confidenceSet: ((DeterminationConfidence) -> Unit)? = null
+    var deselectClicked: (() -> Unit)? = null
 
 
     init {
-        resultView = itemView.selectedResultItem_resultView
         radioGroup = itemView.selectedResultItem_confidenceRadioButtonGroup
         radioButtonDetermined = itemView.selectedResultItem_radioButton_determined
         radioButtonUnsure = itemView.selectedResultItem_radioButton_unsure
@@ -40,6 +41,11 @@ class SelectedResultItemViewHolder(itemView: View) : RecyclerView.ViewHolder(ite
 
     fun configure(mushroom: Mushroom, confidence: DeterminationConfidence?) {
             resultView.configure(mushroom)
+
+            deselectButton.setOnClickListener {
+                deselectClicked?.invoke()
+            }
+
 
             if (mushroom.isGenus) {
                 radioButtonDetermined.setText(R.string.selectedSpeciesCell_confident_genus)

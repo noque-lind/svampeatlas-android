@@ -567,10 +567,16 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
         listener = null
         locationMarker = null
         selectedMarker = null
+        tileOverlay?.remove()
+        tileOverlay?.clearTileCache()
+        accuracyOverlay?.remove()
+        accuracyOverlay = null
         tileOverlay = null
 
+        markers.forEach { it.remove() }
         markers.clear()
         localities.clear()
+        circleOverlays.forEach { it.remove() }
         circleOverlays.clear()
         super.onDestroyView()
     }

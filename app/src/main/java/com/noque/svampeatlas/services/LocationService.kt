@@ -104,6 +104,10 @@ class LocationService(private val applicationContext: Context) {
         }
     }
 
+    fun stop() {
+        state = State.STOPPED
+    }
+
 
     private fun startUpdatingLocation() {
         if (state == State.STOPPED) {

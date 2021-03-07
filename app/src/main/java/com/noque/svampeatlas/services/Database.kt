@@ -44,8 +44,20 @@ val MIGRATION_15_18 = object: Migration(15,18) {
     }
 }
 
+val MIGRATION_18_23 = object: Migration(15,18) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE hosts")
+        database.execSQL("CREATE TABLE IF NOT EXISTS `hosts` (`id` INTEGER NOT NULL, `dkName` TEXT, `latinName` TEXT NOT NULL, `probability` INTEGER, `isUserSelected` INTEGER NOT NULL, PRIMARY KEY(`id`))")
+        database.execSQL("DROP TABLE substrates")
+        database.execSQL("CREATE TABLE IF NOT EXISTS `substrates` (`id` INTEGER NOT NULL, `dkName` TEXT NOT NULL, `enName` TEXT NOT NULL, `czName` TEXT, `groupDkName` TEXT NOT NULL, `groupEnName` TEXT NOT NULL, `groupCzName` TEXT, `hide` INTEGER NOT NULL, PRIMARY KEY(`id`))")
+        database.execSQL("DROP TABLE vegetationType")
+        database.execSQL("CREATE TABLE IF NOT EXISTS `vegetationType` (`id` INTEGER NOT NULL, `dkName` TEXT NOT NULL, `enName` TEXT NOT NULL, `czName` TEXT, PRIMARY KEY(`id`))")
+        database.execSQL("ALTER TABLE mushrooms ADD COLUMN isUserFavorite INTEGER NOT NULL DEFAULT 0")
+    }
+}
+
 @Database(entities = [User::class, Substrate::class, VegetationType::class, Host::class, Mushroom::class, NewObservation::class],
-    version = 22)
+    version = 23)
 
 @TypeConverters(ImagesConverter::class, RedListDataConverter::class, UserRolesTypeConverters::class, IDsConverter::class, StringsConverter::class, DateConverter::class, LatLngConverter::class)
 

@@ -16,7 +16,7 @@ object SharedPreferences {
     private const val HAS_ACCEPTED_IDENTIFCATION_TERMS = "HAS_ACCEPTED_IDENTIFCATION_TERMS"
     private const val SAVE_IMAGES = "SAVE_IMAGES"
     private const val SAVE_IMAGES_DECIDED = "SAVE_IMAGES_DECIDED"
-    private const val HAS_SEEN_WHATS_NEW = "HAS_SEEN_WHATS_NEW"
+    private const val HAS_SEEN_WHATS_NEW = "HAS_SEEN_WHATS_NEW_2.0"
     private const val HAS_SEEN_IMAGE_DELETION = "HAS_SEEN_IMAGE_DELETION"
     private const val PREFERRED_LANGUAGE = "PREFERRED_LANGUAGE"
     private const val LAST_DOWNLOAD_TAXON = "LAST_DOWNLOAD_TAXON"

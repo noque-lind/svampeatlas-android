@@ -4,7 +4,6 @@
     <string name="error_dataService_decodingError_title">Chyba dekódování</string>
     <string name="error_dataService_empty_message">Odpověď serveru neobsahuje žádná data</string>
     <string name="error_dataService_empty_title">Neplatná prázdná odpověď</string>
-    <string name="error_dataService_encodingError_message"/>
     <string name="error_dataService_encodingError_title">Chyba</string>
     <string name="error_dataService_loginError_message">Zkuste použít jiné uživatelské jméno nebo heslo</string>
     <string name="error_dataService_loginError_title">Chyba přihlášení</string>

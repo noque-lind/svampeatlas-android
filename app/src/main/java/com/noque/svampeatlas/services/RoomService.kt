@@ -28,6 +28,7 @@ object RoomService {
             R.string.error_database_noEntries_title,
             when (dataType) {
                 DataType.FAVORITES -> R.string.error_database_noEntries_favoritedMushrooms_message
+                DataType.NOTES -> R.string.error_database_noNotes_message
                 else -> R.string.error_database_noEntries_message
             }
         )

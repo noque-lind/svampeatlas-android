@@ -20,6 +20,8 @@ import com.noque.svampeatlas.fragments.AddObservationFragmentDirections
 import com.noque.svampeatlas.fragments.DetailsFragment
 import com.noque.svampeatlas.models.DeterminationConfidence
 import com.noque.svampeatlas.models.Mushroom
+import com.noque.svampeatlas.models.PredictionResult
+import com.noque.svampeatlas.utilities.SharedPreferences
 import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.views.SearchBarListener
 import com.noque.svampeatlas.views.SearchBarView
@@ -87,6 +89,10 @@ class SpeciesFragment : Fragment() {
             override fun confidenceSet(confidence: DeterminationConfidence) {
                 newObservationViewModel.setConfidence(confidence)
             }
+
+            override fun deselectPressed() {
+                newObservationViewModel.setMushroom(null)
+            }
         })
 
         adapter
@@ -97,9 +103,11 @@ class SpeciesFragment : Fragment() {
     private val searchBarListener = object : SearchBarListener {
         override fun newSearch(entry: String) {
             defaultState = false
-
-           mushroomViewModel.searchOffline(entry)
-//            mushroomViewModel.search(entry, detailed = false, allowGenus = true)
+            if (SharedPreferences.lastDownloadOfTaxon == null) {
+                mushroomViewModel.search(entry, detailed = false, allowGenus = true)
+            } else {
+                mushroomViewModel.searchOffline(entry)
+            }
         }
 
         override fun clearedSearchEntry() {
@@ -151,11 +159,83 @@ class SpeciesFragment : Fragment() {
         }
     }
 
+    private fun configureLowerSection(state: State<List<PredictionResult>>) {
+        //If a mushroom is selected we should not show this
+        if (newObservationViewModel.mushroom.value != null) return
+        when (state) {
+            is State.Items -> {
+                var highestConfidence = 0.0
+                state.items.forEach {
+                    if (it.score > highestConfidence) {
+                        highestConfidence = it.score * 100
+                    }
+                }
+
+                val items = mutableListOf<SpeciesAdapter.Item>()
+
+                if (highestConfidence < 50.0) {
+                    items.add(SpeciesAdapter.Item.Caution())
+                }
+
+                items.addAll(state.items.map { SpeciesAdapter.Item.SelectableMushroom(it.mushroom, it.score) })
+                items.add(SpeciesAdapter.Item.Creditation())
+                speciesAdapter.configureLowerSectionState(State.Items(items), getString(R.string.observationSpeciesCell_predictionsHeader))
+            }
+
+            is State.Error -> {
+                speciesAdapter.configureLowerSectionState(State.Error(state.error), getString(R.string.observationSpeciesCell_predictionsHeader))
+            }
+
+            is State.Loading -> {
+                speciesAdapter.configureLowerSectionState(State.Loading(), getString(R.string.observationSpeciesCell_predictionsHeader))
+            }
+
+            is State.Empty -> {
+                speciesAdapter.configureLowerSectionState(State.Empty(), null)
+            }
+        }
+    }
+
+    private fun configureMiddleSection(state: State<List<Mushroom>>) {
+        // We only want the mushroomState to to anything to the UI if no mushroom has been selected
+        if (newObservationViewModel.mushroom.value != null) return
+
+        when (state) {
+            is State.Items -> {
+                val items = state.items.map { SpeciesAdapter.Item.SelectableMushroom(it) }
+
+                if (defaultState) {
+                    speciesAdapter.configureMiddleSectionState(State.Items(items), getString(R.string.observationSpeciesCell_myFavorites))
+                } else {
+                    speciesAdapter.configureMiddleSectionState(State.Items(items), getString(R.string.observationSpeciesCell_searchResults))
+                }
+            }
+
+            is State.Loading -> {
+                if (defaultState) {
+                    speciesAdapter.configureMiddleSectionState(State.Loading(), getString(R.string.observationSpeciesCell_myFavorites))
+                } else {
+                    speciesAdapter.configureMiddleSectionState(State.Loading(), getString(R.string.observationSpeciesCell_searchResults))
+                }
+            }
+
+            is State.Error -> {
+                if (defaultState) {
+                    speciesAdapter.configureMiddleSectionState(State.Empty(), null)
+                } else {
+                    speciesAdapter.configureMiddleSectionState(State.Error(state.error), getString(R.string.observationSpeciesCell_searchResults))
+                }
+            }
+
+            is State.Empty -> {
+                defaultState()
+            }
+        }
+    }
+
     private fun setupViewModels() {
         newObservationViewModel.mushroom.observe(viewLifecycleOwner, Observer {
-
             if (it != null) {
-                defaultState()
                 recyclerView.setPadding(0, 0, 0, 0)
                 searchBar.visibility = View.GONE
                 speciesAdapter.configureUpperSection(
@@ -170,6 +250,8 @@ class SpeciesFragment : Fragment() {
                     if (it.first.isGenus) getString(R.string.observationSpeciesCell_choosenGenus) else getString(
                         R.string.observationSpeciesCell_choosenSpecies)
                 )
+                speciesAdapter.configureMiddleSectionState(State.Empty(), null)
+                speciesAdapter.configureLowerSectionState(State.Empty(), null)
             } else {
                 recyclerView.setPadding(0, (resources.getDimension(R.dimen.searchbar_view_height) + resources.getDimension(
                         R.dimen.searchbar_top_margin
@@ -184,82 +266,19 @@ class SpeciesFragment : Fragment() {
                     ),
                     null
                 )
+                configureMiddleSection(mushroomViewModel.mushroomsState.value ?: State.Empty())
+                configureLowerSection(newObservationViewModel.predictionResultsState.value ?: State.Empty())
             }
 
             recyclerView.scrollToPosition(0)
         })
 
-
         newObservationViewModel.predictionResultsState.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is State.Items -> {
-                    var highestConfidence = 0.0
-                    it.items.forEach {
-                        if (it.score > highestConfidence) {
-                            highestConfidence = it.score * 100
-                        }
-                    }
-
-                    val items = mutableListOf<SpeciesAdapter.Item>()
-
-                    if (highestConfidence < 50.0) {
-                        items.add(SpeciesAdapter.Item.Caution())
-                    }
-
-                    items.addAll(it.items.map { SpeciesAdapter.Item.SelectableMushroom(it.mushroom, it.score) })
-                    items.add(SpeciesAdapter.Item.Creditation())
-                    speciesAdapter.configureLowerSectionState(State.Items(items), getString(R.string.observationSpeciesCell_predictionsHeader))
-                }
-
-                is State.Error -> {
-                    speciesAdapter.configureLowerSectionState(State.Error(it.error), getString(R.string.observationSpeciesCell_predictionsHeader))
-                }
-
-                is State.Loading -> {
-                    speciesAdapter.configureLowerSectionState(State.Loading(), getString(R.string.observationSpeciesCell_predictionsHeader))
-                }
-
-                is State.Empty -> {
-                    speciesAdapter.configureLowerSectionState(State.Empty(), null)
-                }
-            }
+                configureLowerSection(it)
             })
 
-
         mushroomViewModel.mushroomsState.observe(viewLifecycleOwner, Observer {
-
-            // We only want the mushroomState to to anything to the UI if no mushroom has been selected
-                when (it) {
-                    is State.Items -> {
-                      val items = it.items.map { SpeciesAdapter.Item.SelectableMushroom(it) }
-
-                        if (defaultState) {
-                            speciesAdapter.configureMiddleSectionState(State.Items(items), getString(R.string.observationSpeciesCell_myFavorites))
-                        } else {
-                            speciesAdapter.configureMiddleSectionState(State.Items(items), getString(R.string.observationSpeciesCell_searchResults))
-                        }
-                    }
-
-                    is State.Loading -> {
-                        if (defaultState) {
-                            speciesAdapter.configureMiddleSectionState(State.Loading(), getString(R.string.observationSpeciesCell_myFavorites))
-                        } else {
-                            speciesAdapter.configureMiddleSectionState(State.Loading(), getString(R.string.observationSpeciesCell_searchResults))
-                        }
-                    }
-
-                    is State.Error -> {
-                        if (defaultState) {
-                            speciesAdapter.configureMiddleSectionState(State.Empty(), null)
-                        } else {
-                            speciesAdapter.configureMiddleSectionState(State.Error(it.error), getString(R.string.observationSpeciesCell_searchResults))
-                        }
-                    }
-
-                    is State.Empty -> {
-                        defaultState()
-                    }
-                }
+            configureMiddleSection(it)
         })
     }
 

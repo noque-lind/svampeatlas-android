@@ -23,15 +23,10 @@
                 android:title="@string/addObservationFragment_upload"
                 app:showAsAction="ifRoom" />
             <item
-                android:id="@+id/menu_addObservationFragment_resetButton"
+                android:id="@+id/menu_addObservationFragment_deleteButton"
                 android:icon="@drawable/ic_delete_black_24dp"
                 android:title="@string/common_delete"
                 app:showAsAction="ifRoom" />
-            <item android:checkable="true"
-                android:icon="@drawable/glyph_search"
-                android:id="@+id/menu_addObservationFragment_searchOffline"
-                android:title="Search offline"
-                />
         </menu>
     </item>
 </menu>

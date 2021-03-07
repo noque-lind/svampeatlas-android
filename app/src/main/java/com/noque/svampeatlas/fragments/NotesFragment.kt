@@ -24,6 +24,7 @@ import com.noque.svampeatlas.models.Section
 import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.view_models.NotesFragmentViewModel
+import com.noque.svampeatlas.views.BackgroundView
 import com.noque.svampeatlas.views.BlankActivity
 import kotlinx.android.synthetic.main.action_view_add_notebook_entry.view.*
 import kotlinx.android.synthetic.main.fragment_notebook.*
@@ -40,6 +41,7 @@ class NotesFragment: Fragment() {
     private var recyclerView by autoCleared<RecyclerView> {
         it?.adapter = null
     }
+    private var backgroundView by autoCleared<BackgroundView>()
 
     private val notebookAdapter by lazy {
         NotebookAdapter().apply {
@@ -56,6 +58,11 @@ class NotesFragment: Fragment() {
                     this@apply.sections.deleteItem(0)
                     this@apply.notifyItemRemoved(0)
                 }
+
+                override fun uploadNewObservation(newObservation: NewObservation) {
+                    viewModel.uploadNewObservation(newObservation)
+                }
+
             }
         }
     }
@@ -86,12 +93,19 @@ class NotesFragment: Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.menu_notebookFragment_redownloadOffline) {
+            DownloaderFragment().show(parentFragmentManager, null)
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         toolbar = notebookFragment_toolbar
         recyclerView = notebookFragment_recyclerView
+        backgroundView = notebookFragment_backgroundView
         setupViews()
-        setup()
         setupViewModel()
     }
 
@@ -118,10 +132,6 @@ class NotesFragment: Fragment() {
                         actionState,
                         isCurrentlyActive
                     )
-                }
-
-                override fun getMoveThreshold(viewHolder: RecyclerView.ViewHolder): Float {
-                    return super.getMoveThreshold(viewHolder)
                 }
 
                 override fun onChildDraw(
@@ -218,17 +228,18 @@ class NotesFragment: Fragment() {
 
         })
 
-        viewModel.noteDeleted.observe(viewLifecycleOwner, Observer {
-            notebookAdapter.sections.deleteItem(it)
-            notebookAdapter.notifyItemRemoved(it)
+//        viewModel.noteDeleted.observe(viewLifecycleOwner, Observer {
+//            notebookAdapter.sections.deleteItem(it)
+//            notebookAdapter.notifyItemRemoved(it)
+//        })
+
+        viewModel.uploadState.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is State.Items -> backgroundView.reset()
+                is State.Empty -> backgroundView.reset()
+                is State.Loading -> backgroundView.setLoading()
+                is State.Error -> backgroundView.setError(it.error)
+            }
         })
     }
-
-    private fun setup() {
-    }
-
-
-
-
-
 }
