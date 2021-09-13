@@ -501,15 +501,14 @@ class NewObservationViewModel(application: Application, val type: AddObservation
                 .getLocalities(TAG, location.latLng) { result ->
                     result.onSuccess {
                         _localitiesState.postValue(State.Items(it))
-                        val locality = it.maxWith(
-                            kotlin.Comparator { a, b ->
-                                SphericalUtil.computeDistanceBetween(
-                                    a.location,
-                                    b.location
-                                ).toInt()
-                            }
-                        )
-                        if (locality != null) {
+                        val locality = it.minBy {
+                            SphericalUtil.computeDistanceBetween(
+                                location.latLng,
+                                it.location
+                            ).toInt()
+                        }
+
+                            if (locality != null) {
                             _locality.postValue(locality)
                             if (type != AddObservationFragment.Type.Note && type != AddObservationFragment.Type.EditNote)
                             showNotification.postValue(
