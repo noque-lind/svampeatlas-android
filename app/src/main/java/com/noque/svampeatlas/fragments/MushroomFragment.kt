@@ -36,6 +36,7 @@ import com.noque.svampeatlas.extensions.changeColor
 import com.noque.svampeatlas.extensions.dpToPx
 import com.noque.svampeatlas.extensions.italized
 import com.noque.svampeatlas.extensions.pxToDp
+import com.noque.svampeatlas.fragments.modals.DownloaderFragment
 import com.noque.svampeatlas.views.BackgroundView
 import com.noque.svampeatlas.views.BlankActivity
 import com.noque.svampeatlas.views.SearchBarListener

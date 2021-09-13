@@ -18,6 +18,8 @@ import com.noque.svampeatlas.extensions.highlighted
 import com.noque.svampeatlas.services.DataService
 import kotlinx.android.synthetic.main.view_profile_image.view.*
 
+
+
 class ProfileImageView(context: Context, attrs: AttributeSet?) : ConstraintLayout(context, attrs) {
 
     private val imageView: ImageView

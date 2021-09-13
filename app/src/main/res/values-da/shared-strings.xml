@@ -4,7 +4,6 @@
     <string name="error_dataService_decodingError_title">Dekodningsfejl</string>
     <string name="error_dataService_empty_message">Svaret indeholdte ingen data</string>
     <string name="error_dataService_empty_title">Ugyldigt tomt svar</string>
-    <string name="error_dataService_encodingError_message"/>
     <string name="error_dataService_encodingError_title">Fejl</string>
     <string name="error_dataService_loginError_message">Prøv nogle andre initialer eller et andet kodeord</string>
     <string name="error_dataService_loginError_title">Log ind fejl</string>

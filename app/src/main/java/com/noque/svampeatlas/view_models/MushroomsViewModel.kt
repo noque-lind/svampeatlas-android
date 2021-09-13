@@ -97,6 +97,20 @@ class MushroomsViewModel(category: Category?, application: Application) :
         }
     }
 
+    fun searchOffline(entry: String) {
+        _mushroomsState.value = State.Loading()
+
+        viewModelScope.launch {
+            RoomService.mushrooms.getMushroomsFromSearch(entry).apply {
+                onSuccess {
+                    _mushroomsState.value = State.Items(it)
+                }
+                onError {
+                    _mushroomsState.value = State.Error(it.toAppError(getApplication<MyApplication>().resources))
+                }
+            }
+        }
+    }
 
     fun search(entry: String, detailed: Boolean, allowGenus: Boolean = false) {
         _mushroomsState.value = State.Loading()
@@ -126,15 +140,16 @@ class MushroomsViewModel(category: Category?, application: Application) :
         (mushroomsState.value as? State.Items)?.items?.getOrNull(index)?.let {
             _favoringState.value = State.Loading()
             viewModelScope.launch {
-                DataService.getInstance(getApplication()).getMushroom(TAG, it.id) {
-                    it.onSuccess {
+                DataService.getInstance(getApplication()).mushroomsRepository.getMushroom(it.id).apply {
+                    onSuccess {
                         viewModelScope.launch {
+                            it.isUserFavorite = true
                             RoomService.mushrooms.saveMushroom(it)
                             _favoringState.value = State.Items(it)
                         }
                     }
 
-                    it.onError {
+                    onError {
                         _favoringState.value = State.Error(it)
                     }
                 }
@@ -147,6 +162,8 @@ class MushroomsViewModel(category: Category?, application: Application) :
     fun unFavoriteMushroomAt(index: Int) {
         (mushroomsState.value as? State.Items)?.items?.getOrNull(index)?.let { mushroom ->
             viewModelScope.launch {
+                mushroom.isUserFavorite = false
+                RoomService.mushrooms.saveMushroom(mushroom)
                 RoomService.mushrooms.deleteMushroom(mushroom)
                 _mushroomsState.value = (_mushroomsState.value as? State.Items)?.let { state ->
                     State.Items(state.items.minus(mushroom))

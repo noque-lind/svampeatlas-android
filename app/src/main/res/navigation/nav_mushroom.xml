@@ -73,11 +73,25 @@
         <argument
             android:name="type"
             app:argType="com.noque.svampeatlas.fragments.AddObservationFragment$Type"
-            android:defaultValue="NEW_OBSERVATION" />
+            android:defaultValue="New" />
         <argument
             android:name="id"
+            app:argType="long"
+            android:defaultValue="0L" />
+        <argument
+            android:name="mushroomId"
             app:argType="integer"
             android:defaultValue="0" />
+        <argument
+            android:name="imageFilePath"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="null" />
+        <argument
+            android:name="predictionNotes"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="null" />
     </fragment>
     <fragment
         android:id="@+id/cameraFragment"
@@ -164,6 +178,14 @@
     <action
         android:id="@+id/action_global_emptyFragment"
         app:destination="@id/emptyFragment" />
+    <fragment
+        android:id="@+id/notesFragment"
+        android:name="com.noque.svampeatlas.fragments.NotesFragment"
+        android:label="NotesFragment" >
+        <action
+            android:id="@+id/action_notesFragment_to_addObservationFragment"
+            app:destination="@id/addObservationFragment" />
+    </fragment>
 
 
 </navigation>

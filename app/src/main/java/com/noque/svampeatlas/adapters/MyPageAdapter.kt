@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.R
+import com.noque.svampeatlas.extensions.difDays
+import com.noque.svampeatlas.utilities.SharedPreferences
 import com.noque.svampeatlas.view_holders.*
 
 class MyPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -28,7 +30,6 @@ class MyPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         enum class ViewType : com.noque.svampeatlas.models.ViewType {
             NOTIFICATION,
             OBSERVATION,
-            LOGOUT,
             LOADMORE;
 
             companion object {
@@ -48,7 +49,6 @@ class MyPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             Item(ViewType.OBSERVATION)
 
         class LoadMore(val category: Category, val offset: Int) : Item(ViewType.LOADMORE)
-        class Logout : Item(ViewType.LOGOUT)
     }
 
     private val sections = Sections<Item.ViewType, Item>()
@@ -92,7 +92,6 @@ class MyPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     init {
         sections.addSection(notifications)
         sections.addSection(observations)
-        sections.addSection(Section.Builder<Item>().items(listOf(Item.Logout())).build())
     }
 
     fun setListener(listener: Listener?) {
@@ -146,10 +145,6 @@ class MyPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     Item.ViewType.OBSERVATION -> {
                         view = layoutInflater.inflate(R.layout.item_observation, parent, false)
                         viewHolder = ObservationViewHolder(view)
-                    }
-                    Item.ViewType.LOGOUT -> {
-                        view = layoutInflater.inflate(R.layout.item_log_out, parent, false)
-                        viewHolder = LogOutViewHolder(view)
                     }
                     Item.ViewType.LOADMORE -> {
                         view = layoutInflater.inflate(R.layout.item_reloader, parent, false)

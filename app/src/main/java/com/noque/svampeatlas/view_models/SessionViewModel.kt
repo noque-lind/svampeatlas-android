@@ -1,28 +1,31 @@
 package com.noque.svampeatlas.view_models
 
-import android.app.Application
-import android.provider.Settings
+import android.content.res.Resources
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import com.noque.svampeatlas.R
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.services.DataService
 import com.noque.svampeatlas.services.RoomService
 import com.noque.svampeatlas.utilities.MyApplication
 import com.noque.svampeatlas.utilities.SharedPreferences
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
-import java.util.*
+import java.sql.Date
 import java.util.concurrent.TimeUnit
 
 object Session {
+
+    sealed class Error(title: String, message: String, recoveryAction: RecoveryAction?) :
+        AppError(title, message, recoveryAction) {
+        class NewObservationError(val newObservationError: com.noque.svampeatlas.models.NewObservationError, resources: Resources): Error(resources.getString(newObservationError.title), resources.getString(newObservationError.message), newObservationError.recoveryAction)
+        class IsNotLoggedinError(resources: Resources): Error(resources.getString(R.string.error_dataService_loginError_title), resources.getString(R.string.error_dataService_loginError_message), null)
+    }
+
     const val TAG = "SessionViewModel"
 
     private var token: String?
@@ -257,6 +260,13 @@ object Session {
         }
     }
 
+    suspend fun deleteObservation(id: Int): Result<Void?, AppError> {
+        val token = token
+        val user = user.value
+        if (token == null || user == null) return Result.Error(Error.IsNotLoggedinError(MyApplication.resources))
+        return DataService.getInstance(MyApplication.applicationContext).observationsRepository.deleteObservation(id, token)
+    }
+
     fun deleteObservation(id: Int, completion: (Result<Void?, DataService.Error>) -> Unit) {
         token?.let {
             GlobalScope.launch {
@@ -287,66 +297,56 @@ object Session {
         }
     }
 
-    fun uploadObservation(jsonObject: JSONObject, imageFiles: List<File>?) {
+//    fun editObservation(id: Int, jsonObject: JSONObject, imageFiles: List<File>?) {
+//            DataService.getInstance(MyApplication.applicationContext)
+//                .editObservation(TAG, id, token, jsonObject) {
+//                    it.onError {
+//                        _observationUploadState.value = State.Error(it)
+//
+//                        // Reset state after it has been posted once
+//                        _observationUploadState.value = State.Empty()
+//                    }
+//
+//                    it.onSuccess { id ->
+//                        if (imageFiles != null && imageFiles.isNotEmpty()) {
+//                            GlobalScope.launch {
+//                                DataService.getInstance(MyApplication.applicationContext)
+//                                    .uploadImages(TAG, id, imageFiles, token) {
+//                                        it.onSuccess {
+//                                            _observationUploadState.value =
+//                                                State.Items(Pair(id, it))
+//                                            // Reset state after it has been posted once
+//                                            _observationUploadState.value = State.Empty()
+//                                        }
+//                                    }
+//                            }
+//                        } else {
+//                            _observationUploadState.value = State.Items(Pair(id, 0))
+//                            // Reset state after it has been posted once
+//                            _observationUploadState.value = State.Empty()
+//                        }
+//                        lastUpdated = Date(0)
+//                    }
+//                }
+//        }
+//    }
+
+    suspend fun editObservation(id: Int, observation: JSONObject, newImages: List<File>): Result<Void?, AppError> {
         val token = token
         val user = user.value
-
-        if (token != null && user != null) {
-            _observationUploadState.value = State.Loading()
-
-            val usersArray = JSONArray()
-            listOf(user).forEach {
-                usersArray.put(
-                    JSONObject()
-                        .put("_id", it.id)
-                        .put("Initialer", it.initials)
-                        .put("facebook", it.facebookID)
-                        .put("name", it.name)
-                )
-            }
-            jsonObject.put("users", usersArray)
-
-            DataService.getInstance(MyApplication.applicationContext)
-                .uploadObservation(TAG, token, jsonObject) {
-                    it.onError {
-                        _observationUploadState.value = State.Error(it)
-
-                        // Reset state after it has been posted once
-                        _observationUploadState.value = State.Empty()
-                    }
-
-                    it.onSuccess { id ->
-                        if (imageFiles != null && imageFiles.isNotEmpty()) {
-                            GlobalScope.launch {
-                                DataService.getInstance(MyApplication.applicationContext)
-                                    .uploadImages(TAG, id, imageFiles, token) {
-                                        it.onSuccess {
-                                            _observationUploadState.value =
-                                                State.Items(Pair(id, it))
-                                            // Reset state after it has been posted once
-                                            _observationUploadState.value = State.Empty()
-                                        }
-                                    }
-                            }
-                        } else {
-                            _observationUploadState.value = State.Items(Pair(id, 0))
-                            // Reset state after it has been posted once
-                            _observationUploadState.value = State.Empty()
-                        }
-                        lastUpdated = Date(0)
-                    }
-                }
+        if (token == null || user == null) return Result.Error(Error.IsNotLoggedinError(MyApplication.resources))
+        return DataService.getInstance(MyApplication.applicationContext).observationsRepository.editObservation(id, token, observation, newImages).also {
+            lastUpdated = Date(0)
+            newImages.forEach { it.delete() }
         }
     }
 
-    fun editObservation(id: Int, jsonObject: JSONObject, imageFiles: List<File>?) {
+    suspend fun uploadObservation(observation: JSONObject, imageFiles: List<File>): Result<Pair<Int, Int>, AppError> {
         val token = token
         val user = user.value
-
-        if (token != null && user != null) {
-            _observationUploadState.value = State.Loading()
-
-            val usersArray = JSONArray()
+        if (token == null || user == null) return Result.Error(Error.IsNotLoggedinError(MyApplication.resources))
+        observation.optJSONObject("determination")?.put("user_id", user.id)
+        observation.put("users", JSONArray().also { usersArray ->
             listOf(user).forEach {
                 usersArray.put(
                     JSONObject()
@@ -356,40 +356,16 @@ object Session {
                         .put("name", it.name)
                 )
             }
-            jsonObject.put("users", usersArray)
-
-            DataService.getInstance(MyApplication.applicationContext)
-                .editObservation(TAG, id, token, jsonObject) {
-                    it.onError {
-                        _observationUploadState.value = State.Error(it)
-
-                        // Reset state after it has been posted once
-                        _observationUploadState.value = State.Empty()
-                    }
-
-                    it.onSuccess { id ->
-                        if (imageFiles != null && imageFiles.isNotEmpty()) {
-                            GlobalScope.launch {
-                                DataService.getInstance(MyApplication.applicationContext)
-                                    .uploadImages(TAG, id, imageFiles, token) {
-                                        it.onSuccess {
-                                            _observationUploadState.value =
-                                                State.Items(Pair(id, it))
-                                            // Reset state after it has been posted once
-                                            _observationUploadState.value = State.Empty()
-                                        }
-                                    }
-                            }
-                        } else {
-                            _observationUploadState.value = State.Items(Pair(id, 0))
-                            // Reset state after it has been posted once
-                            _observationUploadState.value = State.Empty()
-                        }
-                        lastUpdated = Date(0)
-                    }
-                }
-    }
-    }
+        })
+        return DataService.getInstance(MyApplication.applicationContext).observationsRepository.uploadObservation(
+            TAG,
+            token,
+            observation,
+            imageFiles).also {
+            lastUpdated = Date(0)
+            imageFiles.forEach { it.delete() }
+        }
+        }
 
 
     fun postOffensiveContentComment(observationID: Int, comment: String?) {

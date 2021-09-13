@@ -53,12 +53,12 @@ class ObservationViewModel(val id: Int, val getSpecies: Boolean,  application: A
         _mushroomState.value = State.Loading()
 
         viewModelScope.launch {
-            DataService.getInstance(getApplication()).getMushroom(TAG, id) {
-                it.onError {
+            DataService.getInstance(getApplication()).mushroomsRepository.getMushroom(id).apply {
+                onError {
                     _mushroomState.value = State.Error(it)
                 }
 
-                it.onSuccess {
+                onSuccess {
                     _mushroomState.value = State.Items(it)
                 }
             }

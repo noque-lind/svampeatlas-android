@@ -1,17 +1,13 @@
 package com.noque.svampeatlas.view_models
 
 import android.app.Application
-import android.content.res.Resources
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.noque.svampeatlas.services.DataService
 import com.noque.svampeatlas.fragments.add_observation.DetailsPickerFragment
 import com.noque.svampeatlas.models.*
-import com.noque.svampeatlas.services.Database
 import com.noque.svampeatlas.services.RoomService
-import com.noque.svampeatlas.utilities.MyApplication
 import kotlinx.coroutines.launch
 
 class DetailsPickerViewModel(private val type: DetailsPickerFragment.Type, application: Application) : AndroidViewModel(application) {
@@ -40,21 +36,13 @@ class DetailsPickerViewModel(private val type: DetailsPickerFragment.Type, appli
     private fun getSubstrateGroups() {
         _substrateGroupsState.value = State.Loading()
         viewModelScope.launch {
-            RoomService.substrates.getSubstrates().apply {
-                onError {
-                    DataService.getInstance(getApplication()).getSubstrateGroups(TAG) { result ->
-                        result.onSuccess {
-                            _substrateGroupsState.value = State.Items(it)
-                        }
-
-                        result.onError {
-                            _substrateGroupsState.value = State.Error(it)
-                        }
-                    }
+            DataService.getInstance(getApplication()).substratesRepository.getSubstrateGroups(TAG).apply {
+                onSuccess {
+                    _substrateGroupsState.value = State.Items(it)
                 }
 
-                onSuccess {
-                    _substrateGroupsState.postValue(State.Items(SubstrateGroup.createFromSubstrates(it)))
+                onError {
+                    _substrateGroupsState.value = State.Error(it)
                 }
             }
         }
@@ -64,18 +52,12 @@ class DetailsPickerViewModel(private val type: DetailsPickerFragment.Type, appli
         _vegetationTypesState.value = State.Loading()
 
         viewModelScope.launch {
-            RoomService.vegetationTypes.getAll().apply {
-                onSuccess { _vegetationTypesState.postValue(State.Items(it)) }
+            DataService.getInstance(getApplication()).vegetationTypeRepository.getVegetationTypes(TAG).apply {
+                onSuccess {
+                    _vegetationTypesState.value = State.Items(it)
+                }
                 onError {
-                    DataService.getInstance(getApplication()).getVegetationTypes(TAG) { result ->
-                        result.onSuccess {
-                            _vegetationTypesState.value = State.Items(it)
-                        }
-
-                        result.onError {
-                            _vegetationTypesState.value = State.Error(it)
-                        }
-                    }
+                    _vegetationTypesState.value = State.Error(it)
                 }
             }
         }

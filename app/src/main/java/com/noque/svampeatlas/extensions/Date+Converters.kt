@@ -7,6 +7,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 
+
 fun Date(ISO8601: String?): Date? {
     ISO8601?.let {
         val cm = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
@@ -22,10 +23,23 @@ fun Date(ISO8601: String?): Date? {
     return null
 }
 
-fun Date.toSimpleString(): String {
+fun Date(minusMonths: Int): Date {
+    val cal = Calendar.getInstance()
+    cal.setTime(Date())
+    cal.add(Calendar.MONTH, -minusMonths)
+    return cal.time
+}
+
+fun Date.toDatabaseName(): String {
     val sf = SimpleDateFormat("yyyy-MM-dd")
     return sf.format(this)
 }
+
+fun String.toDate(): Date {
+    val sf = SimpleDateFormat("yyyy-MM-dd")
+    return sf.parse(this)
+}
+
 
 fun Date.toISO8601(): String {
     val cm = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
@@ -39,13 +53,18 @@ fun Date.difDays(): Long {
     )
 }
 
+fun Date.toTimeString(): String {
+    return SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT).format(this)
+}
 
 fun Date.toReadableDate(recentFormatting: Boolean = true, ignoreTime: Boolean = false): String {
     if (!recentFormatting) {
         return if (ignoreTime) {
             SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM).format(this)
         } else {
-            SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.SHORT).format(this)
+            SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.SHORT).format(
+                this
+            )
         }
     } else {
         val diff = Calendar.getInstance().time.time - this.time
@@ -66,7 +85,10 @@ fun Date.toReadableDate(recentFormatting: Boolean = true, ignoreTime: Boolean = 
             return if (ignoreTime) {
                 SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM).format(this)
             } else {
-                SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.SHORT).format(this)
+                SimpleDateFormat.getDateTimeInstance(
+                    SimpleDateFormat.MEDIUM,
+                    SimpleDateFormat.SHORT
+                ).format(this)
             }
         }
     }

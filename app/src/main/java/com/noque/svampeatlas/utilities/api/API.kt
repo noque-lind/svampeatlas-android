@@ -60,10 +60,12 @@ data class API(val apiType: APIType) {
                         .appendQueryParameter("nocount", "true")
                         .appendQueryParameter("order", "RankID ASC, probability DESC, FullName ASC")
                 } else {
-                    builder.appendQueryParameter("limit", request.limit.toString())
-                        .appendQueryParameter("offset", request.offset.toString())
+                    if (request.limit != null) {
+                        builder.appendQueryParameter("limit", request.limit.toString())
+                        queries.add(SpeciesQueries.Tag(16))
+                    }
+                    builder.appendQueryParameter("offset", request.offset.toString())
                         .appendQueryParameter("order", "FullName ASC")
-                    queries.add(SpeciesQueries.Tag(16))
                 }
                 builder.appendQueryParameter("include", speciesIncludeQuery(queries))
             }
@@ -100,7 +102,7 @@ data class API(val apiType: APIType) {
                 request.ageInYear?.let {
                     val calendar = Calendar.getInstance()
                     calendar.add(Calendar.MONTH, -it * 12)
-                    val dateString = calendar.time.toSimpleString()
+                    val dateString = calendar.time.toDatabaseName()
                     builder.appendQueryParameter("where", "{\"observationDate\":{\"\$gte\":\"$dateString\"}}")
                 }
 
@@ -442,7 +444,7 @@ sealed class APIType() {
             val searchString: String?,
             val queries: List<SpeciesQueries>,
             val offset: Int,
-            val limit: Int
+            val limit: Int?
         ) : Request()
 
         class Mushroom(val id: Int) : Request()

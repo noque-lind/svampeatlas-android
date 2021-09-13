@@ -1,7 +1,8 @@
 package com.noque.svampeatlas.models
 
+import com.noque.svampeatlas.adapters.NotebookAdapter
+import javax.crypto.SealedObject
 
-import android.util.Log
 
 interface ViewType
 
@@ -20,8 +21,8 @@ class Sections<V, I> where V : ViewType, V: Enum<V>, I: Item<V> {
         sections.add(section)
     }
 
-    fun setSections(sections: MutableList<Section<I>>) {
-        this.sections = sections
+    fun setSections(sections: List<Section<I>>) {
+        this.sections = sections.toMutableList()
     }
 
     fun getTitle(position: Int): String? {
@@ -74,6 +75,11 @@ class Sections<V, I> where V : ViewType, V: Enum<V>, I: Item<V> {
     fun getItem(position: Int): I {
         val section = getSection(position)
        return section.first.getItem(position - section.second)
+    }
+
+    fun deleteItem(adapterPosition: Int) {
+        val section = getSection(adapterPosition)
+        section.first.removeItem(adapterPosition - section.second)
     }
 
     fun getSectionPosition(section: Section<I>): Int {
@@ -182,6 +188,24 @@ class Section<T>(private var title: String?, private var state: State<List<T>> =
                     state.items[position - 1]
                 } else {
                     state.items[position]
+                }
+            }
+            else -> { throw IllegalAccessError("Should not access item while state is not items.") }
+        }
+    }
+
+    fun removeItem(position: Int) {
+        when (val state = state) {
+            is State.Items -> {
+                if (title != null && position == 0) { throw java.lang.IndexOutOfBoundsException("Index out of bounds when trying to fetch item at position 0 where title is nut null")
+                } else if (title != null) {
+                    val items = state.items.toMutableList()
+                    items.removeAt(position - 1)
+                    setState(State.Items(items))
+                } else {
+                    val items = state.items.toMutableList()
+                    items.removeAt(position)
+                    setState(State.Items(items))
                 }
             }
             else -> { throw IllegalAccessError("Should not access item while state is not items.") }

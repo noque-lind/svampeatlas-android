@@ -14,7 +14,7 @@ import java.io.File
 
 
 suspend fun Bitmap.toBase64(): String {
-   return Base64.encodeToString(this.toJPEG(0.1), Base64.DEFAULT)
+   return Base64.encodeToString(this.toJPEG(0.3), Base64.DEFAULT)
 }
 
 suspend fun Bitmap.toJPEG(megabyteSize: Double, megabyteDelta: Double = 0.2): ByteArray = withContext(Dispatchers.Default) {

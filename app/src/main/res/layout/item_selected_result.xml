@@ -3,16 +3,34 @@
     android:orientation="vertical"
     android:gravity="center_horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
-<com.noque.svampeatlas.views.ResultView
-    android:clickable="true"
-    android:focusable="true"
-    android:foreground="?android:attr/selectableItemBackground"
-    android:id="@+id/selectedResultItem_resultView"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-</com.noque.svampeatlas.views.ResultView>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.noque.svampeatlas.views.ResultView
+            android:id="@+id/selectedResultItem_resultView"
+            android:layout_width="389dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"></com.noque.svampeatlas.views.ResultView>
+
+        <ImageButton
+            android:id="@+id/selectedResultItem_deSelectButton"
+            style="@style/Widget.AppCompat.ImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_gravity="center_vertical"
+            android:padding="8dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/glyph_cancel" />
+    </LinearLayout>
+
+
 
     <TextView
         android:id="@+id/selectedResultItem_confidenceTitleTextView"

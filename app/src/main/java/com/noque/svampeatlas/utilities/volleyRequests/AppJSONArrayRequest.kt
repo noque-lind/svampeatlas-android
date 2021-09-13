@@ -1,4 +1,4 @@
-package com.noque.svampeatlas.utilities
+package com.noque.svampeatlas.utilities.volleyRequests
 
 import com.android.volley.NetworkResponse
 import com.android.volley.ParseError

@@ -62,7 +62,7 @@
     <!-- MapVC -->
     <string name="mapVC_title">Fundets lokation</string>
     <!-- SearchVC -->
-    <string name="searchVC_searchBar_placeholder">Søg efter en vært her ...</string>
+    <string name="searchVC_searchBar_placeholder">Søg efter en vært her …</string>
     <string name="searchVC_cancelButton">Annuller</string>
     <!-- TermsVC -->
     <string name="termsVC_dismissButton">Forstået</string>
@@ -120,9 +120,9 @@
     <string name="observationDetailsCell_vegetationType">Vegetationstype:</string>
     <string name="observationDetailsCell_host">Vært:</string>
     <string name="observationDetailsCell_notes_title">Andre noter</string>
-    <string name="observationDetailsCell_notes_message">Lugt melagtig ...</string>
+    <string name="observationDetailsCell_notes_message">Lugt melagtig …</string>
     <string name="observationDetailsCell_ecologyNotes_title">Kommentarer om voksested</string>
-    <string name="observationDetailsCell_ecologyNotes_message">På sandjord blandt mos ...</string>
+    <string name="observationDetailsCell_ecologyNotes_message">På sandjord blandt mos …</string>
     <!-- SearchCell -->
     <string name="searchCell_title">Søg på en vært her 👇</string>
     <!-- PickerCell -->
@@ -171,7 +171,7 @@
     <!-- LocationAnnotation -->
     <string name="locationAnnotation_title">Fundets placering</string>
     <!-- UnknownSpeciesButton -->
-    <string name="unknownSpeciesButton_title">Ubestemt svamp</string>
+    <string name="unknownSpeciesButton_title">Jeg ved ikke hvad jeg har fundet</string>
     <string name="unknownSpeciesButton_message">Klik her for at indlægge en ubestemt svamp - fælleskabet vil prøve at hjælpe med bestemmelsen</string>
     <string name="containedResultCell_genus">Slægt: %s</string>
     <!-- SelectedSpeciesCell -->
@@ -202,7 +202,7 @@
     <string name="redlistView_vu">Sårbar art</string>
     <string name="redlistView_dd">Vides ikke</string>
     <!-- Searchbar -->
-    <string name="searchBar_placeholder">Søg efter en art her ...</string>
+    <string name="searchBar_placeholder">Søg efter en art her …</string>
     <!-- CommentsTableView -->
     <string name="commentsTableView_cell_title">Skriv en kommentar</string>
 
@@ -221,15 +221,36 @@
     <string name="addObservationVC_title_edit">Rediger fund</string>
     <string name="observationDetailsScrollView_delete">Slet fund</string>
     <string name="prompt_imagedeletion_error_title">Kunne ikke slette billede</string>
-    <string name="terms_whatsnew_message">Vi er så glade for at du stadig er her\n\nDin app er blevet opdateret og har fået nogle nye spændende funktioner: \n- Nyt design i svampe/og observations detajler \n- Du kan nu redigere en uploadet observation efter det er blevet uploaded \n- Du kan nu slette et fund (kun indenfor 48h efter upload) - En masse stabilitets forbedringer \n- Klargørelse til nye spændende funktioner (offline gem af et fund hvis der er dårligt internet, interaktiv validering, mm.)</string>
+    <string name="terms_whatsnew_message">Vi er så glade for at du stadig er her\nDin app er blevet opdateret og har fået nogle nye spændende funktioner: \n\n2.0\n- (Stor ny funktionalitet) Du kan nu oprette offline fund som du så senere kan uploade til Svampeatlas. Det betyder at du nu kan bruge denne app helt uafhængigt af internet, når du først har downloadet alt dataen til Offline brug.\n\n1.6\n- Nyt design i svampe/og observations detajler \n- Du kan nu redigere en uploadet observation efter det er blevet uploaded \n- Du kan nu slette et fund (kun indenfor 48h efter upload) - En masse stabilitets forbedringer \n- Klargørelse til nye spændende funktioner (offline gem af et fund hvis der er dårligt internet, interaktiv validering, mm.)</string>
     <string name="terms_whatsnew_title">Hvad er nyt?</string>
     <string name="terms_imagedeletion_title">Sletning af billedet er permanent</string>
     <string name="terms_imagedeletion_message">When editing an observation, deletions of images are final, even if you do not submit your other changes. This message will only be shown once, and if you still want to delete the image, you will have to delete the it again\" = \"Når du redigere en observation, er sletning af uploadede billeder permanente, også selvom du ikke uploader andre ændringer. Denne besked vises kun en gang, or du skal slette billedet igen hvis du ønsker at det skal slettes.</string>
+    <string name="notes_fragment_title">Notesbog</string>
     <string name="language_danish">Dansk</string>
     <string name="language_czech">Tjekkisk</string>
     <string name="language_english">Engelsk</string>
     <string name="settings_language_message">Det er ikke alt indhold som er oversat til alle sprog: %s</string>
-    <string name="common_mostUsed">Most used</string>
-    <string name="common_previouslyUsed">Previously used</string>
+    <string name="common_mostUsed">Mest brugte</string>
+    <string name="common_previouslyUsed">Tidligere brugte</string>
+    <string name="downloader_taxon_downloading">Henter artsliste</string>
+    <string name="downloader_taxon_readingFile">Læser fil</string>
+    <string name="downloader_taxon_savingFile">Gemmer til databasen</string>
+    <string name="downloader_taxon_error">Der skete en fejl</string>
+    <string name="common_addEntry">Indtast</string>
+    <string name="addObservationFragment_title_note">Ny note til notesbog</string>
+    <string name="common_save">Gem</string>
+    <string name="common_delete">Slet</string>
+    <string name="common_unknown_locality">Unknown location</string>
+    <string name="addObservationVC_title_edit_note">Redigering af note</string>
+    <string name="download_taxon_title">Vil du hente data til offline brug?</string>
+    <string name="download_taxon_message">Ved at hente al data, kan du forberede dine fund uden internet - og så blot uploade dem når du kommer hjem fra din tur.</string>
+    <string name="downloader_metadata_downloading">Henter substrater, vegetationstyper og værter</string>
+    <string name="downloader_cleaning_up">Rydder op</string>
+    <string name="downloader_downloading">Henter data</string>
+    <string name="common_readyforupload">Klar til upload …</string>
+    <string name="common_notCompleted">Ikke klar til upload</string>
+    <string name="common_redownload">Opdater offline data</string>
+    <string name="noObs_title">Ingen observationer i nærheden</string>
+    <string name="error_database_noNotes_message">Du har endnu ikke nogen gemte notesbog indtastninger. Du kan her oprette noter om de svampe du finder, og så lægge dem op på Svampeatlas senere, f.eks. når du får bedre internet.</string>
 
 </resources>

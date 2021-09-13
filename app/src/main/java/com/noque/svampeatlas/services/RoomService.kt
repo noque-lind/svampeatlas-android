@@ -18,13 +18,17 @@ object RoomService {
             SUBSTRATE,
             VEGETATIONTYPE,
             MUSHROOM,
-            HOST
+            HOST,
+            NOTES
         }
+
+        object DatabaseError: Error(R.string.error_database_saveError_title, R.string.error_database_saveError_message)
 
         class NoData(dataType: DataType) : Error(
             R.string.error_database_noEntries_title,
             when (dataType) {
                 DataType.FAVORITES -> R.string.error_database_noEntries_favoritedMushrooms_message
+                DataType.NOTES -> R.string.error_database_noNotes_message
                 else -> R.string.error_database_noEntries_message
             }
         )
@@ -36,4 +40,5 @@ object RoomService {
      val vegetationTypes by lazy { VegetationTypesDaoInterface(database.VegetationTypeDao()) }
      val hosts by lazy { HostsDaoInterface(database.HostsDao()) }
      val mushrooms by lazy { MushroomsDaoInterface(database.mushroomsDao()) }
+    val notesDao by lazy { NotesDaoInterface(database.notesDao()) }
 }

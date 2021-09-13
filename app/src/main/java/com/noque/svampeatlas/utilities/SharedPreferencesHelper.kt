@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.preference.PreferenceManager
+import com.noque.svampeatlas.extensions.Date
+import java.util.*
 
 object SharedPreferences {
 
@@ -14,9 +16,10 @@ object SharedPreferences {
     private const val HAS_ACCEPTED_IDENTIFCATION_TERMS = "HAS_ACCEPTED_IDENTIFCATION_TERMS"
     private const val SAVE_IMAGES = "SAVE_IMAGES"
     private const val SAVE_IMAGES_DECIDED = "SAVE_IMAGES_DECIDED"
-    private const val HAS_SEEN_WHATS_NEW = "HAS_SEEN_WHATS_NEW"
+    private const val HAS_SEEN_WHATS_NEW = "HAS_SEEN_WHATS_NEW_2.0"
     private const val HAS_SEEN_IMAGE_DELETION = "HAS_SEEN_IMAGE_DELETION"
     private const val PREFERRED_LANGUAGE = "PREFERRED_LANGUAGE"
+    private const val LAST_DOWNLOAD_TAXON = "LAST_DOWNLOAD_TAXON"
 
     private lateinit var prefs: SharedPreferences
 
@@ -100,6 +103,18 @@ object SharedPreferences {
         return prefs.getString(PREFERRED_LANGUAGE, "not_set") ?: "not_set"
     } set(value) {
         prefs.edit().putString(PREFERRED_LANGUAGE, value).apply()
+    }
+
+    var lastDownloadOfTaxon: Date?
+        get() {
+        val long = prefs.getLong(LAST_DOWNLOAD_TAXON, 0L)
+            if (long != 0L) {
+                return Date(long)
+            } else {
+                return null
+            }
+    } set(value) {
+        return prefs.edit().putLong(LAST_DOWNLOAD_TAXON, value?.time ?: 0L).apply()
     }
 
     fun getSaveImages(): Boolean? {

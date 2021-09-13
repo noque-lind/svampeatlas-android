@@ -36,6 +36,12 @@ class AddedImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         lock.visibility = View.GONE
         imageView.alpha = 1F
         when (image) {
+            is NewObservationViewModel.Image.LocallyStored -> {
+            Glide.with(imageView)
+                .load(image.file)
+                .into(imageView)
+            }
+
             is NewObservationViewModel.Image.New -> {
                 Glide.with(imageView)
                     .load(image.file)

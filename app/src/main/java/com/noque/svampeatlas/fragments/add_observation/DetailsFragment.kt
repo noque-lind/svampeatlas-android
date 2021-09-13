@@ -11,6 +11,9 @@ import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -47,7 +50,7 @@ class DetailsFragment : Fragment() {
     }
 
     // View Models
-    private val newObservationViewModel: NewObservationViewModel by activityViewModels()
+    private val newObservationViewModel: NewObservationViewModel by viewModels({ requireParentFragment() })
 
     // Adapters
 
