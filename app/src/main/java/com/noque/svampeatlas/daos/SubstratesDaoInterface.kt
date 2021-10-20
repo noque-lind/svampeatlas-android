@@ -13,7 +13,7 @@ class SubstratesDaoInterface(private val dao: SubstratesDao) {
         dao.save(*substrates.toTypedArray())
     }
 
-    suspend fun getSubstrateWithID(id: Int): Result<Substrate, RoomService.Error> {
+    fun getSubstrateWithID(id: Int): Result<Substrate, RoomService.Error> {
         val substrate = dao.getSubstrateWithID(id)
         return if (substrate != null) Result.Success(substrate) else Result.Error(
             RoomService.Error.NoData(RoomService.Error.DataType.SUBSTRATE))

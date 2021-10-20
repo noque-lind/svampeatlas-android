@@ -48,6 +48,11 @@ object FileManager {
         }
     }
 
+    fun deleteImageGalleryFile(file: File) {
+        file.delete()
+        scanImageForGallery(file, MyApplication.applicationContext)
+    }
+
     fun createNotesDirectoryImageFile(context: Context): File = File(getOutputDirectoryForNoteImages(context),SimpleDateFormat(
         "yyyy-MM-dd-HH-mm-ss-SSS",
         Locale.getDefault()

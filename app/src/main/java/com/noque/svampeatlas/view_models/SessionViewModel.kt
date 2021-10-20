@@ -297,56 +297,25 @@ object Session {
         }
     }
 
-//    fun editObservation(id: Int, jsonObject: JSONObject, imageFiles: List<File>?) {
-//            DataService.getInstance(MyApplication.applicationContext)
-//                .editObservation(TAG, id, token, jsonObject) {
-//                    it.onError {
-//                        _observationUploadState.value = State.Error(it)
-//
-//                        // Reset state after it has been posted once
-//                        _observationUploadState.value = State.Empty()
-//                    }
-//
-//                    it.onSuccess { id ->
-//                        if (imageFiles != null && imageFiles.isNotEmpty()) {
-//                            GlobalScope.launch {
-//                                DataService.getInstance(MyApplication.applicationContext)
-//                                    .uploadImages(TAG, id, imageFiles, token) {
-//                                        it.onSuccess {
-//                                            _observationUploadState.value =
-//                                                State.Items(Pair(id, it))
-//                                            // Reset state after it has been posted once
-//                                            _observationUploadState.value = State.Empty()
-//                                        }
-//                                    }
-//                            }
-//                        } else {
-//                            _observationUploadState.value = State.Items(Pair(id, 0))
-//                            // Reset state after it has been posted once
-//                            _observationUploadState.value = State.Empty()
-//                        }
-//                        lastUpdated = Date(0)
-//                    }
-//                }
-//        }
-//    }
-
-    suspend fun editObservation(id: Int, observation: JSONObject, newImages: List<File>): Result<Void?, AppError> {
+    suspend fun editObservation(id: Int, userObservation: UserObservation): Result<Pair<Int, Int>, AppError> {
         val token = token
         val user = user.value
+        val imageFiles = userObservation.getImagesForUpload()
         if (token == null || user == null) return Result.Error(Error.IsNotLoggedinError(MyApplication.resources))
-        return DataService.getInstance(MyApplication.applicationContext).observationsRepository.editObservation(id, token, observation, newImages).also {
+        return DataService.getInstance(MyApplication.applicationContext).observationsRepository.editObservation(id, token, userObservation.asJSON(false), imageFiles).also {
             lastUpdated = Date(0)
-            newImages.forEach { it.delete() }
+            userObservation.deleteAllImages()
         }
     }
 
-    suspend fun uploadObservation(observation: JSONObject, imageFiles: List<File>): Result<Pair<Int, Int>, AppError> {
+    suspend fun uploadObservation(userObservation: UserObservation): Result<Pair<Int, Int>, AppError> {
         val token = token
         val user = user.value
         if (token == null || user == null) return Result.Error(Error.IsNotLoggedinError(MyApplication.resources))
-        observation.optJSONObject("determination")?.put("user_id", user.id)
-        observation.put("users", JSONArray().also { usersArray ->
+        val json = userObservation.asJSON(true)
+        val imageFiles = userObservation.getImagesForUpload()
+        json.optJSONObject("determination")?.put("user_id", user.id)
+        json.put("users", JSONArray().also { usersArray ->
             listOf(user).forEach {
                 usersArray.put(
                     JSONObject()
@@ -357,13 +326,14 @@ object Session {
                 )
             }
         })
+
         return DataService.getInstance(MyApplication.applicationContext).observationsRepository.uploadObservation(
             TAG,
             token,
-            observation,
+            json,
             imageFiles).also {
             lastUpdated = Date(0)
-            imageFiles.forEach { it.delete() }
+            userObservation.deleteAllImages()
         }
         }
 

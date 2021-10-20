@@ -320,7 +320,8 @@ class DetailsFragment : Fragment() {
                         action.predictionNotes = args.predictionResults
                         findNavController().navigate(action)
                     } else {
-                        findNavController().previousBackStackEntry?.savedStateHandle?.set(AddObservationFragment.SAVED_STATE_TAXON_ID, args.id)
+                        val savedStateHandle = findNavController().previousBackStackEntry?.savedStateHandle
+                        savedStateHandle?.set(AddObservationFragment.SAVED_STATE_TAXON_ID, args.id)
                         findNavController().navigateUp()
                     }
                 }

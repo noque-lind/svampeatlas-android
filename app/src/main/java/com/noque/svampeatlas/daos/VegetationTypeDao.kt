@@ -12,7 +12,7 @@ interface VegetationTypeDao {
     suspend fun getVegetationTypes(): Array<VegetationType>
 
     @Query("SELECT * FROM vegetationType WHERE id = :id LIMIT 1")
-    suspend fun getVegetationTypeWithID(id: Int): VegetationType?
+    fun getVegetationTypeWithID(id: Int): VegetationType?
 
     @Query("SELECT * FROM vegetationType WHERE id = :id LIMIT 1")
     fun getVegetationTypeWithIDNow(id: Int): VegetationType?

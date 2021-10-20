@@ -35,9 +35,9 @@ android {
         applicationId "com.noque.svampeatlas"
         minSdkVersion 21
         targetSdkVersion 29
-        versionName '1.7'
+        versionName '1.7.1'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        versionCode = 26
+        versionCode = 27
         signingConfig signingConfigs.signing
 
         kapt {

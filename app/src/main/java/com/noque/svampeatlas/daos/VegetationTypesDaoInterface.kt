@@ -24,7 +24,7 @@ class VegetationTypesDaoInterface(private val dao: VegetationTypeDao) {
         }
     }
 
-    suspend fun getVegetationTypeWithID(id: Int): Result<VegetationType, RoomService.Error> {
+    fun getVegetationTypeWithID(id: Int): Result<VegetationType, RoomService.Error> {
         val vegetationType = dao.getVegetationTypeWithID(id)
         return if (vegetationType != null) Result.Success(vegetationType) else Result.Error(
             RoomService.Error.NoData(RoomService.Error.DataType.VEGETATIONTYPE))

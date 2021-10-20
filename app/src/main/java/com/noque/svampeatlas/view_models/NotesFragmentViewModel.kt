@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.noque.svampeatlas.models.NewObservation
 import com.noque.svampeatlas.models.Result
 import com.noque.svampeatlas.models.State
+import com.noque.svampeatlas.models.UserObservation
 import com.noque.svampeatlas.services.DataService
 import com.noque.svampeatlas.services.RoomService
 import com.noque.svampeatlas.utilities.MyApplication
@@ -54,6 +55,7 @@ class NotesFragmentViewModel: ViewModel() {
             note.images.forEach { File(it).delete() }
             RoomService.notesDao.delete(note).apply {
                 onSuccess {
+                    UserObservation(note).deleteAllImages()
                     getNotes()
                 }
             }
@@ -66,14 +68,13 @@ class NotesFragmentViewModel: ViewModel() {
             when (val result = note.createJSON(true)) {
                 is Result.Error -> _uploadState.postValue(State.Empty())
                 is Result.Success -> {
-                    Session.uploadObservation(result.value, note.images.map { File(it) }).apply {
+                    Session.uploadObservation(UserObservation(note)).apply {
                         onError {
                             _uploadState.postValue(State.Empty())
                         }
 
                         onSuccess {
                             _uploadState.postValue(State.Items(null))
-                            note.images.forEach { File(it).delete() }
                             RoomService.notesDao.delete(note)
                             getNotes()
                         }

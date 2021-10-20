@@ -252,5 +252,7 @@
     <string name="common_redownload">Opdater offline data</string>
     <string name="noObs_title">Ingen observationer i nærheden</string>
     <string name="error_database_noNotes_message">Du har endnu ikke nogen gemte notesbog indtastninger. Du kan her oprette noter om de svampe du finder, og så lægge dem op på Svampeatlas senere, f.eks. når du får bedre internet.</string>
+    <string name="promp_noteSaved_title">Note gemt</string>
+    <string name="prompt_noteSaved_message">Din note er blevet gemt i din notesbog. Du kan sende den ind senere!</string>
 
 </resources>

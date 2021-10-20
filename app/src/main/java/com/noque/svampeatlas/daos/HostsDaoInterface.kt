@@ -19,7 +19,7 @@ class HostsDaoInterface(private val dao: HostsDao) {
         }
     }
 
-    suspend fun getHostsWithIds(ids: List<Int>): Result<List<Host>, RoomService.Error> {
+    fun getHostsWithIds(ids: List<Int>): Result<List<Host>, RoomService.Error> {
         val hosts = mutableListOf<Host>()
 
         ids.forEach {

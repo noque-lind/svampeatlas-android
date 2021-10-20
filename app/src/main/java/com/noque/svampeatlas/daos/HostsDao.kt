@@ -13,7 +13,7 @@ interface HostsDao {
     suspend fun getHosts(): Array<Host>
 
     @Query("SELECT * FROM hosts WHERE id = :id")
-    suspend fun getHostWithID(id : Int): Host?
+    fun getHostWithID(id : Int): Host?
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun save(vararg hosts: Host)

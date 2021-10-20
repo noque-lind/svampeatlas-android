@@ -89,7 +89,7 @@ class DetailsFragment : Fragment() {
         DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
             val cal = Calendar.getInstance()
             cal.set(year, monthOfYear, dayOfMonth)
-            newObservationViewModel.setDate(cal.time)
+            newObservationViewModel.setObservationDate(cal.time)
         }
 
 
@@ -142,7 +142,7 @@ class DetailsFragment : Fragment() {
             })
 
 
-            newObservationViewModel.date.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+            newObservationViewModel.observationDate.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
                 adapter.date = it
                 adapter.updateCategory(Categories.DATE)
             })

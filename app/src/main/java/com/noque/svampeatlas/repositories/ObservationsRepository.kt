@@ -35,9 +35,9 @@ import kotlin.coroutines.suspendCoroutine
 
 class ObservationsRepository(private val requestQueue: RequestQueue) {
 
-    suspend fun editObservation(id: Int, token: String, jsonObject: JSONObject, imageFiles: List<File>?): Result<Void?, DataService.Error> {
+    suspend fun editObservation(id: Int, token: String, jsonObject: JSONObject, imageFiles: List<File>?): Result<Pair<Int, Int>, DataService.Error> {
         return when (val result = putObservation(id, jsonObject, token)) {
-            is Result.Success -> Result.Success<Void?, DataService.Error>(null).also { postImagesToObservation(id, imageFiles, token) }
+            is Result.Success -> Result.Success(Pair(id, postImagesToObservation(id, imageFiles, token)))
             is Result.Error -> Result.Error(result.error)
         }
     }

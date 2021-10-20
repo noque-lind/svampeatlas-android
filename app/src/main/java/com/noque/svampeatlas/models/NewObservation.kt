@@ -25,7 +25,7 @@ sealed class NewObservationError(title: Int, message: Int) :
 }
 
 @Entity(tableName = "notes")
-data class NewObservation(
+ class NewObservation(
     @PrimaryKey
     val creationDate: Date = Date(),
     var observationDate: Date,

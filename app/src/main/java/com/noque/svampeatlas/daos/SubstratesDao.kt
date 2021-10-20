@@ -9,7 +9,7 @@ interface SubstratesDao {
     suspend fun getSubstrates(): Array<Substrate>
 
     @Query("SELECT * FROM substrates WHERE id = :id LIMIT 1")
-    suspend fun getSubstrateWithID(id: Int): Substrate?
+    fun getSubstrateWithID(id: Int): Substrate?
 
     @Query("SELECT * FROM substrates WHERE id = :id LIMIT 1")
     fun getSubstrateWithIDNow(id: Int): Substrate?
