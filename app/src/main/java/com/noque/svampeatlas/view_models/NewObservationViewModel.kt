@@ -219,7 +219,7 @@ class NewObservationViewModel(application: Application, val type: AddObservation
             is State.Error -> {
                 if (isAwaitingCoordinatedBeforeSave) {
                     isAwaitingCoordinatedBeforeSave = false
-                    TODO()
+                    _isLoading.postValue(false)
                 }
                 _coordinateState.postValue(state)
                 showNotification.postValue(Notification.LocationInaccessible(getApplication<MyApplication>().resources, state.error))
@@ -348,7 +348,6 @@ class NewObservationViewModel(application: Application, val type: AddObservation
                 userObservation.observationDate.value = prompt.imageLocation.date
                 _coordinateState.value = State.Items(prompt.imageLocation)
                 getLocalities(prompt.imageLocation)
-                TODO()
             }
             null -> {}
         }
