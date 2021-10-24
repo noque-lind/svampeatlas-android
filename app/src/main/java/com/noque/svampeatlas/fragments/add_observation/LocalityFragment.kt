@@ -183,13 +183,7 @@ class LocalityFragment: Fragment() {
                 is State.Loading -> mapFragment?.setLoading()
 
                 is State.Error -> {
-                    mapFragment?.setError(it.error) {
-                        when (it) {
-                            RecoveryAction.OPENSETTINGS -> openSettings()
-                            RecoveryAction.TRYAGAIN -> newObservationViewModel.resetLocationData()
-                            else -> {}
-                        }
-                    }
+                    mapFragment?.stopLoading()
                 }
 
                 is State.Empty -> {}
@@ -218,6 +212,15 @@ class LocalityFragment: Fragment() {
 
                     is State.Empty -> {
                         mapFragment?.removeAllMarkers()
+                    }
+                    is State.Error -> {
+                        mapFragment?.setError(it.error) {
+                            when (it) {
+                                RecoveryAction.OPENSETTINGS -> openSettings()
+                                RecoveryAction.TRYAGAIN -> newObservationViewModel.resetLocationData()
+                                else -> {}
+                            }
+                        }
                     }
                 }
             })

@@ -284,6 +284,12 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
         })
     }
 
+    fun stopLoading() {
+        dispatchGroup?.notify(Runnable {
+            backgroundView.reset()
+        })
+    }
+
     fun setError(error: AppError, handler: ((RecoveryAction?) -> Unit)?) {
         dispatchGroup?.notify(Runnable {
             backgroundView.reset()

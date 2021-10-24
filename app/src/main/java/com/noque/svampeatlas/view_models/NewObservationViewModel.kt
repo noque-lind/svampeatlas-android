@@ -115,6 +115,7 @@ class NewObservationViewModel(application: Application, val type: AddObservation
                 userObservation.set(UserObservation())
             }
             AddObservationFragment.Type.FromRecognition -> {
+                userObservation.set(UserObservation())
                 if (mushroomId != 0) {
                     setMushroom(mushroomId)
                 }
@@ -349,7 +350,6 @@ class NewObservationViewModel(application: Application, val type: AddObservation
                 _coordinateState.value = State.Items(prompt.imageLocation)
                 getLocalities(prompt.imageLocation)
             }
-            null -> {}
         }
     }
 
@@ -374,9 +374,16 @@ class NewObservationViewModel(application: Application, val type: AddObservation
     }
 
     fun resetLocationData() {
-        _localitiesState.value = State.Empty()
-        _coordinateState.value = State.Empty()
-        userObservation.locality.value = null
+
+        val location = coordinateState.value?.item
+        if (location != null && locality.value == null) {
+            // When location is found but not locality, we assume the user wants to try and find locality
+            getLocalities(location)
+        } else {
+            userObservation.locality.value = null
+            _localitiesState.value = State.Empty()
+            _coordinateState.value = State.Empty()
+        }
     }
 
     private fun getLocalities(location: Location) {
@@ -418,7 +425,7 @@ class NewObservationViewModel(application: Application, val type: AddObservation
                     }
                     result.onError {
                         _localitiesState.value = State.Error(it)
-                        if (type != AddObservationFragment.Type.Note && type != AddObservationFragment.Type.EditNote)
+                        if (type != AddObservationFragment.Type.Note)
                         showNotification.postValue(Notification.LocalityInaccessible(MyApplication.applicationContext.resources))
                     }
                 }

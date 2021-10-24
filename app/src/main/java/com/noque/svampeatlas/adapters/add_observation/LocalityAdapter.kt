@@ -6,11 +6,17 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.models.Locality
 import com.noque.svampeatlas.R
+import com.noque.svampeatlas.models.AppError2
 import com.noque.svampeatlas.view_holders.LocalityViewHolder
 
 class LocalityAdapter(): RecyclerView.Adapter<LocalityViewHolder>() {
 
+    private val ERROR_VIEW_TYPE = 0
+    private val LOCALITY_VIEW_TYPE = 1
+
+
     private var localities = listOf<Locality>()
+    private var error: AppError2? = null
     private var selectedPosition = 0
     var localitySelected: ((locality: Locality) -> Unit)? = null
 
@@ -23,6 +29,11 @@ class LocalityAdapter(): RecyclerView.Adapter<LocalityViewHolder>() {
 
     fun configure(localities: List<Locality>) {
         this.localities = localities
+        notifyDataSetChanged()
+    }
+
+    fun configure(error: AppError2) {
+        this.error = error
         notifyDataSetChanged()
     }
 
@@ -39,6 +50,7 @@ class LocalityAdapter(): RecyclerView.Adapter<LocalityViewHolder>() {
         localityViewHolder.setListener(onClickListener)
         return localityViewHolder
     }
+
 
     override fun getItemCount(): Int {
         return localities.count()

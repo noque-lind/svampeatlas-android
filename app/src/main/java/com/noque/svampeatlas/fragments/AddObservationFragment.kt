@@ -427,7 +427,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                     // Do show toast, as user is not location screen
                     createToast(it.title, it.message, bitmap)
                 }
-
+                is NewObservationViewModel.Notification.LocalityInaccessible -> createToast(it.title, it.message, bitmap)
                 is NewObservationViewModel.Notification.LocationInaccessible -> createToast(it.title, it.message, bitmap)
                 is NewObservationViewModel.Notification.ObservationUploaded -> {
                     // When a user has uploaded an observation, we always want to just reset, so they can prepare a new one
