@@ -1,10 +1,7 @@
 package com.noque.svampeatlas.models
 
 import android.content.Context
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
+import androidx.room.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -24,6 +21,7 @@ sealed class NewObservationError(title: Int, message: Int) :
     object NoLocationDataError: NewObservationError(R.string.error_newObservation_noCoordinates_title, R.string.error_newObservation_noCoordinates_message)
 }
 
+@SuppressWarnings(RoomWarnings.PRIMARY_KEY_FROM_EMBEDDED_IS_DROPPED)
 @Entity(tableName = "notes")
  class NewObservation(
     @PrimaryKey

@@ -27,17 +27,8 @@ object SharedPreferences {
         prefs = PreferenceManager.getDefaultSharedPreferences(context)
     }
 
-    fun saveToken(token: String) {
-        prefs.edit().putString(TOKEN_KEY, token).apply()
-    }
-
-    fun getToken(): String? {
-        return prefs.getString(TOKEN_KEY, null)
-    }
-
-    fun removeToken() {
-        prefs.edit().remove(TOKEN_KEY).apply()
-    }
+    var token: String? get() = prefs.getString(TOKEN_KEY, null)
+    set(value) = prefs.edit().putString(TOKEN_KEY, value).apply()
 
     fun saveSubstrateID(id: Int?) {
         if (id != null)  prefs.edit().putInt(LOCKED_SUBSTRATE_ID, id).apply() else prefs.edit().remove(

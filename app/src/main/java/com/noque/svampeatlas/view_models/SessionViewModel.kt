@@ -1,5 +1,6 @@
 package com.noque.svampeatlas.view_models
 
+import android.app.backup.SharedPreferencesBackupHelper
 import android.content.res.Resources
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -17,6 +18,7 @@ import org.json.JSONObject
 import java.io.File
 import java.sql.Date
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.suspendCoroutine
 
 object Session {
 
@@ -57,7 +59,7 @@ object Session {
     val observationUploadState: LiveData<State<Pair<Int, Int>>> get() = _observationUploadState
 
     init {
-        this.token = SharedPreferences.getToken()
+        this.token = SharedPreferences.token
         evaluateLoginState(this.token)
     }
 
@@ -65,12 +67,11 @@ object Session {
         if (token != null) {
             getUser(token)
         } else {
-            _loggedInState.value = State.Items(false)
-            _user.value = null
+            setLoggedInState(null, null)
         }
     }
 
-    fun getUser(token: String) {
+    private fun getUser(token: String) {
         GlobalScope.launch {
             val result = RoomService.users.getUser()
 
@@ -80,25 +81,45 @@ object Session {
                             GlobalScope.launch {
                                 RoomService.users.saveUser(it)
                             }
-
-                            _user.postValue(it)
-                            _loggedInState.postValue(State.Items(true))
+                            setLoggedInState(token, it)
                             getNotifications(token)
                             getObservations(it)
                         }
 
                         it.onError {
-                            _loggedInState.postValue(State.Items(false))
-                            _user.postValue(null)
+                           setLoggedInState(null, null)
                         }
                     }
                 }
             result.onSuccess {
-                _user.postValue(it)
-                _loggedInState.postValue(State.Items(true))
+               setLoggedInState(token, it)
                 getNotifications(token)
                 getObservations(it)
+                downloadUser(token)
             }
+        }
+    }
+
+    fun downloadUser(token: String) {
+        DataService.getInstance(MyApplication.applicationContext).getUser(TAG, token) {
+            it.onSuccess {
+                GlobalScope.launch {
+                    RoomService.users.saveUser(it)
+                }
+            }
+        }
+    }
+
+
+    private fun setLoggedInState(token: String?, user: User?) {
+        SharedPreferences.token = token
+        this.token = token
+        this._user.postValue(user)
+
+        if (token == null || user == null) {
+            if (_loggedInState.value?.item != false) _loggedInState.postValue(State.Items(false))
+        } else {
+            if (_loggedInState.value?.item != true) _loggedInState.postValue(State.Items(true))
         }
     }
 
@@ -160,7 +181,7 @@ object Session {
 
             it.onSuccess {
                 token = it
-                SharedPreferences.saveToken(it)
+                SharedPreferences.token = it
                 getUser(it)
             }
         }
@@ -327,6 +348,10 @@ object Session {
             }
         })
 
+        if (json.getJSONArray("users").length() < 1) {
+            return Result.Error(Error.IsNotLoggedinError(MyApplication.resources))
+        }
+
         return DataService.getInstance(MyApplication.applicationContext).observationsRepository.uploadObservation(
             TAG,
             token,
@@ -347,7 +372,7 @@ object Session {
     }
 
     fun logout() {
-        SharedPreferences.removeToken()
+        SharedPreferences.token = null
         GlobalScope.launch {
             RoomService.users.clearUser()
         }

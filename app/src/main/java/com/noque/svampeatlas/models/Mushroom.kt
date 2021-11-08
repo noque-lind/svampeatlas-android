@@ -32,6 +32,7 @@ import java.util.Collections.emptyList
 ////    val getImages: List<Image> get() {return _images ?: listOf()}
 //}
 
+@SuppressWarnings(RoomWarnings.PRIMARY_KEY_FROM_EMBEDDED_IS_DROPPED)
 @Entity(tableName = "mushrooms")
 class Mushroom(
 

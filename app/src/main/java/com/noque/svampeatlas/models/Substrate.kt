@@ -2,11 +2,13 @@ package com.noque.svampeatlas.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.RoomWarnings
 import com.google.gson.annotations.SerializedName
 import com.noque.svampeatlas.extensions.AppLanguage
 import com.noque.svampeatlas.extensions.appLanguage
 import com.noque.svampeatlas.extensions.capitalized
 import java.util.*
+
 
 @Entity(tableName = "substrates")
 data class Substrate(
