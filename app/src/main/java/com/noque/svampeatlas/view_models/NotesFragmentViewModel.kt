@@ -33,10 +33,7 @@ class NotesFragmentViewModel: ViewModel() {
 
 
     fun getNotes() {
-        viewModelScope.launch(Dispatchers.Main) {
-            _notes.value = State.Loading()
-        }
-
+        _notes.postValue(State.Loading())
         viewModelScope.launch {
             RoomService.notesDao.getAll().apply {
                 onSuccess {

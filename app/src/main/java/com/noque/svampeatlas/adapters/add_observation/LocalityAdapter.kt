@@ -37,7 +37,7 @@ class LocalityAdapter(): RecyclerView.Adapter<LocalityViewHolder>() {
         notifyDataSetChanged()
     }
 
-    fun setSelected(locality: Locality): Int {
+    fun setSelected(locality:Locality): Int {
         notifyItemChanged(selectedPosition)
         selectedPosition = localities.indexOf(locality)
         notifyItemChanged(selectedPosition)

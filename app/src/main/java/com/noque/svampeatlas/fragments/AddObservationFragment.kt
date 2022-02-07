@@ -106,6 +106,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     private var addImagesRecyclerView by autoCleared<RecyclerView> { it?.adapter = null }
     private var tabLayout by autoCleared<TabLayout>() { it?.setupWithViewPager(null) }
 
+
     // View models
     private val newObservationViewModel by viewModels<NewObservationViewModel> { NewObservationViewModelFactory(args.type, args.id, args.mushroomId, args.imageFilePath,  requireActivity().application) }
 

@@ -8,7 +8,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.marginBottom
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,7 +15,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.adapters.add_observation.LocalityAdapter
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.extensions.openSettings
+import com.noque.svampeatlas.extensions.toBounds
 import com.noque.svampeatlas.fragments.MapFragment
+import com.noque.svampeatlas.fragments.PromptFragment
+import com.noque.svampeatlas.fragments.modals.LocationSettingsModal
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.utilities.safeAutoCleared
@@ -24,7 +26,7 @@ import com.noque.svampeatlas.view_models.NewObservationViewModel
 import kotlinx.android.synthetic.main.fragment_add_observation_locality.*
 import java.util.*
 
-class LocalityFragment: Fragment() {
+class LocalityFragment: Fragment(), LocationSettingsModal.Listener {
 
     companion object {
         const val TAG = "LocalityFragment"
@@ -43,7 +45,10 @@ class LocalityFragment: Fragment() {
     }
     private var retryButton by autoCleared<ImageButton>()
     private var markerImageView by autoCleared<ImageView>()
-    private var precisionLabel by autoCleared<TextView>()
+    private var locationLabel by autoCleared<TextView>()
+    private var locationLockedImage by autoCleared<ImageView>()
+    private var settingsButton by autoCleared<ImageButton>()
+    private var localityLockedImage by autoCleared<ImageView>()
 
     // View models
     private val newObservationViewModel: NewObservationViewModel by viewModels({ requireParentFragment() })
@@ -145,11 +150,14 @@ class LocalityFragment: Fragment() {
     }
 
     private fun initViews() {
+        settingsButton = localityFragment_settingsButton
         recyclerView = localityFragment_recyclerView
         mapFragment = childFragmentManager.findFragmentById(R.id.localityFragment_mapView) as MapFragment
         retryButton = localityFragment_retryButton
         markerImageView = localityFragment_markerImageView
-        precisionLabel = localityFragment_precisionLabel
+        locationLabel = localityFragment_precisionLabel
+        locationLockedImage = localityFragment_lockedLocation
+        localityLockedImage = localityFragment_lockedLocality
     }
 
     private fun setupViews() {
@@ -170,6 +178,12 @@ class LocalityFragment: Fragment() {
         mapFragment?.setType(MapFragment.Category.REGULAR)
         retryButton.setOnClickListener(retryButtonClicked)
         markerImageView.setOnTouchListener(markerOnTouchListener)
+
+        settingsButton.setOnClickListener {
+            val dialog = LocationSettingsModal()
+            dialog.setTargetFragment(this, 10)
+            dialog.show(parentFragmentManager, null)
+        }
     }
 
     private fun setupViewModels() {
@@ -190,24 +204,33 @@ class LocalityFragment: Fragment() {
             }
         })
 
-            newObservationViewModel.locality.observe(viewLifecycleOwner, Observer {
-                it?.let {
+            newObservationViewModel.locality.observe(viewLifecycleOwner, {
+                it?.first?.let {
                     recyclerView.scrollToPosition(localityAdapter.setSelected(it))
                     mapFragment?.setSelectedLocalityAnnotation(it.location)
                 }
             })
+
+            newObservationViewModel.lockedLocation.observe(viewLifecycleOwner, {
+                locationLockedImage.visibility = if(it != null) View.VISIBLE else View.GONE
+            })
+
+            newObservationViewModel.lockedLocality.observe(viewLifecycleOwner, {
+                localityLockedImage.visibility = if(it != null) View.VISIBLE else View.GONE
+            })
+
 
             newObservationViewModel.coordinateState.observe(viewLifecycleOwner, Observer {
                 when (it) {
                     is State.Items -> {
                         mapFragment?.addLocationMarker(it.items.latLng, resources.getString(R.string.locationAnnotation_title), it.items.accuracy.toDouble())
                         mapFragment?.setRegion(it.items.latLng)
-                        precisionLabel.text = resources.getString(R.string.precisionLabel, it.items.accuracy)
+                        locationLabel.text = resources.getString(R.string.precisionLabel, it.items.accuracy) + ", lat: ${String.format("%.2f", it.items.latLng.latitude)}, lon: ${String.format("%.2f", it.items.latLng.longitude)}"
                     }
 
                     is State.Loading -> {
                         mapFragment?.setLoading()
-                        precisionLabel.text = "Finder placering"
+                        locationLabel.text = "Finder placering..."
                     }
 
                     is State.Empty -> {
@@ -224,5 +247,13 @@ class LocalityFragment: Fragment() {
                     }
                 }
             })
+    }
+
+    override fun lockLocalitySet(value: Boolean) {
+        newObservationViewModel.setLocalityLock(value)
+    }
+
+    override fun lockLocationSet(value: Boolean) {
+        newObservationViewModel.setLocationLock(value)
     }
 }

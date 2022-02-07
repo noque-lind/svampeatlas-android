@@ -254,5 +254,9 @@
     <string name="error_database_noNotes_message">Du har endnu ikke nogen gemte notesbog indtastninger. Du kan her oprette noter om de svampe du finder, og så lægge dem op på Svampeatlas senere, f.eks. når du får bedre internet.</string>
     <string name="promp_noteSaved_title">Note gemt</string>
     <string name="prompt_noteSaved_message">Din note er blevet gemt i din notesbog. Du kan sende den ind senere!</string>
+    <string name="settings_remember_location">Husk disse koordinater</string>
+    <string name="settings_remember_locality">Husk denne placering (navn på lokationen)</string>
+    <string name="settings_locality_title">Placerings indstillinger</string>
+    <string name="settings_locality_message">De her indstillinger kan hjælpe dig i situationer hvor du har dårligt internet, og du gerne vil indsamle en masse observationer samme sted.\n\nDit valg vil blive husket indtil du genstarter appen</string>
 
 </resources>

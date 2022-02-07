@@ -366,6 +366,10 @@
     <string name="addObservationVC_title_edit_note">Edit notebook entry</string>
     <string name="common_save">Save</string>
     <string name="addObservationFragment_title_note">New notebook entry</string>
+    <string name="settings_remember_location">Remember these coordinates</string>
+    <string name="settings_remember_locality">Remember this location (name of location)</string>
+    <string name="settings_locality_title">Location settings</string>
+    <string name="settings_locality_message">These settings are usefull if you are somewhere where the connection is bad, and you are attempting to record a bunch of observations at the same place.\n\nYour choice will be remembered untill you restart the app.</string>
 
 
 </resources>

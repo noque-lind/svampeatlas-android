@@ -1,33 +1,23 @@
 package com.noque.svampeatlas.view_models
 
 import android.app.Application
-import android.content.Context
 import android.content.res.Resources
 import android.util.Log
 import androidx.lifecycle.*
-import com.bumptech.glide.load.engine.Resource
 import com.google.maps.android.SphericalUtil
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.extensions.*
-import com.noque.svampeatlas.extensions.Date
 import com.noque.svampeatlas.fragments.AddObservationFragment
 import com.noque.svampeatlas.models.*
-import com.noque.svampeatlas.models.Observable
 import com.noque.svampeatlas.services.DataService
-import com.noque.svampeatlas.services.FileManager
 import com.noque.svampeatlas.services.RoomService
-import com.noque.svampeatlas.utilities.DispatchGroup
 import com.noque.svampeatlas.utilities.MyApplication
 import com.noque.svampeatlas.utilities.SharedPreferences
 import com.noque.svampeatlas.utilities.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.json.JSONArray
-import org.json.JSONObject
 import java.io.File
 import java.util.*
-import kotlin.properties.Delegates
 
 class NewObservationViewModel(application: Application, val type: AddObservationFragment.Type, val id: Long, mushroomId: Int, imageFilePath: String?) : AndroidViewModel(application) {
 
@@ -58,14 +48,21 @@ class NewObservationViewModel(application: Application, val type: AddObservation
         private const val TAG = "NewObservationViewModel"
     }
 
+    private val _lockedLocality = MutableLiveData<Locality?>()
+    private val _lockedLocation = MutableLiveData<Location?>()
+
+    val lockedLocality: LiveData<Locality?> = _lockedLocality
+    val lockedLocation: LiveData<Location?> = _lockedLocation
+
     private var isAwaitingCoordinatedBeforeSave = false
+
 
 
     val observationDate: LiveData<Date>  get() = userObservation.observationDate
     val substrate: LiveData<Pair<Substrate, Boolean>?> get() = userObservation.substrate
     val vegetationType: LiveData<Pair<VegetationType, Boolean>?> get() = userObservation.vegetationType
     val hosts: LiveData<Pair<List<Host>, Boolean>?> get() = userObservation.hosts
-    val locality: LiveData<Locality?> get() = userObservation.locality
+    val locality: LiveData<Pair<Locality?, Boolean>?> get() = userObservation.locality
     val notes: LiveData<String?> get() = userObservation.notes
     val ecologyNotes: LiveData<String?> get() = userObservation.ecologyNotes
     val images: LiveData<List<UserObservation.Image>> get() = userObservation.images
@@ -79,20 +76,23 @@ class NewObservationViewModel(application: Application, val type: AddObservation
     private val _predictionResultsState by lazy { MutableLiveData<State<List<PredictionResult>>>(State.Empty()) }
 
     private var userObservation = ListenableUserObservation {
-        Log.d(TAG, "user observation was set")
-        val locality = it.locality
-        val location = it.location
-
-        if (locality != null) {
-            _localitiesState.value = State.Items(listOf(locality))
-        } else {
-            _localitiesState.value = State.Empty()
-            _predictionResultsState.value = State.Empty()
-            if (location != null) getLocalities(location)
+        if (it.locality == null && lockedLocality.value != null) {
+            it.locality = Pair(lockedLocality.value, true)
         }
 
-        if (location != null) {
-            _coordinateState.value = State.Items(location)
+        if (it.location == null && lockedLocation.value != null) {
+            it.location = Pair(lockedLocation.value, true)
+        }
+
+        if (it.locality != null) {
+            _localitiesState.value = State.Items(listOfNotNull(it.locality?.first))
+        } else {
+            _localitiesState.value = State.Empty()
+            it.location?.first?.let { getLocalities(it) }
+        }
+
+        if (it.location != null) {
+            it.location?.first?.let { _coordinateState.value = State.Items(it) }
         } else {
             _coordinateState.value = State.Empty()
         }
@@ -197,14 +197,35 @@ class NewObservationViewModel(application: Application, val type: AddObservation
     }
 
     fun setLocality(locality: Locality) {
-        userObservation.locality.value = locality
+        userObservation.locality.value = Pair(locality, _lockedLocality.value != null)
+
+        if (_lockedLocality.value != null) _lockedLocality.value = locality
+    }
+
+    fun setLocalityLock(isLocked: Boolean) {
+        _lockedLocality.value = if (isLocked) {
+            locality.value?.first
+        } else {
+            null
+        }
+    }
+
+    fun setLocationLock(isLocked:Boolean) {
+        _lockedLocation.value = if (isLocked) {
+            coordinateState.value?.item
+        } else {
+            null
+        }
     }
 
     fun setCoordinateState(state: State<Location>) {
         fun setLocation(location: Location) {
             userObservation.observationDate.value = location.date
-            userObservation.location.value = location
+            userObservation.location.value = Pair(location, _lockedLocation.value != null)
             _coordinateState.value = state
+            if (_lockedLocation.value != null) {
+                _lockedLocation.value = location
+            }
             if (isAwaitingCoordinatedBeforeSave) {
                saveAsNote()
             } else {
@@ -401,7 +422,10 @@ class NewObservationViewModel(application: Application, val type: AddObservation
                         }
 
                             if (locality != null) {
-                            userObservation.locality.postValue(locality)
+                            userObservation.locality.postValue(Pair(locality, lockedLocality.value != null))
+                                if (lockedLocality.value != null) {
+                                    _lockedLocality.postValue(locality)
+                                }
                             if (type != AddObservationFragment.Type.Note && type != AddObservationFragment.Type.EditNote)
                                 if(lastShownLocalityNotificationID != locality.id) {
                                     lastShownLocalityNotificationID = locality.id

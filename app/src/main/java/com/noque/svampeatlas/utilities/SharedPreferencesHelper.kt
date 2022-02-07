@@ -20,6 +20,8 @@ object SharedPreferences {
     private const val HAS_SEEN_IMAGE_DELETION = "HAS_SEEN_IMAGE_DELETION"
     private const val PREFERRED_LANGUAGE = "PREFERRED_LANGUAGE"
     private const val LAST_DOWNLOAD_TAXON = "LAST_DOWNLOAD_TAXON"
+    private const val LOCALITY_LOCKED = "LOCALITY_LOCKED"
+    private const val LOCATION_LOCKED = "LOCATION_LOCKED"
 
     private lateinit var prefs: SharedPreferences
 
@@ -94,6 +96,18 @@ object SharedPreferences {
         return prefs.getString(PREFERRED_LANGUAGE, "not_set") ?: "not_set"
     } set(value) {
         prefs.edit().putString(PREFERRED_LANGUAGE, value).apply()
+    }
+
+    var lockedLocality: String? get() {
+        return prefs.getString(LOCALITY_LOCKED, null)
+    } set(value) {
+        prefs.edit().putString(LOCALITY_LOCKED, value).apply()
+    }
+
+    var lockedLocation: String? get() {
+        return prefs.getString(LOCATION_LOCKED, null)
+    } set(value) {
+        prefs.edit().putString(LOCATION_LOCKED, value).apply()
     }
 
     var lastDownloadOfTaxon: Date?

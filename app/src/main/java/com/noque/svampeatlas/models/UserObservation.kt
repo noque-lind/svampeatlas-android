@@ -29,7 +29,6 @@ class Observable {
         ): MutableLiveData<X> {
             source.observeForever {
                 onCallback(it)
-                Log.d("Observer", it.toString())
             }
             return source
         }
@@ -79,10 +78,10 @@ class ListenableUserObservation(private val onChanged: (UserObservation) -> Unit
      }
 
     // Page 3 properties
-     val locality = Observable.observe(MutableLiveData<Locality?>()) {
+     val locality = Observable.observe(MutableLiveData<Pair<Locality?, Boolean>?>()) {
         userObservation.locality = it
     }
-     val location = Observable.observe(MutableLiveData<Location?>()) {
+     val location = Observable.observe(MutableLiveData<Pair<Location?, Boolean>?>()) {
          userObservation.location = it
      }
 
@@ -100,7 +99,7 @@ class ListenableUserObservation(private val onChanged: (UserObservation) -> Unit
         hosts.value = value.hosts
         notes.value = value.notes
         ecologyNotes.value = value.ecologyNotes
-        locality.value = value.locality
+        locality.value = locality.value
         location.value = value.location
     }
 }
@@ -172,8 +171,8 @@ class UserObservation(private val creationDate: Date = Date()) {
     var ecologyNotes: String? = null
 
     // Page 3 properties
-    var locality: Locality? = null
-    var location: Location? = null
+    var locality: Pair<Locality?, Boolean>? = null
+    var location: Pair<Location?, Boolean>? = null
 
     constructor(): this(creationDate = Date()) {
         SharedPreferences.getSubstrateID()?.let {
@@ -207,7 +206,6 @@ class UserObservation(private val creationDate: Date = Date()) {
         observation.substrate?.let { substrate = Pair(it, false) }
         observation.vegetationType?.let { vegetationType = Pair(it, false) }
         hosts = Pair(observation.hosts.toMutableList(), false)
-        locality = observation.locality
         notes = observation.note
         ecologyNotes = observation.ecologyNote
         images = observation.images.map {
@@ -219,8 +217,8 @@ class UserObservation(private val creationDate: Date = Date()) {
             )
         }.toMutableList()
         determinationNotes = null
-        observation.location?.let { location = it }
-        observation.locality?.let { locality = it }
+        observation.location?.let { location = Pair(it, false) }
+        observation.locality?.let { locality = Pair(it, false)  }
     }
 
     constructor(newObservation: NewObservation): this(creationDate = newObservation.creationDate) {
@@ -240,8 +238,7 @@ class UserObservation(private val creationDate: Date = Date()) {
 
             newObservation.substrate?.let { substrate = Pair(it, false) }
             newObservation.vegetationType?.let { vegetationType = Pair(it, false) }
-            locality = newObservation.locality
-            notes = newObservation.note
+        notes = newObservation.note
             ecologyNotes = newObservation.ecologyNote
             RoomService.hosts.getHostsWithIds(newObservation.hostIDs).apply {
                 onSuccess {
@@ -252,8 +249,8 @@ class UserObservation(private val creationDate: Date = Date()) {
             images = newObservation.images.map {
                 Image.LocallyStored(File(it))
             }.toMutableList()
-            newObservation.locality?.let { locality = it }
-            newObservation.coordinate?.let { location = it }
+            newObservation.locality?.let {Pair(it, false) }
+            newObservation.coordinate?.let { Pair(it, false) }
     }
 
     fun isValid(): Error? {
@@ -276,26 +273,26 @@ class UserObservation(private val creationDate: Date = Date()) {
             })
             put("ecologynote", ecologyNotes)
             put("note", notes)
-            put("decimalLatitude", location?.latLng?.latitude)
-            put("decimalLongitude", location?.latLng?.longitude)
-            put("accuracy", location?.accuracy)
+            put("decimalLatitude", location?.first?.latLng?.latitude)
+            put("decimalLongitude", location?.first?.latLng?.longitude)
+            put("accuracy", location?.first?.accuracy)
 
-            if (locality?.geoName != null) {
-                put("geonameId", locality?.geoName?.geonameId)
+            if (locality?.first?.geoName != null) {
+                put("geonameId", locality?.first?.geoName?.geonameId)
                 put(
                     "geoname", JSONObject()
-                        .put("geonameId", locality?.geoName?.geonameId)
-                        .put("name", locality?.geoName?.name)
-                        .put("adminName1", locality?.geoName?.adminName1)
-                        .put("lat", locality?.geoName?.lat)
-                        .put("lng", locality?.geoName?.lng)
-                        .put("countryName", locality?.geoName?.countryName)
-                        .put("countryCode", locality?.geoName?.countryCode)
-                        .put("fcodeName", locality?.geoName?.fcodeName)
-                        .put("fclName", locality?.geoName?.fclName)
+                        .put("geonameId", locality?.first?.geoName?.geonameId)
+                        .put("name", locality?.first?.geoName?.name)
+                        .put("adminName1", locality?.first?.geoName?.adminName1)
+                        .put("lat", locality?.first?.geoName?.lat)
+                        .put("lng", locality?.first?.geoName?.lng)
+                        .put("countryName", locality?.first?.geoName?.countryName)
+                        .put("countryCode", locality?.first?.geoName?.countryCode)
+                        .put("fcodeName", locality?.first?.geoName?.fcodeName)
+                        .put("fclName", locality?.first?.geoName?.fclName)
                 )
             } else {
-                put("locality_id", locality?.id)
+                put("locality_id", locality?.first?.id)
             }
 
             if (includeTaxon) {
@@ -322,10 +319,10 @@ class UserObservation(private val creationDate: Date = Date()) {
             creationDate,
             observationDate ?: Date(),
             mushroom?.first,
-            locality,
+            locality?.first,
             substrate?.first,
             vegetationType?.first,
-            location,
+            location?.first,
             ecologyNotes,
             notes,
             mushroom?.second?.databaseName,
