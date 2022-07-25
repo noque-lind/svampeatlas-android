@@ -13,6 +13,7 @@ import com.noque.svampeatlas.models.Substrate
 import com.noque.svampeatlas.models.VegetationType
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.fragments.add_observation.DetailsFragment
+import com.noque.svampeatlas.models.User
 import com.noque.svampeatlas.view_holders.InputTypeViewHolder
 import com.noque.svampeatlas.view_holders.SettingsViewHolder
 import java.util.*
@@ -21,6 +22,7 @@ class DetailsAdapter(private val resources: Resources, private val categories: A
     RecyclerView.Adapter<ViewHolder>() {
 
     var date: Date? = null
+    var user: User? = null
     var substrate: Pair<Substrate, Boolean>? = null
     var vegetationType: Pair<VegetationType, Boolean>? = null
 
@@ -66,6 +68,7 @@ class DetailsAdapter(private val resources: Resources, private val categories: A
 
         when (categories[viewType]) {
             DetailsFragment.Categories.DATE,
+            DetailsFragment.Categories.Determinators,
             DetailsFragment.Categories.SUBSTRATE,
             DetailsFragment.Categories.HOST,
             DetailsFragment.Categories.VEGETATIONTYPE -> {
@@ -95,6 +98,11 @@ class DetailsAdapter(private val resources: Resources, private val categories: A
                 resources.getString(R.string.observationDetailsCell_date),
                 date?.toReadableDate(recentFormatting = false, ignoreTime = true) ?: "-"
             )
+            DetailsFragment.Categories.Determinators -> (holder as? SettingsViewHolder)?.configure(
+                R.drawable.icon_profile,
+                resources.getString(R.string.observationDetailsCell_collectors),
+                content = "${user?.name ?: ""} (${user?.id ?: ""})")
+
             DetailsFragment.Categories.SUBSTRATE -> {
                 val string = if (substrate?.second == true) "\uD83D\uDD12 " else ""
 
@@ -111,16 +119,11 @@ class DetailsAdapter(private val resources: Resources, private val categories: A
                 resources.getString(R.string.observationDetailsCell_vegetationType),
                 string.plus(vegetationType?.first?.localizedName ?: "*")
             )
-
         }
 
             DetailsFragment.Categories.HOST -> {
                 val hosts = hosts
-
-                Log.d("Some", "Onbind, ${hosts.toString()}")
-
                 var hostsString: String
-
 
                 if (hosts?.first.isNullOrEmpty()) {
                     hostsString = "-"
@@ -130,12 +133,9 @@ class DetailsAdapter(private val resources: Resources, private val categories: A
                         hostsString += if (it.localizedName != null) "${it.localizedName}, " else "${it.latinName}, "
                     }
                    hostsString = hostsString.dropLast(2)
-
                 }
-
                 (holder as? SettingsViewHolder)?.configure(R.drawable.glyph_host,resources.getString(R.string.observationDetailsCell_host), hostsString)
             }
-
 
             DetailsFragment.Categories.ECOLOGYNOTES -> (holder as? InputTypeViewHolder)?.configure(
                 resources.getString(R.string.observationDetailsCell_ecologyNotes_title),

@@ -348,10 +348,6 @@ object Session {
             }
         })
 
-        if (json.getJSONArray("users").length() < 1) {
-            return Result.Error(Error.IsNotLoggedinError(MyApplication.resources))
-        }
-
         return DataService.getInstance(MyApplication.applicationContext).observationsRepository.uploadObservation(
             TAG,
             token,

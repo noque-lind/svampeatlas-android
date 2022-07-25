@@ -105,14 +105,14 @@ class DataService private constructor(context: Context) {
             ),
             null,
             null,
-            Response.Listener {
+            {
                 if (it.isEmpty()) {
                     completion(Result.Error(Error.SearchResponseEmpty(applicationContext)))
                 } else {
                     completion(Result.Success(it))
                 }
             },
-            Response.ErrorListener {
+            {
                 completion(Result.Error(it.toAppError()))
             })
         request.tag = tag
@@ -147,10 +147,10 @@ class DataService private constructor(context: Context) {
             api,
             null,
             null,
-            Response.Listener {
+            {
                 completion(Result.Success(it))
             },
-            Response.ErrorListener {
+            {
                 completion(Result.Error(it.toAppError()))
             })
 
@@ -185,11 +185,11 @@ class DataService private constructor(context: Context) {
             api,
             null,
             null,
-            Response.Listener {
+            {
                 completion(Result.Success(it))
             },
 
-            Response.ErrorListener {
+            {
                 completion(Result.Error(it.toAppError()))
             }
         )

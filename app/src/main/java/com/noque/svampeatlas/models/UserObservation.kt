@@ -29,7 +29,6 @@ class Observable {
         ): MutableLiveData<X> {
             source.observeForever {
                 onCallback(it)
-                Log.d("Observer", it.toString())
             }
             return source
         }

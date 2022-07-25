@@ -366,6 +366,7 @@
     <string name="addObservationVC_title_edit_note">Edit notebook entry</string>
     <string name="common_save">Save</string>
     <string name="addObservationFragment_title_note">New notebook entry</string>
+    <string name="observationDetailsCell_collectors">Collector(s):</string>
 
 
 </resources>

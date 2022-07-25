@@ -264,4 +264,5 @@
     <string name="error_database_noNotes_message">You do not have any saved notebook entries yet. This feature allows you to save notes about your sightings and then upload them at a later time. For example when you have a better internet connection.</string>
     <string name="promp_noteSaved_title">Note saved</string>
     <string name="prompt_noteSaved_message">Your note has been succesfully saved, and you can send it in later!</string>
+    <string name="observationDetailsCell_collectors">Collector(s):</string>
 </resources>

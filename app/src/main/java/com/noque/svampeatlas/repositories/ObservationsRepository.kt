@@ -79,10 +79,10 @@ class ObservationsRepository(private val requestQueue: RequestQueue) {
                     val request = AppMultipartPost(API(APIType.Post.Image(observationID)),
                         token,
                         multipartFormImage,
-                        Response.Listener {
+                        {
                             cont.resume(Result.Success(null))
                         },
-                        Response.ErrorListener {
+                        {
                             cont.resume((Result.Error(it.toAppError())))
                         }
                     )
@@ -103,10 +103,10 @@ class ObservationsRepository(private val requestQueue: RequestQueue) {
             API(APIType.Put.Observation(id)),
             token,
             json,
-            Response.Listener {
+            {
                 cont.resume(Result.Success(null))
             },
-            Response.ErrorListener {
+            {
                 cont.resume(Result.Error(it.toAppError()))
             })
 
@@ -118,11 +118,11 @@ class ObservationsRepository(private val requestQueue: RequestQueue) {
             API(APIType.Post.Observation()),
             token,
             json,
-            Response.Listener {
+            {
                 val id = it.getInt("_id")
                 cont.resume(Result.Success(id))
             },
-            Response.ErrorListener {
+            {
                 cont.resume(Result.Error(it.toAppError()))
             })
 
@@ -133,10 +133,10 @@ class ObservationsRepository(private val requestQueue: RequestQueue) {
         val request = AppEmptyRequest(
             API(APIType.Delete.Observation(id)),
             token,
-            Response.Listener {
+            {
                 cont.resume(Result.Success(null))
             },
-            Response.ErrorListener {
+            {
                 cont.resume(Result.Error(it.toAppError()))
             })
 

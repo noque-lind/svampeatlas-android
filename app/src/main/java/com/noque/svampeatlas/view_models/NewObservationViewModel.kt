@@ -61,7 +61,7 @@ class NewObservationViewModel(application: Application, val type: AddObservation
     private var isAwaitingCoordinatedBeforeSave = false
 
 
-    val observationDate: LiveData<Date>  get() = userObservation.observationDate
+    val observationDate: LiveData<Date> get() = userObservation.observationDate
     val substrate: LiveData<Pair<Substrate, Boolean>?> get() = userObservation.substrate
     val vegetationType: LiveData<Pair<VegetationType, Boolean>?> get() = userObservation.vegetationType
     val hosts: LiveData<Pair<List<Host>, Boolean>?> get() = userObservation.hosts
@@ -73,13 +73,13 @@ class NewObservationViewModel(application: Application, val type: AddObservation
 
     private var lastShownLocalityNotificationID: Int? = null
 
+    private val _user by lazy { MutableLiveData<User>() }
     private val _isLoading by lazy { MutableLiveData<Boolean>(false) }
     private val _coordinateState by lazy { MutableLiveData<State<Location>>() }
     private val _localitiesState by lazy {MutableLiveData<State<List<Locality>>>() }
     private val _predictionResultsState by lazy { MutableLiveData<State<List<PredictionResult>>>(State.Empty()) }
 
     private var userObservation = ListenableUserObservation {
-        Log.d(TAG, "user observation was set")
         val locality = it.locality
         val location = it.location
 
@@ -104,12 +104,19 @@ class NewObservationViewModel(application: Application, val type: AddObservation
     val coordinateState: LiveData<State<Location>> get() = _coordinateState
     val localitiesState: LiveData<State<List<Locality>>> get() = _localitiesState
     val predictionResultsState: LiveData<State<List<PredictionResult>>> get() = _predictionResultsState
+    val user: LiveData<User> get() = _user
 
     val showNotification by lazy { SingleLiveEvent<Notification>() }
     val showPrompt by lazy { SingleLiveEvent<Prompt>() }
 
 
     init {
+        viewModelScope.launch {
+            RoomService.users.getUser().onSuccess {
+                _user.value = it
+            }
+        }
+
         when (type) {
             AddObservationFragment.Type.New, AddObservationFragment.Type.Note -> {
                 userObservation.set(UserObservation())
