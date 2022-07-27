@@ -32,6 +32,7 @@ class DetailsFragment : Fragment() {
 
     enum class Categories {
         DATE,
+        Determinators,
         VEGETATIONTYPE,
         SUBSTRATE,
         HOST,
@@ -121,6 +122,11 @@ class DetailsFragment : Fragment() {
     }
 
     private fun setupViewModels() {
+        newObservationViewModel.user.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+            adapter.user = it
+            adapter.updateCategory(Categories.Determinators)
+        })
+
             newObservationViewModel.substrate.observe(
                 viewLifecycleOwner,
                 androidx.lifecycle.Observer {

@@ -39,7 +39,7 @@ class MushroomRepository(private val requestQueue: RequestQueue) {
             API(APIType.Request.Mushroom(id)),
             null,
             null,
-            Response.Listener {
+            {
                 if (it.firstOrNull() != null) {
                     cache.put(id, it.first())
                     cont.resume(Result.Success(it.first()))
@@ -48,7 +48,7 @@ class MushroomRepository(private val requestQueue: RequestQueue) {
                 }
             },
 
-            Response.ErrorListener {
+            {
                 cont.resume(Result.Error<Mushroom, DataService.Error>(it.toAppError()))
             })
 

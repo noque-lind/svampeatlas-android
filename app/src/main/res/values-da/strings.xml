@@ -258,5 +258,6 @@
     <string name="settings_remember_locality">Husk denne placering (navn på lokationen)</string>
     <string name="settings_locality_title">Placerings indstillinger</string>
     <string name="settings_locality_message">De her indstillinger kan hjælpe dig i situationer hvor du har dårligt internet, og du gerne vil indsamle en masse observationer samme sted.\n\nDit valg vil blive husket indtil du genstarter appen</string>
+    <string name="observationDetailsCell_collectors">Finder(e):</string>
 
 </resources>
