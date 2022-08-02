@@ -96,19 +96,4 @@
 
            />
     </androidx.appcompat.widget.LinearLayoutCompat>
-
-
-    <ImageView
-        android:id="@+id/localityFragment_lockedLocality"
-        android:layout_width="wrap_content"
-        android:padding="6dp"
-        android:layout_height="wrap_content"
-        android:translationY="14dp"
-        android:visibility="gone"
-        android:background="@drawable/circle_view_color_primary"
-        app:layout_constraintBottom_toTopOf="@+id/localityFragment_recyclerView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/glyph_lock" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

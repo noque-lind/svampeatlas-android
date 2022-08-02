@@ -369,7 +369,7 @@
     <string name="settings_remember_location">Remember these coordinates</string>
     <string name="settings_remember_locality">Remember this location (name of location)</string>
     <string name="settings_locality_title">Location settings</string>
-    <string name="settings_locality_message">These settings are usefull if you are somewhere where the connection is bad, and you are attempting to record a bunch of observations at the same place.\n\nYour choice will be remembered untill you restart the app.</string>
+    <string name="settings_locality_message">"These settings are useful if you are somewhere where the connection is bad, and you are attempting to record a bunch of observations at the same place. "</string>
     <string name="observationDetailsCell_collectors">Collector(s):</string>
 
 

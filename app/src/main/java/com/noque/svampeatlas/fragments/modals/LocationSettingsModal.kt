@@ -5,19 +5,24 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageButton
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.noque.svampeatlas.R
 import kotlinx.android.synthetic.main.fragment_modal_locality_settings.*
 
-class LocationSettingsModal: DialogFragment() {
+class LocationSettingsModal(
+    private val lockedLocality: Boolean,
+    private val lockedLocation: Boolean
+) : DialogFragment() {
 
     interface Listener {
         fun lockLocalitySet(value: Boolean)
         fun lockLocationSet(value: Boolean)
     }
 
+    private lateinit var saveButton: Button
     private lateinit var cancelButton: ImageButton
     private lateinit var locationSwitch: SwitchMaterial
     private lateinit var localitySwitch: SwitchMaterial
@@ -32,6 +37,7 @@ class LocationSettingsModal: DialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        saveButton = localitySettingsFragment_saveButton
         cancelButton = localitySettingsFragment_cancelButton
         locationSwitch = localitySettingsFragment_locationSwitch
         localitySwitch = localitySettingsFragment_localitySwitch
@@ -47,17 +53,19 @@ class LocationSettingsModal: DialogFragment() {
     }
 
     private fun setupViews() {
+        locationSwitch.isChecked = lockedLocation
+        localitySwitch.isChecked = lockedLocality
+
+        saveButton.setOnClickListener {
+            (targetFragment as? Listener)?.lockLocalitySet(localitySwitch.isChecked)
+            (targetFragment as? Listener)?.lockLocationSet(locationSwitch.isChecked)
+            dismiss()
+        }
+
         cancelButton.apply {
             setOnClickListener {
                 dismiss()
             }
-        }
-        localitySwitch.setOnCheckedChangeListener { _, _ ->
-            (targetFragment as? Listener)?.lockLocalitySet(localitySwitch.isChecked)
-        }
-
-        locationSwitch.setOnCheckedChangeListener { _, _ ->
-            (targetFragment as? Listener)?.lockLocationSet(locationSwitch.isChecked)
         }
     }
 }

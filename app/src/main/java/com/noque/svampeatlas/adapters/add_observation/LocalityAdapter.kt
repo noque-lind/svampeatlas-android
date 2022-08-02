@@ -11,11 +11,8 @@ import com.noque.svampeatlas.view_holders.LocalityViewHolder
 
 class LocalityAdapter(): RecyclerView.Adapter<LocalityViewHolder>() {
 
-    private val ERROR_VIEW_TYPE = 0
-    private val LOCALITY_VIEW_TYPE = 1
-
-
     private var localities = listOf<Locality>()
+    private var lockedLocality: Locality? = null
     private var error: AppError2? = null
     private var selectedPosition = 0
     var localitySelected: ((locality: Locality) -> Unit)? = null
@@ -29,7 +26,7 @@ class LocalityAdapter(): RecyclerView.Adapter<LocalityViewHolder>() {
 
     fun configure(localities: List<Locality>) {
         this.localities = localities
-        notifyDataSetChanged()
+       notifyDataSetChanged()
     }
 
     fun configure(error: AppError2) {
@@ -37,7 +34,8 @@ class LocalityAdapter(): RecyclerView.Adapter<LocalityViewHolder>() {
         notifyDataSetChanged()
     }
 
-    fun setSelected(locality:Locality): Int {
+    fun setSelected(locality:Locality, locked: Boolean): Int {
+        lockedLocality = if (locked) locality else null
         notifyItemChanged(selectedPosition)
         selectedPosition = localities.indexOf(locality)
         notifyItemChanged(selectedPosition)
@@ -57,6 +55,7 @@ class LocalityAdapter(): RecyclerView.Adapter<LocalityViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: LocalityViewHolder, position: Int) {
-       holder.configure(localities[position], position == selectedPosition)
+        val locality = localities[position]
+       holder.configure(locality, position == selectedPosition, locality.id == lockedLocality?.id)
     }
 }

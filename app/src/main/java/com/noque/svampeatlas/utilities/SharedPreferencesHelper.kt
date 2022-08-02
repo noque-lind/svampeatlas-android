@@ -5,7 +5,11 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.preference.PreferenceManager
 import com.noque.svampeatlas.extensions.Date
+import com.noque.svampeatlas.models.Locality
 import java.util.*
+import com.google.gson.Gson
+import com.noque.svampeatlas.models.Location
+
 
 object SharedPreferences {
 
@@ -98,16 +102,26 @@ object SharedPreferences {
         prefs.edit().putString(PREFERRED_LANGUAGE, value).apply()
     }
 
-    var lockedLocality: String? get() {
-        return prefs.getString(LOCALITY_LOCKED, null)
+    var lockedLocality: Locality? get() {
+        val json = prefs.getString(LOCALITY_LOCKED, null)
+        return if(json != null) Gson().fromJson(json, Locality::class.java) else null
     } set(value) {
-        prefs.edit().putString(LOCALITY_LOCKED, value).apply()
+        if (value != null) {
+            prefs.edit().putString(LOCALITY_LOCKED, Gson().toJson(value)).apply()
+        } else {
+            prefs.edit().remove(LOCALITY_LOCKED).apply()
+        }
     }
 
-    var lockedLocation: String? get() {
-        return prefs.getString(LOCATION_LOCKED, null)
+    var lockedLocation: Location? get() {
+        val json = prefs.getString(LOCATION_LOCKED, null)
+        return if(json != null) Gson().fromJson(json, Location::class.java) else null
     } set(value) {
-        prefs.edit().putString(LOCATION_LOCKED, value).apply()
+        if (value != null) {
+            prefs.edit().putString(LOCATION_LOCKED, Gson().toJson(value)).apply()
+        } else {
+            prefs.edit().remove(LOCATION_LOCKED).apply()
+        }
     }
 
     var lastDownloadOfTaxon: Date?

@@ -48,7 +48,6 @@ class LocalityFragment: Fragment(), LocationSettingsModal.Listener {
     private var locationLabel by autoCleared<TextView>()
     private var locationLockedImage by autoCleared<ImageView>()
     private var settingsButton by autoCleared<ImageButton>()
-    private var localityLockedImage by autoCleared<ImageView>()
 
     // View models
     private val newObservationViewModel: NewObservationViewModel by viewModels({ requireParentFragment() })
@@ -157,7 +156,6 @@ class LocalityFragment: Fragment(), LocationSettingsModal.Listener {
         markerImageView = localityFragment_markerImageView
         locationLabel = localityFragment_precisionLabel
         locationLockedImage = localityFragment_lockedLocation
-        localityLockedImage = localityFragment_lockedLocality
     }
 
     private fun setupViews() {
@@ -180,7 +178,7 @@ class LocalityFragment: Fragment(), LocationSettingsModal.Listener {
         markerImageView.setOnTouchListener(markerOnTouchListener)
 
         settingsButton.setOnClickListener {
-            val dialog = LocationSettingsModal()
+            val dialog = LocationSettingsModal(lockedLocality = newObservationViewModel.locality.value?.second ?: false, lockedLocation = newObservationViewModel.location.value?.second ?: false)
             dialog.setTargetFragment(this, 10)
             dialog.show(parentFragmentManager, null)
         }
@@ -205,20 +203,15 @@ class LocalityFragment: Fragment(), LocationSettingsModal.Listener {
         })
 
             newObservationViewModel.locality.observe(viewLifecycleOwner, {
-                it?.first?.let {
-                    recyclerView.scrollToPosition(localityAdapter.setSelected(it))
-                    mapFragment?.setSelectedLocalityAnnotation(it.location)
+                it?.first?.let { locality ->
+                    recyclerView.scrollToPosition(localityAdapter.setSelected(locality, it.second))
+                    mapFragment?.setSelectedLocalityAnnotation(locality.location)
                 }
             })
 
-            newObservationViewModel.lockedLocation.observe(viewLifecycleOwner, {
-                locationLockedImage.visibility = if(it != null) View.VISIBLE else View.GONE
+            newObservationViewModel.location.observe(viewLifecycleOwner, Observer {
+                locationLockedImage.visibility = if(it?.second == true) View.VISIBLE else View.GONE
             })
-
-            newObservationViewModel.lockedLocality.observe(viewLifecycleOwner, {
-                localityLockedImage.visibility = if(it != null) View.VISIBLE else View.GONE
-            })
-
 
             newObservationViewModel.coordinateState.observe(viewLifecycleOwner, Observer {
                 when (it) {

@@ -99,7 +99,7 @@ class ListenableUserObservation(private val onChanged: (UserObservation) -> Unit
         hosts.value = value.hosts
         notes.value = value.notes
         ecologyNotes.value = value.ecologyNotes
-        locality.value = locality.value
+        locality.value = value.locality
         location.value = value.location
     }
 }
@@ -191,6 +191,14 @@ class UserObservation(private val creationDate: Date = Date()) {
             RoomService.hosts.getHostsWithIds(it).onSuccess {
                 hosts = Pair(it.toMutableList(), true)
             }
+        }
+
+        SharedPreferences.lockedLocality?.let {
+            locality = Pair(it, true)
+        }
+
+        SharedPreferences.lockedLocation?.let {
+            location = Pair(it, true)
         }
     }
 

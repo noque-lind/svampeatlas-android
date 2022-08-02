@@ -48,14 +48,7 @@ class NewObservationViewModel(application: Application, val type: AddObservation
         private const val TAG = "NewObservationViewModel"
     }
 
-    private val _lockedLocality = MutableLiveData<Locality?>()
-    private val _lockedLocation = MutableLiveData<Location?>()
-
-    val lockedLocality: LiveData<Locality?> = _lockedLocality
-    val lockedLocation: LiveData<Location?> = _lockedLocation
-
     private var isAwaitingCoordinatedBeforeSave = false
-
 
     val observationDate: LiveData<Date>  get() = userObservation.observationDate
     val substrate: LiveData<Pair<Substrate, Boolean>?> get() = userObservation.substrate
@@ -66,24 +59,17 @@ class NewObservationViewModel(application: Application, val type: AddObservation
     val ecologyNotes: LiveData<String?> get() = userObservation.ecologyNotes
     val images: LiveData<List<UserObservation.Image>> get() = userObservation.images
     val mushroom: LiveData<Pair<Mushroom, DeterminationConfidence>?> get() = userObservation.mushroom
+    val location: LiveData<Pair<Location?, Boolean>?> get() = userObservation.location
 
     private var lastShownLocalityNotificationID: Int? = null
 
     private val _user by lazy { MutableLiveData<User>() }
-    private val _isLoading by lazy { MutableLiveData<Boolean>(false) }
+    private val _isLoading by lazy { MutableLiveData(false) }
     private val _coordinateState by lazy { MutableLiveData<State<Location>>() }
     private val _localitiesState by lazy {MutableLiveData<State<List<Locality>>>() }
     private val _predictionResultsState by lazy { MutableLiveData<State<List<PredictionResult>>>(State.Empty()) }
 
     private var userObservation = ListenableUserObservation {
-        if (it.locality == null && lockedLocality.value != null) {
-            it.locality = Pair(lockedLocality.value, true)
-        }
-
-        if (it.location == null && lockedLocation.value != null) {
-            it.location = Pair(lockedLocation.value, true)
-        }
-
         if (it.locality != null) {
             _localitiesState.value = State.Items(listOfNotNull(it.locality?.first))
         } else {
@@ -204,35 +190,26 @@ class NewObservationViewModel(application: Application, val type: AddObservation
     }
 
     fun setLocality(locality: Locality) {
-        userObservation.locality.value = Pair(locality, _lockedLocality.value != null)
-
-        if (_lockedLocality.value != null) _lockedLocality.value = locality
+        userObservation.locality.value = Pair(locality, false)
+        SharedPreferences.lockedLocality = null
     }
 
     fun setLocalityLock(isLocked: Boolean) {
-        _lockedLocality.value = if (isLocked) {
-            locality.value?.first
-        } else {
-            null
-        }
+        userObservation.locality.value = Pair(locality.value?.first, isLocked)
+        SharedPreferences.lockedLocality = if (isLocked) locality.value?.first else null
     }
 
     fun setLocationLock(isLocked:Boolean) {
-        _lockedLocation.value = if (isLocked) {
-            coordinateState.value?.item
-        } else {
-            null
-        }
+        userObservation.location.value = Pair(coordinateState.value?.item, isLocked)
+        SharedPreferences.lockedLocation = if (isLocked) coordinateState.value?.item else null
     }
 
     fun setCoordinateState(state: State<Location>) {
         fun setLocation(location: Location) {
             userObservation.observationDate.value = location.date
-            userObservation.location.value = Pair(location, _lockedLocation.value != null)
+            userObservation.location.value = Pair(location, false)
+            SharedPreferences.lockedLocation = null
             _coordinateState.value = state
-            if (_lockedLocation.value != null) {
-                _lockedLocation.value = location
-            }
             if (isAwaitingCoordinatedBeforeSave) {
                saveAsNote()
             } else {
@@ -429,10 +406,7 @@ class NewObservationViewModel(application: Application, val type: AddObservation
                         }
 
                             if (locality != null) {
-                            userObservation.locality.postValue(Pair(locality, lockedLocality.value != null))
-                                if (lockedLocality.value != null) {
-                                    _lockedLocality.postValue(locality)
-                                }
+                            userObservation.locality.postValue(Pair(locality, false))
                             if (type != AddObservationFragment.Type.Note && type != AddObservationFragment.Type.EditNote)
                                 if(lastShownLocalityNotificationID != locality.id) {
                                     lastShownLocalityNotificationID = locality.id

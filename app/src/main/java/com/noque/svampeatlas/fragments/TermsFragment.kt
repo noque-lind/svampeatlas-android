@@ -24,6 +24,7 @@ class TermsFragment: DialogFragment() {
 
     enum class Type {
         IDENTIFICATION,
+        LOCALITYHELPER,
         CAMERAHELPER,
         WHATSNEW,
         IMAGEDELETIONS
