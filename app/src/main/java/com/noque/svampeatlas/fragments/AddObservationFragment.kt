@@ -4,6 +4,8 @@ import android.content.pm.ActivityInfo
 import android.graphics.*
 import android.location.Location
 import android.os.Bundle
+import android.os.Debug
+import android.util.Log
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -22,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.tabs.TabLayout
+import com.noque.svampeatlas.BuildConfig.DEBUG
 import com.noque.svampeatlas.adapters.add_observation.AddImagesAdapter
 import com.noque.svampeatlas.adapters.add_observation.InformationAdapter
 import com.noque.svampeatlas.models.State
@@ -351,6 +354,24 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
 
         viewPager.apply {
             adapter = informationAdapter
+            addOnPageChangeListener(object: ViewPager.SimpleOnPageChangeListener() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    if (Category.LOCALITY.ordinal != position) return
+                    SharedPreferences.decreasePositionReminderCounter()
+                    if (SharedPreferences.shouldShowPositionReminder()) {
+                        val bundle = Bundle()
+                        bundle.putSerializable(
+                            TermsFragment.KEY_TYPE,
+                            TermsFragment.Type.LOCALITYHELPER
+                        )
+                        val dialog = TermsFragment()
+                        dialog.arguments = bundle
+                        dialog.show(childFragmentManager, null)
+                    }
+                }
+
+            })
         }
 
         findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>(SAVED_STATE_FILE_PATH)?.observe(viewLifecycleOwner, Observer {

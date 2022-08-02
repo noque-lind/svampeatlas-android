@@ -255,5 +255,11 @@
     <string name="promp_noteSaved_title">Note gemt</string>
     <string name="prompt_noteSaved_message">Din note er blevet gemt i din notesbog. Du kan sende den ind senere!</string>
     <string name="observationDetailsCell_collectors">Finder(e):</string>
+    <string name="modal_localityHelper_title">Husk at kontrollere din placering</string>
+    <string name="modal_localityHelper_message">Det er vigtigt for kvaliteten af den indsamlede data, at du kontrollerer at placeringen til din observation er korrekt. Du kan se på klippet nedenfor, hvordan du justerer placeringen manuelt.  \n\nHvis det første tilføjede billede indeholder et GPS koordinat, vil appen foreslå at bruge billedets placering istedet for.  \n\nVi vil minde dig om dette engang imellem - du kan slå dette fra i indstillinger.</string>
+    <string name="settings_reminders">Påmindelser</string>
+    <string name="settings_reminders_locality">Modtag påmindelser vedrørende kontrol af position</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nej</string>
 
 </resources>
