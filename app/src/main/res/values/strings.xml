@@ -271,4 +271,5 @@
     <string name="settings_reminders_locality">Recieve reminders regarding importance of correct and precise position attached to records</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="common_continue">Continue</string>
 </resources>

@@ -261,5 +261,6 @@
     <string name="settings_reminders_locality">Modtag påmindelser vedrørende kontrol af position</string>
     <string name="yes">Ja</string>
     <string name="no">Nej</string>
+    <string name="common_continue">Fortsæt</string>
 
 </resources>

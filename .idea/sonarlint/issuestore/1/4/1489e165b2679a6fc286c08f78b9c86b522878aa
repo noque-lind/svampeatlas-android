@@ -1,0 +1,9 @@
+
+mkotlin:S6306§"TUsing "GlobalScope" here leads to the breaking of structured concurrency principles.(á¥ €
+rkotlin:S6306’"TUsing "GlobalScope" here leads to the breaking of structured concurrency principles.(š£Œúÿÿÿÿ
+2kotlin:S1128"Remove this unused import.(Æü³Ï
+2kotlin:S1128&"Remove this unused import.(ñô¦”
+5kotlin:S6310§"Avoid hardcoded dispatchers.(á¥ €
+skotlin:S1186‚"ZAdd a nested comment explaining why this function is empty or complete the implementation.(ÃİÁß
+skotlin:S1186ƒ"ZAdd a nested comment explaining why this function is empty or complete the implementation.(ƒæÏ
+xkotlin:S1186³"ZAdd a nested comment explaining why this function is empty or complete the implementation.(¤÷Ãøÿÿÿÿ

@@ -43,12 +43,9 @@ import com.noque.svampeatlas.view_holders.AddedImageViewHolder
 import com.noque.svampeatlas.view_models.NewObservationViewModel
 import com.noque.svampeatlas.view_models.Session
 import com.noque.svampeatlas.view_models.factories.NewObservationViewModelFactory
-import kotlinx.android.synthetic.main.action_view_add_notebook_entry.view.*
+import kotlinx.android.synthetic.main.action_view_continue.view.*
 import kotlinx.android.synthetic.main.action_view_save_notebook_entry.view.*
-import kotlinx.android.synthetic.main.action_view_upload_changes_entry.view.*
-import kotlinx.android.synthetic.main.action_view_upload_observation_entry.*
-import kotlinx.android.synthetic.main.action_view_upload_observation_entry.actionView_upload
-import kotlinx.android.synthetic.main.action_view_upload_observation_entry.view.*
+import kotlinx.android.synthetic.main.action_view_upload_button.view.*
 import kotlinx.android.synthetic.main.custom_toast.*
 import kotlinx.android.synthetic.main.custom_toast.view.*
 import kotlinx.android.synthetic.main.fragment_add_observation.*
@@ -266,12 +263,34 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         setupViewModels()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        val inflater = activity?.menuInflater
         when (args.type) {
-            Type.New, Type.FromRecognition -> inflater.inflate(R.menu.add_observation_fragment_menu, menu)
-            Type.Edit -> inflater.inflate(R.menu.add_observation_fragment_menu_edit, menu)
-            Type.Note -> inflater.inflate(R.menu.add_observation_fragment_menu_notes, menu)
-            Type.EditNote -> inflater.inflate(R.menu.menu_add_observation_menu_edit_note, menu)
+            Type.New, Type.FromRecognition -> {
+                if (viewPager.currentItem == Category.LOCALITY.ordinal) {
+                    inflater?.inflate(R.menu.add_observation_fragment_menu_upload, menu)
+                } else {
+                    inflater?.inflate(R.menu.add_observation_fragment_menu, menu)
+                }
+
+            }
+            Type.Edit -> inflater?.inflate(R.menu.add_observation_fragment_menu_edit, menu)
+            Type.Note -> inflater?.inflate(R.menu.add_observation_fragment_menu_notes, menu)
+            Type.EditNote -> inflater?.inflate(R.menu.menu_add_observation_menu_edit_note, menu)
+        }
+
+        menu.findItem(R.id.menu_addObservationFragment_continueButton)?.let {
+            (it.actionView as? LinearLayout)?.apply {
+                actionView_continue.setOnClickListener {
+            when (Category.values[viewPager.currentItem]) {
+                Category.SPECIES -> if (newObservationViewModel.mushroom.value != null) viewPager.currentItem =
+                    Category.DETAILS.ordinal else newObservationViewModel.uploadNew()
+                Category.DETAILS -> if (newObservationViewModel.substrate.value != null && newObservationViewModel.vegetationType.value != null) viewPager.currentItem =
+                    Category.LOCALITY.ordinal else newObservationViewModel.uploadNew()
+                Category.LOCALITY -> newObservationViewModel.uploadNew()
+            }
+                }
+            }
         }
 
         menu.findItem(R.id.menu_addObservationFragment_note_save)?.let {
@@ -292,19 +311,17 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
 
         menu.findItem(R.id.menu_addObservationFragment_uploadChanges)?.let {
             (it.actionView as? LinearLayout)?.apply {
-                actionView_uploadChanges.setOnClickListener {
+                actionView_upload.setOnClickListener {
                     newObservationViewModel.uploadChanges()
                 }
             }
         }
 
-        menu.findItem(R.id.menu_addObservationFragment_note_save)?.let {
-            (it.actionView as? LinearLayout)?.apply {
-                actionView_saveNotebookEntry.setOnClickListener {
-                    newObservationViewModel.saveAsNote()
-                }
-            }
-        }
+        super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -356,6 +373,9 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
             adapter = informationAdapter
             addOnPageChangeListener(object: ViewPager.SimpleOnPageChangeListener() {
                 override fun onPageSelected(position: Int) {
+                    activity?.invalidateOptionsMenu()
+
+
                     super.onPageSelected(position)
                     if (Category.LOCALITY.ordinal != position) return
                     SharedPreferences.decreasePositionReminderCounter()
@@ -386,12 +406,18 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     }
 
     private fun setupViewModels() {
+        newObservationViewModel.resetEvent.observe(viewLifecycleOwner, {
+            viewPager.currentItem = 0
+        })
+
         newObservationViewModel.isLoading.observe(viewLifecycleOwner, Observer {
             when (it) {
                 true -> spinnerView.startLoading()
                 false -> spinnerView.stopLoading()
             }
         })
+
+
 
         newObservationViewModel.images.observe(viewLifecycleOwner, Observer {
             addImagesAdapter.configure(it ?: listOf())

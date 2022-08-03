@@ -4,10 +4,10 @@
 
     <item
         android:title="@string/addObservationFragment_upload"
-        android:id="@+id/menu_addObservationFragment_continueButton"
+        android:id="@+id/menu_addObservationFragment_uploadButton"
         android:orderInCategory="1"
         app:showAsAction="always"
-        app:actionLayout="@layout/action_view_continue"
+        app:actionLayout="@layout/action_view_upload_button"
         />
 
     <item
