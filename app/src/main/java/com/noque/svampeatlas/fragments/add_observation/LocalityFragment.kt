@@ -19,6 +19,7 @@ import com.noque.svampeatlas.extensions.toBounds
 import com.noque.svampeatlas.fragments.MapFragment
 import com.noque.svampeatlas.fragments.PromptFragment
 import com.noque.svampeatlas.fragments.modals.LocationSettingsModal
+import com.noque.svampeatlas.fragments.TermsFragment
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.utilities.safeAutoCleared
@@ -90,7 +91,6 @@ class LocalityFragment: Fragment(), LocationSettingsModal.Listener {
                 val y = motionEvent.rawY
 
                 when (motionEvent.action) {
-
                     MotionEvent.ACTION_DOWN -> {
                         val location = IntArray(2)
                         view.getLocationInWindow(location)
@@ -119,6 +119,12 @@ class LocalityFragment: Fragment(), LocationSettingsModal.Listener {
                             mapFragment?.getCoordinatesFor(finalX + (view.width / 2), finalY + view.height)?.let { newObservationViewModel.setCoordinateState(
                                 State.Items(Location(Date(), it, 5F))
                             ) }
+                        } else {
+                            val bundle = Bundle()
+                            bundle.putSerializable(TermsFragment.KEY_TYPE, TermsFragment.Type.LOCALITYHELPER)
+                            val dialog = TermsFragment()
+                            dialog.arguments = bundle
+                            dialog.show(childFragmentManager, null)
                         }
 
                         markerImageView.translationX = 0F

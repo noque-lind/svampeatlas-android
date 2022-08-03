@@ -4,6 +4,7 @@ import android.widget.ImageView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.services.DataService
@@ -40,4 +41,12 @@ fun ImageView.downloadImage(size: DataService.ImageSize,
             .placeholder(circularProgressDrawable)
             .into(this)
     }
+}
+
+fun ImageView.loadGif(resource: Int) {
+    GlideApp.with(context)
+        .asGif()
+        .load(resource)
+        .transition(DrawableTransitionOptions.withCrossFade())// Call your GIF here (url, raw, etc.)
+        .into(this)
 }

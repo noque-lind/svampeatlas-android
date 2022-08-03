@@ -26,7 +26,7 @@ import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.view_models.NotesFragmentViewModel
 import com.noque.svampeatlas.views.BackgroundView
 import com.noque.svampeatlas.views.BlankActivity
-import kotlinx.android.synthetic.main.action_view_add_notebook_entry.view.*
+import kotlinx.android.synthetic.main.action_view_add_notebook_button.view.*
 import kotlinx.android.synthetic.main.fragment_notebook.*
 
 class NotesFragment: Fragment() {

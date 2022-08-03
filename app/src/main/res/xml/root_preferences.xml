@@ -1,20 +1,29 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    app:iconSpaceReserved="false"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
 
     <PreferenceCategory
+        app:iconSpaceReserved="false"
         android:layout_width="match_parent"
         app:title="@string/settings_general_title">
+        <ListPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="not_set"
+            android:entries="@array/language_entries"
+            android:entryValues="@array/language_values"
+            android:key="PREFERRED_LANGUAGE"
+            android:summary="%s"
+            android:title="@string/settings_language_title" />
         <SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
             app:key="SAVE_IMAGES"
-            app:summaryOff="@string/prompt_shouldSaveImages_negative"
-            app:summaryOn="@string/prompt_shouldSaveImages_message"
             app:title="@string/prompt_shouldSaveImages_title" />
     </PreferenceCategory>
-    <ListPreference
-        android:defaultValue="not_set"
-        android:entries="@array/language_entries"
-        android:entryValues="@array/language_values"
-        android:key="PREFERRED_LANGUAGE"
-        android:summary="@string/settings_language_message"
-        android:title="@string/settings_language_title" />
+    <PreferenceCategory  app:iconSpaceReserved="false" android:title="@string/settings_reminders">
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:title="@string/settings_reminders_locality"
+            app:key="shouldShowPositionReminderToggle" />
+    </PreferenceCategory>
 </PreferenceScreen>

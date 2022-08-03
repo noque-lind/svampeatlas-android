@@ -263,10 +263,17 @@
     <string name="unknownSpeciesButton_title">I do not know what i have found</string>
     <string name="error_database_noNotes_message">You do not have any saved notebook entries yet. This feature allows you to save notes about your sightings and then upload them at a later time. For example when you have a better internet connection.</string>
     <string name="promp_noteSaved_title">Note saved</string>
-    <string name="prompt_noteSaved_message">Your note has been succesfully saved, and you can send it in later!</string>
+    <string name="prompt_noteSaved_message">Your note has been successfully saved, and you can send it in later!</string>
     <string name="observationDetailsCell_collectors">Collector(s):</string>
     <string name="settings_remember_location">Remember these coordinates</string>
     <string name="settings_remember_locality">Remember this location (name of location)</string>
     <string name="settings_locality_title">Location settings</string>
     <string name="settings_locality_message">"These settings are useful if you are somewhere where the connection is bad, and you are attempting to record a bunch of observations at the same place. "</string>
+    <string name="modal_localityHelper_title">Remember to confirm your position</string>
+    <string name="modal_localityHelper_message">It is important for the quality of your collected data, that you make sure the position of the observation you are submitting are correct. You can see on the clip below how to adjust the position manually.\n\nIf a photo added to the observation contains a GPS tag, the app will suggest using the position from the image instead.\n\nWe will remind you of this every once in a while. You can turn this reminder off in the settings.</string>
+    <string name="settings_reminders">Reminders</string>
+    <string name="settings_reminders_locality">Recieve reminders regarding importance of correct and precise position attached to records</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="common_continue">Continue</string>
 </resources>

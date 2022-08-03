@@ -84,6 +84,32 @@ object SharedPreferences {
         prefs.edit().putBoolean(HAS_ACCEPTED_IDENTIFCATION_TERMS, value).apply()
     }
 
+    /// Keeps track of how many sent observations it has been since user was last reminded about precision importance
+    private var positionReminderObservationCount: Int get() {
+            return prefs.getInt("positionReminderObservationCount", -1)
+        } set(value) {
+            prefs.edit().putInt("positionReminderObservationCount", value).apply()
+        }
+
+    fun decreasePositionReminderCounter() {
+        positionReminderObservationCount -= 1
+    }
+
+     fun shouldShowPositionReminder(): Boolean {
+        return (shouldShowPositionReminderToggle && positionReminderObservationCount <= 0)
+    }
+
+     fun setHasShownPositionReminder() {
+        prefs.edit().putInt("positionReminderObservationCount", 20).apply()
+    }
+
+    /// Wether the user would like to recieve position reminders, toggleable in settings.
+    var shouldShowPositionReminderToggle: Boolean get() {
+        return if (prefs.contains("shouldShowPositionReminderToggle")) prefs.getBoolean("shouldShowPositionReminderToggle", true) else true
+    } set(value) {
+        prefs.edit().putBoolean("shouldShowPositionReminderToggle", value).apply()
+    }
+
     var hasSeenWhatsNew: Boolean get() {
         return prefs.getBoolean(HAS_SEEN_WHATS_NEW, false)
     } set(value) {
