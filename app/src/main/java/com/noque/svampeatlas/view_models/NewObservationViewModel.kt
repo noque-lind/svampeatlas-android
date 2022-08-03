@@ -98,6 +98,7 @@ class NewObservationViewModel(application: Application, val type: AddObservation
         }
 
         _predictionResultsState.value = State.Empty()
+        resetEvent.call()
     }
 
     val isLoading: LiveData<Boolean> = _isLoading
@@ -108,7 +109,7 @@ class NewObservationViewModel(application: Application, val type: AddObservation
 
     val showNotification by lazy { SingleLiveEvent<Notification>() }
     val showPrompt by lazy { SingleLiveEvent<Prompt>() }
-
+    val resetEvent by lazy { SingleLiveEvent<Void>() }
 
     init {
         viewModelScope.launch {
@@ -450,7 +451,7 @@ class NewObservationViewModel(application: Application, val type: AddObservation
         }
     }
 
-    fun uploadNew() {
+    fun uploadNew(): Boolean {
         val error = userObservation.userObservation.isValid()
         if (error != null) {
             showNotification.postValue(
@@ -459,6 +460,7 @@ class NewObservationViewModel(application: Application, val type: AddObservation
                     MyApplication.resources
                 )
             )
+            return false
         } else {
             viewModelScope.launch {
                 _isLoading.value = true
@@ -471,6 +473,7 @@ class NewObservationViewModel(application: Application, val type: AddObservation
                     _isLoading.postValue(false)
                 }
             }
+            return true
         }
                     }
 

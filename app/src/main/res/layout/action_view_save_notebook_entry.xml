@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/AppPrimary"
+    style="@style/AppSmall"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clickable="true"
+
     android:gravity="center_vertical"
     >
 
@@ -11,7 +12,8 @@
         android:id="@+id/actionView_saveNotebookEntry"
         style="@style/Widget.AppCompat.Button.Small"
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
+        android:layout_height="28dp"
+        android:textSize="11sp"
         android:background="@drawable/toolbar_button_green"
         android:drawableStart="@drawable/glyph_checkmark"
         android:drawablePadding="8dp"
