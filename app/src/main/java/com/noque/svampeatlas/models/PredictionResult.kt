@@ -45,6 +45,7 @@ class PredictionResult(
             null,
             null,
             null,
+            null,
             vernacularNameDK,
             attributes,
             null,

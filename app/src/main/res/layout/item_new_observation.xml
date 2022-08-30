@@ -61,26 +61,6 @@
             style="@style/AppPrimaryHighlighted"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
-        <LinearLayout
-            android:layout_marginTop="4dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:layout_gravity="center_vertical"
-                android:id="@+id/newObservationItem_statusIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/glyph_denied" />
-            <TextView
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="4dp"
-                style="@style/AppSmall"
-                android:id="@+id/newObservationItem_statusLabel"
-                android:layout_weight="1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
     </LinearLayout>
 
     <ImageButton

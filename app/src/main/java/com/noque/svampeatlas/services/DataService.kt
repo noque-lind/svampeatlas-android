@@ -502,11 +502,11 @@ class DataService private constructor(context: Context) {
                 API(APIType.Post.ImagePrediction()),
                 null,
                 jsonObject,
-                Response.Listener {
+                {
                     completion(Result.Success(it))
                 },
 
-                Response.ErrorListener {
+                {
                     completion(Result.Error(it.toAppError()))
                 })
 

@@ -61,8 +61,6 @@ class NewObservationViewModel(application: Application, val type: AddObservation
     val mushroom: LiveData<Pair<Mushroom, DeterminationConfidence>?> get() = userObservation.mushroom
     val location: LiveData<Pair<Location?, Boolean>?> get() = userObservation.location
 
-    private var lastShownLocalityNotificationID: Int? = null
-
     private val _user by lazy { MutableLiveData<User>() }
     private val _isLoading by lazy { MutableLiveData(false) }
     private val _coordinateState by lazy { MutableLiveData<State<Location>>() }
@@ -70,12 +68,7 @@ class NewObservationViewModel(application: Application, val type: AddObservation
     private val _predictionResultsState by lazy { MutableLiveData<State<List<PredictionResult>>>(State.Empty()) }
 
     private var userObservation = ListenableUserObservation {
-        if (it.locality != null) {
-            _localitiesState.value = State.Items(listOfNotNull(it.locality?.first))
-        } else {
-            _localitiesState.value = State.Empty()
-            it.location?.first?.let { getLocalities(it) }
-        }
+        resetEvent.call()
 
         if (it.location != null) {
             it.location?.first?.let { _coordinateState.value = State.Items(it) }
@@ -83,8 +76,21 @@ class NewObservationViewModel(application: Application, val type: AddObservation
             _coordinateState.value = State.Empty()
         }
 
+        if (it.locality != null) {
+            _localitiesState.value = State.Items(listOfNotNull(it.locality?.first))
+        } else {
+            _localitiesState.value = State.Empty()
+            it.location?.first?.let { getLocalities(it) }
+        }
+
         _predictionResultsState.value = State.Empty()
-        resetEvent.call()
+           val file = when (val image = it.images.firstOrNull()) {
+                is UserObservation.Image.LocallyStored -> image.file
+                is UserObservation.Image.New ->  image.file
+               else -> {null}
+           }
+        if (it.mushroom == null && file != null)
+            getPredictions(file)
     }
 
     val isLoading: LiveData<Boolean> = _isLoading
@@ -118,7 +124,7 @@ class NewObservationViewModel(application: Application, val type: AddObservation
             AddObservationFragment.Type.Edit -> {
                editObservation(id)
             }
-            AddObservationFragment.Type.EditNote -> {
+            AddObservationFragment.Type.EditNote, AddObservationFragment.Type.UploadNote -> {
                editNote(id)
             }
         }
@@ -300,7 +306,10 @@ class NewObservationViewModel(application: Application, val type: AddObservation
 
     fun appendImage(imageFile: File) {
         if (userObservation.images.value?.count() == 0 && userObservation.mushroom.value == null) {
-            getPredictions(imageFile)
+            when (type) {
+                AddObservationFragment.Type.New, AddObservationFragment.Type.UploadNote -> getPredictions(imageFile)
+                else -> { }
+            }
         }
 
         userObservation.images.value = ((userObservation.images.value ?: mutableListOf()) + listOf(UserObservation.Image.New(imageFile))).toMutableList()
@@ -380,7 +389,6 @@ class NewObservationViewModel(application: Application, val type: AddObservation
     }
 
     fun resetLocationData() {
-
         val location = coordinateState.value?.item
         if (location != null && locality.value == null) {
             // When location is found but not locality, we assume the user wants to try and find locality
@@ -393,6 +401,8 @@ class NewObservationViewModel(application: Application, val type: AddObservation
     }
 
     private fun getLocalities(location: Location) {
+        // If we are not in right context, we do not want to find locality.
+        if (type == AddObservationFragment.Type.Note || type == AddObservationFragment.Type.EditNote) return
         _localitiesState.value = State.Loading()
         viewModelScope.launch {
             DataService.getInstance(getApplication())
@@ -408,20 +418,8 @@ class NewObservationViewModel(application: Application, val type: AddObservation
 
                             if (locality != null) {
                             userObservation.locality.postValue(Pair(locality, false))
-                            if (type != AddObservationFragment.Type.Note && type != AddObservationFragment.Type.EditNote)
-                                if(lastShownLocalityNotificationID != locality.id) {
-                                    lastShownLocalityNotificationID = locality.id
-                                    showNotification.postValue(
-                                        Notification.LocationFound(
-                                            MyApplication.applicationContext.resources,
-                                            locality,
-                                            location
-                                        )     )
-                                }
-
                         } else {
                             userObservation.locality.postValue(null)
-                            if (type != AddObservationFragment.Type.Note && type != AddObservationFragment.Type.EditNote)
                             showNotification.postValue(
                                 Notification.LocalityInaccessible(
                                     MyApplication.applicationContext.resources
@@ -439,12 +437,12 @@ class NewObservationViewModel(application: Application, val type: AddObservation
     }
 
     private fun getPredictions(imageFile: File) {
-        _predictionResultsState.value = State.Loading()
+        _predictionResultsState.postValue(State.Loading())
 
         viewModelScope.launch {
             DataService.getInstance(getApplication()).getPredictions(imageFile) { it ->
-                it.onError { _predictionResultsState.value = State.Error(it) }
-                it.onSuccess { _predictionResultsState.value = State.Items(it) }
+                it.onError { _predictionResultsState.postValue(State.Error(it)) }
+                it.onSuccess { _predictionResultsState.postValue(State.Items(it)) }
             }
         }
     }
@@ -536,7 +534,7 @@ class NewObservationViewModel(application: Application, val type: AddObservation
                 }
             }
             AddObservationFragment.Type.Note -> userObservation.set(UserObservation())
-            AddObservationFragment.Type.EditNote -> {
+            AddObservationFragment.Type.EditNote, AddObservationFragment.Type.UploadNote -> {
                 viewModelScope.launch {
                     RoomService.notesDao.delete(NewObservation(Date(id), Date(), null, null, null, null, null, null, null, null, null, listOf(), listOf()))
                         .apply {

@@ -18,11 +18,6 @@
 
         <menu>
             <item
-                android:title="@string/addObservationFragment_upload"
-                android:id="@+id/menu_addObservationFragment_uploadButton"
-                android:icon="@drawable/icon_upload"
-                />
-            <item
                 android:id="@+id/menu_addObservationFragment_resetButton"
                 android:icon="@drawable/glyph_reload"
                 android:title="@string/addObservationFragment_reset"

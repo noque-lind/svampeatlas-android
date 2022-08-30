@@ -16,6 +16,7 @@ import com.noque.svampeatlas.adapters.add_observation.LocalityAdapter
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.extensions.openSettings
 import com.noque.svampeatlas.extensions.toBounds
+import com.noque.svampeatlas.fragments.AddObservationFragment
 import com.noque.svampeatlas.fragments.MapFragment
 import com.noque.svampeatlas.fragments.PromptFragment
 import com.noque.svampeatlas.fragments.modals.LocationSettingsModal
@@ -69,7 +70,6 @@ class LocalityFragment: Fragment(), LocationSettingsModal.Listener {
     private val retryButtonClicked = View.OnClickListener {
         newObservationViewModel.resetLocationData()
     }
-
 
     private val mapFragmentListener by lazy {
         object: MapFragment.Listener {
@@ -184,7 +184,12 @@ class LocalityFragment: Fragment(), LocationSettingsModal.Listener {
         markerImageView.setOnTouchListener(markerOnTouchListener)
 
         settingsButton.setOnClickListener {
-            val dialog = LocationSettingsModal(lockedLocality = newObservationViewModel.locality.value?.second ?: false, lockedLocation = newObservationViewModel.location.value?.second ?: false)
+           val localityLockPossible = when (newObservationViewModel.type) {
+                AddObservationFragment.Type.Note, AddObservationFragment.Type.EditNote, AddObservationFragment.Type.Edit -> false
+                else -> true
+            }
+
+            val dialog = LocationSettingsModal(lockedLocality = newObservationViewModel.locality.value?.second ?: false, lockedLocation = newObservationViewModel.location.value?.second ?: false, allowLockingLocality = localityLockPossible)
             dialog.setTargetFragment(this, 10)
             dialog.show(parentFragmentManager, null)
         }

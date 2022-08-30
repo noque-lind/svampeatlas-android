@@ -14,7 +14,8 @@ import kotlinx.android.synthetic.main.fragment_modal_locality_settings.*
 
 class LocationSettingsModal(
     private val lockedLocality: Boolean,
-    private val lockedLocation: Boolean
+    private val lockedLocation: Boolean,
+    private val allowLockingLocality: Boolean
 ) : DialogFragment() {
 
     interface Listener {
@@ -55,6 +56,8 @@ class LocationSettingsModal(
     private fun setupViews() {
         locationSwitch.isChecked = lockedLocation
         localitySwitch.isChecked = lockedLocality
+
+        if (!allowLockingLocality) localitySwitch.visibility = View.GONE
 
         saveButton.setOnClickListener {
             (targetFragment as? Listener)?.lockLocalitySet(localitySwitch.isChecked)

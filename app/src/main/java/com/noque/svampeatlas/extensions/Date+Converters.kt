@@ -53,6 +53,10 @@ fun Date.difDays(): Long {
     )
 }
 
+fun Date.difHours(): Long {
+    return TimeUnit.HOURS.toHours(Calendar.getInstance().time.time - this.time)
+}
+
 fun Date.toTimeString(): String {
     return SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT).format(this)
 }

@@ -8,6 +8,8 @@ import com.noque.svampeatlas.extensions.Date
 import com.noque.svampeatlas.models.Locality
 import java.util.*
 import com.google.gson.Gson
+import com.noque.svampeatlas.BuildConfig
+import com.noque.svampeatlas.extensions.difHours
 import com.noque.svampeatlas.models.Location
 
 
@@ -49,9 +51,6 @@ object SharedPreferences {
     }
 
     fun saveHostsID(hostsID: List<Int>?) {
-
-        Log.d("SharedPrefs", hostsID.toString())
-
         val set = mutableSetOf<String>()
 
         hostsID?.forEach {
@@ -111,9 +110,10 @@ object SharedPreferences {
     }
 
     var hasSeenWhatsNew: Boolean get() {
-        return prefs.getBoolean(HAS_SEEN_WHATS_NEW, false)
-    } set(value) {
-        prefs.edit().putBoolean(HAS_SEEN_WHATS_NEW, value).apply()
+        var lastOpenedVersion  = prefs.getString("lastOpenedVersion", "")
+        return lastOpenedVersion == BuildConfig.VERSION_NAME
+    } set(_) {
+        prefs.edit().putString("lastOpenedVersion", BuildConfig.VERSION_NAME).apply()
     }
 
     var hasSeenImageDeletion: Boolean get() {
@@ -128,25 +128,61 @@ object SharedPreferences {
         prefs.edit().putString(PREFERRED_LANGUAGE, value).apply()
     }
 
+    var locationLockedDate: Date? get() {
+        val longDate = prefs.getLong("locationLockedDate", 0)
+        return if (longDate != 0L) Date(longDate) else null
+    } set(value) {
+        if (value != null) {
+            prefs.edit().putLong("locationLockedDate", value.time).apply()
+        } else {
+            prefs.edit().remove("locationLockedDate").apply()
+        }
+    }
+
+    var localityLockedDate: Date? get() {
+        val longDate = prefs.getLong("localityLockedDate", 0)
+        return if (longDate != 0L) Date(longDate) else null
+    } set(value) {
+        if (value != null) {
+            prefs.edit().putLong("localityLockedDate", value.time).apply()
+        } else {
+            prefs.edit().remove("localityLockedDate").apply()
+        }
+    }
+
     var lockedLocality: Locality? get() {
+        val date = localityLockedDate
+        if (date != null && date.difHours() >= 1L) {
+          return null
+        }
         val json = prefs.getString(LOCALITY_LOCKED, null)
         return if(json != null) Gson().fromJson(json, Locality::class.java) else null
     } set(value) {
         if (value != null) {
             prefs.edit().putString(LOCALITY_LOCKED, Gson().toJson(value)).apply()
+            localityLockedDate = Date()
         } else {
             prefs.edit().remove(LOCALITY_LOCKED).apply()
+            localityLockedDate = null
         }
     }
 
+
     var lockedLocation: Location? get() {
+        val date = locationLockedDate
+        if (date != null && date.difHours() >= 1L) {
+            return null
+        }
+
         val json = prefs.getString(LOCATION_LOCKED, null)
         return if(json != null) Gson().fromJson(json, Location::class.java) else null
     } set(value) {
         if (value != null) {
             prefs.edit().putString(LOCATION_LOCKED, Gson().toJson(value)).apply()
+            locationLockedDate = Date()
         } else {
             prefs.edit().remove(LOCATION_LOCKED).apply()
+            locationLockedDate = null
         }
     }
 

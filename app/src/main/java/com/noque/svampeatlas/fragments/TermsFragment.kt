@@ -120,7 +120,7 @@ class TermsFragment: DialogFragment() {
             }
             Type.WHATSNEW -> {
                 headerView.configure(getString(R.string.terms_whatsnew_title))
-                contentTextView.text = getString(R.string.terms_whatsnew_message)
+                contentTextView.text = getString(R.string.whats_new_2_0)
             }
             Type.IMAGEDELETIONS -> {
                 headerView.configure(getString(R.string.terms_imagedeletion_title))

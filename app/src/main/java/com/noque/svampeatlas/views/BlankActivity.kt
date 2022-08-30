@@ -128,11 +128,12 @@ class BlankActivity : AppCompatActivity() {
         navigationView.itemIconTintList = null
         navController.addOnDestinationChangedListener(onDestinationChangedListener)
         navigationView.setNavigationItemSelectedListener(onNavigationItemSelectedListener)
-      /*  if (!SharedPreferences.hasSeenWhatsNew) {
+        if (!SharedPreferences.hasSeenWhatsNew) {
             val dialog = TermsFragment()
             dialog.arguments = Bundle().apply { putSerializable(TermsFragment.KEY_TYPE, TermsFragment.Type.WHATSNEW) }
             dialog.show(supportFragmentManager, null)
-        }*/
+            SharedPreferences.lastDownloadOfTaxon = null
+        }
     }
 
     private fun setupViewModels() {
