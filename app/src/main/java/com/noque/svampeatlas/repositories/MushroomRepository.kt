@@ -22,6 +22,7 @@ class MushroomRepository(private val requestQueue: RequestQueue) {
 
     private val cache = LruCache<Int, Mushroom>(100)
 
+
     suspend fun getMushroom(id: Int): Result<Mushroom, DataService.Error> {
         cache.get(id)?.let {
             return Result.Success(it)

@@ -78,11 +78,13 @@ class ListenableUserObservation(private val onChanged: (UserObservation) -> Unit
     }
 
     // Page 3 properties
-    val locality = Observable.observe(MutableLiveData<Pair<Locality?, Boolean>?>()) {
+    val locality = Observable.observe(MutableLiveData<Pair<Locality, Boolean>?>()) {
         userObservation.locality = it
+        SharedPreferences.lockedLocality = if (it?.second == true) it.first else null
     }
-    val location = Observable.observe(MutableLiveData<Pair<Location?, Boolean>?>()) {
+    val location = Observable.observe(MutableLiveData<Pair<Location, Boolean>?>()) {
         userObservation.location = it
+        SharedPreferences.lockedLocation = if (it?.second == true) it.first else null
     }
 
 
@@ -171,8 +173,8 @@ class UserObservation(private val creationDate: Date = Date()) {
     var ecologyNotes: String? = null
 
     // Page 3 properties
-    var locality: Pair<Locality?, Boolean>? = null
-    var location: Pair<Location?, Boolean>? = null
+    var locality: Pair<Locality, Boolean>? = null
+    var location: Pair<Location, Boolean>? = null
 
     constructor(): this(creationDate = Date()) {
         SharedPreferences.getSubstrateID()?.let {

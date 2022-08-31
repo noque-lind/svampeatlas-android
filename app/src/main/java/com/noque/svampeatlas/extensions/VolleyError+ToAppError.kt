@@ -43,5 +43,5 @@ fun VolleyError.toAppError(): DataService.Error {
         }
     }
 
-    return DataService.Error.UnknownError(MyApplication.applicationContext)
+    return DataService.Error.VolleyError(MyApplication.applicationContext.getString(R.string.error_dataService_unknown_title), this.message + "" + this.networkResponse.data.toString() ?: "")
 }

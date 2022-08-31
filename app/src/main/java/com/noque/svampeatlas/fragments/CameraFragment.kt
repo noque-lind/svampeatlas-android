@@ -220,6 +220,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
             }
 
             override fun photoLibraryButtonPressed() {
+                requestPermissions(arrayOf(Manifest.permission.ACCESS_MEDIA_LOCATION), CODE_PERMISSION)
                     val intent = Intent(Intent.ACTION_GET_CONTENT)
                     intent.type = "image/*"
                     intent.putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/jpeg", "image/png"))

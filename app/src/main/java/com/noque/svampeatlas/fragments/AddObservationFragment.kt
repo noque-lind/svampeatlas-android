@@ -295,7 +295,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                 Category.SPECIES -> newObservationViewModel.uploadNew()
                 Category.DETAILS -> if (newObservationViewModel.substrate.value != null && newObservationViewModel.vegetationType.value != null) viewPager.currentItem =
                     Category.SPECIES.ordinal else newObservationViewModel.uploadNew()
-                Category.LOCALITY -> if (newObservationViewModel.location.value != null && newObservationViewModel.locality.value != null) viewPager.currentItem = Category.DETAILS.ordinal else newObservationViewModel.uploadNew()
+                Category.LOCALITY -> if (newObservationViewModel.coordinateState.value?.item?.first != null && newObservationViewModel.locality.value != null) viewPager.currentItem = Category.DETAILS.ordinal else newObservationViewModel.uploadNew()
             }
                 }
             }

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "626849664673",
+    "project_id": "svampeatlas-2b2de",
+    "storage_bucket": "svampeatlas-2b2de.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:626849664673:android:9d60baadce0b08f4622ae0",
+        "android_client_info": {
+          "package_name": "com.noque.svampeatlas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "626849664673-qhhkvdvaf4f36qhsvi6fkco7neu07csk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLs9wwU7tR-LZFmF3XR823ICSIZMVPZbE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "626849664673-qhhkvdvaf4f36qhsvi6fkco7neu07csk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

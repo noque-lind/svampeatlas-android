@@ -244,7 +244,7 @@ class SearchBarView(context: Context, attrs: AttributeSet?) : ConstraintLayout(c
 
     private fun onSearch() {
         val searchString = editText.text.toString()
-
+        resignFocus()
         if (searchString != "" && searchString != recentSearch) {
             recentSearch = searchString
             listener?.newSearch(searchString)

@@ -15,10 +15,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.adapters.add_observation.LocalityAdapter
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.extensions.openSettings
-import com.noque.svampeatlas.extensions.toBounds
 import com.noque.svampeatlas.fragments.AddObservationFragment
 import com.noque.svampeatlas.fragments.MapFragment
-import com.noque.svampeatlas.fragments.PromptFragment
 import com.noque.svampeatlas.fragments.modals.LocationSettingsModal
 import com.noque.svampeatlas.fragments.TermsFragment
 import com.noque.svampeatlas.models.*
@@ -61,14 +59,13 @@ class LocalityFragment: Fragment(), LocationSettingsModal.Listener {
         adapter.localitySelected = {
             newObservationViewModel.setLocality(it)
         }
-
         adapter
     }
 
     // Listeners
 
     private val retryButtonClicked = View.OnClickListener {
-        newObservationViewModel.resetLocationData()
+        newObservationViewModel.resetLocation()
     }
 
     private val mapFragmentListener by lazy {
@@ -184,12 +181,12 @@ class LocalityFragment: Fragment(), LocationSettingsModal.Listener {
         markerImageView.setOnTouchListener(markerOnTouchListener)
 
         settingsButton.setOnClickListener {
-           val localityLockPossible = when (newObservationViewModel.type) {
+           val localityLockPossible = when (newObservationViewModel.context) {
                 AddObservationFragment.Type.Note, AddObservationFragment.Type.EditNote, AddObservationFragment.Type.Edit -> false
                 else -> true
             }
 
-            val dialog = LocationSettingsModal(lockedLocality = newObservationViewModel.locality.value?.second ?: false, lockedLocation = newObservationViewModel.location.value?.second ?: false, allowLockingLocality = localityLockPossible)
+            val dialog = LocationSettingsModal(lockedLocality = newObservationViewModel.locality.value?.second ?: false, lockedLocation = newObservationViewModel.coordinateState.value?.item?.second ?: false, allowLockingLocality = localityLockPossible)
             dialog.setTargetFragment(this, 10)
             dialog.show(parentFragmentManager, null)
         }
@@ -220,16 +217,13 @@ class LocalityFragment: Fragment(), LocationSettingsModal.Listener {
                 }
             })
 
-            newObservationViewModel.location.observe(viewLifecycleOwner, Observer {
-                locationLockedImage.visibility = if(it?.second == true) View.VISIBLE else View.GONE
-            })
-
             newObservationViewModel.coordinateState.observe(viewLifecycleOwner, Observer {
                 when (it) {
                     is State.Items -> {
-                        mapFragment?.addLocationMarker(it.items.latLng, resources.getString(R.string.locationAnnotation_title), it.items.accuracy.toDouble())
-                        mapFragment?.setRegion(it.items.latLng)
-                        locationLabel.text = resources.getString(R.string.precisionLabel, it.items.accuracy) + ", lat: ${String.format("%.2f", it.items.latLng.latitude)}, lon: ${String.format("%.2f", it.items.latLng.longitude)}"
+                        locationLockedImage.visibility = if (it.items.second) View.VISIBLE else View.GONE
+                        mapFragment?.addLocationMarker(it.items.first.latLng, resources.getString(R.string.locationAnnotation_title), it.items.first.accuracy.toDouble())
+                        mapFragment?.setRegion(it.items.first.latLng)
+                        locationLabel.text = resources.getString(R.string.precisionLabel, it.items.first.accuracy) + ", lat: ${String.format("%.2f", it.items.first.latLng.latitude)}, lon: ${String.format("%.2f", it.items.first.latLng.longitude)}"
                     }
 
                     is State.Loading -> {
@@ -244,7 +238,7 @@ class LocalityFragment: Fragment(), LocationSettingsModal.Listener {
                         mapFragment?.setError(it.error) {
                             when (it) {
                                 RecoveryAction.OPENSETTINGS -> openSettings()
-                                RecoveryAction.TRYAGAIN -> newObservationViewModel.resetLocationData()
+                                RecoveryAction.TRYAGAIN -> newObservationViewModel.resetLocation()
                                 else -> {}
                             }
                         }
