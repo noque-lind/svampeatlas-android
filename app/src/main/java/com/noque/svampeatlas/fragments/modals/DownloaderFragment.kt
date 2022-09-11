@@ -68,7 +68,7 @@ class DownloaderFragment: DialogFragment() {
     }
 
     private fun setupViews() {
-        titleTextView.text = getString(R.string.downloader_downloading)
+        titleTextView.text = getString(R.string.downloader_message_data)
     }
 
     private fun setupViewModels() {

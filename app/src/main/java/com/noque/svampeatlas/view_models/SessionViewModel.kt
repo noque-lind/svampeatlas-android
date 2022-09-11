@@ -25,7 +25,7 @@ object Session {
     sealed class Error(title: String, message: String, recoveryAction: RecoveryAction?) :
         AppError(title, message, recoveryAction) {
         class NewObservationError(val newObservationError: com.noque.svampeatlas.models.NewObservationError, resources: Resources): Error(resources.getString(newObservationError.title), resources.getString(newObservationError.message), newObservationError.recoveryAction)
-        class IsNotLoggedinError(resources: Resources): Error(resources.getString(R.string.error_dataService_loginError_title), resources.getString(R.string.error_dataService_loginError_message), null)
+        class IsNotLoggedinError(resources: Resources): Error(resources.getString(R.string.dataServiceError_loginError_title), resources.getString(R.string.dataServiceError_loginError_message), null)
     }
 
     const val TAG = "SessionViewModel"

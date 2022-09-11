@@ -3,11 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:title="@string/addObservationFragment_upload"
-        android:id="@+id/menu_addObservationFragment_uploadButton"
+        android:title="@string/common_continue"
+        android:id="@+id/menu_addObservationFragment_continueButton"
         android:orderInCategory="1"
         app:showAsAction="always"
-        app:actionLayout="@layout/action_view_upload_button"
+        app:actionLayout="@layout/action_view_continue"
         />
 
     <item
@@ -26,7 +26,7 @@
             <item
                 android:id="@+id/menu_addObservationFragment_deleteButton"
                 android:icon="@drawable/ic_delete_black_24dp"
-                android:title="@string/common_delete"
+                android:title="@string/action_deleteNote"
                 app:showAsAction="ifRoom" />
         </menu>
 

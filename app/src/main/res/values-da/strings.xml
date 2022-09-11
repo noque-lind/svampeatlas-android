@@ -1,273 +1,368 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created by simplelocalize.io -->
 <resources>
-    <string name="addObservationFragment_upload">Upload</string>
-    <string name="addObservationFragment_reset">Start forfra</string>
+<string name="aboutVC_generalTerms_message">Når du opretter dig som bruger/indrapportør på Danmarks Svampeatlas, har du mulighed for at indlægge svampefund og kommentere på andres fund. Nedenfor gennemgår vi mere detaljeret de betingelser og retningslinier, som vi arbejder efter.
 
-    <string name="mapViewSettings_title">Filtrer søgning</string>
-    <string name="mapViewSettings_clearOldResults">Ryd alt</string>
-    <string name="mapViewSettings_age">Fundets alder:</string>
-    <string name="mapViewSettings_radius">Radius:</string>
+Alle kan oprette sig som brugere på Danmarks Svampeatlas. Alle indrapporteringer og kommentarer er åbent tilgængelige for alle brugere. Vi henstiller til en god og konstruktiv omgangstone og gør opmærksom på, at du er ansvarlig for de handlinger, der bliver foretaget med dit login på netstedet. Ved gentagne brud på de specifikke retningslinjer som gennemgås nedenfor, forbeholder Danmarks Svampeatlas sig ret til at slette din profil og/eller stoppe din brugeradgang. Det samme kan ske i tilfælde af grov og gentagen forsømmelse af almindelige regler for god omgangstone på nettet.
 
-    <!-- NavigationItems -->
-    <string name="navigationItem_loginVC">Log ind</string>
-    <string name="navigationItem_myPageVC">Min side</string>
-    <string name="navigationItem_newObservationVC">Nyt fund</string>
-    <string name="navigationItem_nearbyVC">I nærheden</string>
-    <string name="navigationItem_mushroomsVC">Svampebog</string>
-    <string name="navigationItem_cameraVC">Navneforslag</string>
-    <string name="navigationItem_facebook">Facebook</string>
-    <string name="navigationItem_about">Om</string>
-    <!-- ToxicityLevels -->
-    <string name="toxicityLevel_poisonous">Giftig</string>
-    <!-- MapViewFilteringSettings -->
-    <string name="mapViewFilteringSettings_ageOfSighting">Fundets alder:</string>
-    <!-- NewObservationError -->
+Vi ser meget gerne at du uploader fotos og tekst som dokumentation for dine svampefund. I mange tilfælde kan et godt foto være et krav for, at dine fund kan valideres. Hvis du anvender fotos eller tekster, der ikke er dine egne, skal du sikre at du har rettigheder til at bruge disse. Du er desuden forpligtet til så vidt muligt at sikre, at de geografiske koordinater knyttet til hvert fund er præcise, og at det valgte zoom-niveau ikke resulterer i en højere præcision end der er belæg for.
 
-    <!-- DatabaseError -->
+Informationer og fotos, som du har videregivet til Danmarks Svampeatlas, vises på projektets hjemmeside, under det enkelte fund og ved gallerivisninger for de arter som fundene repræsenterer. Fotos og andre informationer er knyttet til det enkelte svampefund og udgør i mange tilfælde en vigtig dokumentation som derfor ikke slettes. Ved visning på Danmarks Svampeatlas vil fotografens navn tydeligt fremgå. Brug af billederne, ud over de nævnte, vil kun finde sted efter direkte aftale med brugerne, som beholder alle rettigheder til egne fotos. Sender du belæg som dokumentation for enkelte fund, vil den enkelte ekspert beslutte om belægget skal gemmes for eftertiden i samlingerne på Statens Naturhistoriske Museum ved Københavns Universitet eller ved en anden internationalt anerkendt samling.
 
-    <!-- Date stringable -->
-    <string name="dateFormatting_rightNow">Lige nu</string>
-    <string name="dateFormatting_hoursSince">%d timer siden</string>
-    <string name="dateFormatting_today">I dag</string>
-    <string name="dateFormatting_1dayHasPassed">1 dag siden</string>
-    <string name="dateFormatting_daysPassed">%d dage siden</string>
-    <!-- LoginVC -->
-    <string name="loginVC_upperLabel">Log ind på</string>
-    <string name="loginVC_lowerLabel">Danmarks Svampeatlas</string>
-    <string name="loginVC_detailsLabel">Bidrag til viden om Danske svampe ved at dele dine fund med andre, samt modtage valideringer af dine fund fra danmarks førende svampeeksperter.</string>
-    <string name="loginVC_initialsTextField_placeholder">Initialer</string>
-    <string name="loginVC_initialsTextField_error">Du skal udfylde dit brugernavn</string>
-    <string name="loginVC_passwordTextField_placeholder">Kodeord</string>
-    <string name="loginVC_passwordTextField_error">Du skal skrive dit kodeord</string>
-    <string name="loginVC_loginButton">Log ind</string>
-    <string name="loginVC_createNewAccountButton">Klik her for at oprette en ny konto</string>
-    <!-- AddObservationVC -->
-    <string name="addObservationVC_title">Nyt fund</string>
-    <string name="addObservationVC_observationCategories_species">Art</string>
-    <string name="addObservationVC_observationCategories_details">Detajler</string>
-    <string name="addObservationVC_observationCategories_location">Lokalitet</string>
+De fund-data du indtaster i Danmarks Svampeatlas, videregives til den Globale Biodiversisetets Facilitet (GBIF) under OECD og er internationlt søgbare via gbif.org under OECD. Billeder som er uploadet som dokumentation af hvert fund er linket til dette og er således synlige hos GBIF. Ønsker du ikke at links til dine billeder videregives til GBIF, så send venligst en email til atlas@svampe.dk
 
-    <!-- NearbyVC -->
-    <string name="nearbyVC_title">I nærheden</string>
-    <!-- MushroomVC -->
-    <string name="mushroomVC_title">Svampebog</string>
-    <string name="mushroomVC_category_favorites">Mine favoritter</string>
-    <string name="mushroomVC_category_species">Svampearter</string>
+Hvis du på et tidspunkt vælger at få slettet din profil, forbliver alle informationer og materiale indlagt med denne profil synlige og søgbare på projektets hjemmeside.
 
-    <!-- DetailsVC -->
-    <string name="detailsVC_observationTitle">Fund af: %s</string>
-    <string name="detailsVC_newSightingPrompt">Nyt fund</string>
-    <!-- CameraVC -->
+Validatorer og administratorer har ret til at slette/ændre information, som vedrører dine observationer, så længe retningslinjerne for information ikke bliver overtrådt derved.</string>
+<string name="aboutVC_generalTerms_title">Generelle betingelser</string>
+<string name="aboutVC_general_message">Svampeatlas 2.0 bygger videre på atlasprojektet Danmarks Svampeatlas, som kortlagde danske storsvampe, med hovedfokus på basidiesvampene i en femårig periode fra 2009-13. Projektet var støttet af Aage V. Jensen Naturfond og havde som hovedformål at øge vores viden om svampenes udbredelse og økologi i Danmark, og at gøre denne viden tilgængelig for offentligheden.
 
-    <!-- MapVC -->
-    <string name="mapVC_title">Fundets lokation</string>
-    <!-- SearchVC -->
-    <string name="searchVC_searchBar_placeholder">Søg efter en vært her …</string>
-    <string name="searchVC_cancelButton">Annuller</string>
-    <!-- TermsVC -->
-    <string name="termsVC_dismissButton">Forstået</string>
-    <string name="termsVC_mlPredict_title">Automatisk billedgenkendelse - du skal acceptere vores betingelser.</string>
-    <string name="termsVC_mlPredict_message">Brug af automatisk billedegenkendelse kan aldrig være helt præcis, og det er derfor vigtigt at systemet bruges med endnu mere kritisk sans end din svampebog. Spis aldrig svampe uden at søge hjælp fra svampekyndige mennesker. Danmarks Svampeatlas og Noque ApS frasiger sig ethvert ansvar for eventuelle forgiftninger eller andre sundhedsskadelige forhold.\nSystemet er udviklet af Milan Šulc og Professor Jiri Matas fra det Tjekkiske Tekniske Universitet (CTU) i Prag, Lukáš Picek fra University of West Bohemia (UWB) i Tjekkiet og Danmarks Svampeatlas. Systemet er baseret på kunstig intelligens og er trænet med alle de fotos I har biddraget med til Svampeatlasset. Jo mere du bidrager med observationer og gode billeder, jo bedre vil vi kunne udvikle teknologien i fremtiden.\nDette system er stadig i udviklingsfase og vi vil meget gerne have jeres feedback så det kan laves endnu bedre i fremtiden. Start en tråd på vores Facebook gruppe, eller send en mail til app@noque.dk</string>
-    <string name="termsVC_localityHelper_title">Sådan justerer du dit funds placering</string>
-    <string name="termsVC_cameraHelper_title">Sådan tager du de bedste billeder</string>
-    <string name="termsVC_cameraHelper_message">Når du fotografere svampe til bestemmelse så husk følgende:\n\n\tAt fotografere i bredformat (vandret). Tjek at din telefon ikke har rotationslås aktiveret\n\n\t- At få både unge og gamle frugtlegemer med på foto (hvis muligt)\n\n\t- At vise både hat, lameller og evt. slør. læg et par svampe ned - både unge og gamle\n\n\t- At fotografere i medlys (ikke modlys) og skygge for direkte sollys, fx med din egen krop\n\n\t- Fotografere du rørhatte så skær gerne et frugtlegeme igennem på langs</string>
-    <!-- AboutVC -->
-    <string name="aboutVC_title">Om</string>
-    <string name="aboutVC_recognition_title">Artsbestemmelse</string>
-    <string name="aboutVC_recognition_message">Brug af automatisk billedegenkendelse kan aldrig være helt præcis, og det er derfor vigtigt at systemet bruges med endnu mere kritisk sans end din svampebog. Spis aldrig svampe uden at søge hjælp fra svampekyndige mennesker. Danmarks Svampeatlas og Noque ApS frasiger sig ethvert ansvar for eventuelle forgiftninger eller andre sundhedsskadelige forhold.\n\nBilledegenkendelses systemet er udviklet af Milan Šulc og Professor Jiri Matas fra det Tjekkiske Tekniske Universitet (CTU) i Prag, Lukáš Picek fra University of West Bohemia (UWB) i Tjekkiet og Danmarks Svampeatlas.</string>
-    <string name="aboutVC_general_title">Generelt</string>
-    <string name="aboutVC_general_message">Svampeatlas 2.0 bygger videre på atlasprojektet Danmarks Svampeatlas, som kortlagde danske storsvampe, med hovedfokus på basidiesvampene i en femårig periode fra 2009-13. Projektet var støttet af Aage V. Jensen Naturfond og havde som hovedformål at øge vores viden om svampenes udbredelse og økologi i Danmark, og at gøre denne viden tilgængelig for offentligheden.\n\nMere end 400 frivillige var involveret i Danmarks Svampeatlas, hvor de bidrog med ca. 250.000 kvalitetstjekkede svampefund. Siden er yderligere ca. 50.000 nye svampefund kommet til, mens godt 230.000 gamle svampefund er importeret i projektdatabasen som nu indeholder mere end 600.000 kvalitetstjekkede svampefund. Projektet har medført et langt bedre kendskab til Danmarks funga. Mere end 180 basidiesvampe er blevet føjet til listen over kendte danske arter, og flere arter der var regnet som uddøde er genfundet. Samtidigt er der udviklet en række søge- og hjælpefunktioner der præsenterer vores viden om de enkelte svampearter i overskuelig form, og som gør det meget nemmere at inddrage viden om truede svampearter i naturforvaltningen.\n\nI Svampeatlas 2.0 er det målet at fastholde, fremtidssikre og videreudvikle de ressourcer der er opbygget gennem Danmarks Svampeatlas, til glæde for alle naturinteresserede og til gavn for alle der arbejder med naturforvaltning professionelt. Dette vil bl.a. ske gennem udvikling af en ny databasestruktur, og et interaktivt brugerinterface, der i høj grad inddrager de frivillige svampekyndige som aktive medspillere i processen med at sikre høj datakvalitet. Samtidigt vil vi indbygge smarte filtre, baseret på eksisterende viden om svampenes fænologi og udbredelse i Danmark, der automatisk kan registrere om et nyt svampefund kan regnes som sandsynligt.\n\nUdover udviklingen af nye database og web-funktioner vil projektet udvikle en mobil-app til bestemmelse og registrering af svampefund i felten. Derudover er det målet at fastholde projektets overordnede koncept og resultater i en sammenfattende bog om Danmarks Svampeatlas, samt at skrive et nyt bestemmelsesværk for Danmarks basidiesvampe, baseret på de bestemmelsesnøgler der blev lavet i Danmarks Svampeatlas.\n\nSvampeatlas 2.0 udføres i et samarbejde mellem Center for Makroøkologi, Evolution og Klima (CMEC) ved Statens Naturhistoriske Museum (SNM), Københavns Universitet, Foreningen til Svampekundskabens Fremme og MycoKey. Projektgruppen består af Tobias Guldberg Frøslev, Thomas Stjernegaard Jeppesen, Thomas Læssøe (SNM) og Jens H. Petersen med Jacob Heilmann-Clausen som projektleder. Projektet er støttet af Aage V. Jensens Naturfond.</string>
-    <string name="aboutVC_generalTerms_title">Generelle betingelser</string>
-    <string name="aboutVC_generalTerms_message">Når du opretter dig som bruger/indrapportør på Danmarks Svampeatlas, har du mulighed for at indlægge svampefund og kommentere på andres fund. Nedenfor gennemgår vi mere detaljeret de betingelser og retningslinier, som vi arbejder efter.\n\nAlle kan oprette sig som brugere på Danmarks Svampeatlas. Alle indrapporteringer og kommentarer er åbent tilgængelige for alle brugere. Vi henstiller til en god og konstruktiv omgangstone og gør opmærksom på, at du er ansvarlig for de handlinger, der bliver foretaget med dit login på netstedet. Ved gentagne brud på de specifikke retningslinjer som gennemgås nedenfor, forbeholder Danmarks Svampeatlas sig ret til at slette din profil og/eller stoppe din brugeradgang. Det samme kan ske i tilfælde af grov og gentagen forsømmelse af almindelige regler for god omgangstone på nettet.\n\nVi ser meget gerne at du uploader fotos og tekst som dokumentation for dine svampefund. I mange tilfælde kan et godt foto være et krav for, at dine fund kan valideres. Hvis du anvender fotos eller tekster, der ikke er dine egne, skal du sikre at du har rettigheder til at bruge disse. Du er desuden forpligtet til så vidt muligt at sikre, at de geografiske koordinater knyttet til hvert fund er præcise, og at det valgte zoom-niveau ikke resulterer i en højere præcision end der er belæg for.\n\nInformationer og fotos, som du har videregivet til Danmarks Svampeatlas, vises på projektets hjemmeside, under det enkelte fund og ved gallerivisninger for de arter som fundene repræsenterer. Fotos og andre informationer er knyttet til det enkelte svampefund og udgør i mange tilfælde en vigtig dokumentation som derfor ikke slettes. Ved visning på Danmarks Svampeatlas vil fotografens navn tydeligt fremgå. Brug af billederne, ud over de nævnte, vil kun finde sted efter direkte aftale med brugerne, som beholder alle rettigheder til egne fotos. Sender du belæg som dokumentation for enkelte fund, vil den enkelte ekspert beslutte om belægget skal gemmes for eftertiden i samlingerne på Statens Naturhistoriske Museum ved Københavns Universitet eller ved en anden internationalt anerkendt samling.\n\nDe fund-data du indtaster i Danmarks Svampeatlas, videregives til den Globale Biodiversisetets Facilitet (GBIF) under OECD og er internationlt søgbare via gbif.org under OECD. Billeder som er uploadet som dokumentation af hvert fund er linket til dette og er således synlige hos GBIF. Ønsker du ikke at links til dine billeder videregives til GBIF, så send venligst en email til atlas@svampe.dk\n\nHvis du på et tidspunkt vælger at få slettet din profil, forbliver alle informationer og materiale indlagt med denne profil synlige og søgbare på projektets hjemmeside.\n\nValidatorer og administratorer har ret til at slette/ændre information, som vedrører dine observationer, så længe retningslinjerne for information ikke bliver overtrådt derved.</string>
-    <string name="aboutVC_qualityAssurance_title">Kvalitetssikring/validering</string>
-    <string name="aboutVC_qualityAssurance_message">For at sikre at de informationer, der ligger i svampebasen er troværdige, undergår alle fund kvalitetssikring. Fund af arter uden valideringskrav bliver automatisk godkendt, mens fund af arter med valideringskrav som udgangspunkt er uvaliderede, indtil de er godkendt af en validator. For de valideringskrævende arter er der angivet en række valideringskrav. Hvis disse krav ikke er opfyldt i forbindelse med indlæggelse af fund, kan man ikke regne med en seriøs behandling af observationen og fundet afvises. Godkendte fund, også af arter, der ikke kræver validering, kan senere afvises af validatorer, fx hvis det vurderes at der ikke er tilstrækkelig dokumentation til at fundet kan godkendes eller at den vedlagte dokumentation viser, at det er en anden men ubestemmelig art. Alle brugere har mulighed for at kommentere på alle fund - både uvaliderede, godkendte og afviste. Kvalitetssikring/validering kræver ofte mikroskopisk undersøgelse af materiale, hvorfor behandlingstiden kan være lang.</string>
-    <string name="aboutVC_guidelines_title">Retningslinier for brug af data fra Danmarks Svampeatlas</string>
-    <string name="aboutVC_guidelines_message">Simple funddata kan søges via webinterfacet på Danmarks Svampeatlas og kan frit bruges i alle typer af forvaltningsopgaver på såvel lokalt som nationalt plan, fx i forbindelse med miljøvurderinger (VVM’er), udarbejdelse af plejeplaner samt til lokal og national prioritering af naturbeskyttelse i Danmark. Danmarks Svampeatlas bør i hvert tilfælde citeres som kilde. Data kan på tilsvarende vis bruges i forskningssammenhæng. Bemærk at databasen indeholder både godkendte, uvaliderede og afviste fund, hvilket er specificeret under hvert fund.\n\nValideringsprocessen omfatter artsbestemmelsen, og de grovere geografiske data. Især ældre fund har ofte meget upræcise fund-koordinater, men også for helt nye fund kan de være upræcist angivet. Den brugerdefinerede usikkerhed på fund-koordinater er angivet i meter for hvert fund, og skal betragtes som vejledende, fx ved udarbejdelse af detaljerede lokale forvaltningsplaner. Danmarks Svampeatlas rummer et meget stort antal standardnavne for lokaliteter, som vælges af rapportøren. Det betyder, at fund af den samme svamp kan være indrapporteret med flere forskellige lokalitetsnavne af forskellige brugere, og tillige med forskellige koordinater. I praksis er dette mest aktuelt for meget sjældne og karismatiske arter, fx pindsvinepigsvamp og safrangul fedtporesvamp.</string>
-    <!-- Utilities -->
-    <string name="utilities_photoAlbumName">Svampeatlas</string>
-    <!-- ELFileManager -->
+Mere end 400 frivillige var involveret i Danmarks Svampeatlas, hvor de bidrog med ca. 250.000 kvalitetstjekkede svampefund. Siden er yderligere ca. 50.000 nye svampefund kommet til, mens godt 230.000 gamle svampefund er importeret i projektdatabasen som nu indeholder mere end 600.000 kvalitetstjekkede svampefund. Projektet har medført et langt bedre kendskab til Danmarks funga. Mere end 180 basidiesvampe er blevet føjet til listen over kendte danske arter, og flere arter der var regnet som uddøde er genfundet. Samtidigt er der udviklet en række søge- og hjælpefunktioner der præsenterer vores viden om de enkelte svampearter i overskuelig form, og som gør det meget nemmere at inddrage viden om truede svampearter i naturforvaltningen.
 
-    <!-- ReloadCell -->
-    <string name="reloadCell_showMore">Vis mere</string>
-    <string name="reloadCell_tryAgain">Prøv igen</string>
-    <!-- MyPageScrollView -->
-    <string name="myPageScrollView_notificationsHeader">Notifikationer</string>
-    <string name="myPageScrollView_observationsHeader">Observationer</string>
-    <string name="myPageScrollView_logout">Log ud</string>
-    <!-- NotificationCell -->
-    <string name="notificationCell_commentAdded_1">har kommenteret på et fund af:</string>
-    <string name="notificationCell_commentAdded_2">som du følger.</string>
-    <string name="notificationCell_determinationAdded_1">har tilføjet bestemmelsen:</string>
-    <string name="notificationCell_determinationAdded_2">til et fund som du følger.</string>
-    <string name="notificationCell_determinationApproved_1">Et fund du følger er blevet valideret og godkendt som:</string>
-    <string name="notificationCell_determinationExpertApproved">er blevet ekspertgodkendt</string>
-    <!-- MapViewSettingsView -->
-    <string name="mapViewSettingsView_year">%d år</string>
-    <string name="mapViewSettingsView_newSearch">Ny søgning</string>
-    <!-- ObservationSpeciesCell -->
-    <string name="observationSpeciesCell_chooseSpecies">Vælg art</string>
-    <string name="observationSpeciesCell_chooseGenus">Vælg slægt</string>
-    <string name="observationSpeciesCell_deselect">Fravælg</string>
-    <string name="observationSpeciesCell_choosenSpecies">Valgte art</string>
-    <string name="observationSpeciesCell_choosenGenus">Valgte slægt</string>
-    <string name="observationSpeciesCell_predictionsHeader">Navneforslag</string>
-    <string name="observationSpeciesCell_searchResults">Søgeresultater</string>
-    <string name="observationSpeciesCell_myFavorites">Mine favoritter</string>
-    <!-- ObservationDetailsCell -->
-    <string name="observationDetailsCell_mostUsed">Mest brugt</string>
-    <string name="observationDetailsCell_date">Dato:</string>
-    <string name="observationDetailsCell_substrate">Substrat:</string>
-    <string name="observationDetailsCell_vegetationType">Vegetationstype:</string>
-    <string name="observationDetailsCell_host">Vært:</string>
-    <string name="observationDetailsCell_notes_title">Andre noter</string>
-    <string name="observationDetailsCell_notes_message">Lugt melagtig …</string>
-    <string name="observationDetailsCell_ecologyNotes_title">Kommentarer om voksested</string>
-    <string name="observationDetailsCell_ecologyNotes_message">På sandjord blandt mos …</string>
-    <!-- SearchCell -->
-    <string name="searchCell_title">Søg på en vært her 👇</string>
-    <!-- PickerCell -->
-    <string name="pickerCell_rememberChoice">Husk mit valg</string>
-    <!-- CautionCell -->
-    <string name="cautionCell_lowConfidence">Bemærk at ingen af de nedenstående forslag har en særlig stor sandsynlighed.</string>
-    <!-- AppScrollView -->
-    <string name="appScrollView_informationHeaderTitle">Information</string>
-    <!-- MushroomDetailsScrollView -->
-    <string name="mushroomDetailsScrollView_validationTips">Valideringstips</string>
-    <string name="mushroomDetailsScrollView_description">Beskrivelse</string>
-    <string name="mushroomDetailsScrollView_eatability">Spiselighedsrapport</string>
-    <string name="mushroomDetailsScrollView_ecology">Økologi</string>
-    <string name="mushroomDetailsScrollView_similarities">Forvekslingsmuligheder</string>
-    <string name="mushroomDetailsScrollView_acceptedRecords">Accepterede fund:</string>
-    <string name="mushroomDetailsScrollView_latestAcceptedRecord">Seneste accepteret fund:</string>
-    <string name="mushroomDetailsScrollView_latestUpdated">Sidst opdateret d.:</string>
-    <string name="mushroomDetailsScrollView_heatMap">Fund i nærheden</string>
-    <string name="mushroomDetailsScrollView_latestObservations">Seneste observationer</string>
-    <!-- ObservationDetailsScrollView -->
-    <string name="observationDetailsScrollView_rapportContent_title">Rapporter stødende indhold</string>
-    <string name="observationDetailsScrollView_rapportContent_message">Finder du en kommentar, eller brugergeneret indhold stødende? Giv en begrundelse her, så kikker vi på det.</string>
-    <string name="observationDetailsScrollView_rapportContent_placeholder">Eg. stødende billeder</string>
-    <string name="observationDetailsScrollView_rapportContent_thankYou_title">Mange tak</string>
-    <string name="observationDetailsScrollView_rapportContent_thankYou_message">Din rapportering er med til at gøre Svampeatlas et sikkert sted</string>
-    <string name="observationDetailsScrollView_rapportContent_abort">Afbryd</string>
-    <string name="observationDetailsScrollView_ecologyNotes">Kommentarer om voksested</string>
-    <string name="observationDetailsScrollView_notes">Andre noter</string>
-    <string name="observationDetailsScrollView_validationStatus">Valideringsstatus:</string>
-    <string name="observationDetailsScrollView_validationStatus_approved">Godkendt</string>
-    <string name="observationDetailsScrollView_validationStatus_declined">Afvist</string>
-    <string name="observationDetailsScrollView_validationStatus_verifying">Valideres</string>
-    <string name="observationDetailsScrollView_validationStatus_unknown">Vides ikke</string>
-    <string name="observationDetailsScrollView_observationDate">Fundets dato:</string>
-    <string name="observationDetailsScrollView_substrate">Substrat:</string>
-    <string name="observationDetailsScrollView_vegetationType">Vegetationstype:</string>
-    <string name="observationDetailsScrollView_location">Placering</string>
-    <string name="observationDetailsScrollView_species">Art</string>
-    <string name="observationDetailsScrollView_comments">Kommentarer</string>
-    <!-- ResultsView -->
-    <string name="resultsView_header_title">Vi har %d forslag til dig</string>
-    <string name="resultsView_header_message">Bemærk at disse forslag er vejledende og aldrig må stå alene, hvis du ønsker at spise de svampe du har fundet.</string>
-    <!-- CameraControlsTextButton -->
-    <string name="cameraControlTextButton_noPhoto">Intet billede</string>
-    <string name="cameraControlTextButton_usePhoto">Brug billede</string>
-    <!-- LocationAnnotation -->
-    <string name="locationAnnotation_title">Fundets placering</string>
-    <!-- UnknownSpeciesButton -->
-    <string name="unknownSpeciesButton_title">Jeg ved ikke hvad jeg har fundet</string>
-    <string name="unknownSpeciesButton_message">Klik her for at indlægge en ubestemt svamp - fælleskabet vil prøve at hjælpe med bestemmelsen</string>
-    <string name="containedResultCell_genus">Slægt: %s</string>
-    <!-- SelectedSpeciesCell -->
-    <string name="selectedSpeciesCell_question">Hvor sikker er du?</string>
-    <string name="selectedSpeciesCell_confident_species">Det er helt sikkert den her art</string>
-    <string name="selectedSpeciesCell_confident_genus">Det er helt sikkert den her slægt</string>
-    <string name="selectedSpeciesCell_possible_species">Det er muligvis denne art</string>
-    <string name="selectedSpeciesCell_possible_genus">Det er muligvis denne slægt</string>
-    <string name="selectedSpeciesCell_likely_species">Det er sandsynligvis denne art</string>
-    <string name="selectedSpeciesCell_likely_genus">Det er sandsynligvis denne slægt</string>
-    <!-- CreditationCell -->
-    <string name="creditationCell_ai">Billedegenkendelses systemet er udviklet af Milan Šulc og Professor Jiri Matas fra det Tjekkiske Tekniske Universitet (CTU) i Prag, Lukáš Picek fra University of West Bohemia (UWB) i Tjekkiet og Danmarks Svampeatlas.</string>
-    <string name="creditationCell_aiNewObservation">Disse navneforslag er baseret på det første billede du har tilføjet til dette fund. Billedegenkendelses systemet er udviklet af Milan Šulc og Professor Jiri Matas fra det Tjekkiske Tekniske Universitet (CTU) i Prag, Lukáš Picek fra University of West Bohemia (UWB) i Tjekkiet og Danmarks Svampeatlas.</string>
-    <!-- UserView -->
-    <string name="userView_guest_title">Svampeatlas</string>
-    <string name="userView_guest_message">Log ind for at få den bedste oplevelse</string>
-    <!-- MushroomView -->
-    <string name="mushroomView_numberOfRecords">Antal danske fund:</string>
-    <string name="mushroomView_latestObservation">Seneste fund:</string>
-    <string name="mushroomView_lastUpdate">Sidst opdateret d.:</string>
-    <!-- MapView -->
-    <string name="mapViewCategories_regular">Standard</string>
-    <string name="mapViewCategories_satelite">Luftfoto</string>
-    <string name="mapViewCategories_topographical">Topografisk</string>
-    <!-- RedlistView -->
-    <string name="redlistView_lcnt">Ikke en truet art</string>
-    <string name="redlistView_cren">Truet art</string>
-    <string name="redlistView_vu">Sårbar art</string>
-    <string name="redlistView_dd">Vides ikke</string>
-    <!-- Searchbar -->
-    <string name="searchBar_placeholder">Søg efter en art her …</string>
-    <!-- CommentsTableView -->
-    <string name="commentsTableView_cell_title">Skriv en kommentar</string>
+I Svampeatlas 2.0 er det målet at fastholde, fremtidssikre og videreudvikle de ressourcer der er opbygget gennem Danmarks Svampeatlas, til glæde for alle naturinteresserede og til gavn for alle der arbejder med naturforvaltning professionelt. Dette vil bl.a. ske gennem udvikling af en ny databasestruktur, og et interaktivt brugerinterface, der i høj grad inddrager de frivillige svampekyndige som aktive medspillere i processen med at sikre høj datakvalitet. Samtidigt vil vi indbygge smarte filtre, baseret på eksisterende viden om svampenes fænologi og udbredelse i Danmark, der automatisk kan registrere om et nyt svampefund kan regnes som sandsynligt.
 
-    <!-- SettingsVC -->
-    <string name="settingsVC_title">Indstillinger</string>
-    <string name="navigationItem_SettingsVC">Indstillinger</string>
-    <string name="settings_general_title">Generelt</string>
-    <string name="settings_language_title">Indholdets sprog</string>
-    <string name="determinationLabel_validating">Bestemmelsen valideres</string>
-    <string name="determinationLabel_approved">Bestemmelsen er godkendt</string>
-    <string name="determinationLabel_rejected">Bestemmelsen er afvist</string>
-    <string name="precisionLabel">Præcision: %.02f m</string>
-    <string name="detailsPickerFragment_vegetationTypesPicker">Vælg vegetationstype</string>
-    <string name="detailsPickerFragment_substratePicker">Vælg substrat</string>
-    <string name="detailsPickerFragment_hostsPicker">Vælg vært(er)</string>
-    <string name="addObservationVC_title_edit">Rediger fund</string>
-    <string name="observationDetailsScrollView_delete">Slet fund</string>
-    <string name="prompt_imagedeletion_error_title">Kunne ikke slette billede</string>
-    <string name="terms_whatsnew_message">Vi er så glade for at du stadig er her\nDin app er blevet opdateret og har fået nogle nye spændende funktioner: \n\n2.0\n- (Stor ny funktionalitet) Du kan nu oprette offline fund som du så senere kan uploade til Svampeatlas. Det betyder at du nu kan bruge denne app helt uafhængigt af internet, når du først har downloadet alt dataen til Offline brug.\n\n1.6\n- Nyt design i svampe/og observations detajler \n- Du kan nu redigere en uploadet observation efter det er blevet uploaded \n- Du kan nu slette et fund (kun indenfor 48h efter upload) - En masse stabilitets forbedringer \n- Klargørelse til nye spændende funktioner (offline gem af et fund hvis der er dårligt internet, interaktiv validering, mm.)</string>
-    <string name="terms_whatsnew_title">Hvad er nyt?</string>
-    <string name="terms_imagedeletion_title">Sletning af billedet er permanent</string>
-    <string name="terms_imagedeletion_message">When editing an observation, deletions of images are final, even if you do not submit your other changes. This message will only be shown once, and if you still want to delete the image, you will have to delete the it again\" = \"Når du redigere en observation, er sletning af uploadede billeder permanente, også selvom du ikke uploader andre ændringer. Denne besked vises kun en gang, or du skal slette billedet igen hvis du ønsker at det skal slettes.</string>
-    <string name="notes_fragment_title">Notesbog</string>
-    <string name="language_danish">Dansk</string>
-    <string name="language_czech">Tjekkisk</string>
-    <string name="language_english">Engelsk</string>
-    <string name="settings_language_message">Det er ikke alt indhold som er oversat til alle sprog: %s</string>
-    <string name="common_mostUsed">Mest brugte</string>
-    <string name="common_previouslyUsed">Tidligere brugte</string>
-    <string name="downloader_taxon_downloading">Henter artsliste</string>
-    <string name="downloader_taxon_readingFile">Læser fil</string>
-    <string name="downloader_taxon_savingFile">Gemmer til databasen</string>
-    <string name="downloader_taxon_error">Der skete en fejl</string>
-    <string name="common_addEntry">Indtast</string>
-    <string name="addObservationFragment_title_note">Ny note til notesbog</string>
-    <string name="common_save">Gem</string>
-    <string name="common_delete">Slet</string>
-    <string name="common_unknown_locality">Unknown location</string>
-    <string name="addObservationVC_title_edit_note">Redigering af note</string>
-    <string name="download_taxon_title">Vil du hente data til offline brug?</string>
-    <string name="download_taxon_message">Ved at hente al data, kan du forberede dine fund uden internet - og så blot uploade dem når du kommer hjem fra din tur.</string>
-    <string name="downloader_metadata_downloading">Henter substrater, vegetationstyper og værter</string>
-    <string name="downloader_cleaning_up">Rydder op</string>
-    <string name="downloader_downloading">Henter data</string>
-    <string name="common_readyforupload">Klar til upload …</string>
-    <string name="common_notCompleted">Ikke klar til upload</string>
-    <string name="common_redownload">Opdater offline data</string>
-    <string name="noObs_title">Ingen observationer i nærheden</string>
-    <string name="error_database_noNotes_message">Du har endnu ikke nogen gemte notesbog indtastninger. Du kan her oprette noter om de svampe du finder, og så lægge dem op på Svampeatlas senere, f.eks. når du får bedre internet.</string>
-    <string name="promp_noteSaved_title">Note gemt</string>
-    <string name="prompt_noteSaved_message">Din note er blevet gemt i din notesbog. Du kan sende den ind senere!</string>
-    <string name="settings_remember_location">Husk disse koordinater</string>
-    <string name="settings_remember_locality">Husk denne placering (navn på lokationen)</string>
-    <string name="settings_locality_title">Placerings indstillinger</string>
-    <string name="observationDetailsCell_collectors">Finder(e):</string>
-    <string name="modal_localityHelper_message">Det er vigtigt for kvaliteten af den indsamlede data, at du kontrollerer at placeringen til din observation er korrekt. Du kan se på klippet nedenfor, hvordan du justerer placeringen manuelt.\n\nHvis det første tilføjede billede indeholder et GPS koordinat, vil appen foreslå at bruge billedets placering istedet for.\n\nVi vil minde dig om dette engang imellem - du kan slå dette fra i indstillinger.</string>
-    <string name="settings_reminders">Påmindelser</string>
-    <string name="settings_reminders_locality">Modtag påmindelser vedrørende kontrol af position</string>
-    <string name="yes">Ja</string>
-    <string name="no">Nej</string>
-    <string name="common_continue">Fortsæt</string>
-    <string name="action_upload_note">Indsend note</string>
-    <string name="action_save_changes">Gem ændringer</string>
-    <string name="settings_locality_message">De her indstillinger kan hjælpe dig i situationer hvor du har dårligt internet, og du gerne vil indrapportere en masse observationer fra samme sted.</string>
-    <string name="whats_new_2_0">Vi har netop lanceret en ny version af Svampeatlas appen (version 2.0), og denne gang med ganske væsentlige ændringer og forbedringer. Mest væsentligt er:  \n\n1)\tÆndret indberetningsflow. Vi har byttet om på rækkefølgen når man opretter et nyt fund, så man starter med lokalitet, dernæst vælger habitat, substrat og vært for til sidst at vælge art. Ændringen skyldes først og fremmest at vi snart vil lancere en ny forbedret version af vores billedgenkendelses AI, som vil give bedre artsforslag baseret på data om habitat og substrat. Ønsker du fremover at starte med at få et artsforslag kan du stadig bruge funktionen navneforslag i sidemenuen  \n\n2)\tMulighed for at låse lokalitetnavn og koordinater. Vi har gjort det muligt at låse lokalitetsnavn og eventuelt også fund-koordinater, hvis man indberetter mange fund fra den samme lokalitet, eller fra et enkelt hotspot. Dermed kan man spare tid og batteri i felten og samtidigt få mere konsistente lokalitetsnavne på dine fund. Funktionen kan nulstilles manuelt eller automatisk efter en time.  \n\n3)\tForenkling af notesbogfunktion. Vi har nu opdateret notesbogfunktionen så den ikke kan anvende AI til artsbestemmelse eller søge efter lokalitetsnavne når du opretter nye noter. Du kan stadig vælge artsnavne fra din artsliste på telefonen og tilføje metadata, men AI og valg af lokalitet aktiveres først når du åbner fundet fra notesbogen igen for at redigere det inden du oploader det til Svampeatlas. Formålet med ændringen er at spare tid og batteri i felten, så du udelukkende kan koncentrere dig om at oprette svampefund. Koordinater kobles enten til de foto du tilføjer i notesbogen eller din placering når en ny fundnote oprettes uden foto. Husk derfor at tage fotos eller oprette noter lige der hvor din svamp er fundet.  \n\nDerudover er der gennemført en række mindre forbedringer og bug fixes. Man kan igen søge arter ved hjælp af 3 + 3 koder (fx ama mus for Amanita muscaria), ligesom billedvisning på artspræsentationer er forbedret.</string>
-    <string name="modal_localityHelper_title">Husk at bekræfte din placering</string>
+Udover udviklingen af nye database og web-funktioner vil projektet udvikle en mobil-app til bestemmelse og registrering af svampefund i felten. Derudover er det målet at fastholde projektets overordnede koncept og resultater i en sammenfattende bog om Danmarks Svampeatlas, samt at skrive et nyt bestemmelsesværk for Danmarks basidiesvampe, baseret på de bestemmelsesnøgler der blev lavet i Danmarks Svampeatlas.
 
+Svampeatlas 2.0 udføres i et samarbejde mellem Center for Makroøkologi, Evolution og Klima (CMEC) ved Statens Naturhistoriske Museum (SNM), Københavns Universitet, Foreningen til Svampekundskabens Fremme og MycoKey. Projektgruppen består af Tobias Guldberg Frøslev, Thomas Stjernegaard Jeppesen, Thomas Læssøe (SNM) og Jens H. Petersen med Jacob Heilmann-Clausen som projektleder. Projektet er støttet af Aage V. Jensens Naturfond.</string>
+<string name="aboutVC_general_title">Generelt</string>
+<string name="aboutVC_guidelines_message">Simple funddata kan søges via webinterfacet på Danmarks Svampeatlas og kan frit bruges i alle typer af forvaltningsopgaver på såvel lokalt som nationalt plan, fx i forbindelse med miljøvurderinger (VVM’er), udarbejdelse af plejeplaner samt til lokal og national prioritering af naturbeskyttelse i Danmark. Danmarks Svampeatlas bør i hvert tilfælde citeres som kilde. Data kan på tilsvarende vis bruges i forskningssammenhæng. Bemærk at databasen indeholder både godkendte, uvaliderede og afviste fund, hvilket er specificeret under hvert fund.
+
+Valideringsprocessen omfatter artsbestemmelsen, og de grovere geografiske data. Især ældre fund har ofte meget upræcise fund-koordinater, men også for helt nye fund kan de være upræcist angivet. Den brugerdefinerede usikkerhed på fund-koordinater er angivet i meter for hvert fund, og skal betragtes som vejledende, fx ved udarbejdelse af detaljerede lokale forvaltningsplaner. Danmarks Svampeatlas rummer et meget stort antal standardnavne for lokaliteter, som vælges af rapportøren. Det betyder, at fund af den samme svamp kan være indrapporteret med flere forskellige lokalitetsnavne af forskellige brugere, og tillige med forskellige koordinater. I praksis er dette mest aktuelt for meget sjældne og karismatiske arter, fx pindsvinepigsvamp og safrangul fedtporesvamp.</string>
+<string name="aboutVC_guidelines_title">Retningslinier for brug af data fra Danmarks Svampeatlas</string>
+<string name="aboutVC_qualityAssurance_message">For at sikre at de informationer, der ligger i svampebasen er troværdige, undergår alle fund kvalitetssikring. Fund af arter uden valideringskrav bliver automatisk godkendt, mens fund af arter med valideringskrav som udgangspunkt er uvaliderede, indtil de er godkendt af en validator. For de valideringskrævende arter er der angivet en række valideringskrav. Hvis disse krav ikke er opfyldt i forbindelse med indlæggelse af fund, kan man ikke regne med en seriøs behandling af observationen og fundet afvises. Godkendte fund, også af arter, der ikke kræver validering, kan senere afvises af validatorer, fx hvis det vurderes at der ikke er tilstrækkelig dokumentation til at fundet kan godkendes eller at den vedlagte dokumentation viser, at det er en anden men ubestemmelig art. Alle brugere har mulighed for at kommentere på alle fund - både uvaliderede, godkendte og afviste. Kvalitetssikring/validering kræver ofte mikroskopisk undersøgelse af materiale, hvorfor behandlingstiden kan være lang.</string>
+<string name="aboutVC_qualityAssurance_title">Kvalitetssikring/validering</string>
+<string name="aboutVC_recognition_message">Brug af automatisk billedegenkendelse kan aldrig være helt præcis, og det er derfor vigtigt at systemet bruges med endnu mere kritisk sans end din svampebog. Spis aldrig svampe uden at søge hjælp fra svampekyndige mennesker. Danmarks Svampeatlas og Noque ApS frasiger sig ethvert ansvar for eventuelle forgiftninger eller andre sundhedsskadelige forhold.
+
+Billedegenkendelses systemet er udviklet af Milan Šulc og Professor Jiri Matas fra det Tjekkiske Tekniske Universitet (CTU) i Prag, Lukáš Picek fra University of West Bohemia (UWB) i Tjekkiet og Danmarks Svampeatlas.</string>
+<string name="aboutVC_recognition_title">Artsbestemmelse</string>
+<string name="aboutVC_title">Om</string>
+<string name="action_adjustSelf">Nej, jeg justere placeringen selv</string>
+<string name="action_cancel">Annuller</string>
+<string name="action_cancelUpload">Annuller upload</string>
+<string name="action_continueUpload">Nej, fortsæt med at uploade</string>
+<string name="action_deleteNote">Slet note</string>
+<string name="action_deleteObservation">Slet observation</string>
+<string name="action_editNote">Rediger note</string>
+<string name="action_editObservation">Rediger observation</string>
+<string name="action_fetchData">Ja, hent data</string>
+<string name="action_findLocation">Ja, find min placering</string>
+<string name="action_newNote">Ny note</string>
+<string name="action_no">Nej, ikke lige nu</string>
+<string name="action_refresh_data">Opdater taxonliste</string>
+<string name="action_save">Gem</string>
+<string name="action_saveAsNote">Gem som note</string>
+<string name="action_save_changes">Gem ændringer</string>
+<string name="action_selectUnknownSpecie">Indlæg en ubestemt svamp</string>
+<string name="action_tryAgain">Prøv igen</string>
+<string name="action_uploadNow">Indsend nu!</string>
+<string name="action_upload_note">Indsend note</string>
+<string name="addObservationError_imageUploadError">Men der skete en fejl med at uploade billedet/ne. %1$d ud af %2$d billeder er blevet uploaded</string>
+<string name="addObservationVC_localityFoundError_title">Nærmeste placering kunne ikke findes.</string>
+<string name="addObservationVC_localityFound_title">Fundets placering er blevet bestemt</string>
+<string name="addObservationVC_observationCategories_details">Detajler</string>
+<string name="addObservationVC_observationCategories_location">Lokalitet</string>
+<string name="addObservationVC_observationCategories_species">Art</string>
+<string name="addObservationVC_successfullUpload_title">Dit fund er blevet oprettet</string>
+<string name="addObservationVC_title">Nyt fund</string>
+<string name="addObservationVC_useImageMetadata_message">Et tilføjet billede har en anden placering og tid, end den nuværende. Vil du bruge billedets GPS-information og dato i stedet for?
+
+Billedets GPS-Præcision: %s m</string>
+<string name="addObservationVC_useImageMetadata_negative">Nej</string>
+<string name="addObservationVC_useImageMetadata_positive">Ja, brug billedets informationer</string>
+<string name="addObservationVC_useImageMetadata_title">Forslag til placering</string>
+<string name="appScrollView_informationHeaderTitle">Information</string>
+<string name="avViewError_cameraError_title">Kamera fejl</string>
+<string name="avViewError_permissionsError_message">Du kan give appen tilladelse til at bruge kameraet i indstillinger.</string>
+<string name="avViewError_permissionsError_title">Manglende tilladelse</string>
+<string name="avViewError_unknown_message">Der skete en ukendt fejl</string>
+<string name="avViewError_unknown_title">Ukendt fejl</string>
+<string name="cameraControlTextButton_noPhoto">Intet billede</string>
+<string name="cameraControlTextButton_usePhoto">Brug billede</string>
+<string name="cameraVC_shouldSaveImagesPrompt_message">Hvis du er interesseret, kan vi oprette et album til de billeder du tager i denne app.</string>
+<string name="cameraVC_shouldSaveImagesPrompt_message_negative">Nej</string>
+<string name="cameraVC_shouldSaveImagesPrompt_message_positive">Ja, gem billederne</string>
+<string name="cameraVC_shouldSaveImagesPrompt_title">Skal dine billeder gemmes?</string>
+<string name="cautionCell_lowConfidence">Bemærk at ingen af de nedenstående forslag har en særlig stor sandsynlighed.</string>
+<string name="commentsTableView_cell_title">Skriv en kommentar</string>
+<string name="common_clearAll">Ryd alt</string>
+<string name="common_continue">Fortsæt</string>
+<string name="common_date">Dato: %s</string>
+<string name="common_localityNotSelected">Lokation ikke valgt</string>
+<string name="common_success">Færdig!</string>
+<string name="common_twoChoices">Du har nedenstående valgmuligheder.</string>
+<string name="common_upload">Indsend</string>
+<string name="containedResultCell_genus">Slægt: </string>
+<string name="creditationCell_ai">Billedegenkendelses systemet er udviklet af Milan Šulc og Professor Jiri Matas fra det Tjekkiske Tekniske Universitet (CTU) i Prag, Lukáš Picek fra University of West Bohemia (UWB) i Tjekkiet og Danmarks Svampeatlas.</string>
+<string name="creditationCell_aiNewObservation">Disse navneforslag er baseret på det første billede du har tilføjet til dette fund. Billedegenkendelses systemet er udviklet af Milan Šulc og Professor Jiri Matas fra det Tjekkiske Tekniske Universitet (CTU) i Prag, Lukáš Picek fra University of West Bohemia (UWB) i Tjekkiet og Danmarks Svampeatlas.</string>
+<string name="dataServiceError_decodingError_message">Den modtagne data kunne ikke læses</string>
+<string name="dataServiceError_decodingError_title">Dekodningsfejl</string>
+<string name="dataServiceError_empty_message">Svaret indeholdte ingen data</string>
+<string name="dataServiceError_empty_title">Ugyldigt tomt svar</string>
+<string name="dataServiceError_encodingError_message">Kodningsfejl</string>
+<string name="dataServiceError_encodingError_title">Fejl</string>
+<string name="dataServiceError_loginError_message">Prøv nogle andre initialer eller et andet kodeord</string>
+<string name="dataServiceError_loginError_title">Log ind fejl</string>
+<string name="dataServiceError_searchResponseEmpty_message">Det du søgte efter kunne ikke findes, prøv at søg efter noget andet</string>
+<string name="dataServiceError_searchResponseEmpty_title">Fandt intet</string>
+<string name="dataServiceError_unknown_message">Der skete en ukendt fejl</string>
+<string name="dataServiceError_unknown_title">Ukendt fejl</string>
+<string name="databaseError_contentOutdated_message">Den gemte data er outdated</string>
+<string name="databaseError_contentOutdated_title">Databasen skal opdateres</string>
+<string name="databaseError_initError_message">Der skete en fejl med at indlæse appen\'s lokale database. Appen kan derfor desværre ikke starte korrekt uden at slette den gamle database og oprette en på ny. Dette betyder at din gemte data vil blive slettet. Vi beklager meget fejlen, tryk nedenfor for at fortsætte.</string>
+<string name="databaseError_initError_title">Database fejl</string>
+<string name="databaseError_noEntries_favoritedMushrooms_message">Du har ingen gemte favoritter. Du kan gøre en svamp til en favorit ved at swippe til venstre.</string>
+<string name="databaseError_noEntries_message">Der var ingen gemt data.</string>
+<string name="databaseError_noEntries_title">Fandt intet</string>
+<string name="databaseError_readError_message">Der var desværre problemer med at læse data fra disken</string>
+<string name="databaseError_readError_title">Læsefejl</string>
+<string name="databaseError_saveError_message">Kunne ikke gemme, prøv igen.</string>
+<string name="databaseError_saveError_title">Gemme-fejl</string>
+<string name="dateFormatting_daysPassed">%d dage siden</string>
+<string name="dateFormatting_hoursSince">%d timer siden</string>
+<string name="dateFormatting_rightNow">Lige nu</string>
+<string name="dateFormatting_today">I dag</string>
+<string name="detailsPickerFragment_hostsPicker">Vælg vært(er)</string>
+<string name="detailsPickerFragment_substratePicker">Vælg substrat</string>
+<string name="detailsPickerFragment_vegetationTypesPicker">Vælg vegetationstype</string>
+<string name="detailsVC_newSightingPrompt">Nyt fund</string>
+<string name="detailsVC_observationTitle">Fund af: %s</string>
+<string name="downloader_message_data">Henter data til offline brug ...</string>
+<string name="downloader_message_taxon">Henter svampe til offline brug ...</string>
+<string name="downloader_readingFile">Læser fil</string>
+<string name="downloader_success">Din enhed har nu den nyeste opdatering til taxon databasen.</string>
+<string name="downloader_title">Henter metadata</string>
+<string name="elFileManagerError_imageSavingError_message">Der skete en fejl i forbindelse med at gemme billedet til telefonens midlertidige lagerplads.</string>
+<string name="elFileManagerError_imageSavingError_title">Gemme fejl</string>
+<string name="elPhotosError_notAuthorized_message">Du har ikke givet appen tilladelse til at skrive og læse til dit fotobibliotek. Du kan ændre det i indstillinger, men bemærk at dette genstarter appen.</string>
+<string name="elPhotosError_notAuthorized_title">Mangler tilladelse</string>
+<string name="elPhotosError_unknownFetchError_message">Der skete en ukendt fejl i forbindelse med at få adgang til det valgte billede.</string>
+<string name="elPhotosError_unknownFetchError_title">Ukendt fejl</string>
+<string name="elPhotosError_unknownSaveError_message">Der skete en ukendt fejl i forbindelse med at gemme billedet til dit fotoalbum.</string>
+<string name="elPhotosError_unknownSaveError_title">Ukendt fejl</string>
+<string name="error_addObservationError_lowAccuracy">Upræcis observationsplacering</string>
+<string name="error_cantDelete">Kunne ikke slette</string>
+<string name="language_czech">Tjekkisk</string>
+<string name="language_danish">Dansk</string>
+<string name="language_english">Engelsk</string>
+<string name="locationAnnotation_title">Fundets placering</string>
+<string name="locationManagerError_badAccuracy_message">Det var ikke muligt at finde din lokation med en tilstrækkelig sikkerhed.</string>
+<string name="locationManagerError_badAccuracy_title">Utilstrækelig nøjagtighed</string>
+<string name="locationManagerError_networkError_message">Det lader til at der skete en netværks fejl med din telefons GPS-komponent.</string>
+<string name="locationManagerError_networkError_title">Netværksfejl</string>
+<string name="locationManagerError_permissionDenied_message">Du har afvist at appen skal kunne tilgå din GPS lokation, hvilket den skal kunne for at vise dig den her data.</string>
+<string name="locationManagerError_permissionDenied_title">Manglende tilladelse</string>
+<string name="locationManagerError_permissionsUndetermined_message">For at vise dig den her data, skal appen kunne finde ud af hvor du er.</string>
+<string name="locationManagerError_permissionsUndetermined_title">Hvor er du henne?</string>
+<string name="locationManagerError_unknown_message">Der skete en ukendt fejl i forsøget på at finde din GPS lokation.</string>
+<string name="locationManagerError_unknown_title">Ukendt fejl</string>
+<string name="loginVC_createNewAccountButton">Klik her for at oprette en ny konto</string>
+<string name="loginVC_detailsLabel">Bidrag til viden om Danske svampe ved at dele dine fund med andre, samt modtage valideringer af dine fund fra danmarks førende svampeeksperter.</string>
+<string name="loginVC_initialsTextField_error">Du skal udfylde dit brugernavn</string>
+<string name="loginVC_initialsTextField_placeholder">Initialer</string>
+<string name="loginVC_loginButton">Log ind</string>
+<string name="loginVC_lowerLabel">Danmarks Svampeatlas</string>
+<string name="loginVC_passwordTextField_error">Du skal skrive dit kodeord</string>
+<string name="loginVC_passwordTextField_placeholder">Adgangskode</string>
+<string name="loginVC_upperLabel">Log ind på</string>
+<string name="mapVC_title">Fundets lokation</string>
+<string name="mapViewCategories_regular">Standard</string>
+<string name="mapViewCategories_satelite">Luftfoto</string>
+<string name="mapViewCategories_topographical">Topografisk</string>
+<string name="mapViewFilteringSettings_ageOfSighting">Fundets alder: </string>
+<string name="mapViewSettingsView_newSearch">Ny søgning</string>
+<string name="mapViewSettingsView_year">%d år</string>
+<string name="mapViewSettings_title">Filtrer søgning</string>
+<string name="message_deletionsAreFinal">Sletning af billedet er permanent</string>
+<string name="message_editingObservation">Du er igang med at redigere en observation</string>
+<string name="message_imageDeletetionsPermanent">Når du redigere en observation, er sletning af uploadede billeder permanente, også selvom du ikke uploader andre ændringer. Denne besked vises kun en gang, or du skal slette billedet igen hvis du ønsker at det skal slettes.</string>
+<string name="message_noteSaved">Noten er blevet gemt</string>
+<string name="message_noteSaved_message">Noten er blevet gemt i din lokale database, og du kan se det i din notesbog</string>
+<string name="message_observationUpdated">Observationen blev opdateret</string>
+<string name="message_savingToStorage">Gemmer til lokal database</string>
+<string name="modal_localityHelper_message">Det er vigtigt for kvaliteten af den indsamlede data, at du kontrollerer at placeringen til din observation er korrekt. Du kan se på klippet nedenfor, hvordan du justerer placeringen manuelt.
+
+Hvis det første tilføjede billede indeholder et GPS koordinat, vil appen foreslå at bruge billedets placering istedet for.
+
+Vi vil minde dig om dette engang imellem - du kan slå dette fra i indstillinger.</string>
+<string name="modal_localityHelper_title">Husk at kontrollere din placering</string>
+<string name="mushroomDetailsScrollView_acceptedRecords">Accepterede fund:</string>
+<string name="mushroomDetailsScrollView_description">Beskrivelse</string>
+<string name="mushroomDetailsScrollView_eatability">Spiselighedsrapport</string>
+<string name="mushroomDetailsScrollView_ecology">Økologi</string>
+<string name="mushroomDetailsScrollView_heatMap">Fund i nærheden</string>
+<string name="mushroomDetailsScrollView_latestAcceptedRecord">Seneste accepteret fund:</string>
+<string name="mushroomDetailsScrollView_latestObservations">Seneste observationer</string>
+<string name="mushroomDetailsScrollView_latestUpdated">Sidst opdateret d.:</string>
+<string name="mushroomDetailsScrollView_similarities">Forvekslingsmuligheder</string>
+<string name="mushroomDetailsScrollView_validationTips">Valideringstips</string>
+<string name="mushroomVC_category_favorites">Mine favoritter</string>
+<string name="mushroomVC_category_species">Svampearter</string>
+<string name="mushroomVC_favoriteSucces_message">Du har hurtig adgang til at se svampen og dens billeder, også uden internet - under mine favoritter.</string>
+<string name="mushroomVC_favoriteSucces_title">%s er nu markeret som favorit</string>
+<string name="mushroomVC_title">Svampebog</string>
+<string name="mushroomView_lastUpdate">Sidst opdateret d.:</string>
+<string name="mushroomView_latestObservation">Seneste fund:</string>
+<string name="mushroomView_numberOfRecords">Antal danske fund:</string>
+<string name="myPageScrollView_logout">Log ud</string>
+<string name="myPageScrollView_notificationsHeader">Notifikationer</string>
+<string name="myPageScrollView_observationsHeader">Observationer</string>
+<string name="navigationItem_about">Om</string>
+<string name="navigationItem_cameraVC">Navneforslag</string>
+<string name="navigationItem_facebook">Facebook</string>
+<string name="navigationItem_loginVC">Log ind</string>
+<string name="navigationItem_mushroomsVC">Svampebog</string>
+<string name="navigationItem_myPageVC">Min side</string>
+<string name="navigationItem_nearbyVC">I nærheden</string>
+<string name="navigationItem_newObservationVC">Nyt fund</string>
+<string name="navigationItem_notebook">Notesbog</string>
+<string name="navigationItem_settings">Indstillinger</string>
+<string name="nearbyVC_title">I nærheden</string>
+<string name="newObservationError_missingInformation">Manglende information</string>
+<string name="newObservationError_noCoordinates_message">Dine koordinater kunne ikke findes automatisk, så du skal selv angive fundets position.</string>
+<string name="newObservationError_noCoordinates_title">Ingen koordinater</string>
+<string name="newObservationError_noLocality_message">Dine koordinater er blevet bestemt, men det var ikke muligt at finde et nærliggende stedsnavn. Prøv venligst igen.</string>
+<string name="newObservationError_noLocality_title">Hvor er du?</string>
+<string name="newObservationError_noMushroom_message">Du mangler at fortælle hvilken svampeart du har fundet. Hvis du ikke ved det, kan du trykke på knappen \'Ubestemt svamp\'.</string>
+<string name="newObservationError_noSubstrateGroup_message">Du mangler at angive et substrat.</string>
+<string name="newObservationError_noVegetationType_message">Du mangler at angive en vegetationstype.</string>
+<string name="newObservationError_tooInaccurate">Den nuværende præcision er: %0.2f m, hvilket er for upræcist. Vil du bruge din nuværende placering i stedet for?</string>
+<string name="notebook_message">Du har ingen gemte noter. Denne funktionalitet lader dig gemme observationer lokalt uden at indsende dem før du er klar. Det er smart hvis du tit har dårlig forbindelse når du er ude og finde svampe.</string>
+<string name="notebook_title">Notesbog</string>
+<string name="notificationCell_determinationExpertApproved"> er blevet ekspertgodkendt</string>
+<string name="observationDetailsCell_collectors">Finder(e)</string>
+<string name="observationDetailsCell_date">Dato:</string>
+<string name="observationDetailsCell_ecologyNotes_message">På sandjord blandt mos ...</string>
+<string name="observationDetailsCell_ecologyNotes_title">Kommentarer om voksested</string>
+<string name="observationDetailsCell_host">Vært:</string>
+<string name="observationDetailsCell_mostUsed">Mest brugt</string>
+<string name="observationDetailsCell_notes_message">Lugt melagtig ...</string>
+<string name="observationDetailsCell_notes_title">Andre noter</string>
+<string name="observationDetailsCell_substrate">Substrat:</string>
+<string name="observationDetailsCell_vegetationType">Vegetationstype:</string>
+<string name="observationDetailsScrollView_comments">Kommentarer</string>
+<string name="observationDetailsScrollView_ecologyNotes">Kommentarer om voksested</string>
+<string name="observationDetailsScrollView_location">Lokalitet</string>
+<string name="observationDetailsScrollView_notes">Andre noter</string>
+<string name="observationDetailsScrollView_observationDate">Fundets dato:</string>
+<string name="observationDetailsScrollView_rapportContent_abort">Annuller</string>
+<string name="observationDetailsScrollView_rapportContent_message">Finder du en kommentar, eller brugergeneret indhold stødende? Giv en begrundelse her, så kikker vi på det.</string>
+<string name="observationDetailsScrollView_rapportContent_placeholder">Eg. stødende billeder</string>
+<string name="observationDetailsScrollView_rapportContent_thankYou_message">Din rapportering er med til at gøre Svampeatlas et sikkert sted</string>
+<string name="observationDetailsScrollView_rapportContent_thankYou_title">Mange tak</string>
+<string name="observationDetailsScrollView_rapportContent_title">Rapporter stødende indhold</string>
+<string name="observationDetailsScrollView_species">Art</string>
+<string name="observationDetailsScrollView_substrate">Substrat:</string>
+<string name="observationDetailsScrollView_validationStatus">Valideringsstatus:</string>
+<string name="observationDetailsScrollView_validationStatus_approved">Godkendt</string>
+<string name="observationDetailsScrollView_validationStatus_declined">Afvist</string>
+<string name="observationDetailsScrollView_validationStatus_unknown">Vides ikke</string>
+<string name="observationDetailsScrollView_validationStatus_verifying">Valideres</string>
+<string name="observationDetailsScrollView_vegetationType">Vegetationstype:</string>
+<string name="observationEdit_changeValidation">Muligheden for at tilføje bestemmelser til en allerede bestemt observation kommer snart. For nu, kan du kun redigere de andre variabler</string>
+<string name="observationLocationCell_precision">Præcision: %.02f m</string>
+<string name="observationSpeciesCell_chooseGenus">Vælg slægt</string>
+<string name="observationSpeciesCell_chooseSpecies">Vælg art</string>
+<string name="observationSpeciesCell_choosenGenus">Valgte slægt</string>
+<string name="observationSpeciesCell_choosenSpecies">Valgte art</string>
+<string name="observationSpeciesCell_deselect">Fravælg</string>
+<string name="observationSpeciesCell_myFavorites">Mine favoritter</string>
+<string name="observationSpeciesCell_predictionsHeader">Navneforslag</string>
+<string name="observationSpeciesCell_searchResults">Søgeresultater</string>
+<string name="observation_id">Observation med ID: %d</string>
+<string name="pickerCell_rememberChoice">Husk mit valg</string>
+<string name="precision">Præcision %.2f m.</string>
+<string name="prompt_taxonData_message">For at du kan bruge denne funktionalitet, skal du have data downloaded til offline brug. Hvis du allerede har hentet data, skal dataen opdateres. Gør kun dette hvis du har en god internet forbindelse. Er du klar?</string>
+<string name="prompt_taxonData_title">Vil du gerne hente data til offline brug?</string>
+<string name="recoveryAction_activate">Aktivér</string>
+<string name="recoveryAction_login">Log ind</string>
+<string name="recoveryAction_openSettings">Åben indstillinger</string>
+<string name="recoveryAction_tryAgain">Prøv igen</string>
+<string name="redlistView_cren">Truet art</string>
+<string name="redlistView_dd">Vides ikke</string>
+<string name="redlistView_lcnt">Ikke en truet art</string>
+<string name="redlistView_vu">Sårbar art</string>
+<string name="reloadCell_showMore">Vis mere</string>
+<string name="reloadCell_tryAgain">Prøv igen</string>
+<string name="resultsView_header_message">Bemærk at disse forslag er vejledende og aldrig må stå alene, hvis du ønsker at spise de svampe du har fundet.</string>
+<string name="resultsView_header_title">Vi har %d forslag til dig</string>
+<string name="searchBar_placeholder">Søg efter en art her ...</string>
+<string name="searchCell_title">Søg på en vært her 👇</string>
+<string name="searchVC_cancelButton">Annuller</string>
+<string name="searchVC_searchBar_placeholder">Søg efter en vært her ...</string>
+<string name="selectedSpeciesCell_confident_genus">Det er helt sikkert den her slægt</string>
+<string name="selectedSpeciesCell_confident_species">Det er helt sikkert den her art</string>
+<string name="selectedSpeciesCell_likely_genus">Det er sandsynligvis denne slægt</string>
+<string name="selectedSpeciesCell_likely_species">Det er sandsynligvis denne art</string>
+<string name="selectedSpeciesCell_possible_genus">Det er muligvis denne slægt</string>
+<string name="selectedSpeciesCell_possible_species">Det er muligvis denne art</string>
+<string name="selectedSpeciesCell_question">Hvor sikker er du?</string>
+<string name="sessionError_noNotifications_message">Så har du mere tid til at gå ud og finde svampe.</string>
+<string name="sessionError_noNotifications_title">Du har ingen notifikationer</string>
+<string name="sessionError_noObservations_message">Skynd dig ud i felten og hvis os hvad du kan finde.</string>
+<string name="sessionError_noObservations_title">Du har ingen observationer</string>
+<string name="sessionError_notLoggedIn_message">Du er ikke logget ind, og bør ikke kunne gøre dette.</string>
+<string name="sessionError_notLoggedIn_title">Ikke logget ind</string>
+<string name="sessionError_tokenInvalid_message">Dit login er ikke længere gyldig, login igen.</string>
+<string name="sessionError_tokenInvalid_title">Ugyldigt log ind</string>
+<string name="settingsCell_database">Ryd offline indhold</string>
+<string name="settingsCell_language">Sprog</string>
+<string name="settingsInformationCell_message">Her har du mulighed for at finjustere din app oplevelse. Lige nu kan du ikke så meget, men der kommer flere muligheder til, jo mere vi kan fornemme i har brug for.</string>
+<string name="settings_general_header">Generelt</string>
+<string name="settings_locality_message">De her indstillinger kan hjælpe dig i situationer hvor du har dårligt internet, og du gerne vil indrapportere en masse observationer fra samme sted.
+
+Dine valg nulstilles efter 1 time, for at forhindre fejlindrapporteringer</string>
+<string name="settings_locality_title">Placerings indstillinger</string>
+<string name="settings_remember_locality">Husk denne placering (navn på lokationen)</string>
+<string name="settings_remember_location">Husk disse koordinater</string>
+<string name="settings_reminders">Påmindelser</string>
+<string name="settings_reminders_title">Modtag påmindelser vedrørende kontrol af position</string>
+<string name="termsVC_cameraHelper_message">Når du fotografere svampe til bestemmelse så husk følgende:
+\tAt fotografere i bredformat (vandret). Tjek at din telefon ikke har rotationslås aktiveret
+\t- At få både unge og gamle frugtlegemer med på foto (hvis muligt)
+\t- At vise både hat, lameller og evt. slør. læg et par svampe ned - både unge og gamle
+\t- At fotografere i medlys (ikke modlys) og skygge for direkte sollys, fx med din egen krop
+\t- Fotografere du rørhatte så skær gerne et frugtlegeme igennem på langs</string>
+<string name="termsVC_cameraHelper_title">Sådan tager du de bedste billeder</string>
+<string name="termsVC_dismissButton">Forstået</string>
+<string name="termsVC_localityHelper_title">Sådan justerer du dit funds placering</string>
+<string name="termsVC_mlPredict_message">Brug af automatisk billedegenkendelse kan aldrig være helt præcis, og det er derfor vigtigt at systemet bruges med endnu mere kritisk sans end din svampebog. Spis aldrig svampe uden at søge hjælp fra svampekyndige mennesker. Danmarks Svampeatlas og Noque ApS frasiger sig ethvert ansvar for eventuelle forgiftninger eller andre sundhedsskadelige forhold.
+Systemet er udviklet af Milan Šulc og Professor Jiri Matas fra det Tjekkiske Tekniske Universitet (CTU) i Prag, Lukáš Picek fra University of West Bohemia (UWB) i Tjekkiet og Danmarks Svampeatlas. Systemet er baseret på kunstig intelligens og er trænet med alle de fotos I har biddraget med til Svampeatlasset. Jo mere du bidrager med observationer og gode billeder, jo bedre vil vi kunne udvikle teknologien i fremtiden.
+Dette system er stadig i udviklingsfase og vi vil meget gerne have jeres feedback så det kan laves endnu bedre i fremtiden. Start en tråd på vores Facebook gruppe, eller send en mail til app@noque.dk</string>
+<string name="termsVC_mlPredict_title">Automatisk billedgenkendelse - du skal acceptere vores betingelser.</string>
+<string name="toxicityLevel_poisonous">Giftig</string>
+<string name="unknownSpeciesButton_message">Klik her for at indlægge en ubestemt svamp - fælleskabet vil prøve at hjælpe med bestemmelsen</string>
+<string name="unknownSpeciesButton_title">Ubestemt svamp</string>
+<string name="urlSessionError_invalidResponse_message">Svaret jeg fik tilbage fra serveren, giver desværre ingen mening.</string>
+<string name="urlSessionError_invalidResponse_title">Ugyldigt svar</string>
+<string name="urlSessionError_noInternet_message">Din enhed har ingen forbindelse til internettet.</string>
+<string name="urlSessionError_noInternet_title">Ingen internet</string>
+<string name="urlSessionError_payloadTooLarge_message">Serveren kan ikke håndtere så stor en datamængde.</string>
+<string name="urlSessionError_payloadTooLarge_title">Anmodningen var for stor</string>
+<string name="urlSessionError_serverError_message">Det lader til at der er et problem med serveren lige nu. Måske trænger den til et kram?</string>
+<string name="urlSessionError_serverError_title">Server fejl</string>
+<string name="urlSessionError_timeout_message">Det tog for lang tid før svaret nåede frem. Prøv igen, det kan være jeg var for utålmodig</string>
+<string name="urlSessionError_timeout_title">Time-out</string>
+<string name="urlSessionError_unAuthorized_message">Din konto kunne ikke verificeres, du skal muligvis logge på igen.</string>
+<string name="urlSessionError_unAuthorized_title">Uautoriseret</string>
+<string name="urlSessionError_unknown_message">Der skete en ukendt fejl</string>
+<string name="urlSessionError_unknown_title">Ukendt fejl</string>
+<string name="userView_guest_message">Log ind for at få den bedste oplevelse</string>
+<string name="userView_guest_title">Svampeatlas</string>
+<string name="utilities_photoAlbumName">Svampeatlas</string>
+<string name="whats_new_title">Hvad er nyt?</string>
+<string name="dateFormatting_1dayHasPassed">1 dag siden</string>
+<string name="notificationCell_commentAdded_1">har kommenteret på et fund af: </string>
+<string name="notificationCell_determinationAdded_1"> har tilføjet bestemmelsen: </string>
+<string name="notificationCell_determinationApproved_1">Et fund du følger er blevet valideret og godkendt som: </string>
+<string name="notificationCell_commentAdded_2">som du følger.</string>
+<string name="notificationCell_determinationAdded_2"> til et fund som du følger.</string>
+<string name="whats_new_2_0">Vi har netop lanceret en ny version af Svampeatlas appen (version 2.0), og denne gang med ganske væsentlige ændringer og forbedringer. Mest væsentligt er:
+
+1)	Ændret indberetningsflow. Vi har byttet om på rækkefølgen når man opretter et nyt fund, så man starter med lokalitet, dernæst vælger habitat, substrat og vært for til sidst at vælge art. Ændringen skyldes først og fremmest at vi snart vil lancere en ny forbedret version af vores billedgenkendelses AI, som vil give bedre artsforslag baseret på data om habitat og substrat. Ønsker du fremover at starte med at få et artsforslag kan du stadig bruge funktionen navneforslag i sidemenuen
+
+2)	Mulighed for at låse lokalitetnavn og koordinater. Vi har gjort det muligt at låse lokalitetsnavn og eventuelt også fund-koordinater, hvis man indberetter mange fund fra den samme lokalitet, eller fra et enkelt hotspot. Dermed kan man spare tid og batteri i felten og samtidigt få mere konsistente lokalitetsnavne på dine fund. Funktionen kan nulstilles manuelt eller automatisk efter en time.
+
+3)	Forenkling af notesbogfunktion. Vi har nu opdateret notesbogfunktionen så den ikke kan anvende AI til artsbestemmelse eller søge efter lokalitetsnavne når du opretter nye noter. Du kan stadig vælge artsnavne fra din artsliste på telefonen og tilføje metadata, men AI og valg af lokalitet aktiveres først når du åbner fundet fra notesbogen igen for at redigere det inden du oploader det til Svampeatlas. Formålet med ændringen er at spare tid og batteri i felten, så du udelukkende kan koncentrere dig om at oprette svampefund. Koordinater kobles enten til de foto du tilføjer i notesbogen eller din placering når en ny fundnote oprettes uden foto. Husk derfor at tage fotos eller oprette noter lige der hvor din svamp er fundet.
+
+Derudover er der gennemført en række mindre forbedringer og bug fixes. Man kan igen søge arter ved hjælp af 3 + 3 koder (fx ama mus for Amanita muscaria), ligesom billedvisning på artspræsentationer er forbedret.   </string>
 </resources>

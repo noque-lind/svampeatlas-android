@@ -78,13 +78,13 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         recoveryAction
     ) {
         class PermissionsError(resources: Resources): Error(
-            resources.getString(R.string.error_camera_permissionsError_title), resources.getString(
-                R.string.error_camera_permissionsError_message
+            resources.getString(R.string.avViewError_permissionsError_title), resources.getString(
+                R.string.avViewError_permissionsError_message
             ), RecoveryAction.OPENSETTINGS
         )
         class CaptureError(resources: Resources): Error(
-            resources.getString(R.string.error_camera_cameraError_title), resources.getString(
-                R.string.error_camera_unknown_message
+            resources.getString(R.string.avViewError_cameraError_title), resources.getString(
+                R.string.avViewError_unknown_message
             ), RecoveryAction.TRYAGAIN
         ) }
 
@@ -284,10 +284,10 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         if (saveImages == null) {
             PromptFragment().also {
                 it.arguments = Bundle().also { bundle ->
-                    bundle.putString(PromptFragment.KEY_TITLE, getString(R.string.prompt_shouldSaveImages_title))
-                    bundle.putString(PromptFragment.KEY_MESSAGE, getString(R.string.prompt_shouldSaveImages_message))
-                    bundle.putString(PromptFragment.KEY_POSITIVE, getString(R.string.prompt_shouldSaveImages_positive))
-                    bundle.putString(PromptFragment.KEY_NEGATIVE, getString(R.string.prompt_shouldSaveImages_negative))
+                    bundle.putString(PromptFragment.KEY_TITLE, getString(R.string.cameraVC_shouldSaveImagesPrompt_title))
+                    bundle.putString(PromptFragment.KEY_MESSAGE, getString(R.string.cameraVC_shouldSaveImagesPrompt_message))
+                    bundle.putString(PromptFragment.KEY_POSITIVE, getString(R.string.cameraVC_shouldSaveImagesPrompt_message_positive))
+                    bundle.putString(PromptFragment.KEY_NEGATIVE, getString(R.string.cameraVC_shouldSaveImagesPrompt_message_negative))
                 }
                 it.setTargetFragment(this@CameraFragment, 0)
                 it.show(parentFragmentManager, null)

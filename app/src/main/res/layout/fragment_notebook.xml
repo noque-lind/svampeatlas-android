@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/icon_menu_button"
         android:paddingEnd="8dp"
-        app:title="@string/notes_fragment_title" />
+        app:title="@string/navigationItem_notebook" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/notebookFragment_recyclerView"

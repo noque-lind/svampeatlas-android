@@ -155,8 +155,8 @@ class MyPageFragment : Fragment() {
 
                     is State.Items -> {
                         if (state.items.first.count() == 0) {
-                            adapter.configureNotificationsState(State.Error(AppError(resources.getString(R.string.error_session_noNotifications_title),
-                                resources.getString(R.string.error_session_noNotifications_message), null)), getString(R.string.myPageScrollView_notificationsHeader))
+                            adapter.configureNotificationsState(State.Error(AppError(resources.getString(R.string.sessionError_noNotifications_title),
+                                resources.getString(R.string.sessionError_noNotifications_message), null)), getString(R.string.myPageScrollView_notificationsHeader))
                         } else {
                             val items: MutableList<MyPageAdapter.Item> = state.items.first.map { MyPageAdapter.Item.Notification(it) }.toMutableList()
                             if (items.count() != state.items.second) items.add(MyPageAdapter.Item.LoadMore(MyPageAdapter.Item.Category.NOTIFICATIONS, items.lastIndex))
@@ -181,8 +181,8 @@ class MyPageFragment : Fragment() {
                     is State.Items -> {
                         if (state.items.first.count() == 0) {
                             adapter.configureObservationsState(State.Error(AppError(
-                                resources.getString(R.string.error_session_noObservations_title),
-                                resources.getString(R.string.error_session_noObservations_message), null
+                                resources.getString(R.string.sessionError_noObservations_title),
+                                resources.getString(R.string.sessionError_noObservations_message), null
                             )), getString(R.string.myPageScrollView_observationsHeader))
                         } else {
                             val items: MutableList<MyPageAdapter.Item> = state.items.first.map { MyPageAdapter.Item.Observation(it) }.toMutableList()

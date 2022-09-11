@@ -39,17 +39,17 @@ class ObservationHeaderView(context: Context, attrs: AttributeSet?) :
             Observation.ValidationStatus.APPROVED -> {
                 observationHeaderView_determinationIcon.setImageResource(R.drawable.glyph_checkmark)
                 observationHeaderView_determinationIcon.setBackgroundResource(R.drawable.circle_view_color_green)
-                observationHeaderView_determinationLabel.text = resources.getString(R.string.determinationLabel_approved)
+                observationHeaderView_determinationLabel.text = resources.getString(R.string.observationDetailsScrollView_validationStatus_approved)
             }
             Observation.ValidationStatus.VERIFYING -> {
                 observationHeaderView_determinationIcon.setImageResource(R.drawable.glyph_neutral)
                 observationHeaderView_determinationIcon.setBackgroundResource(R.drawable.circle_view_color_primary)
-                observationHeaderView_determinationLabel.text = resources.getString(R.string.determinationLabel_validating)
+                observationHeaderView_determinationLabel.text = resources.getString(R.string.observationDetailsScrollView_validationStatus_verifying)
             }
             Observation.ValidationStatus.REJECTED -> {
                 observationHeaderView_determinationIcon.setImageResource(R.drawable.glyph_denied)
                 observationHeaderView_determinationIcon.setBackgroundResource(R.drawable.circle_view_color_red)
-                observationHeaderView_determinationLabel.text = resources.getString(R.string.determinationLabel_rejected)
+                observationHeaderView_determinationLabel.text = resources.getString(R.string.observationDetailsScrollView_validationStatus_declined)
             }
             Observation.ValidationStatus.UNKNOWN -> {
                 observationHeaderView_determinationIcon.visibility = View.GONE

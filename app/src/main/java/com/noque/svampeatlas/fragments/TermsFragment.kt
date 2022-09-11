@@ -119,12 +119,12 @@ class TermsFragment: DialogFragment() {
                 contentTextView.text = getString(R.string.termsVC_cameraHelper_message)
             }
             Type.WHATSNEW -> {
-                headerView.configure(getString(R.string.terms_whatsnew_title))
+                headerView.configure(getString(R.string.whats_new_2_0))
                 contentTextView.text = getString(R.string.whats_new_2_0)
             }
             Type.IMAGEDELETIONS -> {
-                headerView.configure(getString(R.string.terms_imagedeletion_title))
-                contentTextView.text = getString(R.string.terms_imagedeletion_message)
+                headerView.configure(getString(R.string.message_deletionsAreFinal))
+                contentTextView.text = getString(R.string.message_imageDeletetionsPermanent)
             }
             Type.LOCALITYHELPER -> {
                 imageView.loadGif(R.drawable.locality_helper)

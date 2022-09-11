@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:title="@string/common_save"
+        android:title="@string/action_save_changes"
         android:id="@+id/menu_addObservationFragment_note_save"
         android:orderInCategory="1"
         app:showAsAction="always"
@@ -18,9 +18,9 @@
 
         <menu>
             <item
-                android:id="@+id/menu_addObservationFragment_resetButton"
-                android:icon="@drawable/glyph_reload"
-                android:title="@string/addObservationFragment_reset"
+                android:id="@+id/menu_addObservationFragment_deleteButton"
+                android:icon="@drawable/ic_delete_black_24dp"
+                android:title="@string/action_deleteNote"
                 app:showAsAction="ifRoom" />
         </menu>
     </item>

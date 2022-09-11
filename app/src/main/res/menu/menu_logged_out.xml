@@ -42,7 +42,7 @@
             android:icon="@drawable/icon_about"/>
 
         <item
-            android:title="@string/navigationItem_SettingsVC"
+            android:title="@string/navigationItem_settings"
             android:id="@+id/settingsFragment"
             android:icon="@drawable/icons_settings"/>
 

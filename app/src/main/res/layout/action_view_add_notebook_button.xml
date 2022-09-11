@@ -19,6 +19,6 @@
         android:paddingStart="8dp"
         android:paddingTop="0dp"
         android:paddingEnd="8dp"
-        android:text="@string/common_addEntry" />
+        android:text="@string/action_newNote" />
 
 </LinearLayout>

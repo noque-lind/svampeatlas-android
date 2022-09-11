@@ -19,6 +19,6 @@
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
         android:padding="0dp"
-        android:text="@string/addObservationFragment_upload" />
+        android:text="@string/common_upload" />
 
 </LinearLayout>

@@ -9,39 +9,39 @@ fun VolleyError.toAppError(): DataService.Error {
     when (this) {
         is AuthFailureError -> {
             return DataService.Error.VolleyError(
-                MyApplication.applicationContext.getString(R.string.error_network_unAuthorized_title),
-                MyApplication.applicationContext.getString(R.string.error_network_unAuthorized_message)
+                MyApplication.applicationContext.getString(R.string.urlSessionError_unAuthorized_title),
+                MyApplication.applicationContext.getString(R.string.urlSessionError_unAuthorized_message)
             )
         }
 
         is NoConnectionError -> {
             return DataService.Error.VolleyError(
-                MyApplication.applicationContext.getString(R.string.error_network_noInternet_title),
-                MyApplication.applicationContext.getString(R.string.error_network_noInternet_message)
+                MyApplication.applicationContext.getString(R.string.urlSessionError_noInternet_title),
+                MyApplication.applicationContext.getString(R.string.urlSessionError_noInternet_message)
             )
         }
 
         is TimeoutError -> {
             return DataService.Error.VolleyError(
-                MyApplication.applicationContext.getString(R.string.error_network_timeout_title),
-                MyApplication.applicationContext.getString(R.string.error_network_timeout_message)
+                MyApplication.applicationContext.getString(R.string.urlSessionError_timeout_title),
+                MyApplication.applicationContext.getString(R.string.urlSessionError_timeout_message)
             )
         }
 
         is ServerError -> {
             return DataService.Error.VolleyError(
-                MyApplication.applicationContext.getString(R.string.error_network_serverError_title),
-                MyApplication.applicationContext.getString(R.string.error_network_serverError_message)
+                MyApplication.applicationContext.getString(R.string.urlSessionError_serverError_title),
+                MyApplication.applicationContext.getString(R.string.urlSessionError_serverError_message)
             )
         }
 
         is ParseError -> {
             return DataService.Error.VolleyError(
-                MyApplication.applicationContext.getString(R.string.error_network_invalidResponse_title),
-                MyApplication.applicationContext.getString(R.string.error_network_invalidResponse_message)
+                MyApplication.applicationContext.getString(R.string.urlSessionError_invalidResponse_title),
+                MyApplication.applicationContext.getString(R.string.urlSessionError_invalidResponse_message)
             )
         }
     }
 
-    return DataService.Error.VolleyError(MyApplication.applicationContext.getString(R.string.error_dataService_unknown_title), this.message + "" + this.networkResponse.data.toString() ?: "")
+    return DataService.Error.VolleyError(MyApplication.applicationContext.getString(R.string.dataServiceError_unknown_title), this.message + "" + this.networkResponse.data.toString() ?: "")
 }

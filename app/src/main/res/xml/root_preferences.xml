@@ -6,7 +6,7 @@
     <PreferenceCategory
         app:iconSpaceReserved="false"
         android:layout_width="match_parent"
-        app:title="@string/settings_general_title">
+        app:title="@string/settings_general_header">
         <ListPreference
             app:iconSpaceReserved="false"
             android:defaultValue="not_set"
@@ -14,16 +14,16 @@
             android:entryValues="@array/language_values"
             android:key="PREFERRED_LANGUAGE"
             android:summary="%s"
-            android:title="@string/settings_language_title" />
+            android:title="@string/settingsCell_language" />
         <SwitchPreferenceCompat
             app:iconSpaceReserved="false"
             app:key="SAVE_IMAGES"
-            app:title="@string/prompt_shouldSaveImages_title" />
+            app:title="@string/cameraVC_shouldSaveImagesPrompt_title" />
     </PreferenceCategory>
     <PreferenceCategory  app:iconSpaceReserved="false" android:title="@string/settings_reminders">
         <SwitchPreference
             app:iconSpaceReserved="false"
-            android:title="@string/settings_reminders_locality"
+            android:title="@string/settings_reminders_title"
             app:key="shouldShowPositionReminderToggle" />
     </PreferenceCategory>
 </PreferenceScreen>

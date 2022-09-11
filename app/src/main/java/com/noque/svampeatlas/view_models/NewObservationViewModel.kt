@@ -29,21 +29,19 @@ fun <T> initialObserveMutableLiveData(observer: Observer<T>): MutableLiveData<T>
 class NewObservationViewModel(application: Application, val context: AddObservationFragment.Type, val id: Long, mushroomId: Int, imageFilePath: String?) : AndroidViewModel(application) {
 
     sealed class Notification(val title: String, val message: String) {
-        class LocationFound(resources: Resources, val locality: Locality, location: Location): Notification(resources.getString(R.string.prompt_localityDetermined_title), resources.getString(R.string.prompt_localityDetermined_message, locality.name, location.latLng.latitude, location.latLng.longitude, location.accuracy))
-        class LocationInaccessible(resources: Resources, error: AppError): Notification(resources.getString(R.string.prompt_localityDeterminedError_title), error.message)
-        class LocalityInaccessible(resources: Resources): Notification(resources.getString(R.string.error_newObservation_noLocality_title), resources.getString(R.string.error_newObservation_noLocality_message))
-        class ObservationUploaded(resources: Resources, id: Int): Notification(resources.getString(R.string.prompt_successRecordCreation_title),
+        class LocationInaccessible(resources: Resources, error: AppError): Notification(resources.getString(R.string.newObservationError_noCoordinates_title), error.message)
+        class LocalityInaccessible(resources: Resources): Notification(resources.getString(R.string.newObservationError_noLocality_title), resources.getString(R.string.newObservationError_noLocality_message))
+        class ObservationUploaded(resources: Resources, id: Int): Notification(resources.getString(R.string.addObservationVC_successfullUpload_title),
             "ID: $id")
         class ObservationUpdated(resources: Resources): Notification("", "")
-        class NoteSaved(resources: Resources): Notification(resources.getString(R.string.promp_noteSaved_title),resources.getString(R.string.prompt_noteSaved_message))
+        class NoteSaved(resources: Resources): Notification(resources.getString(R.string.message_noteSaved),resources.getString(R.string.message_noteSaved_message))
         class Deleted(resource: Resources): Notification("", "")
-        class ImageDeletionError(resources: Resources, error: AppError): Notification(resources.getString(R.string.prompt_imagedeletion_error_title), error.message)
         class NewObservationError(val error: UserObservation.Error, resources: Resources): Notification(resources.getString(error.title), resources.getString(error.message))
         class Error(error: AppError): Notification(error.title, error.message)
     }
 
     sealed class Prompt(val title: String, val message: String, val yes: String, val no: String) {
-        class UseImageMetadata(resources: Resources, val imageLocation: Location, val userLocation: Location): Prompt(resources.getString(R.string.prompt_useImageMetadata_title), resources. getString(R.string.prompt_useImageMetadata_message, imageLocation.accuracy), resources.getString(R.string.prompt_useImageMetadata_positive), resources.getString(R.string.prompt_useImageMetadata_negative))
+        class UseImageMetadata(resources: Resources, val imageLocation: Location, val userLocation: Location): Prompt(resources.getString(R.string.addObservationVC_useImageMetadata_title), resources. getString(R.string.addObservationVC_useImageMetadata_message, imageLocation.accuracy), resources.getString(R.string.addObservationVC_useImageMetadata_positive), resources.getString(R.string.addObservationVC_useImageMetadata_negative))
     }
 
     companion object {
@@ -94,7 +92,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
                 is UserObservation.Image.New ->  image.file
                else -> {null}
            }
-        if (it.mushroom == null && file != null)
+        if (it.mushroom == null && file != null && context == AddObservationFragment.Type.UploadNote)
             getPredictions(file)
 
     }
@@ -350,7 +348,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
                     Session.deleteImage(image.id) {
                         it.onError {
                             userObservation.images.postValue(userObservation.images.value)
-                            showNotification.postValue((Notification.ImageDeletionError(getApplication<MyApplication>().resources, it)))
+                         /*   showNotification.postValue((Notification.ImageDeletionError(getApplication<MyApplication>().resources, it)))*/
                         }
                         it.onSuccess {
                             userObservation.images.postValue(userObservation.images.value?.toMutableList()?.minusElement(image))

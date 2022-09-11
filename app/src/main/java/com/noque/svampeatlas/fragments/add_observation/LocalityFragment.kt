@@ -223,7 +223,7 @@ class LocalityFragment: Fragment(), LocationSettingsModal.Listener {
                         locationLockedImage.visibility = if (it.items.second) View.VISIBLE else View.GONE
                         mapFragment?.addLocationMarker(it.items.first.latLng, resources.getString(R.string.locationAnnotation_title), it.items.first.accuracy.toDouble())
                         mapFragment?.setRegion(it.items.first.latLng)
-                        locationLabel.text = resources.getString(R.string.precisionLabel, it.items.first.accuracy) + ", lat: ${String.format("%.2f", it.items.first.latLng.latitude)}, lon: ${String.format("%.2f", it.items.first.latLng.longitude)}"
+                        locationLabel.text = resources.getString(R.string.precision, it.items.first.accuracy) + ", lat: ${String.format("%.2f", it.items.first.latLng.latitude)}, lon: ${String.format("%.2f", it.items.first.latLng.longitude)}"
                     }
 
                     is State.Loading -> {

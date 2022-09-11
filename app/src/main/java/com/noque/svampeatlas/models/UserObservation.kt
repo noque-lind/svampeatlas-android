@@ -111,27 +111,27 @@ class UserObservation(private val creationDate: Date = Date()) {
     sealed class Error(title: Int, message: Int) :
         AppError2(title, message, null) {
         object NoMushroomError : Error(
-            R.string.error_newObservation_missingInformation_title,
-            R.string.error_newObservation_noMushroom_message
+            R.string.newObservationError_missingInformation,
+            R.string.newObservationError_noMushroom_message
         )
 
         object NoSubstrateError : Error(
-            R.string.error_newObservation_missingInformation_title,
-            R.string.error_newObservation_noSubstrategroup_message
+            R.string.newObservationError_missingInformation,
+            R.string.newObservationError_noSubstrateGroup_message
         )
 
         object NoVegetationTypeError : Error(
-            R.string.error_newObservation_missingInformation_title,
-            R.string.error_newObservation_noVegetationType_message
+            R.string.newObservationError_missingInformation,
+            R.string.newObservationError_noVegetationType_message
         )
 
         object NoLocationDataError : Error(
-            R.string.error_newObservation_noCoordinates_title,
-            R.string.error_newObservation_noCoordinates_message
+            R.string.newObservationError_noCoordinates_title,
+            R.string.newObservationError_noCoordinates_message
         )
         object NoLocalityDataError: Error(
-            R.string.error_newObservation_noLocality_title,
-            R.string.error_newObservation_noLocality_message
+            R.string.newObservationError_noLocality_title,
+            R.string.newObservationError_noLocality_message
         )
     }
 

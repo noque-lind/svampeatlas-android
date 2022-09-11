@@ -44,7 +44,7 @@ class NoteItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             imageViewLayout.visibility = View.GONE
         }
 
-        smallLabel.text = String.format(itemView.resources.getString(R.string.notesItem_upperLabel), newObservation.creationDate.toTimeString(), newObservation.locality?.name ?: itemView.resources.getString(R.string.common_unknown_locality))
+        smallLabel.text = newObservation.creationDate.toTimeString() + ", " +  (newObservation.locality?.name ?: itemView.resources.getString(R.string.common_localityNotSelected))
         primaryLabel.text = newObservation.species?.localizedName ?: newObservation.species?.fullName ?: "-"
     }
 }

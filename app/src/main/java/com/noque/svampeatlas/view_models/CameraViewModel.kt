@@ -62,7 +62,7 @@ class CameraViewModel(private val type: CameraFragment.Type, application: Applic
                 }
             } catch (exception: FileNotFoundException) {
                 val res = getApplication<Application>().resources
-                _imageFileState.postValue(State.Error(AppError(res.getString(R.string.error_photosManager_unknownFetchError_title), res.getString(R.string.error_photosManager_unknownFetchError_message), null)))
+                _imageFileState.postValue(State.Error(AppError(res.getString(R.string.elPhotosError_unknownFetchError_title), res.getString(R.string.elPhotosError_unknownFetchError_message), null)))
             }
         }
     }
