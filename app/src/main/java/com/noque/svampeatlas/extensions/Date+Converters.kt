@@ -53,6 +53,11 @@ fun Date.difDays(): Long {
     )
 }
 
+fun Date.difHours(): Long {
+    val hours = TimeUnit.MILLISECONDS.toHours(Calendar.getInstance().time.time - this.time)
+    return hours
+}
+
 fun Date.toTimeString(): String {
     return SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT).format(this)
 }

@@ -47,21 +47,21 @@ class DataService private constructor(context: Context) {
     sealed class Error(title: String, message: String) : AppError(title, message, null) {
         class VolleyError(title: String, message: String) : Error(title, message)
         class SearchResponseEmpty(context: Context) : Error(
-            context.getString(R.string.error_dataService_searchResponseEmpty_title),
-            context.getString(R.string.error_dataService_searchResponseEmpty_message)
+            context.getString(R.string.dataServiceError_searchResponseEmpty_title),
+            context.getString(R.string.dataServiceError_searchResponseEmpty_message)
         )
 
         class LoginError(context: Context) : Error(
-            context.getString(R.string.error_dataService_loginError_title),
-            context.getString(R.string.error_dataService_loginError_message)
+            context.getString(R.string.dataServiceError_loginError_title),
+            context.getString(R.string.dataServiceError_loginError_message)
         )
 
         class NotFound(context: Context) : Error(
-            context.getString(R.string.error_dataService_empty_title),
-            context.getString(R.string.error_dataService_empty_message)
+            context.getString(R.string.dataServiceError_empty_title),
+            context.getString(R.string.dataServiceError_empty_message)
         )
 
-        class UnknownError(context: Context) : Error(context.getString(R.string.error_dataService_unknown_title), context.getString(R.string.error_dataService_unknown_message))
+        class UnknownError(context: Context) : Error(context.getString(R.string.dataServiceError_unknown_title), context.getString(R.string.dataServiceError_unknown_message))
         class ExtractionError() : Error("", "")
     }
 
@@ -502,11 +502,11 @@ class DataService private constructor(context: Context) {
                 API(APIType.Post.ImagePrediction()),
                 null,
                 jsonObject,
-                Response.Listener {
+                {
                     completion(Result.Success(it))
                 },
 
-                Response.ErrorListener {
+                {
                     completion(Result.Error(it.toAppError()))
                 })
 

@@ -18,7 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/icon_menu_button"
-        app:title="@string/settingsVC_title" />
+        app:title="@string/navigationItem_settings" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment"

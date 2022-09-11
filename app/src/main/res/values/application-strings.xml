@@ -3,5 +3,5 @@
 
     <string name= "app_name">Atlas of Fungi</string>
     <string name="application_title">Fungal Atlas</string>
-
+    <string name="asset_statements" translatable="false">[{ \"include\": \"https://svampe.databasen.org/.well-known/assetlinks.json\" }]</string>
 </resources>

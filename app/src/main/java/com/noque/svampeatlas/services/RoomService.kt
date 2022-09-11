@@ -22,14 +22,14 @@ object RoomService {
             NOTES
         }
 
-        object DatabaseError: Error(R.string.error_database_saveError_title, R.string.error_database_saveError_message)
+        object DatabaseError: Error(R.string.databaseError_saveError_title, R.string.databaseError_saveError_message)
 
         class NoData(dataType: DataType) : Error(
-            R.string.error_database_noEntries_title,
+            R.string.databaseError_noEntries_title,
             when (dataType) {
-                DataType.FAVORITES -> R.string.error_database_noEntries_favoritedMushrooms_message
-                DataType.NOTES -> R.string.error_database_noNotes_message
-                else -> R.string.error_database_noEntries_message
+                DataType.FAVORITES -> R.string.databaseError_noEntries_favoritedMushrooms_message
+                DataType.NOTES -> R.string.notebook_message
+                else -> R.string.databaseError_noEntries_message
             }
         )
     }

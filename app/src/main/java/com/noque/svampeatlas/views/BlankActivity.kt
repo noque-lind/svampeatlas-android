@@ -20,7 +20,10 @@ import android.util.Log
 import android.view.View.*
 import androidx.navigation.*
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.ktx.Firebase
 import com.noque.svampeatlas.fragments.TermsFragment
+import com.noque.svampeatlas.services.Analytics
 import com.noque.svampeatlas.services.FileManager
 import com.noque.svampeatlas.utilities.SharedPreferences
 import com.noque.svampeatlas.view_models.Session
@@ -39,12 +42,10 @@ class BlankActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private var isLoggedIn: Boolean? = null
 
-
     // Views
     private lateinit var navigationView: NavigationView
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var userView: UserView
-
 
     // Listeners
 
@@ -107,6 +108,7 @@ class BlankActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Analytics.setInstance(FirebaseAnalytics.getInstance(this))
         super.onCreate(savedInstanceState)
         isLoggedIn = savedInstanceState?.getBoolean(KEY_IS_LOGGED_IN)
         setContentView(R.layout.activity_blank)
@@ -128,11 +130,12 @@ class BlankActivity : AppCompatActivity() {
         navigationView.itemIconTintList = null
         navController.addOnDestinationChangedListener(onDestinationChangedListener)
         navigationView.setNavigationItemSelectedListener(onNavigationItemSelectedListener)
-      /*  if (!SharedPreferences.hasSeenWhatsNew) {
+        if (!SharedPreferences.hasSeenWhatsNew) {
             val dialog = TermsFragment()
             dialog.arguments = Bundle().apply { putSerializable(TermsFragment.KEY_TYPE, TermsFragment.Type.WHATSNEW) }
             dialog.show(supportFragmentManager, null)
-        }*/
+            SharedPreferences.lastDownloadOfTaxon = null
+        }
     }
 
     private fun setupViewModels() {

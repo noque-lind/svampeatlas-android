@@ -15,10 +15,10 @@ import java.util.*
 
 sealed class NewObservationError(title: Int, message: Int) :
     AppError2(title, message, null) {
-    object NoMushroomError: NewObservationError(R.string.error_newObservation_missingInformation_title, R.string.error_newObservation_noMushroom_message)
-    object NoSubstrateError: NewObservationError(R.string.error_newObservation_missingInformation_title, R.string.error_newObservation_noSubstrategroup_message)
-    object NoVegetationTypeError: NewObservationError(R.string.error_newObservation_missingInformation_title, R.string.error_newObservation_noVegetationType_message)
-    object NoLocationDataError: NewObservationError(R.string.error_newObservation_noCoordinates_title, R.string.error_newObservation_noCoordinates_message)
+    object NoMushroomError: NewObservationError(R.string.newObservationError_missingInformation, R.string.newObservationError_noMushroom_message)
+    object NoSubstrateError: NewObservationError(R.string.newObservationError_missingInformation, R.string.newObservationError_noSubstrateGroup_message)
+    object NoVegetationTypeError: NewObservationError(R.string.newObservationError_missingInformation, R.string.newObservationError_noVegetationType_message)
+    object NoLocationDataError: NewObservationError(R.string.newObservationError_noCoordinates_title, R.string.newObservationError_noCoordinates_message)
 }
 
 @SuppressWarnings(RoomWarnings.PRIMARY_KEY_FROM_EMBEDDED_IS_DROPPED)

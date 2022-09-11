@@ -5,12 +5,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.R
-import com.noque.svampeatlas.fragments.modals.DownloaderFragment
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.utilities.SharedPreferences
 import com.noque.svampeatlas.view_holders.DownloadTaxonViewHolder
-import com.noque.svampeatlas.view_holders.NewObservationViewHolder
-import com.noque.svampeatlas.view_holders.NotificationViewHolder
+import com.noque.svampeatlas.view_holders.NoteItemViewHolder
 
 class NotebookAdapter: BaseAdapter<NotebookAdapter.Items, NotebookAdapter.Items.ViewTypes>() {
 
@@ -48,7 +46,7 @@ class NotebookAdapter: BaseAdapter<NotebookAdapter.Items, NotebookAdapter.Items.
     override val onClickListener: View.OnClickListener
         get() = View.OnClickListener {
             when (val tag = it.tag) {
-                is NewObservationViewHolder -> {
+                is NoteItemViewHolder -> {
                     (sections.getItem(tag.adapterPosition) as? Items.Note)?.let { listener?.newObservationSelected(it.newObservation) }
                 }
                 is DownloadTaxonViewHolder -> {
@@ -67,7 +65,7 @@ class NotebookAdapter: BaseAdapter<NotebookAdapter.Items, NotebookAdapter.Items.
                 val view = inflater.inflate(R.layout.item_new_observation, parent, false)
                 return Pair(
                     view,
-                    NewObservationViewHolder(view)
+                    NoteItemViewHolder(view)
                 )
 
             }
@@ -80,7 +78,7 @@ class NotebookAdapter: BaseAdapter<NotebookAdapter.Items, NotebookAdapter.Items.
 
     override fun bindViewHolder(holder: RecyclerView.ViewHolder, item: Items) {
         when (holder) {
-            is NewObservationViewHolder -> (item as? Items.Note)?.let { holder.configure(item.newObservation) {
+            is NoteItemViewHolder -> (item as? Items.Note)?.let { holder.configure(item.newObservation) {
                 listener?.uploadNewObservation(item.newObservation)
             } }
         }

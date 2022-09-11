@@ -10,12 +10,12 @@
     <item
         android:icon="@drawable/ic_baseline_edit_24"
         android:id="@+id/menu_detailsFragment_edit"
-        android:title="@string/addObservationVC_title_edit"
+        android:title="@string/action_editObservation"
         app:showAsAction="never" />
     <item
         android:icon="@drawable/ic_delete_black_24dp"
         android:id="@+id/menu_detailsFragment_delete"
-        android:title="@string/observationDetailsScrollView_delete"
+        android:title="@string/action_deleteObservation"
         app:showAsAction="never" />
 
 </menu>

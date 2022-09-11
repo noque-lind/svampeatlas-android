@@ -12,10 +12,10 @@ enum class RecoveryAction {
 
     fun description(resources: Resources): String {
         return when(this) {
-            ACTIVATE -> resources.getString(R.string.recovery_action_activate)
-            OPENSETTINGS -> resources.getString(R.string.recovery_action_openSettings)
-            TRYAGAIN -> resources.getString(R.string.recovery_action_tryAgain)
-            LOGIN -> resources.getString(R.string.recovery_action_login)
+            ACTIVATE -> resources.getString(R.string.recoveryAction_activate)
+            OPENSETTINGS -> resources.getString(R.string.recoveryAction_openSettings)
+            TRYAGAIN -> resources.getString(R.string.recoveryAction_tryAgain)
+            LOGIN -> resources.getString(R.string.recoveryAction_login)
         }
     }
 }

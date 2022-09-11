@@ -239,8 +239,8 @@ class DetailsPickerFragment() : DialogFragment() {
                         val defaultList = state.items.first.filterNot { it.isUserSelected }
                         val previouslyUsed = state.items.first.filter { it.isUserSelected }
                         hostsAdapter.configure(listOf(
-                            Section(if (previouslyUsed.isNotEmpty()) getString(R.string.common_previouslyUsed) else null, State.Items(previouslyUsed.map { PickerAdapter.PickerItem(it) })),
-                            Section(getString(R.string.common_mostUsed), State.Items(defaultList.map { PickerAdapter.PickerItem(it) }))
+                            Section(null, State.Items(previouslyUsed.map { PickerAdapter.PickerItem(it) })),
+                            Section(getString(R.string.observationDetailsCell_mostUsed), State.Items(defaultList.map { PickerAdapter.PickerItem(it) }))
                         ), newObservationViewModel.hosts.value?.first ?: listOf())
                     } else {
                         hostsAdapter.configure(listOf(Section(null, State.Items(state.items.first.map { PickerAdapter.PickerItem(it) }))), newObservationViewModel.hosts.value?.first ?: mutableListOf())

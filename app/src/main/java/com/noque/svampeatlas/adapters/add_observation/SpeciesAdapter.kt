@@ -20,7 +20,7 @@ class SpeciesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     companion object {
         val TAG = "SpeciesAdapter"
         val DEFAULT_MUSHROOM =
-            Mushroom(60212, "Fungi Sp.", null, null, 0, null, null, null, null, null, null)
+            Mushroom(60212, "Fungi Sp.", null,  null, null, 0, null, null, null, null, null, null)
     }
 
     sealed class Item(viewType: ViewType) :

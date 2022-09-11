@@ -26,7 +26,7 @@ import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.view_models.NotesFragmentViewModel
 import com.noque.svampeatlas.views.BackgroundView
 import com.noque.svampeatlas.views.BlankActivity
-import kotlinx.android.synthetic.main.action_view_add_notebook_entry.view.*
+import kotlinx.android.synthetic.main.action_view_add_notebook_button.view.*
 import kotlinx.android.synthetic.main.fragment_notebook.*
 
 class NotesFragment: Fragment() {
@@ -34,7 +34,6 @@ class NotesFragment: Fragment() {
     companion object {
         const val RELOAD_DATA_KEY = "RELOAD_DATA_KEY"
     }
-
 
     // Views
     private var toolbar by autoCleared<Toolbar>()
@@ -60,7 +59,10 @@ class NotesFragment: Fragment() {
                 }
 
                 override fun uploadNewObservation(newObservation: NewObservation) {
-                    viewModel.uploadNewObservation(newObservation)
+                    val action = NotesFragmentDirections.actionNotesFragmentToAddObservationFragment()
+                    action.type = AddObservationFragment.Type.UploadNote
+                    action.id = newObservation.creationDate.time
+                    findNavController().navigate(action)
                 }
 
             }
@@ -226,20 +228,6 @@ class NotesFragment: Fragment() {
                 is State.Error -> notebookAdapter.setSections(listOf(Section(null, State.Error(it.error))))
             }
 
-        })
-
-//        viewModel.noteDeleted.observe(viewLifecycleOwner, Observer {
-//            notebookAdapter.sections.deleteItem(it)
-//            notebookAdapter.notifyItemRemoved(it)
-//        })
-
-        viewModel.uploadState.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is State.Items -> backgroundView.reset()
-                is State.Empty -> backgroundView.reset()
-                is State.Loading -> backgroundView.setLoading()
-                is State.Error -> backgroundView.setError(it.error)
-            }
         })
     }
 }

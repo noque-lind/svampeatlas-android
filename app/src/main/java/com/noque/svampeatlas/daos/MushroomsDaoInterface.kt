@@ -1,5 +1,6 @@
 package com.noque.svampeatlas.daos
 
+import android.util.Log
 import com.noque.svampeatlas.extensions.AppLanguage
 import com.noque.svampeatlas.extensions.appLanguage
 import com.noque.svampeatlas.models.Host
@@ -52,12 +53,12 @@ class MushroomsDaoInterface(private val dao: MushroomsDao) {
             }
         }
 
-        val transformedSearchTerm = fullSearchTerm + "%"
+        val transformedSearchTerm = "%$fullSearchTerm%"
 
        val result =  when (Locale.getDefault().appLanguage()) {
-            AppLanguage.Danish -> dao.searchMushrooms_dk(transformedSearchTerm)
-            AppLanguage.English -> dao.searchMushrooms_en(transformedSearchTerm)
-            AppLanguage.Czech -> dao.searchMushrooms_cz(transformedSearchTerm)
+            AppLanguage.Danish -> dao.searchMushrooms_dk(transformedSearchTerm, taxonName = taxonName, genus = genus)
+            AppLanguage.English -> dao.searchMushrooms_en(transformedSearchTerm, taxonName = taxonName, genus = genus)
+            AppLanguage.Czech -> dao.searchMushrooms_cz(transformedSearchTerm, taxonName = taxonName, genus = genus)
         }
         return if (result.isNotEmpty()) {
             Result.Success(result.toList())

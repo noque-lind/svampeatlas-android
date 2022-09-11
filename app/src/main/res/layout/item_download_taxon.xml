@@ -30,13 +30,13 @@
             style="@style/AppPrimaryHighlighted"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/download_taxon_title" />
+            android:text="@string/prompt_taxonData_title" />
 
         <TextView
             style="@style/AppPrimary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/download_taxon_message" />
+            android:text="@string/prompt_taxonData_message" />
 
 
     </LinearLayout>

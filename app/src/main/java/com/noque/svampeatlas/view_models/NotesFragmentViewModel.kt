@@ -20,10 +20,6 @@ import java.io.File
 
 class NotesFragmentViewModel: ViewModel() {
 
-    private val _uploadState by lazy { MutableLiveData<State<Void?>>(State.Empty()) }
-    val uploadState: LiveData<State<Void?>> = _uploadState
-
-
     private val _notes by lazy { MutableLiveData<State<MutableList<NewObservation>>>(State.Empty()) }
     val notes: LiveData<State<MutableList<NewObservation>>> get() = _notes
 
@@ -33,18 +29,15 @@ class NotesFragmentViewModel: ViewModel() {
 
 
     fun getNotes() {
-        viewModelScope.launch(Dispatchers.Main) {
-            _notes.value = State.Loading()
-        }
-
+        _notes.postValue(State.Loading())
         viewModelScope.launch {
             RoomService.notesDao.getAll().apply {
                 onSuccess {
-                    _notes.value = State.Items(it.toMutableList())
+                    _notes.postValue(State.Items(it.toMutableList()))
                 }
 
                 onError {
-                    _notes.value = State.Error(it.toAppError(MyApplication.resources))
+                    _notes.postValue(State.Error(it.toAppError(MyApplication.resources)))
                 }
             }
         }
@@ -57,28 +50,6 @@ class NotesFragmentViewModel: ViewModel() {
                 onSuccess {
                     UserObservation(note).deleteAllImages()
                     getNotes()
-                }
-            }
-        }
-    }
-
-    fun uploadNewObservation(note: NewObservation) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _uploadState.postValue(State.Loading())
-            when (val result = note.createJSON(true)) {
-                is Result.Error -> _uploadState.postValue(State.Empty())
-                is Result.Success -> {
-                    Session.uploadObservation(UserObservation(note)).apply {
-                        onError {
-                            _uploadState.postValue(State.Empty())
-                        }
-
-                        onSuccess {
-                            _uploadState.postValue(State.Items(null))
-                            RoomService.notesDao.delete(note)
-                            getNotes()
-                        }
-                    }
                 }
             }
         }

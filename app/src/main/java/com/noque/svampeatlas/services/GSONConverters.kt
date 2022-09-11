@@ -1,10 +1,12 @@
 package com.noque.svampeatlas.services
 
+import androidx.room.Index
 import androidx.room.TypeConverter
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.noque.svampeatlas.models.Image
+import com.noque.svampeatlas.models.NewObservation
 import com.noque.svampeatlas.models.RedListData
 import java.util.*
 
@@ -86,6 +88,7 @@ object RedListDataConverter {
 
 
 object ImagesConverter {
+    data class IndexedImage(val index: Int, val image: Image)
 
     val gson = Gson()
 
@@ -96,18 +99,19 @@ object ImagesConverter {
             return Collections.emptyList()
         }
 
-        val listType = object : TypeToken<List<Image>>() {
-
+        val listType = object : TypeToken<List<IndexedImage>>() {
         }.type
+        val indexImages = gson.fromJson<List<IndexedImage>>(data, listType)
 
-        return gson.fromJson(data, listType)
+        return indexImages.sortedBy { it.index }.map { it.image }
     }
 
     @TypeConverter
     @JvmStatic
     fun toString(images: List<Image>?): String? {
         images?.let {
-            return gson.toJson(images)
+            val indexedImages = it.mapIndexed { index, image -> IndexedImage(index, image) }
+            return gson.toJson(indexedImages)
         }
         return null
     }

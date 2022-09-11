@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:title="@string/common_upload"
+        android:id="@+id/menu_addObservationFragment_uploadButton"
+        android:orderInCategory="1"
+        app:showAsAction="always"
+        app:actionLayout="@layout/action_view_upload_button"
+        />
+
+    <item
+        android:id="@+id/menu_addObservationFragment_overflow"
+        android:icon="@drawable/ic_more_vertical"
+        android:orderInCategory="101"
+        app:showAsAction="always"
+        android:title="">
+
+        <menu>
+            <item
+                android:id="@+id/menu_addObservationFragment_note_save"
+                android:icon="@drawable/glyph_checkmark"
+                android:title="@string/action_saveAsNote"
+                app:showAsAction="ifRoom" />
+        </menu>
+
+    </item>
+
+</menu>

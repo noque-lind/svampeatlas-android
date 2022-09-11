@@ -6,10 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.noque.svampeatlas.R
+import com.noque.svampeatlas.extensions.loadGif
 import com.noque.svampeatlas.fragments.add_observation.DetailsPickerFragment
 import com.noque.svampeatlas.utilities.SharedPreferences
 import com.noque.svampeatlas.views.HeaderView
@@ -24,6 +26,7 @@ class TermsFragment: DialogFragment() {
 
     enum class Type {
         IDENTIFICATION,
+        LOCALITYHELPER,
         CAMERAHELPER,
         WHATSNEW,
         IMAGEDELETIONS
@@ -43,6 +46,7 @@ class TermsFragment: DialogFragment() {
     private lateinit var headerView: HeaderView
     private lateinit var contentTextView: TextView
     private lateinit var acceptButton: Button
+    private lateinit var imageView: ImageView
 
 
     // Listeners
@@ -58,6 +62,9 @@ class TermsFragment: DialogFragment() {
                 }
                 Type.WHATSNEW -> {
                     SharedPreferences.hasSeenWhatsNew = true
+                }
+                Type.LOCALITYHELPER -> {
+                    SharedPreferences.setHasShownPositionReminder()
                 }
                 else -> {}
             }
@@ -93,6 +100,7 @@ class TermsFragment: DialogFragment() {
     }
 
     private fun initViews() {
+        imageView = termsFragment_imageView
         contentTextView = termsFragment_contentTextView
         acceptButton = termsFragment_acceptButton
         headerView = termsFragment_headerView
@@ -111,12 +119,17 @@ class TermsFragment: DialogFragment() {
                 contentTextView.text = getString(R.string.termsVC_cameraHelper_message)
             }
             Type.WHATSNEW -> {
-                headerView.configure(getString(R.string.terms_whatsnew_title))
-                contentTextView.text = getString(R.string.terms_whatsnew_message)
+                headerView.configure(getString(R.string.whats_new_2_0))
+                contentTextView.text = getString(R.string.whats_new_2_0)
             }
             Type.IMAGEDELETIONS -> {
-                headerView.configure(getString(R.string.terms_imagedeletion_title))
-                contentTextView.text = getString(R.string.terms_imagedeletion_message)
+                headerView.configure(getString(R.string.message_deletionsAreFinal))
+                contentTextView.text = getString(R.string.message_imageDeletetionsPermanent)
+            }
+            Type.LOCALITYHELPER -> {
+                imageView.loadGif(R.drawable.locality_helper)
+                headerView.configure(resources.getString(R.string.modal_localityHelper_title))
+                contentTextView.text = resources.getString(R.string.modal_localityHelper_message)
             }
         }
     }

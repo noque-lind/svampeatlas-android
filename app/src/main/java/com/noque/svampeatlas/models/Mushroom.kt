@@ -39,6 +39,7 @@ class Mushroom(
     @PrimaryKey
     @SerializedName("_id") val id: Int,
     @SerializedName("FullName") val fullName: String,
+    @SerializedName("TaxonName") val taxonName: String?,
     @SerializedName("Author") val fullNameAuthor: String?,
     @SerializedName("updatedAt") val updatedAt: String?,
     @SerializedName("probability") val probability: Int?,
@@ -58,7 +59,7 @@ class Mushroom(
     var isUserFavorite: Boolean = false
 ) {
 
-    constructor(id: Int, fullName: String, vernacularNameDK: VernacularNameDK?) : this(id, fullName, null, null, null, null, vernacularNameDK, null, null, null, null)
+    constructor(id: Int, fullName: String, vernacularNameDK: VernacularNameDK?) : this(id, fullName, null, null, null, null, null, vernacularNameDK, null, null, null, null)
 
     val localizedName: String? get() {
         return when (Locale.getDefault().appLanguage()) {

@@ -18,11 +18,8 @@ import kotlinx.android.synthetic.main.fragment_observation_location.*
  */
 class ObservationLocationFragment : Fragment() {
 
-
     // Objects
-
     private val args:  ObservationLocationFragmentArgs by navArgs()
-
 
     // Views
     private lateinit var toolbar: androidx.appcompat.widget.Toolbar

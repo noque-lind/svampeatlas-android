@@ -5,19 +5,20 @@
     android:layout_height="match_parent"
     android:clickable="true"
     android:gravity="center_vertical"
-  >
+    >
 
     <Button
-        android:id="@+id/actionView_addNotebookEntry"
+        android:id="@+id/actionView_upload"
         style="@style/Widget.AppCompat.Button.Small"
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
+        android:layout_height="28dp"
+        android:textSize="11sp"
         android:background="@drawable/toolbar_button_green"
-        android:drawableStart="@drawable/icon_plus"
-        android:padding="0dp"
+        android:drawableRight="@drawable/glyph_checkmark"
+        android:drawablePadding="10dp"
         android:paddingStart="8dp"
-        android:paddingTop="0dp"
         android:paddingEnd="8dp"
-        android:text="@string/common_addEntry" />
+        android:padding="0dp"
+        android:text="@string/common_upload" />
 
 </LinearLayout>

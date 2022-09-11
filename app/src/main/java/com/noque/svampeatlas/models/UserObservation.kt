@@ -37,22 +37,22 @@ class Observable {
 
 class ListenableUserObservation(private val onChanged: (UserObservation) -> Unit) {
 
-     var userObservation = UserObservation()
+    var userObservation = UserObservation()
 
-     val images = Observable.observe(MutableLiveData<List<UserObservation.Image>>()) {
-         userObservation.images = it
-     }
+    val images = Observable.observe(MutableLiveData<List<UserObservation.Image>>()) {
+        userObservation.images = it
+    }
 
     // Page 1 properties
-     val mushroom = Observable.observe(MutableLiveData<Pair<Mushroom, DeterminationConfidence>?>()) {
-           userObservation.mushroom = it
+    val mushroom = Observable.observe(MutableLiveData<Pair<Mushroom, DeterminationConfidence>?>()) {
+        userObservation.mushroom = it
     }
 
     var determinationNotes: String?
-    get() = userObservation.determinationNotes
-    set(value) {
-        userObservation.determinationNotes = value
-    }
+        get() = userObservation.determinationNotes
+        set(value) {
+            userObservation.determinationNotes = value
+        }
 
 
     // Page 2 properties
@@ -62,28 +62,30 @@ class ListenableUserObservation(private val onChanged: (UserObservation) -> Unit
     val substrate = Observable.observe(MutableLiveData<Pair<Substrate, Boolean>?>()) {
         userObservation.substrate = it
     }
-     val vegetationType = Observable.observe(MutableLiveData<Pair<VegetationType, Boolean>?>()) {
-         userObservation.vegetationType = it
-     }
+    val vegetationType = Observable.observe(MutableLiveData<Pair<VegetationType, Boolean>?>()) {
+        userObservation.vegetationType = it
+    }
 
-     val hosts = Observable.observe(MutableLiveData<Pair<List<Host>, Boolean>?>()) {
-         userObservation.hosts = it
-     }
+    val hosts = Observable.observe(MutableLiveData<Pair<List<Host>, Boolean>?>()) {
+        userObservation.hosts = it
+    }
 
     val notes = Observable.observe(MutableLiveData<String?>()) {
         userObservation.notes = it
     }
-     val ecologyNotes = Observable.observe(MutableLiveData<String?>()) {
-         userObservation.ecologyNotes = it
-     }
+    val ecologyNotes = Observable.observe(MutableLiveData<String?>()) {
+        userObservation.ecologyNotes = it
+    }
 
     // Page 3 properties
-     val locality = Observable.observe(MutableLiveData<Locality?>()) {
+    val locality = Observable.observe(MutableLiveData<Pair<Locality, Boolean>?>()) {
         userObservation.locality = it
+        SharedPreferences.lockedLocality = if (it?.second == true) it.first else null
     }
-     val location = Observable.observe(MutableLiveData<Location?>()) {
-         userObservation.location = it
-     }
+    val location = Observable.observe(MutableLiveData<Pair<Location, Boolean>?>()) {
+        userObservation.location = it
+        SharedPreferences.lockedLocation = if (it?.second == true) it.first else null
+    }
 
 
     fun set(value: UserObservation) {
@@ -109,27 +111,27 @@ class UserObservation(private val creationDate: Date = Date()) {
     sealed class Error(title: Int, message: Int) :
         AppError2(title, message, null) {
         object NoMushroomError : Error(
-            R.string.error_newObservation_missingInformation_title,
-            R.string.error_newObservation_noMushroom_message
+            R.string.newObservationError_missingInformation,
+            R.string.newObservationError_noMushroom_message
         )
 
         object NoSubstrateError : Error(
-            R.string.error_newObservation_missingInformation_title,
-            R.string.error_newObservation_noSubstrategroup_message
+            R.string.newObservationError_missingInformation,
+            R.string.newObservationError_noSubstrateGroup_message
         )
 
         object NoVegetationTypeError : Error(
-            R.string.error_newObservation_missingInformation_title,
-            R.string.error_newObservation_noVegetationType_message
+            R.string.newObservationError_missingInformation,
+            R.string.newObservationError_noVegetationType_message
         )
 
         object NoLocationDataError : Error(
-            R.string.error_newObservation_noCoordinates_title,
-            R.string.error_newObservation_noCoordinates_message
+            R.string.newObservationError_noCoordinates_title,
+            R.string.newObservationError_noCoordinates_message
         )
         object NoLocalityDataError: Error(
-            R.string.error_newObservation_noLocality_title,
-            R.string.error_newObservation_noLocality_message
+            R.string.newObservationError_noLocality_title,
+            R.string.newObservationError_noLocality_message
         )
     }
 
@@ -171,8 +173,8 @@ class UserObservation(private val creationDate: Date = Date()) {
     var ecologyNotes: String? = null
 
     // Page 3 properties
-    var locality: Locality? = null
-    var location: Location? = null
+    var locality: Pair<Locality, Boolean>? = null
+    var location: Pair<Location, Boolean>? = null
 
     constructor(): this(creationDate = Date()) {
         SharedPreferences.getSubstrateID()?.let {
@@ -192,6 +194,14 @@ class UserObservation(private val creationDate: Date = Date()) {
                 hosts = Pair(it.toMutableList(), true)
             }
         }
+
+        SharedPreferences.lockedLocality?.let {
+            locality = Pair(it, true)
+        }
+
+        SharedPreferences.lockedLocation?.let {
+            location = Pair(it, true)
+        }
     }
 
     constructor(observation: Observation) : this(creationDate = observation.createdAt ?: Date()) {
@@ -206,7 +216,6 @@ class UserObservation(private val creationDate: Date = Date()) {
         observation.substrate?.let { substrate = Pair(it, false) }
         observation.vegetationType?.let { vegetationType = Pair(it, false) }
         hosts = Pair(observation.hosts.toMutableList(), false)
-        locality = observation.locality
         notes = observation.note
         ecologyNotes = observation.ecologyNote
         images = observation.images.map {
@@ -218,48 +227,47 @@ class UserObservation(private val creationDate: Date = Date()) {
             )
         }.toMutableList()
         determinationNotes = null
-        observation.location?.let { location = it }
-        observation.locality?.let { locality = it }
+        observation.location?.let { location = Pair(it, false) }
+        observation.locality?.let { locality = Pair(it, false)  }
     }
 
     constructor(newObservation: NewObservation): this(creationDate = newObservation.creationDate) {
-            observationDate = newObservation.observationDate
-            val species = newObservation.species
-            if (species != null) {
-                mushroom = Pair(
-                    species,
-                    DeterminationConfidence.fromDatabaseName(
-                        newObservation.confidence
-                            ?: DeterminationConfidence.CONFIDENT.databaseName
-                    )
+        observationDate = newObservation.observationDate
+        val species = newObservation.species
+        mushroom = if (species != null) {
+            Pair(
+                species,
+                DeterminationConfidence.fromDatabaseName(
+                    newObservation.confidence
+                        ?: DeterminationConfidence.CONFIDENT.databaseName
                 )
-            } else {
-                mushroom = null
-            }
+            )
+        } else {
+            null
+        }
 
-            newObservation.substrate?.let { substrate = Pair(it, false) }
-            newObservation.vegetationType?.let { vegetationType = Pair(it, false) }
-            locality = newObservation.locality
-            notes = newObservation.note
-            ecologyNotes = newObservation.ecologyNote
-            RoomService.hosts.getHostsWithIds(newObservation.hostIDs).apply {
-                onSuccess {
-                    hosts = Pair(it, false)
-                }
+        newObservation.substrate?.let { substrate = Pair(it, false) }
+        newObservation.vegetationType?.let { vegetationType = Pair(it, false) }
+        notes = newObservation.note
+        ecologyNotes = newObservation.ecologyNote
+        RoomService.hosts.getHostsWithIds(newObservation.hostIDs).apply {
+            onSuccess {
+                hosts = Pair(it, false)
             }
+        }
 
-            images = newObservation.images.map {
-                Image.LocallyStored(File(it))
-            }.toMutableList()
-            newObservation.locality?.let { locality = it }
-            newObservation.coordinate?.let { location = it }
+        images = newObservation.images.map {
+            Image.LocallyStored(File(it))
+        }.toMutableList()
+        newObservation.locality?.let { locality =  Pair(it, SharedPreferences.lockedLocality?.id == it.id) }
+        newObservation.coordinate?.let { location =  Pair(it, SharedPreferences.lockedLocation?.latLng == it.latLng) }
     }
 
     fun isValid(): Error? {
-        if (mushroom == null) return Error.NoMushroomError
+        if (locality == null || locality == null) return Error.NoLocalityDataError
         if (substrate == null) return Error.NoSubstrateError
         if (vegetationType == null) return Error.NoVegetationTypeError
-        if (locality == null || locality == null) return Error.NoLocalityDataError
+        if (mushroom == null) return Error.NoMushroomError
         return null
     }
 
@@ -275,26 +283,26 @@ class UserObservation(private val creationDate: Date = Date()) {
             })
             put("ecologynote", ecologyNotes)
             put("note", notes)
-            put("decimalLatitude", location?.latLng?.latitude)
-            put("decimalLongitude", location?.latLng?.longitude)
-            put("accuracy", location?.accuracy)
+            put("decimalLatitude", location?.first?.latLng?.latitude)
+            put("decimalLongitude", location?.first?.latLng?.longitude)
+            put("accuracy", location?.first?.accuracy)
 
-            if (locality?.geoName != null) {
-                put("geonameId", locality?.geoName?.geonameId)
+            if (locality?.first?.geoName != null) {
+                put("geonameId", locality?.first?.geoName?.geonameId)
                 put(
                     "geoname", JSONObject()
-                        .put("geonameId", locality?.geoName?.geonameId)
-                        .put("name", locality?.geoName?.name)
-                        .put("adminName1", locality?.geoName?.adminName1)
-                        .put("lat", locality?.geoName?.lat)
-                        .put("lng", locality?.geoName?.lng)
-                        .put("countryName", locality?.geoName?.countryName)
-                        .put("countryCode", locality?.geoName?.countryCode)
-                        .put("fcodeName", locality?.geoName?.fcodeName)
-                        .put("fclName", locality?.geoName?.fclName)
+                        .put("geonameId", locality?.first?.geoName?.geonameId)
+                        .put("name", locality?.first?.geoName?.name)
+                        .put("adminName1", locality?.first?.geoName?.adminName1)
+                        .put("lat", locality?.first?.geoName?.lat)
+                        .put("lng", locality?.first?.geoName?.lng)
+                        .put("countryName", locality?.first?.geoName?.countryName)
+                        .put("countryCode", locality?.first?.geoName?.countryCode)
+                        .put("fcodeName", locality?.first?.geoName?.fcodeName)
+                        .put("fclName", locality?.first?.geoName?.fclName)
                 )
             } else {
-                put("locality_id", locality?.id)
+                put("locality_id", locality?.first?.id)
             }
 
             if (includeTaxon) {
@@ -321,10 +329,10 @@ class UserObservation(private val creationDate: Date = Date()) {
             creationDate,
             observationDate ?: Date(),
             mushroom?.first,
-            locality,
+            locality?.first,
             substrate?.first,
             vegetationType?.first,
-            location,
+            location?.first,
             ecologyNotes,
             notes,
             mushroom?.second?.databaseName,

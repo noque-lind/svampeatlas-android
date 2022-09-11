@@ -12,6 +12,7 @@ import com.noque.svampeatlas.fragments.add_observation.SpeciesFragment
 
 class InformationAdapter(val context: Context?, val categories: Array<AddObservationFragment.Category>, fm: FragmentManager, behavior: Int) : FragmentPagerAdapter(fm, behavior) {
 
+
     override fun getItem(position: Int): Fragment {
         return when (categories[position]) {
             AddObservationFragment.Category.SPECIES -> SpeciesFragment()
@@ -23,6 +24,7 @@ class InformationAdapter(val context: Context?, val categories: Array<AddObserva
     override fun getCount(): Int {
         return categories.count()
     }
+
 
     override fun getPageTitle(position: Int): CharSequence? {
         return when (categories[position]) {

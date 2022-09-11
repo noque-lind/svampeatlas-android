@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:title="@string/action_save"
+        android:id="@+id/menu_addObservationFragment_note_save"
+        android:orderInCategory="1"
+        app:showAsAction="always"
+        app:actionLayout="@layout/action_view_save_notebook_entry"
+        />
+</menu>

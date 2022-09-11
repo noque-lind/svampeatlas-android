@@ -2,11 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 <item
-    android:title="@string/common_addEntry"
+    android:title="@string/action_newNote"
     android:id="@+id/menu_notebookFragment_addEntry"
     android:orderInCategory="1"
     app:showAsAction="always"
-    app:actionLayout="@layout/action_view_add_notebook_entry"
+    app:actionLayout="@layout/action_view_add_notebook_button"
     />
 
     <item
@@ -19,7 +19,7 @@
             <item
                 android:id="@+id/menu_notebookFragment_redownloadOffline"
                 android:icon="@drawable/glyph_reload"
-                android:title="@string/common_redownload"
+                android:title="@string/action_refresh_data"
                 app:showAsAction="ifRoom" />
         </menu>
 

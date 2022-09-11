@@ -29,9 +29,9 @@ class LocationService(private val applicationContext: Context) {
     sealed class Error(title: String, message: String, recoveryAction: RecoveryAction): AppError(title, message,
         recoveryAction
     ) {
-        class PermissionDenied(resources: Resources): Error(resources.getString(R.string.error_locationManager_permissionDenied_title), resources.getString(R.string.error_locationManager_permissionDenied_message), RecoveryAction.OPENSETTINGS)
-        class PermissionsUndetermined(resources: Resources): Error(resources.getString(R.string.error_locationManager_permissionsUndetermined_title), resources.getString(R.string.error_locationManager_permissionsUndetermined_message), RecoveryAction.ACTIVATE)
-        class BadAccuracy(resources: Resources): Error(resources.getString(R.string.error_locationManager_badAccuracy_title), resources.getString(R.string.error_locationManager_badAccuracy_message), RecoveryAction.TRYAGAIN)
+        class PermissionDenied(resources: Resources): Error(resources.getString(R.string.locationManagerError_permissionDenied_title), resources.getString(R.string.locationManagerError_permissionDenied_message), RecoveryAction.OPENSETTINGS)
+        class PermissionsUndetermined(resources: Resources): Error(resources.getString(R.string.locationManagerError_permissionsUndetermined_title), resources.getString(R.string.locationManagerError_permissionsUndetermined_message), RecoveryAction.ACTIVATE)
+        class BadAccuracy(resources: Resources): Error(resources.getString(R.string.locationManagerError_badAccuracy_title), resources.getString(R.string.locationManagerError_badAccuracy_message), RecoveryAction.TRYAGAIN)
     }
 
     enum class State {

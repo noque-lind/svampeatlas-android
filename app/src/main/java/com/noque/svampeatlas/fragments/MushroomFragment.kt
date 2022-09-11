@@ -384,7 +384,7 @@ class MushroomFragment : Fragment() {
                 is State.Items -> {
                     mushroomsViewModel.resetFavoritizingState()
                     val bitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_elmessageview_failure).changeColor(ResourcesCompat.getColor(resources, R.color.colorGreen, null))
-                    createToast(getString(R.string.prompt_favoritizingSucces_title, it.items.localizedName ?: it.items.fullName.italized()), getString(R.string.prompt_favoritizingSucces_message), bitmap)
+                    createToast(getString(R.string.mushroomVC_favoriteSucces_title, it.items.localizedName ?: it.items.fullName.italized()), getString(R.string.mushroomVC_favoriteSucces_message), bitmap)
                 }
             }
         })

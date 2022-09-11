@@ -29,21 +29,20 @@ import java.io.FileReader
 class DownloaderViewModel(application: Application) : AndroidViewModel(application) {
 
     sealed class LoadingState(val resID: Int) {
-        object DownloadingTaxon : LoadingState(R.string.downloader_taxon_downloading)
-        object ReadingFile : LoadingState(R.string.downloader_taxon_readingFile)
-        object DownloadingMetadata : LoadingState(R.string.downloader_metadata_downloading)
-        object SavingFile : LoadingState(R.string.downloader_taxon_savingFile)
-        object Cleaninup : LoadingState(R.string.downloader_cleaning_up)
+        object DownloadingTaxon : LoadingState(R.string.downloader_message_taxon)
+        object ReadingFile : LoadingState(R.string.downloader_readingFile)
+        object DownloadingMetadata : LoadingState(R.string.downloader_message_data)
+        object SavingFile : LoadingState(R.string.message_savingToStorage)
     }
 
     sealed class Error(title: Int, message: Int, recoveryAction: RecoveryAction?) :
         AppError2(title, message, recoveryAction) {
         object InternetError : Error(
-            R.string.error_network_noInternet_title,
-            R.string.error_network_noInternet_message,
+            R.string.urlSessionError_noInternet_title,
+            R.string.urlSessionError_noInternet_message,
             RecoveryAction.TRYAGAIN
         )
-        object Unknown: Error(R.string.downloader_taxon_error, R.string.error_network_unknown_title, RecoveryAction.TRYAGAIN)
+        object Unknown: Error(R.string.databaseError_saveError_title, R.string.dataServiceError_unknown_message, RecoveryAction.TRYAGAIN)
     }
 
 
@@ -91,10 +90,9 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             val mushrooms = GsonBuilder().create().fromJson<List<Mushroom>>(json, object : TypeToken<List<Mushroom>>() {}.type)
             _loadingState.postValue(LoadingState.SavingFile)
             RoomService.mushrooms.save(mushrooms)
-            _loadingState.postValue(LoadingState.Cleaninup)
             file.delete()
         } catch (error: FileNotFoundException) {
-            _state.postValue(State.Error(AppError(getApplication<MyApplication>().resources.getString(R.string.downloader_taxon_error), error.localizedMessage ?: "", RecoveryAction.TRYAGAIN)))
+            _state.postValue(State.Error(AppError(getApplication<MyApplication>().resources.getString(R.string.dataServiceError_unknown_title), error.localizedMessage ?: "", RecoveryAction.TRYAGAIN)))
         }
     }
 

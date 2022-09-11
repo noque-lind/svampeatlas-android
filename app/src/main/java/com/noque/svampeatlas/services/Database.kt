@@ -1,10 +1,9 @@
 package com.noque.svampeatlas.services
 
 import android.content.Context
+import android.provider.ContactsContract
+import androidx.room.*
 import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.noque.svampeatlas.daos.*
@@ -56,8 +55,9 @@ val MIGRATION_18_23 = object: Migration(15,18) {
     }
 }
 
+
 @Database(entities = [User::class, Substrate::class, VegetationType::class, Host::class, Mushroom::class, NewObservation::class],
-    version = 23)
+    version = 25)
 
 @TypeConverters(ImagesConverter::class, RedListDataConverter::class, UserRolesTypeConverters::class, IDsConverter::class, StringsConverter::class, DateConverter::class, LatLngConverter::class)
 

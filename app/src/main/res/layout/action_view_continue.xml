@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/AppPrimary"
+    style="@style/AppSmall"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clickable="true"
     android:gravity="center_vertical"
-    >
+    android:focusable="true">
 
     <Button
-        android:id="@+id/actionView_uploadChanges"
+        android:id="@+id/actionView_continue"
         style="@style/Widget.AppCompat.Button.Small"
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:background="@drawable/toolbar_button_green"
-        android:drawableStart="@drawable/icon_upload"
+        android:layout_height="28dp"
+        android:textSize="11sp"
+        android:background="@drawable/toolbar_button_secondary"
+        android:drawableRight="@drawable/glyph_disclosure_button"
         android:drawablePadding="10dp"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
         android:padding="0dp"
-        android:text="@string/addObservationFragment_upload" />
+        android:text="@string/common_continue" />
 
 </LinearLayout>
