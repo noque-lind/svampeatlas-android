@@ -59,7 +59,7 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.preference:preference:1.1.1'
+
 
     def nav_version = "2.3.2"
     def camerax_version = '1.0.0-rc01'
@@ -69,9 +69,9 @@ dependencies {
     def material_version = "1.2.1"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.google.firebase:firebase-analytics:21.1.0'
-    implementation 'com.google.firebase:firebase-common-ktx:20.1.1'
-
+    implementation 'com.google.firebase:firebase-analytics:21.1.1'
+    implementation 'com.google.firebase:firebase-common-ktx:20.1.2'
+    implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.2.0'
