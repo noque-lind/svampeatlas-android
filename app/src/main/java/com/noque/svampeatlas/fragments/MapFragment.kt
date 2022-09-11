@@ -443,10 +443,10 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
                             )
                         )
                     )
-                googleMap.addMarker(markerOptions).also {
+                googleMap.addMarker(markerOptions)?.let {
                     it.tag = LOCALITY_TAG
                     markers.add(it)
-                    this.localities.put(it.id, locality)
+                    this.localities[it.id] = locality
                 }
             }
         })

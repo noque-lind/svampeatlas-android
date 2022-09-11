@@ -80,12 +80,11 @@ class LocationService(private val applicationContext: Context) {
     }
 
     private val locationCallback = object: LocationCallback() {
-        override fun onLocationResult(result: LocationResult?) {
-            if (result?.lastLocation != null && result.lastLocation.accuracy > 0 && (SystemClock.elapsedRealtimeNanos() - result.lastLocation.elapsedRealtimeNanos) < 5000000000) {
-                latestLocation = result.lastLocation
-
-                if (result.lastLocation != null && result.lastLocation.accuracy <= DESIRED_ACCURACY) {
-                    stopServiceAndSendLocation()
+        override fun onLocationResult(p0: LocationResult) {
+            p0.lastLocation?.let {
+                if (it.accuracy > 0 && (SystemClock.elapsedRealtimeNanos() - it.elapsedRealtimeNanos) < 5000000000) {
+                    latestLocation = it
+                    if (it.accuracy <= DESIRED_ACCURACY) stopServiceAndSendLocation()
                 }
             }
         }
