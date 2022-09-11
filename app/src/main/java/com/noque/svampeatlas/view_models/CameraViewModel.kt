@@ -25,7 +25,7 @@ import java.util.*
 
 
 
-class CameraViewModel(private val type: CameraFragment.Type, application: Application) : AndroidViewModel(application) {
+class CameraViewModel(private val type: CameraFragment.Context, application: Application) : AndroidViewModel(application) {
 
     companion object {
         val TAG = "CameraViewModel"
@@ -44,7 +44,7 @@ class CameraViewModel(private val type: CameraFragment.Type, application: Applic
 
     fun setImageFile(imageFile: File) {
         _imageFileState.postValue(State.Items(imageFile))
-        if (type == CameraFragment.Type.IDENTIFY) {
+        if (type == CameraFragment.Context.IDENTIFY) {
             viewModelScope.launch { getPredictions(imageFile) }
         }
     }

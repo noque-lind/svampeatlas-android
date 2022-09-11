@@ -77,7 +77,7 @@ class MushroomFragment : Fragment() {
             val action = MushroomFragmentDirections.actionGlobalMushroomDetailsFragment(
                 mushroom.id,
                 DetailsFragment.TakesSelection.NO,
-                DetailsFragment.Type.SPECIES,
+                DetailsFragment.Context.SPECIES,
                 null,
                 null
             )
@@ -370,6 +370,7 @@ class MushroomFragment : Fragment() {
                 is State.Error -> {
                     backgroundView?.setError(it.error)
                 }
+                else -> {}
             }
         })
 
@@ -386,6 +387,7 @@ class MushroomFragment : Fragment() {
                     val bitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_elmessageview_failure).changeColor(ResourcesCompat.getColor(resources, R.color.colorGreen, null))
                     createToast(getString(R.string.mushroomVC_favoriteSucces_title, it.items.localizedName ?: it.items.fullName.italized()), getString(R.string.mushroomVC_favoriteSucces_message), bitmap)
                 }
+                else -> {}
             }
         })
     }

@@ -182,7 +182,7 @@ class LocalityFragment: Fragment(), LocationSettingsModal.Listener {
 
         settingsButton.setOnClickListener {
            val localityLockPossible = when (newObservationViewModel.context) {
-                AddObservationFragment.Type.Note, AddObservationFragment.Type.EditNote, AddObservationFragment.Type.Edit -> false
+                AddObservationFragment.Context.Note, AddObservationFragment.Context.EditNote, AddObservationFragment.Context.Edit -> false
                 else -> true
             }
 

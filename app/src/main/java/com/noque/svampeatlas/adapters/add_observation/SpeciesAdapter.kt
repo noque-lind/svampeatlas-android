@@ -62,6 +62,7 @@ class SpeciesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     is Item.SelectedMushroom -> {
                         listener?.mushroomSelected(item.mushroom)
                     }
+                    else -> {}
                 }
             }
             is UnknownSpeciesViewHolder -> {
@@ -72,6 +73,7 @@ class SpeciesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     is Item.SelectableMushroom -> {
                         listener?.mushroomSelected(item.mushroom)
                     }
+                    else -> {}
                 }
             }
         }
@@ -190,6 +192,7 @@ class SpeciesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     is Item.SelectableMushroom -> {
                         holder.configure(item.mushroom)
                     }
+                    else -> {}
                 }
             }
 
@@ -198,6 +201,7 @@ class SpeciesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     is Item.SelectedMushroom -> {
                         holder.configure(item.mushroom, item.confidence)
                     }
+                    else -> {}
                 }
             }
 

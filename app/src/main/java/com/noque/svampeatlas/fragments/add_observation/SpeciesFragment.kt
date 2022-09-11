@@ -68,7 +68,7 @@ class SpeciesFragment : Fragment() {
                         AddObservationFragmentDirections.actionGlobalMushroomDetailsFragment(
                             mushroom.id,
                             DetailsFragment.TakesSelection.DESELECT,
-                            DetailsFragment.Type.SPECIES,
+                            DetailsFragment.Context.SPECIES,
                             null,
                             null
                         )
@@ -78,7 +78,7 @@ class SpeciesFragment : Fragment() {
                         AddObservationFragmentDirections.actionGlobalMushroomDetailsFragment(
                             mushroom.id,
                             DetailsFragment.TakesSelection.SELECT,
-                            DetailsFragment.Type.SPECIES,
+                            DetailsFragment.Context.SPECIES,
                             null,
                             null
                         )

@@ -49,7 +49,7 @@ class MyPageFragment : Fragment() {
                 val action = MyPageFragmentDirections.actionGlobalMushroomDetailsFragment(
                     observation.id,
                     DetailsFragment.TakesSelection.NO,
-                    DetailsFragment.Type.OBSERVATIONWITHSPECIES,
+                    DetailsFragment.Context.OBSERVATIONWITHSPECIES,
                     null,
                     null
                 )
@@ -73,7 +73,7 @@ class MyPageFragment : Fragment() {
                 val action = MyPageFragmentDirections.actionGlobalMushroomDetailsFragment(
                     notification.observationID,
                     DetailsFragment.TakesSelection.NO,
-                    DetailsFragment.Type.OBSERVATIONWITHSPECIES,
+                    DetailsFragment.Context.OBSERVATIONWITHSPECIES,
                     null,
                     null
                 )
@@ -167,6 +167,7 @@ class MyPageFragment : Fragment() {
                     is State.Error -> {
                         adapter.configureNotificationsState(State.Error(state.error), getString(R.string.myPageScrollView_notificationsHeader))
                     }
+                    else -> {}
                 }
 
                 evaluateIfFinishedLoading()
@@ -196,6 +197,7 @@ class MyPageFragment : Fragment() {
                     is State.Error -> {
                         adapter.configureObservationsState(State.Error(state.error), getString(R.string.myPageScrollView_observationsHeader))
                     }
+                    else -> {}
                 }
 
                 evaluateIfFinishedLoading()

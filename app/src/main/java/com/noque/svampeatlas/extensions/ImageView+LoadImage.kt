@@ -2,13 +2,13 @@ package com.noque.svampeatlas.extensions
 
 import android.widget.ImageView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
+import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.services.DataService
-import com.noque.svampeatlas.utilities.GlideApp
 
 
 
@@ -22,21 +22,21 @@ fun ImageView.downloadImage(size: DataService.ImageSize,
 
     if (size == DataService.ImageSize.FULL) {
         if (useThumbnail) {
-            val thumbnailRequest = GlideApp.with(context).load("${DataService.ImageSize.MINI.value}$url").onlyRetrieveFromCache(true)
-            GlideApp
+            val thumbnailRequest = Glide.with(context).load("${DataService.ImageSize.MINI.value}$url").onlyRetrieveFromCache(true)
+            Glide
                 .with(context)
                 .load(url)
                 .thumbnail(thumbnailRequest)
                 .into(this)
 
         } else {
-            GlideApp
+            Glide
                 .with(context)
                 .load(url)
                 .into(this)
         }
     } else {
-        GlideApp.with(context)
+        Glide.with(context)
             .load("${size.value}$url")
             .placeholder(circularProgressDrawable)
             .into(this)
@@ -44,7 +44,7 @@ fun ImageView.downloadImage(size: DataService.ImageSize,
 }
 
 fun ImageView.loadGif(resource: Int) {
-    GlideApp.with(context)
+    Glide.with(context)
         .asGif()
         .load(resource)
         .transition(DrawableTransitionOptions.withCrossFade())// Call your GIF here (url, raw, etc.)

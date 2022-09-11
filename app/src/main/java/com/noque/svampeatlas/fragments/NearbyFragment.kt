@@ -139,7 +139,7 @@ class NearbyFragment : Fragment(), MapSettingsFragment.Listener {
                 val action = NearbyFragmentDirections.actionGlobalMushroomDetailsFragment(
                     it.id,
                     DetailsFragment.TakesSelection.NO,
-                    DetailsFragment.Type.OBSERVATIONWITHSPECIES,
+                    DetailsFragment.Context.OBSERVATIONWITHSPECIES,
                     null,
                     null
                 )

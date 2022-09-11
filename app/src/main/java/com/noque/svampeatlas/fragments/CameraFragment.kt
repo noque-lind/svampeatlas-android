@@ -66,7 +66,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         private const val CODE_LIBRARY_REQUEST = 1234
     }
 
-    enum class Type {
+    enum class Context {
         NEW_OBSERVATION,
         IMAGE_CAPTURE,
         IDENTIFY
@@ -134,7 +134,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
 
     private val cameraViewModel by lazy { ViewModelProvider(
         this, CameraViewModelFactory(
-            args.type,
+            args.context,
             requireActivity().application
         )
     ).get(CameraViewModel::class.java) }
@@ -161,7 +161,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                 val action = CameraFragmentDirections.actionGlobalMushroomDetailsFragment(
                     predictionResult.mushroom.id,
                     DetailsFragment.TakesSelection.SELECT,
-                    DetailsFragment.Type.SPECIES,
+                    DetailsFragment.Context.SPECIES,
                     (cameraViewModel.imageFileState.value as? State.Items)?.items?.absolutePath,
                     if (state is State.Items) PredictionResult.getNotes(
                         predictionResult,
@@ -340,7 +340,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
 
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
-            this.sensorManager = (requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager).also {
+            this.sensorManager = (requireContext().getSystemService(android.content.Context.SENSOR_SERVICE) as SensorManager).also {
                 it.registerListener(
                     sensorEventListener, it.getDefaultSensor(
                         Sensor.TYPE_ROTATION_VECTOR
@@ -414,18 +414,18 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
 
         @SuppressLint("ClickableViewAccessibility")
         private fun setupViews() {
-            when (args.type) {
-                Type.IMAGE_CAPTURE -> {
+            when (args.context) {
+                Context.IMAGE_CAPTURE -> {
                     toolbar.setNavigationIcon(R.drawable.glyph_cancel)
                     toolbar.setNavigationOnClickListener {
                         findNavController().navigateUp()
                     }
                 }
-                Type.IDENTIFY -> {
+                Context.IDENTIFY -> {
                     (requireActivity() as BlankActivity).setSupportActionBar(toolbar)
                     cameraControlsView.configureState(CameraControlsView.State.CAPTURE)
                 }
-                Type.NEW_OBSERVATION -> {
+                Context.NEW_OBSERVATION -> {
                     (requireActivity() as BlankActivity).setSupportActionBar(toolbar)
                     cameraControlsView.configureState(CameraControlsView.State.CAPTURE_NEW)
                 }
@@ -445,6 +445,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                         is State.Items -> setImageState(state.items)
                         is State.Error -> setError(state.error)
                         is State.Empty -> reset()
+                        else -> {}
                     }
                 })
 
@@ -469,7 +470,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
         }
 
         private fun validateState() {
-            if (args.type == Type.IDENTIFY && !SharedPreferences.hasAcceptedIdentificationTerms()) {
+            if (args.context == Context.IDENTIFY && !SharedPreferences.hasAcceptedIdentificationTerms()) {
                 TermsFragment().also {
                     it.arguments = Bundle().also { bundle -> bundle.putSerializable(TermsFragment.KEY_TYPE, TermsFragment.Type.IDENTIFICATION) }
                     it.listener = object: TermsFragment.Listener {
@@ -490,9 +491,9 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
             backgroundView.reset()
             imageView.setImageResource(android.R.color.transparent)
             imageView.setBackgroundResource(android.R.color.transparent)
-            when (args.type) {
-                Type.IMAGE_CAPTURE, Type.IDENTIFY -> cameraControlsView.configureState(CameraControlsView.State.CAPTURE)
-                Type.NEW_OBSERVATION -> cameraControlsView.configureState(CameraControlsView.State.CAPTURE_NEW)
+            when (args.context) {
+                Context.IMAGE_CAPTURE, Context.IDENTIFY -> cameraControlsView.configureState(CameraControlsView.State.CAPTURE)
+                Context.NEW_OBSERVATION -> cameraControlsView.configureState(CameraControlsView.State.CAPTURE_NEW)
             }
         }
 
@@ -538,7 +539,7 @@ class CameraFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCall
                     .into(this)
             }
 
-            if (args.type == Type.IMAGE_CAPTURE || args.type == Type.NEW_OBSERVATION) cameraControlsView.configureState(CameraControlsView.State.CONFIRM)
+            if (args.context == Context.IMAGE_CAPTURE || args.context == Context.NEW_OBSERVATION) cameraControlsView.configureState(CameraControlsView.State.CONFIRM)
         }
 
         private fun setError(error: AppError) {

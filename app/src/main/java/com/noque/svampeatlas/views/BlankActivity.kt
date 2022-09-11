@@ -98,7 +98,7 @@ class BlankActivity : AppCompatActivity() {
                     navController.navigate(
                         it,
                         null,
-                        NavOptions.Builder().setPopUpTo(navController.graph.startDestination, false).build()
+                        NavOptions.Builder().setPopUpTo(navController.graph.startDestinationId, false).build()
                     )
                 }
             }
@@ -150,18 +150,19 @@ class BlankActivity : AppCompatActivity() {
 
                     if (it.items != isLoggedIn && it.items) {
                         val newGraph = navController.graph
-                        newGraph.startDestination = R.id.myPageFragment
+                        newGraph.setStartDestination(R.id.myPageFragment)
                         navigationView.setCheckedItem(R.id.myPageFragment)
                         navController.graph = newGraph
 //                        toolbar.setupWithNavController(navController, appBarConfiguration)
                     } else if (it.items != isLoggedIn && !it.items) {
                         val newGraph = navController.graph
-                        newGraph.startDestination = R.id.mushroomFragment
+                        newGraph.setStartDestination(R.id.mushroomFragment)
                         navigationView.setCheckedItem(R.id.mushroomFragment)
                         navController.graph = newGraph
                     }
                     isLoggedIn = it.items
                 }
+                else -> {}
             }
         })
 

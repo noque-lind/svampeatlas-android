@@ -69,6 +69,7 @@ class MyPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     is Item.LoadMore -> {
                         listener?.getAdditionalData(item.category, item.offset)
                     }
+                    else -> {}
                 }
             }
             is NotificationViewHolder -> {
@@ -76,6 +77,7 @@ class MyPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     is Item.Notification -> {
                         listener?.notificationSelected(item.notification)
                     }
+                    else -> {}
                 }
             }
 
@@ -84,6 +86,7 @@ class MyPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     is Item.Observation -> {
                         listener?.observationSelected(item.observation)
                     }
+                    else -> {}
                 }
             }
         }
@@ -166,10 +169,12 @@ class MyPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             is HeaderViewHolder -> { sections.getTitle(position)?.let { holder.configure(it) } }
             is ObservationViewHolder -> { when (val item = sections.getItem(position)) {
                 is Item.Observation -> { holder.configure(item.observation, true) }
+                else -> {}
             } }
 
             is NotificationViewHolder -> {when (val item = sections.getItem(position)) {
                 is Item.Notification -> { holder.configure(item.notification) }
+                else -> {}
             }}
 
             is ErrorViewHolder -> { sections.getError(position)?.let { holder.configure(it) } }

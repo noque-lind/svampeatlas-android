@@ -26,7 +26,7 @@ fun <T> initialObserveMutableLiveData(observer: Observer<T>): MutableLiveData<T>
     return liveData
 }
 
-class NewObservationViewModel(application: Application, val context: AddObservationFragment.Type, val id: Long, mushroomId: Int, imageFilePath: String?) : AndroidViewModel(application) {
+class NewObservationViewModel(application: Application, val context: AddObservationFragment.Context, val id: Long, mushroomId: Int, imageFilePath: String?) : AndroidViewModel(application) {
 
     sealed class Notification(val title: String, val message: String) {
         class LocationInaccessible(resources: Resources, error: AppError): Notification(resources.getString(R.string.newObservationError_noCoordinates_title), error.message)
@@ -92,7 +92,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
                 is UserObservation.Image.New ->  image.file
                else -> {null}
            }
-        if (it.mushroom == null && file != null && context == AddObservationFragment.Type.UploadNote)
+        if (it.mushroom == null && file != null && context == AddObservationFragment.Context.UploadNote)
             getPredictions(file)
 
     }
@@ -115,20 +115,20 @@ class NewObservationViewModel(application: Application, val context: AddObservat
         }
 
         when (context) {
-            AddObservationFragment.Type.New, AddObservationFragment.Type.Note -> {
+            AddObservationFragment.Context.New, AddObservationFragment.Context.Note -> {
                 userObservation.set(UserObservation())
             }
-            AddObservationFragment.Type.FromRecognition -> {
+            AddObservationFragment.Context.FromRecognition -> {
                 userObservation.set(UserObservation())
                 if (mushroomId != 0) {
                     setMushroom(mushroomId)
                 }
                 imageFilePath?.let { appendImage(File(imageFilePath)) }
             }
-            AddObservationFragment.Type.Edit -> {
+            AddObservationFragment.Context.Edit -> {
                editObservation(id)
             }
-            AddObservationFragment.Type.EditNote, AddObservationFragment.Type.UploadNote -> {
+            AddObservationFragment.Context.EditNote, AddObservationFragment.Context.UploadNote -> {
                editNote(id)
             }
         }
@@ -251,6 +251,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
                     else -> setLocation(state.items)
                 }
             }
+            else -> {}
         }
     }
 
@@ -309,7 +310,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
         if (userObservation.images.value?.count() == 0 && userObservation.mushroom.value == null) {
             // We are only interested in the upload note context
             when (context) {
-                AddObservationFragment.Type.New, AddObservationFragment.Type.UploadNote -> getPredictions(imageFile)
+                AddObservationFragment.Context.New, AddObservationFragment.Context.UploadNote -> getPredictions(imageFile)
                 else -> { }
             }
         }
@@ -356,6 +357,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
                         }
                     }
                 }
+                else -> {}
             }
         }
     }
@@ -367,6 +369,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
                 _coordinateState.value = State.Items(Pair(prompt.imageLocation, false))
                 getLocalities(prompt.imageLocation)
             }
+            else -> {}
         }
     }
 
@@ -379,6 +382,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
                         getLocalities(prompt.userLocation)
                     }
                     is State.Items -> { /* Do nothing */ }
+                    else -> {}
                 }
 
             }
@@ -403,7 +407,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
 
     private fun getLocalities(location: Location) {
         // If we are not in right context, we do not want to find locality.
-        if (context == AddObservationFragment.Type.Note || context == AddObservationFragment.Type.EditNote) return
+        if (context == AddObservationFragment.Context.Note || context == AddObservationFragment.Context.EditNote) return
         _localitiesState.value = State.Loading()
         viewModelScope.launch {
             DataService.getInstance(getApplication())
@@ -430,7 +434,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
                     }
                     result.onError {
                         _localitiesState.value = State.Error(it)
-                        if (context != AddObservationFragment.Type.Note)
+                        if (context != AddObservationFragment.Context.Note)
                         showNotification.postValue(Notification.LocalityInaccessible(MyApplication.applicationContext.resources))
                     }
                 }
@@ -521,8 +525,8 @@ class NewObservationViewModel(application: Application, val context: AddObservat
 
     fun delete() {
         when (context) {
-            AddObservationFragment.Type.New, AddObservationFragment.Type.FromRecognition -> userObservation.set(UserObservation())
-            AddObservationFragment.Type.Edit -> {
+            AddObservationFragment.Context.New, AddObservationFragment.Context.FromRecognition -> userObservation.set(UserObservation())
+            AddObservationFragment.Context.Edit -> {
                 viewModelScope.launch {
                     Session.deleteObservation(id.toInt()).apply {
                         onError {
@@ -534,8 +538,8 @@ class NewObservationViewModel(application: Application, val context: AddObservat
                     }
                 }
             }
-            AddObservationFragment.Type.Note -> userObservation.set(UserObservation())
-            AddObservationFragment.Type.EditNote, AddObservationFragment.Type.UploadNote -> {
+            AddObservationFragment.Context.Note -> userObservation.set(UserObservation())
+            AddObservationFragment.Context.EditNote, AddObservationFragment.Context.UploadNote -> {
                 viewModelScope.launch {
                     RoomService.notesDao.delete(NewObservation(Date(id), Date(), null, null, null, null, null, null, null, null, null, listOf(), listOf()))
                         .apply {

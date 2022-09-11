@@ -64,7 +64,7 @@ class DetailsFragment : Fragment() {
         DESELECT
     }
 
-    enum class Type {
+    enum class Context {
         SPECIES,
         OBSERVATION,
         OBSERVATIONWITHSPECIES
@@ -101,8 +101,8 @@ class DetailsFragment : Fragment() {
                 Geometry.Type.RECTANGLE
             )
 
-            when (args.type) {
-                Type.SPECIES -> {
+            when (args.context) {
+                Context.SPECIES -> {
                     speciesViewModel.getHeatMapObservations(geometry)
                     mapFragment.setRegion(geometry.coordinate, geometry.radius)
                 }
@@ -153,7 +153,7 @@ class DetailsFragment : Fragment() {
         ViewModelProvider(
             this, ObservationsViewModelFactory(
                 args.id,
-                args.type == Type.OBSERVATIONWITHSPECIES,
+                args.context == Context.OBSERVATIONWITHSPECIES,
                 requireActivity().application
             )
         ).get(ObservationViewModel::class.java)
@@ -176,7 +176,7 @@ class DetailsFragment : Fragment() {
             override fun onClicked(mushroom: Mushroom) {
                 val action = DetailsFragmentDirections.actionGlobalMushroomDetailsFragment(
                     mushroom.id,
-                    TakesSelection.NO, Type.SPECIES,
+                    TakesSelection.NO, Context.SPECIES,
                     null,
                     null
                 )
@@ -192,7 +192,7 @@ class DetailsFragment : Fragment() {
             val action = DetailsFragmentDirections.actionGlobalMushroomDetailsFragment(
                 it.id,
                 TakesSelection.NO,
-                Type.OBSERVATION,
+                Context.OBSERVATION,
                 null,
                 null
             )
@@ -227,10 +227,10 @@ class DetailsFragment : Fragment() {
             override fun localitySelected(locality: Locality) {}
 
             override fun onClick() {
-                when (args.type) {
-                    Type.SPECIES -> {
+                when (args.context) {
+                    Context.SPECIES -> {
                     }
-                    Type.OBSERVATION, Type.OBSERVATIONWITHSPECIES -> {
+                    Context.OBSERVATION, Context.OBSERVATIONWITHSPECIES -> {
                         (observationViewModel.observationState.value as? State.Items)?.items?.let {
                             val action =
                                 DetailsFragmentDirections.actionMushroomDetailsFragmentToObservationLocationFragment(
@@ -274,8 +274,7 @@ class DetailsFragment : Fragment() {
                         R.id.menu_detailsFragment_edit -> {
                             observationViewModel.observationState.value?.item?.let { observation ->
                                 val action =
-                                    DetailsFragmentDirections.actionMushroomDetailsFragmentToAddObservationFragmentEdit()
-                                action.type = AddObservationFragment.Type.Edit
+                                    DetailsFragmentDirections.actionMushroomDetailsFragmentToAddObservationFragmentEdit(AddObservationFragment.Context.Edit)
                                 action.id = observation.id.toLong()
                                 findNavController().navigate(action)
                             }
@@ -310,13 +309,12 @@ class DetailsFragment : Fragment() {
     private val takesSelectionButtonPressed = View.OnClickListener {
         when (args.takesSelection) {
             TakesSelection.SELECT -> {
-                if (args.type == Type.SPECIES) {
+                if (args.context == Context.SPECIES) {
                     if (args.predictionResults != null && args.imageFilePath != null) {
                         val action =
-                            DetailsFragmentDirections.actionMushroomDetailsFragmentToAddObservationFragment()
+                            DetailsFragmentDirections.actionMushroomDetailsFragmentToAddObservationFragment(AddObservationFragment.Context.FromRecognition)
                         action.imageFilePath = args.imageFilePath
                         action.mushroomId = args.id
-                        action.type = AddObservationFragment.Type.FromRecognition
                         action.predictionNotes = args.predictionResults
                         findNavController().navigate(action)
                     } else {
@@ -339,13 +337,13 @@ class DetailsFragment : Fragment() {
     private val imagesViewOnClick = { index: Int ->
         val images = mutableListOf<Image>()
 
-        when (args.type) {
-            Type.SPECIES -> {
+        when (args.context) {
+            Context.SPECIES -> {
                 (speciesViewModel.mushroomState.value as? State.Items)?.items?.images?.let {
                     images.addAll(it)
                 }
             }
-            Type.OBSERVATION, Type.OBSERVATIONWITHSPECIES -> {
+            Context.OBSERVATION, Context.OBSERVATIONWITHSPECIES -> {
                 (observationViewModel.observationState.value as? State.Items)?.items?.images?.let {
                     images.addAll(it)
                 }
@@ -481,15 +479,15 @@ class DetailsFragment : Fragment() {
         }
 
 
-        when (args.type) {
-            Type.OBSERVATION -> {
+        when (args.context) {
+            Context.OBSERVATION -> {
                 recyclerView.apply {
                     adapter = commentsAdapter
                     layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
                 }
             }
 
-            Type.OBSERVATIONWITHSPECIES -> {
+            Context.OBSERVATIONWITHSPECIES -> {
                 mushroomViewHeaderTextView.visibility = View.VISIBLE
                 mushroomView.setListener(mushroomViewListener)
                 mushroomView.round(true)
@@ -502,7 +500,7 @@ class DetailsFragment : Fragment() {
 
             }
 
-            Type.SPECIES -> {
+            Context.SPECIES -> {
                 recyclerView.apply {
                     adapter = observationsAdapter
                     layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -525,11 +523,12 @@ class DetailsFragment : Fragment() {
                 is State.Loading -> {
                     backgroundView.setLoading()
                 }
+                else -> {}
             }
         })
 
-        when (args.type) {
-            Type.SPECIES -> {
+        when (args.context) {
+            Context.SPECIES -> {
                 speciesViewModel.mushroomState.observe(viewLifecycleOwner, Observer {
                     backgroundView.reset()
 
@@ -544,6 +543,7 @@ class DetailsFragment : Fragment() {
                         is State.Error -> {
                             backgroundView.setError(it.error)
                         }
+                        else -> {}
                     }
                 })
 
@@ -562,6 +562,7 @@ class DetailsFragment : Fragment() {
                             is State.Error -> {
                                 mapFragment.setError(it.error, null)
                             }
+                            else -> {}
                         }
                     })
 
@@ -570,11 +571,12 @@ class DetailsFragment : Fragment() {
                         is State.Items -> {
                             observationsAdapter.configure(it.items, false)
                         }
+                        else -> {}
                     }
                 })
             }
 
-            Type.OBSERVATION, Type.OBSERVATIONWITHSPECIES -> {
+            Context.OBSERVATION, Context.OBSERVATIONWITHSPECIES -> {
                 observationViewModel.observationState.observe(viewLifecycleOwner, Observer {
                     backgroundView.reset()
 
@@ -591,6 +593,7 @@ class DetailsFragment : Fragment() {
                         is State.Error -> {
                             backgroundView.setError(it.error)
                         }
+                        else -> {}
                     }
                 })
 
@@ -599,6 +602,7 @@ class DetailsFragment : Fragment() {
                         is State.Items -> {
                             mushroomView.configure(it.items)
                         }
+                        else -> {}
                     }
                 })
             }
@@ -779,8 +783,8 @@ class DetailsFragment : Fragment() {
     }
 
     private fun fetchLocationIfNeeded() {
-        when (args.type) {
-            Type.SPECIES -> {
+        when (args.context) {
+            Context.SPECIES -> {
                 if (speciesViewModel.heatMapObservationCoordinates.value == null) {
                     locationService.start()
                 }

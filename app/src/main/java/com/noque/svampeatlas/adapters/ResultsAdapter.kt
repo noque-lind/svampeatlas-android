@@ -87,6 +87,7 @@ class ResultsAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     is Item.Result -> {
                         listener?.predictionResultSelected(item.predictionResult)
                     }
+                    else -> {}
                 }
             }
         }
@@ -158,6 +159,7 @@ class ResultsAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                         is Item.Result -> {
                             holder.configure(item.predictionResult.mushroom)
                         }
+                        else -> {}
                     }
                 }
             }

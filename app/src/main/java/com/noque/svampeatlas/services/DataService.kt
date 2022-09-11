@@ -389,6 +389,7 @@ class DataService private constructor(context: Context) {
                     is Result.Success -> {
                         completedUploads += 1
                     }
+                    else -> {}
                 }
                 dispatchGroup.leave()
             }

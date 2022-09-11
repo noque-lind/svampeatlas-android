@@ -47,6 +47,7 @@ import java.io.File
 import java.util.*
 
 
+
 class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsResultCallback, PromptFragment.Listener {
 
     override fun onRequestPermissionsResult(
@@ -64,7 +65,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         const val SAVED_STATE_TAXON_ID = "SAVED_STATE_TAXON_ID"
     }
 
-    enum class Type {
+    enum class Context {
         New,
         FromRecognition,
         Edit,
@@ -103,16 +104,14 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
 
 
     // View models
-    private val newObservationViewModel by viewModels<NewObservationViewModel> { NewObservationViewModelFactory(args.type, args.id, args.mushroomId, args.imageFilePath,  requireActivity().application) }
+    private val newObservationViewModel by viewModels<NewObservationViewModel> { NewObservationViewModelFactory(args.context, args.id, args.mushroomId, args.imageFilePath,  requireActivity().application) }
 
     // Adapters
     private val addImagesAdapter by lazy {
         val adapter = AddImagesAdapter()
-
         adapter.addImageButtonClicked = {
             val action =
-                AddObservationFragmentDirections.actionGlobalCameraFragment()
-            action.type = CameraFragment.Type.IMAGE_CAPTURE
+                AddObservationFragmentDirections.actionGlobalCameraFragment(CameraFragment.Context.IMAGE_CAPTURE)
             findNavController().navigate(action)
         }
 
@@ -120,7 +119,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     }
 
     private val informationAdapter by lazy {
-        if (args.type == Type.Edit) {
+        if (args.context == Context.Edit) {
             InformationAdapter(
                 context,
                 arrayOf(Category.DETAILS, Category.LOCALITY),
@@ -215,7 +214,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                 } else if (!SharedPreferences.hasSeenImageDeletion) {
                     addImagesAdapter.notifyItemChanged(viewHolder.adapterPosition)
                     val dialog = TermsFragment()
-                    dialog.arguments = Bundle().apply { putSerializable(TermsFragment.KEY_TYPE, TermsFragment.Type.IMAGEDELETIONS) }
+              /*      dialog.arguments = Bundle().apply { putSerializable(TermsFragment.KEY_TYPE, TermsFragment.Context.IMAGEDELETIONS) }*/
                     dialog.show(childFragmentManager, null)
                 } else {
                     newObservationViewModel.removeImageAt(position)
@@ -235,11 +234,10 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
-        return if (!addImageShown && args.type == Type.New) {
+        return if (!addImageShown && args.context == Context.New) {
             addImageShown = true
             val action =
-                AddObservationFragmentDirections.actionAddObservationFragmentToCameraFragment()
-            action.type = CameraFragment.Type.NEW_OBSERVATION
+                AddObservationFragmentDirections.actionAddObservationFragmentToCameraFragment(CameraFragment.Context.NEW_OBSERVATION)
             findNavController().navigate(action)
             null
         } else {
@@ -261,15 +259,16 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         val inflater = activity?.menuInflater
-        when (args.type) {
-            Type.New, Type.FromRecognition -> {
+args.context
+        when (args.context) {
+            Context.New, Context.FromRecognition -> {
                 if (viewPager.currentItem == Category.SPECIES.ordinal) {
                     inflater?.inflate(R.menu.add_observation_fragment_menu_new_upload, menu)
                 } else {
                     inflater?.inflate(R.menu.add_observation_fragment_menu_new_continue, menu)
                 }
             }
-            Type.UploadNote -> {
+            Context.UploadNote -> {
                 if (viewPager.currentItem == Category.SPECIES.ordinal) {
                     inflater?.inflate(R.menu.add_observation_fragment_menu_note_upload, menu)
                 } else {
@@ -277,9 +276,9 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                 }
             }
 
-            Type.Edit -> inflater?.inflate(R.menu.add_observation_fragment_menu_observation_edit, menu)
-            Type.Note -> inflater?.inflate(R.menu.add_observation_fragment_menu_note_save, menu)
-            Type.EditNote -> inflater?.inflate(R.menu.add_observation_fragment_menu_note_edit, menu)
+            Context.Edit -> inflater?.inflate(R.menu.add_observation_fragment_menu_observation_edit, menu)
+            Context.Note -> inflater?.inflate(R.menu.add_observation_fragment_menu_note_save, menu)
+            Context.EditNote -> inflater?.inflate(R.menu.add_observation_fragment_menu_note_edit, menu)
         }
 
         menu.findItem(R.id.menu_addObservationFragment_continueButton)?.let {
@@ -340,19 +339,19 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
     private fun setupView() {
         locationService.setListener(locationServiceListener)
 
-        when (args.type) {
-            Type.Edit -> {
+        when (args.context) {
+            Context.Edit -> {
                 toolbar.setTitle(R.string.action_editObservation)
                 toolbar.subtitle = "ID: ${args.id}"
             }
-            Type.Note -> {
+            Context.Note -> {
                 toolbar.setTitle(R.string.action_newNote)
             }
-            Type.EditNote -> {
+            Context.EditNote -> {
                 toolbar.setTitle(R.string.action_editNote)
                 toolbar.subtitle = Date(args.id).toReadableDate(false, ignoreTime = false)
             }
-            Type.UploadNote -> {
+            Context.UploadNote -> {
                 toolbar.setTitle(R.string.action_upload_note)
                 toolbar.subtitle = Date(args.id).toReadableDate(false, ignoreTime = false)
             }
@@ -483,8 +482,8 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                 }
                 is NewObservationViewModel.Notification.NoteSaved -> {
                     // When a user has saved a note, we need to check which state the app is in, to determine if they should be taken back or stay, to create a new one.
-                    when (args.type) {
-                        Type.New, Type.FromRecognition -> {
+                    when (args.context) {
+                        Context.New, Context.FromRecognition -> {
                             viewPager.currentItem = Category.SPECIES.ordinal
                             createToast(it.title, it.message, bitmap)
                             newObservationViewModel.delete()
@@ -493,27 +492,28 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                                 true
                             )
                         }
-                        Type.Note, Type.EditNote, Type.UploadNote -> {
+                        Context.Note, Context.EditNote, Context.UploadNote -> {
                             findNavController().previousBackStackEntry?.savedStateHandle?.set(
                                 NotesFragment.RELOAD_DATA_KEY,
                                 true
                             )
                             findNavController().navigateUp()
                         }
+                        else -> {}
                     }
                 }
                 is NewObservationViewModel.Notification.Deleted -> {
-                    when (args.type) {
-                        Type.New, Type.Note, Type.FromRecognition -> {
+                    when (args.context) {
+                        Context.New, Context.Note, Context.FromRecognition -> {
                             viewPager.currentItem = Category.SPECIES.ordinal
                         }
-                        Type.Edit -> {
+                        Context.Edit -> {
                             val action =
                                 AddObservationFragmentDirections.actionGlobalMyPageFragment()
                             findNavController().navigate(action)
                         }
 
-                        Type.EditNote, Type.UploadNote -> {
+                        Context.EditNote, Context.UploadNote -> {
                             findNavController().previousBackStackEntry?.savedStateHandle?.set(
                                 NotesFragment.RELOAD_DATA_KEY,
                                 true
@@ -530,6 +530,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                                 Category.DETAILS.ordinal
                             UserObservation.Error.NoLocationDataError -> viewPager.currentItem =
                                 Category.LOCALITY.ordinal
+                            else -> {}
                         }
                     createToast(it.title, it.message, bitmap)
                 }

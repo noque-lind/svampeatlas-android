@@ -246,6 +246,7 @@ class DetailsPickerFragment() : DialogFragment() {
                         hostsAdapter.configure(listOf(Section(null, State.Items(state.items.first.map { PickerAdapter.PickerItem(it) }))), newObservationViewModel.hosts.value?.first ?: mutableListOf())
                     }
                 }
+                else -> {}
             }
         })
 
@@ -262,6 +263,7 @@ class DetailsPickerFragment() : DialogFragment() {
 
                         substratesAdapter.configure(sections)
                     }
+                    else -> {}
                 }
             })
 
@@ -276,6 +278,7 @@ class DetailsPickerFragment() : DialogFragment() {
                             listOf(Section.Builder<PickerAdapter.PickerItem<VegetationType>>().items(state.items.map { PickerAdapter.PickerItem(it) }).build())
                         )
                     }
+                    else -> {}
                 }
             })
     }

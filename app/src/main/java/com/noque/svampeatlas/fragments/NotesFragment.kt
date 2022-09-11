@@ -46,8 +46,7 @@ class NotesFragment: Fragment() {
         NotebookAdapter().apply {
             listener = object: NotebookAdapter.Listener {
                 override fun newObservationSelected(newObservation: NewObservation) {
-                   val action = NotesFragmentDirections.actionNotesFragmentToAddObservationFragment()
-                    action.type = AddObservationFragment.Type.EditNote
+                   val action = NotesFragmentDirections.actionNotesFragmentToAddObservationFragment(AddObservationFragment.Context.EditNote)
                     action.id = newObservation.creationDate.time
                     findNavController().navigate(action)
                 }
@@ -59,8 +58,7 @@ class NotesFragment: Fragment() {
                 }
 
                 override fun uploadNewObservation(newObservation: NewObservation) {
-                    val action = NotesFragmentDirections.actionNotesFragmentToAddObservationFragment()
-                    action.type = AddObservationFragment.Type.UploadNote
+                    val action = NotesFragmentDirections.actionNotesFragmentToAddObservationFragment(AddObservationFragment.Context.UploadNote)
                     action.id = newObservation.creationDate.time
                     findNavController().navigate(action)
                 }
@@ -87,7 +85,7 @@ class NotesFragment: Fragment() {
         menu.findItem(R.id.menu_notebookFragment_addEntry)?.let {
             (it.actionView as? LinearLayout)?.apply {
                 actionView_addNotebookEntry.setOnClickListener {
-                    val action = NotesFragmentDirections.actionNotesFragmentToAddObservationFragment().setType(AddObservationFragment.Type.Note)
+                    val action = NotesFragmentDirections.actionNotesFragmentToAddObservationFragment(AddObservationFragment.Context.Note)
                     findNavController().navigate(action)
                 }
             }
