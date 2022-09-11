@@ -40,9 +40,7 @@
 <string name="addObservationVC_observationCategories_species">Species</string>
 <string name="addObservationVC_successfullUpload_title">You observation has been created</string>
 <string name="addObservationVC_title">New sighting</string>
-<string name="addObservationVC_useImageMetadata_message">An added image seems to have been taken at a different time and place than now. Would you like to use the information from the image instead?
-
-Image GPS-Precision: %s m</string>
+<string name="addObservationVC_useImageMetadata_message">An added image seems to have been taken at a different time and place than now. Would you like to use the information from the image instead?\n\nImage GPS-Precision: %s m</string>
 <string name="addObservationVC_useImageMetadata_negative">No</string>
 <string name="addObservationVC_useImageMetadata_positive">Yes, use the image metadata</string>
 <string name="addObservationVC_useImageMetadata_title">Location suggestion</string>
@@ -117,7 +115,7 @@ Image GPS-Precision: %s m</string>
 <string name="elPhotosError_unknownSaveError_title">Unknown error</string>
 <string name="error_addObservationError_lowAccuracy">Low accuracy</string>
 <string name="error_cantDelete">Could not delete</string>
-<string name="language_czech"></string>
+<string name="language_czech">Czech</string>
 <string name="language_danish">Danish</string>
 <string name="language_english">English</string>
 <string name="locationAnnotation_title">Observation location</string>
@@ -280,9 +278,7 @@ Image GPS-Precision: %s m</string>
 <string name="settingsCell_language">Language</string>
 <string name="settingsInformationCell_message">This is where you are able to adjust this app so that it fits your needs. For now, you are not able to do much, but more options will come if we find that it is needed.</string>
 <string name="settings_general_header">General</string>
-<string name="settings_locality_message">These settings are useful if you are somewhere where the connection is bad, and you are attempting to record a bunch of observations at the same place. 
-
-Your choices are reset after 1 hour.</string>
+<string name="settings_locality_message">These settings are useful if you are somewhere where the connection is bad, and you are attempting to record a bunch of observations at the same place. \n\nYour choices are reset after 1 hour.</string>
 <string name="settings_locality_title">Location settings</string>
 <string name="settings_remember_locality">Remember this location (name of location)</string>
 <string name="settings_remember_location">Remember these coordinates</string>
@@ -321,12 +317,5 @@ Your choices are reset after 1 hour.</string>
 <string name="notificationCell_determinationApproved_1">An observation you are following has been validated and approved as: </string>
 <string name="notificationCell_commentAdded_2">which your are following.</string>
 <string name="notificationCell_determinationAdded_2"> to an observation you are following.</string>
-<string name="whats_new_2_0">We have just launched a new version of the Svampeatlas app (version 2.0), this time with quite significant changes and improvements. Most important are:
-1)	Ændret indberetningsflow. Vi har byttet om på rækkefølgen når man opretter et nyt fund, så man starter med lokalitet, dernæst vælger habitat, substrat og vært for til sidst at vælge art. Ændringen skyldes først og fremmest at vi snart vil lancere en ny forbedret version af vores billedgenkendelses AI, som vil give bedre artsforslag baseret på data om habitat og substrat. Ønsker du fremover at starte med at få et artsforslag kan du stadig bruge funktionen navneforslag i sidemenuen
-
-2)	Mulighed for at låse lokalitetnavn og koordinater. Vi har gjort det muligt at låse lokalitetsnavn og eventuelt også fund-koordinater, hvis man indberetter mange fund fra den samme lokalitet, eller fra et enkelt hotspot. Dermed kan man spare tid og batteri i felten og samtidigt få mere konsistente lokalitetsnavne på dine fund. Funktionen kan nulstilles manuelt eller automatisk efter en time.
-
-3)	Forenkling af notesbogfunktion. Vi har nu opdateret notesbogfunktionen så den ikke kan anvende AI til artsbestemmelse eller søge efter lokalitetsnavne når du opretter nye noter. Du kan stadig vælge artsnavne fra din artsliste på telefonen og tilføje metadata, men AI og valg af lokalitet aktiveres først når du åbner fundet fra notesbogen igen for at redigere det inden du oploader det til Svampeatlas. Formålet med ændringen er at spare tid og batteri i felten, så du udelukkende kan koncentrere dig om at oprette svampefund. Koordinater kobles enten til de foto du tilføjer i notesbogen eller din placering når en ny fundnote oprettes uden foto. Husk derfor at tage fotos eller oprette noter lige der hvor din svamp er fundet.
-
-Derudover er der gennemført en række mindre forbedringer og bug fixes. Man kan igen søge arter ved hjælp af 3 + 3 koder (fx ama mus for Amanita muscaria), ligesom billedvisning på artspræsentationer er forbedret.   </string>
+<string name="whats_new_2_0">We have just launched a new version of the Svampeatlas app (version 2.0), this time with quite significant changes and improvements. Most important are:\n1)	Ændret indberetningsflow. Vi har byttet om på rækkefølgen når man opretter et nyt fund, så man starter med lokalitet, dernæst vælger habitat, substrat og vært for til sidst at vælge art. Ændringen skyldes først og fremmest at vi snart vil lancere en ny forbedret version af vores billedgenkendelses AI, som vil give bedre artsforslag baseret på data om habitat og substrat. Ønsker du fremover at starte med at få et artsforslag kan du stadig bruge funktionen navneforslag i sidemenuen\n\n2)	Mulighed for at låse lokalitetnavn og koordinater. Vi har gjort det muligt at låse lokalitetsnavn og eventuelt også fund-koordinater, hvis man indberetter mange fund fra den samme lokalitet, eller fra et enkelt hotspot. Dermed kan man spare tid og batteri i felten og samtidigt få mere konsistente lokalitetsnavne på dine fund. Funktionen kan nulstilles manuelt eller automatisk efter en time.\n\n3)	Forenkling af notesbogfunktion. Vi har nu opdateret notesbogfunktionen så den ikke kan anvende AI til artsbestemmelse eller søge efter lokalitetsnavne når du opretter nye noter. Du kan stadig vælge artsnavne fra din artsliste på telefonen og tilføje metadata, men AI og valg af lokalitet aktiveres først når du åbner fundet fra notesbogen igen for at redigere det inden du oploader det til Svampeatlas. Formålet med ændringen er at spare tid og batteri i felten, så du udelukkende kan koncentrere dig om at oprette svampefund. Koordinater kobles enten til de foto du tilføjer i notesbogen eller din placering når en ny fundnote oprettes uden foto. Husk derfor at tage fotos eller oprette noter lige der hvor din svamp er fundet.\n\nDerudover er der gennemført en række mindre forbedringer og bug fixes. Man kan igen søge arter ved hjælp af 3 + 3 koder (fx ama mus for Amanita muscaria), ligesom billedvisning på artspræsentationer er forbedret.   </string>
 </resources>
