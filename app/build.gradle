@@ -16,7 +16,7 @@ android {
             keyAlias 'key0'
         }
     }
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     lintOptions {
         checkReleaseBuilds false
@@ -35,7 +35,7 @@ android {
     defaultConfig {
         applicationId "com.noque.svampeatlas"
         minSdkVersion 23
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionName '2.0.1'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         versionCode = 34

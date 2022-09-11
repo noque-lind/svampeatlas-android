@@ -119,7 +119,7 @@ class TermsFragment: DialogFragment() {
                 contentTextView.text = getString(R.string.termsVC_cameraHelper_message)
             }
             Type.WHATSNEW -> {
-                headerView.configure(getString(R.string.whats_new_2_0))
+                headerView.configure(getString(R.string.whats_new_title))
                 contentTextView.text = getString(R.string.whats_new_2_0)
             }
             Type.IMAGEDELETIONS -> {
