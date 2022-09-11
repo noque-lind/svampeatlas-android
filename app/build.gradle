@@ -38,7 +38,7 @@ android {
         targetSdkVersion 30
         versionName '2.0'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        versionCode = 32
+        versionCode = 33
         signingConfig signingConfigs.signing
 
         kapt {
