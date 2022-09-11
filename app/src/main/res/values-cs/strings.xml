@@ -40,9 +40,7 @@
 <string name="addObservationVC_observationCategories_species">Druh</string>
 <string name="addObservationVC_successfullUpload_title">Vaše pozorování bylo vytvořeno</string>
 <string name="addObservationVC_title">Nové pozorování</string>
-<string name="addObservationVC_useImageMetadata_message">Zdá se, že přidaný obrázek byl pořízen více než 500 metrů od aktuálního umístění pozorování. Chcete použít informace o GPS a datu z obrázku?
-
-Image GPS-Precision: %s m.</string>
+<string name="addObservationVC_useImageMetadata_message">Zdá se, že přidaný obrázek byl pořízen více než 500 metrů od aktuálního umístění pozorování. Chcete použít informace o GPS a datu z obrázku?\n\nImage GPS-Precision: %s m.</string>
 <string name="addObservationVC_useImageMetadata_negative">Ne</string>
 <string name="addObservationVC_useImageMetadata_positive">Ano, použijte metadata obrázku</string>
 <string name="addObservationVC_useImageMetadata_title">Návrh umístění</string>
@@ -60,10 +58,10 @@ Image GPS-Precision: %s m.</string>
 <string name="cameraVC_shouldSaveImagesPrompt_title">Chcete uložit vaše fotografie?</string>
 <string name="cautionCell_lowConfidence">Žádný z níže uvedených návrhů pravděpodobně není správný.</string>
 <string name="commentsTableView_cell_title">Napsat komentář</string>
-<string name="common_clearAll"></string>
+<string name="common_clearAll">Vymazat vše</string>
 <string name="common_continue">Pokračovat</string>
 <string name="common_date">Datum: %s</string>
-<string name="common_localityNotSelected"></string>
+<string name="common_localityNotSelected">Nebyla vybrána žádná lokalita</string>
 <string name="common_success">Hotovo!</string>
 <string name="common_twoChoices">Máte následující možnosti:</string>
 <string name="common_upload">Nahrát</string>
@@ -97,14 +95,14 @@ Image GPS-Precision: %s m.</string>
 <string name="dateFormatting_hoursSince">před %d hodinami</string>
 <string name="dateFormatting_rightNow">Teď</string>
 <string name="dateFormatting_today">Dnes</string>
-<string name="detailsPickerFragment_hostsPicker"></string>
-<string name="detailsPickerFragment_substratePicker"></string>
-<string name="detailsPickerFragment_vegetationTypesPicker"></string>
+<string name="detailsPickerFragment_hostsPicker">Vyberte hostitele</string>
+<string name="detailsPickerFragment_substratePicker">Vyberte substrát</string>
+<string name="detailsPickerFragment_vegetationTypesPicker">Vyberte typ vegetace</string>
 <string name="detailsVC_newSightingPrompt">Nové pozorování</string>
 <string name="detailsVC_observationTitle">Pozorování: %s</string>
 <string name="downloader_message_data">Stahování offline dat</string>
 <string name="downloader_message_taxon">Stahování taxonů</string>
-<string name="downloader_readingFile"></string>
+<string name="downloader_readingFile">Čtení souboru</string>
 <string name="downloader_success">Vaše zařízení má nyní nejnovější aktualizaci databáze taxonů.</string>
 <string name="downloader_title">Stahování metadat</string>
 <string name="elFileManagerError_imageSavingError_message">Při pokusu o uložení obrázku do dočasného úložiště v telefonu došlo k chybě.</string>
@@ -117,9 +115,9 @@ Image GPS-Precision: %s m.</string>
 <string name="elPhotosError_unknownSaveError_title">Neznámá chyba</string>
 <string name="error_addObservationError_lowAccuracy">Nepřesné</string>
 <string name="error_cantDelete">Nelze smazat</string>
-<string name="language_czech"></string>
-<string name="language_danish"></string>
-<string name="language_english"></string>
+<string name="language_czech">čeština</string>
+<string name="language_danish">dánština</string>
+<string name="language_english">Angličtina</string>
 <string name="locationAnnotation_title">Místo pozorování</string>
 <string name="locationManagerError_badAccuracy_message">Nebylo možné určit vaši polohu s dostatečnou přesností.</string>
 <string name="locationManagerError_badAccuracy_title">Nepřesné</string>
@@ -147,7 +145,7 @@ Image GPS-Precision: %s m.</string>
 <string name="mapViewFilteringSettings_ageOfSighting">Věk: </string>
 <string name="mapViewSettingsView_newSearch">Nové hledání</string>
 <string name="mapViewSettingsView_year">%d rok</string>
-<string name="mapViewSettings_title"></string>
+<string name="mapViewSettings_title">Filtrovat vyhledávání</string>
 <string name="message_deletionsAreFinal">Odstranění bylo dokončeno</string>
 <string name="message_editingObservation">Upravujete pozorování</string>
 <string name="message_imageDeletetionsPermanent">Při úpravách pozorování jsou smazání snímků nevratné, i když své další změny neodešlete. Tato zpráva se zobrazí pouze jednou, pokud přesto chcete obrázek smazat, budete vyzváni k potvrzení tohoto kroku.</string>
@@ -201,7 +199,7 @@ Image GPS-Precision: %s m.</string>
 <string name="notebook_message">Ještě nemáte žádné uložené poznámky. Tato funkce vám umožňuje ukládat vaše pozorování lokálně, aniž byste je museli nahrávat, než budou zcela připravena. Možná až budete mít lepší připojení k internetu.</string>
 <string name="notebook_title">Zápisník</string>
 <string name="notificationCell_determinationExpertApproved">schváleno odborníkem.</string>
-<string name="observationDetailsCell_collectors"></string>
+<string name="observationDetailsCell_collectors">Viděno</string>
 <string name="observationDetailsCell_date">Datum:</string>
 <string name="observationDetailsCell_ecologyNotes_message">Na písčité půdě ...</string>
 <string name="observationDetailsCell_ecologyNotes_title">Komentáře k ekologii</string>
@@ -280,9 +278,7 @@ Image GPS-Precision: %s m.</string>
 <string name="settingsCell_language">Jazyk</string>
 <string name="settingsInformationCell_message">Zde můžete tuto aplikaci upravit tak, aby vyhovovala vašim potřebám. Zatím toho k nastavení moc není, ale pokud zjistíme, že je potřeba přidat další nastavení, přidáme je na tuto stránku.</string>
 <string name="settings_general_header">Obecné</string>
-<string name="settings_locality_message">Tato nastavení jsou užitečná, pokud máte špatné připojení k internetu, a pokoušíte se zaznamenat více pozorování na stejném místě.
-
-Vaše volby se resetují po 1 hodině.</string>
+<string name="settings_locality_message">Tato nastavení jsou užitečná, pokud máte špatné připojení k internetu, a pokoušíte se zaznamenat více pozorování na stejném místě.\n\nVaše volby se resetují po 1 hodině.</string>
 <string name="settings_locality_title">Nastavení polohy</string>
 <string name="settings_remember_locality">Zapamatovat si tuto polohu (název místa)</string>
 <string name="settings_remember_location">Zapamatovat tyto souřadnice</string>
