@@ -111,7 +111,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         val adapter = AddImagesAdapter()
         adapter.addImageButtonClicked = {
             val action =
-                AddObservationFragmentDirections.actionGlobalCameraFragment(CameraFragment.Context.IMAGE_CAPTURE)
+                AddObservationFragmentDirections.actionAddObservationFragmentToCameraFragment().setContext(CameraFragment.Context.IMAGE_CAPTURE)
             findNavController().navigate(action)
         }
 
@@ -237,7 +237,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
         return if (!addImageShown && args.context == Context.New) {
             addImageShown = true
             val action =
-                AddObservationFragmentDirections.actionAddObservationFragmentToCameraFragment(CameraFragment.Context.NEW_OBSERVATION)
+                AddObservationFragmentDirections.actionAddObservationFragmentToCameraFragment().setContext(CameraFragment.Context.NEW_OBSERVATION)
             findNavController().navigate(action)
             null
         } else {
