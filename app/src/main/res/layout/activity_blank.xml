@@ -14,10 +14,9 @@
     <androidx.fragment.app.FragmentContainerView
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:id="@+id/blankActivity_navHostFragment"
-
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:navGraph="@navigation/nav_mushroom"
+        app:navGraph="@navigation/nav_main"
         app:defaultNavHost="true"
         />
 

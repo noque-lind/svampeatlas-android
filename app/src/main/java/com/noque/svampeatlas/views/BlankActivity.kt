@@ -71,7 +71,6 @@ class BlankActivity : AppCompatActivity() {
                         destinationID = null
 
                         val intent = try {
-                            packageManager.getPackageInfo("com.facebook.katana", 0)
                             Intent(
                                 Intent.ACTION_VIEW,
                                 Uri.parse("fb://facewebmodal/f?href=https://www.facebook.com/groups/svampeatlas")
@@ -140,7 +139,6 @@ class BlankActivity : AppCompatActivity() {
 
     private fun setupViewModels() {
         Session.loggedInState.observe(this, Observer {
-
             when (it) {
                 is State.Items -> {
                     navigationView.menu.clear()
@@ -149,13 +147,13 @@ class BlankActivity : AppCompatActivity() {
                     )
 
                     if (it.items != isLoggedIn && it.items) {
-                        val newGraph = navController.graph
+                        val newGraph = navController.navInflater.inflate(R.navigation.nav_main)
                         newGraph.setStartDestination(R.id.myPageFragment)
                         navigationView.setCheckedItem(R.id.myPageFragment)
                         navController.graph = newGraph
 //                        toolbar.setupWithNavController(navController, appBarConfiguration)
                     } else if (it.items != isLoggedIn && !it.items) {
-                        val newGraph = navController.graph
+                        val newGraph = navController.navInflater.inflate(R.navigation.nav_main)
                         newGraph.setStartDestination(R.id.mushroomFragment)
                         navigationView.setCheckedItem(R.id.mushroomFragment)
                         navController.graph = newGraph

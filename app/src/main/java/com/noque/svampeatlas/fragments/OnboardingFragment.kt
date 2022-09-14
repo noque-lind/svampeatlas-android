@@ -11,15 +11,6 @@ import com.noque.svampeatlas.R
 import com.noque.svampeatlas.views.SpinnerView
 import kotlinx.android.synthetic.main.fragment_onboarding.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- *
- */
 class OnboardingFragment : Fragment() {
 
     private lateinit var spinnerView: SpinnerView
@@ -45,6 +36,4 @@ class OnboardingFragment : Fragment() {
     private fun setupViews() {
         spinnerView.startLoading()
     }
-
-
 }

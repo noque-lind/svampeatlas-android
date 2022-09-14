@@ -36,6 +36,7 @@ import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.common.util.concurrent.ListenableFuture
+import com.noque.svampeatlas.MushroomNavigationDirections
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.adapters.ResultsAdapter
 import com.noque.svampeatlas.extensions.openSettings

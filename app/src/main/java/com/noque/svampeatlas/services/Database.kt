@@ -43,7 +43,7 @@ val MIGRATION_15_18 = object: Migration(15,18) {
     }
 }
 
-val MIGRATION_18_23 = object: Migration(15,18) {
+val MIGRATION_18_23 = object: Migration(18,23) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("DROP TABLE hosts")
         database.execSQL("CREATE TABLE IF NOT EXISTS `hosts` (`id` INTEGER NOT NULL, `dkName` TEXT, `latinName` TEXT NOT NULL, `probability` INTEGER, `isUserSelected` INTEGER NOT NULL, PRIMARY KEY(`id`))")
@@ -78,6 +78,7 @@ abstract class Database: RoomDatabase() {
             .addMigrations(MIGRATION_13_14)
             .addMigrations(MIGRATION_14_15)
             .addMigrations(MIGRATION_15_18)
+            .addMigrations(MIGRATION_18_23)
             .fallbackToDestructiveMigration()
             .allowMainThreadQueries()
             .build()

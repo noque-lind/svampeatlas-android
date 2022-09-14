@@ -99,7 +99,8 @@
         tools:layout="@layout/fragment_camera">
         <argument
             android:name="Context"
-            app:argType="com.noque.svampeatlas.fragments.CameraFragment$Context" />
+            app:argType="com.noque.svampeatlas.fragments.CameraFragment$Context"
+            android:defaultValue="IDENTIFY" />
     </fragment>
 
     <fragment
