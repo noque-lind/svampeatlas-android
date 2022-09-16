@@ -72,7 +72,8 @@
             app:destination="@id/cameraFragment" />
         <argument
             android:name="context"
-            app:argType="com.noque.svampeatlas.fragments.AddObservationFragment$Context" />
+            app:argType="com.noque.svampeatlas.fragments.AddObservationFragment$Context"
+            android:defaultValue="New" />
         <argument
             android:name="id"
             app:argType="long"

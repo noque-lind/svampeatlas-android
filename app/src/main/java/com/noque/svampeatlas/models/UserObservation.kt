@@ -271,50 +271,61 @@ class UserObservation(private val creationDate: Date = Date()) {
         return null
     }
 
-    fun asJSON(includeTaxon: Boolean): JSONObject {
+    fun asJSON(includeTaxon: Boolean): JSONObject? {
+        val substrate = substrate?.first
+        val vegetationType = vegetationType?.first
+        val locality = locality?.first
+        val location = location?.first
+        val hosts = hosts?.first
+        if (substrate == null || vegetationType == null || locality == null || location == null) return null
+
         return JSONObject().apply {
             put("os", "Android")
             put("browser", "Native App - ${BuildConfig.VERSION_NAME}")
-            put("observationDate", (observationDate?.toDatabaseName()))
-            put("substrate_id", substrate?.first?.id)
-            put("vegetationtype_id", vegetationType?.first?.id)
-            put("associatedOrganisms", JSONArray().apply {
-                hosts?.first?.map { JSONObject().put("_id", it.id) }?.forEach { this.put(it) }
-            })
-            put("ecologynote", ecologyNotes)
-            put("note", notes)
-            put("decimalLatitude", location?.first?.latLng?.latitude)
-            put("decimalLongitude", location?.first?.latLng?.longitude)
-            put("accuracy", location?.first?.accuracy)
+            put("observationDate", (observationDate.toDatabaseName()))
+            put("substrate_id", substrate.id)
+            put("vegetationtype_id", vegetationType.id)
+            put("decimalLatitude", location.latLng.latitude)
+            put("decimalLongitude", location.latLng.longitude)
+            put("accuracy", location.accuracy)
 
-            if (locality?.first?.geoName != null) {
-                put("geonameId", locality?.first?.geoName?.geonameId)
+            if (ecologyNotes?.isEmpty() == false) put("ecologynote", ecologyNotes)
+            if (notes?.isEmpty() == false) put("note", notes)
+            if (hosts?.isEmpty() == false) put("associatedOrganisms", JSONArray().apply {
+                hosts.map { JSONObject().put("_id", it.id) }.forEach { this.put(it) }
+            })
+
+
+
+            if (locality.geoName != null) {
+                put("geonameId", locality.geoName?.geonameId)
                 put(
                     "geoname", JSONObject()
-                        .put("geonameId", locality?.first?.geoName?.geonameId)
-                        .put("name", locality?.first?.geoName?.name)
-                        .put("adminName1", locality?.first?.geoName?.adminName1)
-                        .put("lat", locality?.first?.geoName?.lat)
-                        .put("lng", locality?.first?.geoName?.lng)
-                        .put("countryName", locality?.first?.geoName?.countryName)
-                        .put("countryCode", locality?.first?.geoName?.countryCode)
-                        .put("fcodeName", locality?.first?.geoName?.fcodeName)
-                        .put("fclName", locality?.first?.geoName?.fclName)
+                        .put("geonameId", locality.geoName.geonameId)
+                        .put("name", locality.geoName.name)
+                        .put("adminName1", locality.geoName.adminName1)
+                        .put("lat", locality.geoName.lat)
+                        .put("lng", locality.geoName.lng)
+                        .put("countryName", locality.geoName.countryName)
+                        .put("countryCode", locality.geoName.countryCode)
+                        .put("fcodeName", locality.geoName.fcodeName)
+                        .put("fclName", locality.geoName.fclName)
                 )
             } else {
-                put("locality_id", locality?.first?.id)
+                put("locality_id", locality.id)
             }
 
-            if (includeTaxon) {
+            val mushroom = mushroom
+            if (includeTaxon && mushroom != null) {
                 put(
                     "determination",
                     JSONObject()
                         .put(
                             "confidence",
-                            mushroom?.second?.databaseName
+                            mushroom.second.databaseName
                                 ?: DeterminationConfidence.CONFIDENT.databaseName
                         )
-                        .put("taxon_id", mushroom?.first?.id)
+                        .put("taxon_id", mushroom.first.id)
                         .put("notes", determinationNotes ?: "")
                 )
             }

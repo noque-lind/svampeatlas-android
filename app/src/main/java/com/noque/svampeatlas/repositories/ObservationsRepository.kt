@@ -34,7 +34,9 @@ class ObservationsRepository(private val requestQueue: RequestQueue) {
     }
 
     suspend fun uploadObservation(tag: String, token: String, jsonObject: JSONObject, imageFiles: List<File>?): Result<Pair<Int, Int>, DataService.Error> {
-       return when (val result = post(jsonObject, token)) {
+       Analytics.logEvent("upload_observation", Bundle().apply { putString("object", jsonObject.toString()) })
+
+        return when (val result = post(jsonObject, token)) {
            is Result.Success -> Result.Success(Pair(result.value,postImagesToObservation(result.value, imageFiles, token)))
            is Result.Error -> {
                Analytics.logEvent("UPLOAD_ERROR", Bundle().apply { putString("TITLE", result.error.title); putString("MESSAGE", result.error.message) })

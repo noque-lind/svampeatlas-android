@@ -206,18 +206,22 @@ class LocalityFragment: Fragment(), LocationSettingsModal.Listener {
                     mapFragment?.stopLoading()
                 }
 
-                is State.Empty -> {}
+                is State.Empty -> {
+                    localityAdapter.configure(emptyList())
+                    mapFragment?.addLocalities(emptyList())
+                }
             }
         })
 
-            newObservationViewModel.locality.observe(viewLifecycleOwner, {
+            newObservationViewModel.locality.observe(viewLifecycleOwner) {
+
                 it?.first?.let { locality ->
                     recyclerView.scrollToPosition(localityAdapter.setSelected(locality, it.second))
                     mapFragment?.setSelectedLocalityAnnotation(locality.location)
                 }
-            })
+            }
 
-            newObservationViewModel.coordinateState.observe(viewLifecycleOwner, Observer {
+        newObservationViewModel.coordinateState.observe(viewLifecycleOwner, Observer {
                 when (it) {
                     is State.Items -> {
                         locationLockedImage.visibility = if (it.items.second) View.VISIBLE else View.GONE

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.CompoundButton
 import android.widget.ImageButton
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -58,6 +59,10 @@ class LocationSettingsModal(
         localitySwitch.isChecked = lockedLocality
 
         if (!allowLockingLocality) localitySwitch.visibility = View.GONE
+
+        locationSwitch.setOnCheckedChangeListener { _, newValue ->
+            if (newValue && localitySwitch.visibility == View.VISIBLE) localitySwitch.isChecked = true
+        }
 
         saveButton.setOnClickListener {
             (targetFragment as? Listener)?.lockLocalitySet(localitySwitch.isChecked)

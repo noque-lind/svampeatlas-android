@@ -28,7 +28,6 @@
         <activity
             android:exported="true"
             android:name=".views.BlankActivity"
-            android:label="@string/application_title"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

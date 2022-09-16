@@ -274,7 +274,8 @@ class DetailsFragment : Fragment() {
                         R.id.menu_detailsFragment_edit -> {
                             observationViewModel.observationState.value?.item?.let { observation ->
                                 val action =
-                                    DetailsFragmentDirections.actionMushroomDetailsFragmentToAddObservationFragmentEdit(AddObservationFragment.Context.Edit)
+                                    DetailsFragmentDirections.actionMushroomDetailsFragmentToAddObservationFragmentEdit()
+                                action.context = AddObservationFragment.Context.Edit
                                 action.id = observation.id.toLong()
                                 findNavController().navigate(action)
                             }
@@ -312,7 +313,8 @@ class DetailsFragment : Fragment() {
                 if (args.context == Context.SPECIES) {
                     if (args.predictionResults != null && args.imageFilePath != null) {
                         val action =
-                            DetailsFragmentDirections.actionMushroomDetailsFragmentToAddObservationFragment(AddObservationFragment.Context.FromRecognition)
+                            DetailsFragmentDirections.actionMushroomDetailsFragmentToAddObservationFragment()
+                        action.context = AddObservationFragment.Context.FromRecognition
                         action.imageFilePath = args.imageFilePath
                         action.mushroomId = args.id
                         action.predictionNotes = args.predictionResults

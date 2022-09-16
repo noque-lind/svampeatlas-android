@@ -42,6 +42,34 @@ data class ObservationItem(val observation: Observation) : ClusterItem {
     override fun getPosition(): LatLng {
         return observation.coordinate
     }
+
+    override fun hashCode(): Int {
+        var result = observation.id
+       /* result = 31 * result + location.hashCode()
+        if (name.isNotEmpty()) {
+            result = 31 * result + name.hashCode()
+        }
+        if (addressRegion.isNotEmpty()) {
+            result = 31 * result + addressRegion.hashCode()
+        }
+        if (addressLocality.isNotEmpty()) {
+            result = 31 * result + addressLocality.hashCode()
+        }
+        if (streetAddress.isNotEmpty()) {
+            result = 31 * result + streetAddress.hashCode()
+        }
+        if (postalCode.isNotEmpty()) {
+            result = 31 * result + postalCode.hashCode()
+        }
+        if (category.isNotEmpty()) {
+            result = 31 * result + category.hashCode()
+        }
+        if (products.isNotEmpty()) {
+            result = 31 * result + products.hashCode()
+        }*/
+
+        return result
+    }
 }
 
 class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
@@ -422,7 +450,7 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
     }
 
     fun addLocalities(localities: List<Locality>) {
-        dispatchGroup?.notify(Runnable {
+        dispatchGroup?.notify {
             reset()
 
             localities.forEach { locality ->
@@ -449,12 +477,12 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
                     this.localities[it.id] = locality
                 }
             }
-        })
+        }
     }
 
 
     fun addLocationMarker(location: LatLng, title: String? = null, accuracy: Double? = null) {
-        dispatchGroup?.notify(Runnable {
+        dispatchGroup?.notify {
             reset()
 
             locationMarker?.remove()
@@ -491,12 +519,17 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
                         .strokeWidth(1F)
                         .radius(it)
                         .zIndex(10F)
-                        .fillColor(ColorUtils.setAlphaComponent(resources.getColor(R.color.colorGreen), 40))
+                        .fillColor(
+                            ColorUtils.setAlphaComponent(
+                                resources.getColor(R.color.colorGreen),
+                                40
+                            )
+                        )
                 )?.let {
                     accuracyOverlay = it
                 }
             }
-        })
+        }
     }
 
     fun addObservationMarkers(observations: List<Observation>) {
@@ -516,7 +549,7 @@ class MapFragment : Fragment(), ViewTreeObserver.OnGlobalLayoutListener {
             clusterManager?.setOnClusterItemClickListener(onClusterItemListener)
 
             observations.forEach { observation ->
-                clusterManager?.addItem(ObservationItem(observation))
+              clusterManager?.addItem(ObservationItem(observation))
             }
         })
     }

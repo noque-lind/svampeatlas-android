@@ -41,7 +41,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
     }
 
     sealed class Prompt(val title: String, val message: String, val yes: String, val no: String) {
-        class UseImageMetadata(resources: Resources, val imageLocation: Location, val userLocation: Location): Prompt(resources.getString(R.string.addObservationVC_useImageMetadata_title), resources. getString(R.string.addObservationVC_useImageMetadata_message, imageLocation.accuracy), resources.getString(R.string.addObservationVC_useImageMetadata_positive), resources.getString(R.string.addObservationVC_useImageMetadata_negative))
+        class UseImageMetadata(resources: Resources, val imageLocation: Location, val userLocation: Location): Prompt(resources.getString(R.string.addObservationVC_useImageMetadata_title), resources. getString(R.string.addObservationVC_useImageMetadata_message, imageLocation.accuracy.toString()), resources.getString(R.string.addObservationVC_useImageMetadata_positive), resources.getString(R.string.addObservationVC_useImageMetadata_negative))
     }
 
     companion object {
@@ -215,7 +215,6 @@ class NewObservationViewModel(application: Application, val context: AddObservat
     // This functions is called by the location manager, when the state changes
     fun setCoordinateState(state: State<Location>) {
         fun setLocation(location: Location) {
-            userObservation.observationDate.value = location.date
             _coordinateState.value = State.Items(Pair(location, false))
             if (isAwaitingCoordinatedBeforeSave) {
                saveAsNote()
@@ -246,6 +245,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
                             promptToUseImageLocation(imageLocation, state.items)
                         } else {
                             setLocation(state.items)
+                            if (state.item != null) userObservation.observationDate.value = state.item.date
                         }
                     }
                     else -> setLocation(state.items)
@@ -406,8 +406,12 @@ class NewObservationViewModel(application: Application, val context: AddObservat
     }
 
     private fun getLocalities(location: Location) {
-        // If we are not in right context, we do not want to find locality.
-        if (context == AddObservationFragment.Context.Note || context == AddObservationFragment.Context.EditNote) return
+        // If we are not in right context, we do not want to find locality. But we want to clear saved locality.
+        if (context == AddObservationFragment.Context.Note || context == AddObservationFragment.Context.EditNote) {
+            _localitiesState.value = State.Empty()
+            userObservation.locality.value = null
+            return
+        }
         _localitiesState.value = State.Loading()
         viewModelScope.launch {
             DataService.getInstance(getApplication())
@@ -421,16 +425,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
                             ).toInt()
                         }
 
-                            if (locality != null) {
-                            userObservation.locality.postValue(Pair(locality, false))
-                        } else {
-                            userObservation.locality.postValue(null)
-                            showNotification.postValue(
-                                Notification.LocalityInaccessible(
-                                    MyApplication.applicationContext.resources
-                                )
-                            )
-                        }
+                        userObservation.locality.postValue(Pair(locality, false))
                     }
                     result.onError {
                         _localitiesState.value = State.Error(it)
