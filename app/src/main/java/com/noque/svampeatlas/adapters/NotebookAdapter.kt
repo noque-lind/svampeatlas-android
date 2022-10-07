@@ -14,31 +14,17 @@ class NotebookAdapter: BaseAdapter<NotebookAdapter.Items, NotebookAdapter.Items.
 
     interface Listener {
         fun newObservationSelected(newObservation: NewObservation)
-        fun downloadForOfflinePressed()
         fun uploadNewObservation(newObservation: NewObservation)
     }
 
 
     sealed class Items(viewType: ViewTypes) : Item<Items.ViewTypes>(viewType) {
         enum class ViewTypes: ViewType {
-            DownloadPrompt,
             NewObservation
         }
 
         class Note(val newObservation: NewObservation): Items(ViewTypes.NewObservation)
-        class DownloadPrompt : Items(ViewTypes.DownloadPrompt)
     }
-
-    override fun setSections(sections: List<Section<Items>>) {
-        if (SharedPreferences.lastDownloadOfTaxon == null) {
-            val finalList = mutableListOf(Section.Builder<Items>().items(listOf(Items.DownloadPrompt())).build())
-            finalList.addAll(sections)
-            super.setSections(finalList)
-        } else {
-            super.setSections(sections)
-        }
-    }
-
 
 
     var listener: Listener? = null
@@ -48,9 +34,6 @@ class NotebookAdapter: BaseAdapter<NotebookAdapter.Items, NotebookAdapter.Items.
             when (val tag = it.tag) {
                 is NoteItemViewHolder -> {
                     (sections.getItem(tag.adapterPosition) as? Items.Note)?.let { listener?.newObservationSelected(it.newObservation) }
-                }
-                is DownloadTaxonViewHolder -> {
-                    listener?.downloadForOfflinePressed()
                 }
             }
         }
@@ -68,10 +51,6 @@ class NotebookAdapter: BaseAdapter<NotebookAdapter.Items, NotebookAdapter.Items.
                     NoteItemViewHolder(view)
                 )
 
-            }
-            Items.ViewTypes.DownloadPrompt -> {
-                val view = inflater.inflate(R.layout.item_download_taxon, parent, false)
-                return Pair(view, DownloadTaxonViewHolder(view))
             }
         }
     }

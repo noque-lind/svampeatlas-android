@@ -9,6 +9,7 @@ import com.noque.svampeatlas.models.Locality
 import java.util.*
 import com.google.gson.Gson
 import com.noque.svampeatlas.BuildConfig
+import com.noque.svampeatlas.extensions.difDays
 import com.noque.svampeatlas.extensions.difHours
 import com.noque.svampeatlas.models.Location
 
@@ -22,7 +23,6 @@ object SharedPreferences {
     private const val HAS_ACCEPTED_IDENTIFCATION_TERMS = "HAS_ACCEPTED_IDENTIFCATION_TERMS"
     private const val SAVE_IMAGES = "SAVE_IMAGES"
     private const val SAVE_IMAGES_DECIDED = "SAVE_IMAGES_DECIDED"
-    private const val HAS_SEEN_WHATS_NEW = "HAS_SEEN_WHATS_NEW_2.0"
     private const val HAS_SEEN_IMAGE_DELETION = "HAS_SEEN_IMAGE_DELETION"
     private const val PREFERRED_LANGUAGE = "PREFERRED_LANGUAGE"
     private const val LAST_DOWNLOAD_TAXON = "LAST_DOWNLOAD_TAXON"
@@ -83,6 +83,7 @@ object SharedPreferences {
         prefs.edit().putBoolean(HAS_ACCEPTED_IDENTIFCATION_TERMS, value).apply()
     }
 
+
     /// Keeps track of how many sent observations it has been since user was last reminded about precision importance
     private var positionReminderObservationCount: Int get() {
             return prefs.getInt("positionReminderObservationCount", -1)
@@ -111,6 +112,7 @@ object SharedPreferences {
 
     var hasSeenWhatsNew: Boolean get() {
         var lastOpenedVersion  = prefs.getString("lastOpenedVersion", "")
+        if (lastOpenedVersion?.startsWith(BuildConfig.VERSION_NAME.first()) == true) lastOpenedVersion = BuildConfig.VERSION_NAME
         return lastOpenedVersion == BuildConfig.VERSION_NAME
     } set(_) {
         prefs.edit().putString("lastOpenedVersion", BuildConfig.VERSION_NAME).apply()
@@ -177,26 +179,45 @@ object SharedPreferences {
         val json = prefs.getString(LOCATION_LOCKED, null)
         return if(json != null) Gson().fromJson(json, Location::class.java) else null
     } set(value) {
-        if (value != null) {
+        locationLockedDate = if (value != null) {
             prefs.edit().putString(LOCATION_LOCKED, Gson().toJson(value)).apply()
-            locationLockedDate = Date()
+            Date()
         } else {
             prefs.edit().remove(LOCATION_LOCKED).apply()
-            locationLockedDate = null
+            null
         }
     }
 
-    var lastDownloadOfTaxon: Date?
+    // Taxon data
+
+    var databaseShouldUpdate: Boolean get()  {
+        val lastDataUpdateDate = lastDataUpdateDate
+        return !(lastDataUpdateDate != null && lastDataUpdateDate.difDays() < 30)
+    } set(value) {
+        lastDataUpdateDate = if (value) Date(3) else Date()
+    }
+
+    fun databaseWasUpdated() {
+        lastDataUpdateDate = Date()
+    }
+
+    fun databasePresent(): Boolean {
+        return lastDataUpdateDate != null
+    }
+
+    private var lastDataUpdateDate: Date?
         get() {
         val long = prefs.getLong(LAST_DOWNLOAD_TAXON, 0L)
-            if (long != 0L) {
-                return Date(long)
+            return if (long != 0L) {
+                Date(long)
             } else {
-                return null
+                null
             }
     } set(value) {
         return prefs.edit().putLong(LAST_DOWNLOAD_TAXON, value?.time ?: 0L).apply()
     }
+
+    // Soem
 
     fun getSaveImages(): Boolean? {
         return if (!prefs.getBoolean(SAVE_IMAGES_DECIDED, false)) {
@@ -207,7 +228,6 @@ object SharedPreferences {
     }
 
     fun setSaveImages(newValue: Boolean) {
-
         prefs.edit().putBoolean(SAVE_IMAGES, newValue).putBoolean(SAVE_IMAGES_DECIDED, true).apply()
     }
 }

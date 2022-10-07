@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/titleItem_title"
+        style="@style/AppTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center" />
+
+    <TextView
+        android:id="@+id/titleItem_message"
+        style="@style/AppPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="16dp"
+        android:textAlignment="center" />
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:paddingTop="16dp"
+        android:background="?android:attr/listDivider" />
+
+</LinearLayout>

@@ -26,7 +26,7 @@ data class Substrate(
         return when (Locale.getDefault().appLanguage()) {
             AppLanguage.Danish -> dkName.capitalized()
             AppLanguage.English -> enName.capitalized()
-            AppLanguage.Czech -> groupCzName?.capitalized() ?: enName.capitalized()
+            AppLanguage.Czech -> czName?.capitalized() ?: enName.capitalized()
         }
     }
 

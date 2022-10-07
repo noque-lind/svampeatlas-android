@@ -64,7 +64,7 @@ class MushroomFragment : Fragment() {
     // View models
 
     private val mushroomsViewModel by lazy {
-        ViewModelProvider(this, MushroomsViewModelFactory(MushroomsViewModel.Category.SPECIES, requireActivity().application)).get(MushroomsViewModel::class.java)
+        ViewModelProvider(this, MushroomsViewModelFactory(MushroomsViewModel.Category.SPECIES, requireActivity().application))[MushroomsViewModel::class.java]
     }
 
 

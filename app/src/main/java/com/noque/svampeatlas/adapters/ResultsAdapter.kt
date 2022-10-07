@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.R
+import com.noque.svampeatlas.adapters.add_observation.SpeciesAdapter
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.view_holders.*
 
@@ -12,16 +13,18 @@ class ResultsAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     interface Listener {
         fun reloadSelected()
-        fun predictionResultSelected(predictionResult: PredictionResult)
+        fun predictionResultSelected(predictionResult: Prediction)
     }
 
     sealed class Item(viewType: ViewType) : com.noque.svampeatlas.models.Item<Item.ViewType>(viewType) {
-        class Result(val predictionResult: PredictionResult): Item(ViewType.RESULTVIEW)
+        class Title(val title: Int, val message: Int): Item(ViewType.Title_View)
+        class Result(val predictionResult: Prediction): Item(ViewType.RESULTVIEW)
         class TryAgain(): Item(ViewType.RETRYVIEW)
         class Caution(): Item(ViewType.CAUTIONVIEW)
         class Creditation(): Item(ViewType.CREDITATION)
 
         enum class ViewType : com.noque.svampeatlas.models.ViewType {
+            Title_View,
             RESULTVIEW,
             CREDITATION,
             CAUTIONVIEW,
@@ -37,7 +40,7 @@ class ResultsAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var listener: Listener? = null
 
-    fun configure(results: List<PredictionResult>) {
+    fun configure(results: List<Prediction>, predictable: Boolean) {
         var highestConfidence = 0.0
         results.forEach {
             if (it.score > highestConfidence) {
@@ -45,18 +48,27 @@ class ResultsAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             }
         }
 
+        var titleSection: Section<Item>
+        if (predictable) {
+            titleSection = Section(null, State.Items(listOf(Item.Title(R.string.resultsView_header_title, R.string.resultsView_header_message))))
+        } else {
+            titleSection = Section(null, State.Items(listOf(Item.Title(R.string.resultsView_unpredictable_title, R.string.resultsView_unpredictable_message))))
+        }
+
         if (highestConfidence < 50.0) {
             sections.setSections(mutableListOf(
-                Section<Item>(null, State.Items(listOf(Item.Caution()))),
-                Section<Item>(null, State.Items(results.map { Item.Result(it) })),
-                Section<Item>(null, State.Items(listOf(Item.Creditation()))),
-                Section<Item>(null, State.Items(listOf(Item.TryAgain())))
+                titleSection,
+                Section(null, State.Items(listOf(Item.TryAgain()))),
+                Section(null, State.Items(listOf(Item.Caution()))),
+                Section(null, State.Items(results.map { Item.Result(it) })),
+                Section(null, State.Items(listOf(Item.Creditation())))
             ))
         } else {
             sections.setSections(mutableListOf(
-                Section<Item>(null, State.Items(results.map { Item.Result(it) })),
-                Section<Item>(null, State.Items(listOf(Item.Creditation()))),
-                Section<Item>(null, State.Items(listOf(Item.TryAgain())))
+                titleSection,
+                Section(null, State.Items(results.map { Item.Result(it) })),
+                Section(null, State.Items(listOf(Item.Creditation()))),
+                Section(null, State.Items(listOf(Item.TryAgain())))
             ))
         }
 
@@ -141,6 +153,10 @@ class ResultsAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                         view = layoutInflater.inflate(R.layout.item_caution, parent, false)
                         viewHolder = CautionViewHolder(view)
                     }
+                    Item.ViewType.Title_View -> {
+                        view = layoutInflater.inflate(R.layout.item_title, parent, false)
+                        viewHolder = TitleViewHolder(view)
+                    }
                 }
             }
         }
@@ -173,6 +189,13 @@ class ResultsAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
             is CreditationViewHolder -> {
                 holder.configure(CreditationViewHolder.Type.AI)
+            }
+
+            is TitleViewHolder -> {
+                    when (val item = sections.getItem(position)) {
+                        is Item.Title -> holder.configure(item.title, item.message)
+                        else -> {}
+                    }
             }
         }
     }

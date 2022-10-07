@@ -2,22 +2,24 @@ package com.noque.svampeatlas.view_models
 
 import android.app.Application
 import android.content.res.Resources
-import android.util.Log
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.google.maps.android.SphericalUtil
 import com.noque.svampeatlas.R
-import com.noque.svampeatlas.extensions.*
+import com.noque.svampeatlas.extensions.getExifLocation
 import com.noque.svampeatlas.fragments.AddObservationFragment
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.services.DataService
+import com.noque.svampeatlas.services.RecognitionService
 import com.noque.svampeatlas.services.RoomService
 import com.noque.svampeatlas.utilities.MyApplication
 import com.noque.svampeatlas.utilities.SharedPreferences
 import com.noque.svampeatlas.utilities.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.io.File
+import java.lang.Exception
 import java.util.*
 
 fun <T> initialObserveMutableLiveData(observer: Observer<T>): MutableLiveData<T> {
@@ -27,6 +29,10 @@ fun <T> initialObserveMutableLiveData(observer: Observer<T>): MutableLiveData<T>
 }
 
 class NewObservationViewModel(application: Application, val context: AddObservationFragment.Context, val id: Long, mushroomId: Int, imageFilePath: String?) : AndroidViewModel(application) {
+
+    companion object {
+        private const val TAG = "NewObservationViewModel"
+    }
 
     sealed class Notification(val title: String, val message: String) {
         class LocationInaccessible(resources: Resources, error: AppError): Notification(resources.getString(R.string.newObservationError_noCoordinates_title), error.message)
@@ -38,19 +44,18 @@ class NewObservationViewModel(application: Application, val context: AddObservat
         class Deleted(resource: Resources): Notification("", "")
         class NewObservationError(val error: UserObservation.Error, resources: Resources): Notification(resources.getString(error.title), resources.getString(error.message))
         class Error(error: AppError): Notification(error.title, error.message)
+        class RecognitionServiceError
     }
 
     sealed class Prompt(val title: String, val message: String, val yes: String, val no: String) {
         class UseImageMetadata(resources: Resources, val imageLocation: Location, val userLocation: Location): Prompt(resources.getString(R.string.addObservationVC_useImageMetadata_title), resources. getString(R.string.addObservationVC_useImageMetadata_message, imageLocation.accuracy.toString()), resources.getString(R.string.addObservationVC_useImageMetadata_positive), resources.getString(R.string.addObservationVC_useImageMetadata_negative))
     }
 
-    companion object {
-        private const val TAG = "NewObservationViewModel"
-    }
-
+    // If null during session - then we do not want to find predictions
+    private var recognitionService: RecognitionService? = null
     private var isAwaitingCoordinatedBeforeSave = false
 
-    val observationDate: LiveData<Date>  get() = userObservation.observationDate
+    val observationDate: LiveData<Date> get() = userObservation.observationDate
     val substrate: LiveData<Pair<Substrate, Boolean>?> get() = userObservation.substrate
     val vegetationType: LiveData<Pair<VegetationType, Boolean>?> get() = userObservation.vegetationType
     val hosts: LiveData<Pair<List<Host>, Boolean>?> get() = userObservation.hosts
@@ -68,39 +73,41 @@ class NewObservationViewModel(application: Application, val context: AddObservat
     }) }
 
     private val _localitiesState by lazy {MutableLiveData<State<List<Locality>>>() }
-    private val _predictionResultsState by lazy { MutableLiveData<State<List<PredictionResult>>>(State.Empty()) }
+    private val _predictionResultsState by lazy { MutableLiveData<State<List<Prediction>>>(State.Empty()) }
 
-    private var userObservation = ListenableUserObservation {
+    private val userObservation = ListenableUserObservation {
         resetEvent.call()
 
-        if (it.location != null) {
-          it.location?.let { locationPair -> _coordinateState.value = State.Items(locationPair)}
-        } else {
-            _coordinateState.value = State.Empty()
+            if (it.location != null) {
+                it.location?.let { locationPair -> _coordinateState.value = State.Items(locationPair)}
+            } else {
+                _coordinateState.value = State.Empty()
+            }
+
+            if (it.locality != null) {
+                _localitiesState.value = State.Items(listOfNotNull(it.locality?.first))
+            } else {
+                _localitiesState.value = State.Empty()
+                it.location?.first?.let { getLocalities(it) }
+            }
+            recognitionService?.reset()
+            _predictionResultsState.value = State.Empty()
+
+        viewModelScope.launch {
+            if (it.mushroom == null && it.images.isNotEmpty() && context == AddObservationFragment.Context.UploadNote) {
+                it.images.forEach { when (it) {
+                    is UserObservation.Image.LocallyStored -> {recognitionService?.addPhotoToRequest(it.file) }
+                    is UserObservation.Image.New ->  {}
+                    else -> {}
+                } }
+            }
         }
-
-        if (it.locality != null) {
-            _localitiesState.value = State.Items(listOfNotNull(it.locality?.first))
-        } else {
-            _localitiesState.value = State.Empty()
-            it.location?.first?.let { getLocalities(it) }
         }
-
-        _predictionResultsState.value = State.Empty()
-           val file = when (val image = it.images.firstOrNull()) {
-                is UserObservation.Image.LocallyStored -> image.file
-                is UserObservation.Image.New ->  image.file
-               else -> {null}
-           }
-        if (it.mushroom == null && file != null && context == AddObservationFragment.Context.UploadNote)
-            getPredictions(file)
-
-    }
 
     val isLoading: LiveData<Boolean> = _isLoading
     val coordinateState: LiveData<State<Pair<Location, Boolean>>> get() = _coordinateState
     val localitiesState: LiveData<State<List<Locality>>> get() = _localitiesState
-    val predictionResultsState: LiveData<State<List<PredictionResult>>> get() = _predictionResultsState
+    val predictionResultsState: LiveData<State<List<Prediction>>> get() = _predictionResultsState
     val user: LiveData<User> get() = _user
 
     val showNotification by lazy { SingleLiveEvent<Notification>() }
@@ -115,7 +122,11 @@ class NewObservationViewModel(application: Application, val context: AddObservat
         }
 
         when (context) {
-            AddObservationFragment.Context.New, AddObservationFragment.Context.Note -> {
+            AddObservationFragment.Context.New -> {
+                recognitionService = RecognitionService()
+                userObservation.set(UserObservation())
+            }
+            AddObservationFragment.Context.Note -> {
                 userObservation.set(UserObservation())
             }
             AddObservationFragment.Context.FromRecognition -> {
@@ -128,8 +139,12 @@ class NewObservationViewModel(application: Application, val context: AddObservat
             AddObservationFragment.Context.Edit -> {
                editObservation(id)
             }
-            AddObservationFragment.Context.EditNote, AddObservationFragment.Context.UploadNote -> {
-               editNote(id)
+            AddObservationFragment.Context.UploadNote -> {
+                recognitionService = RecognitionService()
+                editNote(id)
+            }
+            AddObservationFragment.Context.EditNote -> {
+                editNote(id)
             }
         }
     }
@@ -167,7 +182,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
             val predictionResults = predictionResultsState.value?.item
             val predictionResult = predictionResults?.find { it.mushroom.id == taxonID }
             if (predictionResult != null && !predictionResults.isNullOrEmpty()) {
-                setDeterminationNotes(PredictionResult.getNotes(predictionResult, predictionResults))
+                setDeterminationNotes(Prediction.getNotes(predictionResult, predictionResults))
             } else if (!predictionResults.isNullOrEmpty()) {
                 setDeterminationNotes(null)
             }
@@ -306,13 +321,8 @@ class NewObservationViewModel(application: Application, val context: AddObservat
     }
 
     fun appendImage(imageFile: File) {
-        // If there currently is no images added, and the user has not selected a species, then we want to find suggestions.
-        if (userObservation.images.value?.count() == 0 && userObservation.mushroom.value == null) {
-            // We are only interested in the upload note context
-            when (context) {
-                AddObservationFragment.Context.New, AddObservationFragment.Context.UploadNote -> getPredictions(imageFile)
-                else -> { }
-            }
+        viewModelScope.launch {
+            recognitionService?.addPhotoToRequest(imageFile)
         }
 
         userObservation.images.value = ((userObservation.images.value ?: listOf()) + listOf(UserObservation.Image.New(imageFile)))
@@ -330,6 +340,16 @@ class NewObservationViewModel(application: Application, val context: AddObservat
 //            removedImage.postValue(position)
             if (userObservation.images.value?.count() == 0) {
                 _predictionResultsState.value = State.Empty()
+            }
+            recognitionService?.reset()
+            viewModelScope.launch {
+                images.value?.forEach {
+                    when (it) {
+                        is UserObservation.Image.Hosted -> {}
+                        is UserObservation.Image.LocallyStored -> recognitionService?.addPhotoToRequest(it.file)
+                        is UserObservation.Image.New -> recognitionService?.addPhotoToRequest(it.file)
+                    }
+                }
             }
         }
 
@@ -384,7 +404,6 @@ class NewObservationViewModel(application: Application, val context: AddObservat
                     is State.Items -> { /* Do nothing */ }
                     else -> {}
                 }
-
             }
             null -> {}
         }
@@ -436,13 +455,33 @@ class NewObservationViewModel(application: Application, val context: AddObservat
         }
     }
 
-    private fun getPredictions(imageFile: File) {
-        _predictionResultsState.postValue(State.Loading())
+    var getPredictionsJob: Job? = null
 
-        viewModelScope.launch {
-            DataService.getInstance(getApplication()).getPredictions(imageFile) { it ->
-                it.onError { _predictionResultsState.postValue(State.Error(it)) }
-                it.onSuccess { _predictionResultsState.postValue(State.Items(it)) }
+    fun getPredictions() {
+        getPredictionsJob?.cancel(null)
+        getPredictionsJob = viewModelScope.launch {
+            val substrate = substrate.value?.first
+            val vegetationType = vegetationType.value?.first
+            try {
+                if (substrate != null && vegetationType != null) {
+                    recognitionService?.addMetadataToRequest(vegetationType, substrate, observationDate.value ?: Date())
+                }
+
+                _predictionResultsState.postValue(State.Loading())
+                val predictionResults = mutableListOf<Prediction>()
+                val result = recognitionService?.getResults()
+                if (result != null) {
+                    for (index in result.taxonIds.indices) {
+                        DataService.getInstance(MyApplication.applicationContext).mushroomsRepository.getMushroom(result.taxonIds[index]).onSuccess {
+                            predictionResults.add(Prediction(it,result.conf[index]))
+                        }
+                    }
+                    _predictionResultsState.postValue(State.Items(predictionResults))
+                } else {
+                    _predictionResultsState.postValue(State.Empty())
+                }
+            } catch (error: Exception) {
+                _predictionResultsState.postValue(State.Empty())
             }
         }
     }

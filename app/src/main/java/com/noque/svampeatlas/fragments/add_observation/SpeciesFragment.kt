@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -14,13 +13,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.noque.svampeatlas.adapters.add_observation.SpeciesAdapter
-import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.fragments.AddObservationFragmentDirections
 import com.noque.svampeatlas.fragments.DetailsFragment
-import com.noque.svampeatlas.models.DeterminationConfidence
-import com.noque.svampeatlas.models.Mushroom
-import com.noque.svampeatlas.models.PredictionResult
+import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.utilities.SharedPreferences
 import com.noque.svampeatlas.utilities.autoCleared
 import com.noque.svampeatlas.views.SearchBarListener
@@ -103,7 +99,7 @@ class SpeciesFragment : Fragment() {
     private val searchBarListener = object : SearchBarListener {
         override fun newSearch(entry: String) {
             defaultState = false
-            if (SharedPreferences.lastDownloadOfTaxon == null) {
+            if (!SharedPreferences.databasePresent()) {
                 mushroomViewModel.search(entry, detailed = false, allowGenus = true)
             } else {
                 mushroomViewModel.searchOffline(entry)
@@ -159,7 +155,7 @@ class SpeciesFragment : Fragment() {
         }
     }
 
-    private fun configureLowerSection(state: State<List<PredictionResult>>) {
+    private fun configureLowerSection(state: State<List<Prediction>>) {
         //If a mushroom is selected we should not show this
         if (newObservationViewModel.mushroom.value != null) return
         when (state) {
@@ -234,7 +230,11 @@ class SpeciesFragment : Fragment() {
     }
 
     private fun setupViewModels() {
-        newObservationViewModel.mushroom.observe(viewLifecycleOwner, Observer {
+        newObservationViewModel.resetEvent.observe(viewLifecycleOwner) {
+            searchBar.resetText()
+        }
+
+        newObservationViewModel.mushroom.observe(viewLifecycleOwner) {
             if (it != null) {
                 recyclerView.setPadding(0, 0, 0, 0)
                 searchBar.visibility = View.GONE
@@ -248,14 +248,20 @@ class SpeciesFragment : Fragment() {
                         )
                     ),
                     if (it.first.isGenus) getString(R.string.observationSpeciesCell_choosenGenus) else getString(
-                        R.string.observationSpeciesCell_choosenSpecies)
+                        R.string.observationSpeciesCell_choosenSpecies
+                    )
                 )
                 speciesAdapter.configureMiddleSectionState(State.Empty(), null)
                 speciesAdapter.configureLowerSectionState(State.Empty(), null)
             } else {
-                recyclerView.setPadding(0, (resources.getDimension(R.dimen.searchbar_view_height) + resources.getDimension(
+                recyclerView.setPadding(
+                    0,
+                    (resources.getDimension(R.dimen.searchbar_view_height) + resources.getDimension(
                         R.dimen.searchbar_top_margin
-                    )).toInt(), 0, 0)
+                    )).toInt(),
+                    0,
+                    0
+                )
                 searchBar.visibility = View.VISIBLE
                 searchBar.expand()
                 speciesAdapter.configureUpperSection(
@@ -267,11 +273,13 @@ class SpeciesFragment : Fragment() {
                     null
                 )
                 configureMiddleSection(mushroomViewModel.mushroomsState.value ?: State.Empty())
-                configureLowerSection(newObservationViewModel.predictionResultsState.value ?: State.Empty())
+                configureLowerSection(
+                    newObservationViewModel.predictionResultsState.value ?: State.Empty()
+                )
             }
 
             recyclerView.scrollToPosition(0)
-        })
+        }
 
         newObservationViewModel.predictionResultsState.observe(viewLifecycleOwner, Observer {
                 configureLowerSection(it)

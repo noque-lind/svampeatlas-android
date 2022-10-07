@@ -10,7 +10,7 @@ import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 
 class AppMultipartPost(private val api: API,
-                       private val token: String,
+                       private val token: String?,
                        private val image: MultipartFormImage,
                        private val listener: Response.Listener<NetworkResponse>,
                        errorListener: Response.ErrorListener): Request<NetworkResponse>(api.volleyMethod(), api.url(), errorListener) {
@@ -20,7 +20,7 @@ class AppMultipartPost(private val api: API,
 
     override fun getHeaders(): MutableMap<String, String> {
         val header = mutableMapOf<String, String>()
-        header.put("Authorization", "Bearer $token")
+        token?.let { header.put("Authorization", "Bearer $it") }
         return header
 
     }

@@ -19,6 +19,7 @@ import com.noque.svampeatlas.extensions.italized
 import com.noque.svampeatlas.extensions.red
 import com.noque.svampeatlas.models.AppError
 import com.noque.svampeatlas.models.Mushroom
+import com.noque.svampeatlas.models.Prediction
 import com.noque.svampeatlas.models.PredictionResult
 import com.noque.svampeatlas.services.DataService
 import kotlinx.android.synthetic.main.view_result.view.*
@@ -27,8 +28,6 @@ import org.w3c.dom.Text
 
 class ResultsView(context: Context?, attrs: AttributeSet?) : LinearLayout(context, attrs) {
 
-    private val titleTextView: TextView
-    private val messageTextView: TextView
     private val recyclerView: RecyclerView
 
     private val resultsAdapter by lazy { ResultsAdapter() }
@@ -36,8 +35,6 @@ class ResultsView(context: Context?, attrs: AttributeSet?) : LinearLayout(contex
     init {
         val inflater = LayoutInflater.from(getContext())
         inflater.inflate(R.layout.view_results, this)
-        titleTextView = resultsView_titleTextView
-        messageTextView = resultsView_messageTextView
         recyclerView = resultsView_recyclerView
         setupViews()
     }
@@ -53,16 +50,14 @@ class ResultsView(context: Context?, attrs: AttributeSet?) : LinearLayout(contex
         resultsAdapter.setListener(listener)
     }
 
-    fun showResults(results: List<PredictionResult>) {
-        titleTextView.text = resources.getString(R.string.resultsView_header_title, results.count())
+    fun showResults(results: List<Prediction>, predictable: Boolean) {
+       /* titleTextView.text = resources.getString(R.string.resultsView_header_title, results.count())
         messageTextView.text = context.getString(R.string.resultsView_header_message).red()
-
-        resultsAdapter.configure(results)
+*/
+        resultsAdapter.configure(results, predictable)
         recyclerView.scrollTo(0,0)
         recyclerView.layoutManager?.scrollToPosition(0)
 
-        titleTextView.animate().alpha(1F).setDuration(1000).start()
-        messageTextView.animate().alpha(1F).setDuration(1000).start()
         recyclerView.animate().alpha(1F).setDuration(1000).start()
     }
 
@@ -72,8 +67,6 @@ class ResultsView(context: Context?, attrs: AttributeSet?) : LinearLayout(contex
     }
 
     fun reset() {
-        titleTextView.animate().alpha(0F).setDuration(1000).start()
-        messageTextView.animate().alpha(0F).setDuration(1000).start()
-        recyclerView.animate().alpha(0F).setDuration(1000).start()
+           recyclerView.animate().alpha(0F).setDuration(1000).start()
     }
 }

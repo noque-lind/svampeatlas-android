@@ -15,24 +15,20 @@ import android.hardware.SensorManager
 import android.media.ExifInterface
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.ImageView
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.Toolbar
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.constraintlayout.motion.widget.MotionLayout
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -43,7 +39,7 @@ import com.noque.svampeatlas.R
 import com.noque.svampeatlas.adapters.ResultsAdapter
 import com.noque.svampeatlas.extensions.openSettings
 import com.noque.svampeatlas.models.AppError
-import com.noque.svampeatlas.models.PredictionResult
+import com.noque.svampeatlas.models.Prediction
 import com.noque.svampeatlas.models.RecoveryAction
 import com.noque.svampeatlas.models.State
 import com.noque.svampeatlas.services.FileManager
@@ -168,16 +164,16 @@ class CameraFragment : Fragment(), PromptFragment.Listener, MenuProvider {
     private val resultsAdapterListener by lazy {
         object : ResultsAdapter.Listener {
             override fun reloadSelected() {  cameraViewModel.reset(); }
-            override fun predictionResultSelected(predictionResult: PredictionResult) {
+            override fun predictionResultSelected(predictionResult: Prediction) {
                 val state = cameraViewModel.predictionResultsState.value
                 val action = CameraFragmentDirections.actionGlobalMushroomDetailsFragment(
                     predictionResult.mushroom.id,
                     DetailsFragment.TakesSelection.SELECT,
                     DetailsFragment.Context.SPECIES,
                     (cameraViewModel.imageFileState.value as? State.Items)?.items?.absolutePath,
-                    if (state is State.Items) PredictionResult.getNotes(
+                    if (state is State.Items) Prediction.getNotes(
                         predictionResult,
-                        state.items
+                        state.items.first
                     ) else null
                 )
 
@@ -230,6 +226,7 @@ class CameraFragment : Fragment(), PromptFragment.Listener, MenuProvider {
                 cameraViewModel.reset()
             }
 
+            @RequiresApi(Build.VERSION_CODES.Q)
             override fun photoLibraryButtonPressed() {
                /* pickMediaRequest.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))*/
                 permissionRequest.launch(arrayOf(Manifest.permission.ACCESS_MEDIA_LOCATION))
@@ -464,7 +461,7 @@ class CameraFragment : Fragment(), PromptFragment.Listener, MenuProvider {
                     }
                     is State.Items -> {
                         container.transitionToEnd()
-                        resultsView.showResults(state.items)
+                        resultsView.showResults(state.items.first, state.items.second)
                     }
 
                     is State.Empty -> {

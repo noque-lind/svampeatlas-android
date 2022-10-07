@@ -6,28 +6,9 @@
     style="@style/Light"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/resultsView_titleTextView"
-        style="@style/AppTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:textAlignment="center" />
-
-    <TextView
-        android:id="@+id/resultsView_messageTextView"
-        style="@style/AppPrimary"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:textAlignment="center" />
-
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_marginTop="16dp"
+        android:paddingTop="16dp"
+        android:clipToPadding="false"
         android:id="@+id/resultsView_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

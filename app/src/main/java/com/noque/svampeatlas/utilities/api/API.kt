@@ -44,10 +44,15 @@ data class API(val apiType: APIType) {
     }
 
     private fun createGetURL(request: APIType.Request): String {
-        val builder = Uri.Builder()
-        builder.scheme("https")
-            .authority("svampe.databasen.org")
-            .appendPath("api")
+
+
+        val builder = Uri.Builder().scheme("https")
+        when (request) {
+            is APIType.Request.ImagePredictionGetResults -> builder.authority("fungi.piva-ai.com")
+            else ->  builder
+                .authority("svampe.databasen.org")
+                .appendPath("api")
+        }
 
         when (request) {
             is APIType.Request.Mushrooms -> {
@@ -182,6 +187,7 @@ data class API(val apiType: APIType) {
                 builder.appendPath("observations")
                 builder.appendPath("count")
             }
+            is APIType.Request.ImagePredictionGetResults -> builder.appendPath("get_results").appendPath(request.id)
         }
 
         val url = builder.build().toString()
@@ -192,8 +198,16 @@ data class API(val apiType: APIType) {
     private fun createPostURL(request: APIType.Post): String {
         val builder = Uri.Builder()
         builder.scheme("https")
-            .authority("svampe.databasen.org")
-            .appendPath("api")
+
+        when (request) {
+           is APIType.Post.ImagePredictionAddPhoto, is APIType.Post.ImagePredictionAddMetaData -> {
+               builder.authority("fungi.piva-ai.com")
+           }
+            else -> {
+                builder.authority("svampe.databasen.org")
+                builder.appendPath("api")
+            }
+        }
 
         when (request) {
             is APIType.Post.Observation -> {
@@ -230,6 +244,13 @@ data class API(val apiType: APIType) {
                 builder.appendPath("observations")
                 builder.appendPath("${request.observationID}")
                 builder.appendPath("notifications")
+            }
+            is APIType.Post.ImagePredictionAddPhoto -> {
+                builder.appendPath("add_photo")
+                if (request.id != null) builder.appendPath(request.id)
+            }
+            is APIType.Post.ImagePredictionAddMetaData -> {
+    builder.appendPath("add_metadata").appendPath(request.id)
             }
         }
 
@@ -467,15 +488,18 @@ sealed class APIType() {
         class UserNotificationCount() : Request()
         class UserNotifications(val limit: Int, val offset: Int) : Request()
         class ObservationCountForUser(val userId: Int) : Request()
+        class ImagePredictionGetResults(val id: String): Request()
     }
 
     sealed class Post : APIType() {
-        class Observation() : Post()
+        object Observation : Post()
         class Image(val observationID: Int) : Post()
-        class Login() : Post()
+        object Login : Post()
         class Comment(val taxonID: Int) : Post()
-        class ImagePrediction: Post()
+        object ImagePrediction : Post()
         class OffensiveContentComment(val observationID: Int): Post()
+        class ImagePredictionAddPhoto(val id: String?) : Post()
+        class ImagePredictionAddMetaData(val id: String): Post()
     }
 
     sealed class Put: APIType() {

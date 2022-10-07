@@ -10,15 +10,16 @@ import com.noque.svampeatlas.R
 import com.noque.svampeatlas.extensions.copyTo
 import com.noque.svampeatlas.extensions.getExifLocation
 import com.noque.svampeatlas.fragments.CameraFragment
-import com.noque.svampeatlas.models.AppError
-import com.noque.svampeatlas.models.Location
-import com.noque.svampeatlas.models.PredictionResult
-import com.noque.svampeatlas.models.State
+import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.services.DataService
+import com.noque.svampeatlas.services.RecognitionService
+import com.noque.svampeatlas.utilities.MyApplication
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.*
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,19 +29,16 @@ import java.util.*
 class CameraViewModel(private val type: CameraFragment.Context, application: Application) : AndroidViewModel(application) {
 
     companion object {
-        val TAG = "CameraViewModel"
+        const val TAG = "CameraViewModel"
     }
 
-    private val _imageFileState by lazy { MutableLiveData<State<File>>() }
+    private val recognitionService = RecognitionService()
+
+    private val _imageFileState by lazy { MutableLiveData<State<File>>(State.Empty()) }
     val imageFileState: LiveData<State<File>> get() = _imageFileState
 
-    private val _predictionResultsState by lazy { MutableLiveData<State<List<PredictionResult>>>() }
-    val predictionResultsState: LiveData<State<List<PredictionResult>>> get() = _predictionResultsState
-
-    init {
-        _imageFileState.value = State.Empty()
-        _predictionResultsState.value = State.Empty()
-    }
+    private val _predictionResultsState by lazy { MutableLiveData<State<Pair<List<Prediction>, Boolean>>>(State.Empty()) }
+    val predictionResultsState: LiveData<State<Pair<List<Prediction>, Boolean>>> get() = _predictionResultsState
 
     fun setImageFile(imageFile: File) {
         _imageFileState.postValue(State.Items(imageFile))
@@ -78,14 +76,29 @@ class CameraViewModel(private val type: CameraFragment.Context, application: App
 
         _imageFileState.value = State.Empty()
         _predictionResultsState.value = State.Empty()
+        recognitionService.reset()
         DataService.getInstance(getApplication()).clearRequestsWithTag(TAG)
     }
 
     private suspend fun getPredictions(imageFile: File) = withContext(Dispatchers.Default) {
-        _predictionResultsState.postValue(State.Loading())
-            DataService.getInstance(getApplication()).getPredictions(imageFile) {
-                it.onError { _predictionResultsState.postValue(State.Error(it)) }
-                it.onSuccess { _predictionResultsState.postValue(State.Items(it)) }
-        }
+       try {
+           _predictionResultsState.postValue(State.Loading())
+           recognitionService.addPhotoToRequest(imageFile)
+           delay(2000)
+           val predictionResults = mutableListOf<Prediction>()
+           val result = recognitionService.getResults()
+           if (result != null) {
+               for (index in result.taxonIds.indices) {
+                   DataService.getInstance(MyApplication.applicationContext).mushroomsRepository.getMushroom(result.taxonIds[index]).onSuccess {
+                       predictionResults.add(Prediction(it,result.conf[index]))
+                   }
+               }
+               _predictionResultsState.postValue(State.Items(Pair(predictionResults, result.reliablePrediction)))
+           } else {
+
+           }
+       } catch (error: Exception) {
+           Log.d(TAG, error.toString())
+       }
     }
 }

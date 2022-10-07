@@ -54,8 +54,8 @@ class DetailsFragment : Fragment() {
     }
 
     companion object {
-        val TAG = "DetailsFragment"
-        val KEY_HAS_EXPANDED = "KEY_HAS_EXPANDED"
+        const val TAG = "DetailsFragment"
+        const val KEY_HAS_EXPANDED = "KEY_HAS_EXPANDED"
     }
 
     enum class TakesSelection {
@@ -145,8 +145,7 @@ class DetailsFragment : Fragment() {
 
     // View models
     private val speciesViewModel by lazy {
-        ViewModelProvider(this, SpeciesViewModelFactory(args.id, requireActivity().application))
-            .get(SpeciesViewModel::class.java)
+        ViewModelProvider(this, SpeciesViewModelFactory(args.id, requireActivity().application))[SpeciesViewModel::class.java]
     }
 
     private val observationViewModel by lazy {
@@ -156,7 +155,7 @@ class DetailsFragment : Fragment() {
                 args.context == Context.OBSERVATIONWITHSPECIES,
                 requireActivity().application
             )
-        ).get(ObservationViewModel::class.java)
+        )[ObservationViewModel::class.java]
     }
 
     // Adapters

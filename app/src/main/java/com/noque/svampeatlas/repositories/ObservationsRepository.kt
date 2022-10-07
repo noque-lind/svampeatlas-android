@@ -51,7 +51,7 @@ class ObservationsRepository(private val requestQueue: RequestQueue) {
 
     private suspend fun post(json: JSONObject, token: String): Result<Int, DataService.Error> = suspendCoroutine { cont ->
         val request = AppJSONObjectRequest(
-            API(APIType.Post.Observation()),
+            API(APIType.Post.Observation),
             token,
             json,
             {

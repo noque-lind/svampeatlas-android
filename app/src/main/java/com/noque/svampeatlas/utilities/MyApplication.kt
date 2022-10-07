@@ -7,6 +7,7 @@ import android.util.Log
 import com.bumptech.glide.load.engine.Resource
 import com.downloader.PRDownloader
 import com.noque.svampeatlas.services.FileManager
+import dagger.hilt.android.HiltAndroidApp
 
 class MyApplication: Application() {
 

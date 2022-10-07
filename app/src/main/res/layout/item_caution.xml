@@ -13,8 +13,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:tint="@color/colorRed"
-        app:srcCompat="@drawable/icon_about" />
+        app:srcCompat="@drawable/icon_about"
+        app:tint="@color/colorRed" />
 
         <TextView
             android:layout_width="match_parent"

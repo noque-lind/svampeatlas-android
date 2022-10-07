@@ -4,6 +4,35 @@ import android.util.Log
 import com.google.gson.annotations.SerializedName
 import com.google.gson.Gson
 
+
+
+class Prediction(val mushroom: Mushroom, val score: Double) {
+    companion object {
+        fun getNotes(
+            selectedPrediction: Prediction?,
+            predictionsResults: List<Prediction>
+        ): String {
+            var string = ""
+
+            if (selectedPrediction != null) {
+                string += "#imagevision_score: ${String.format(
+                    "%.2f",
+                    selectedPrediction.score * 100
+                ).replace(",", ".")}; "
+            }
+
+            string += "#imagevision_list: "
+
+            predictionsResults.forEach {
+                string += "${it.mushroom.fullName} (${String.format("%.2f", it.score * 100).replace(",", ".")}), "
+            }
+
+            string = string.dropLast(2)
+            return string
+        }
+    }
+}
+
 class PredictionResult(
     @SerializedName("_id") private val id: Int,
     @SerializedName("score") val score: Double,

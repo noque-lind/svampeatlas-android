@@ -29,7 +29,7 @@ import com.noque.svampeatlas.views.BlankActivity
 import kotlinx.android.synthetic.main.action_view_add_notebook_button.view.*
 import kotlinx.android.synthetic.main.fragment_notebook.*
 
-class NotesFragment: Fragment() {
+class NotesFragment: Fragment(), PromptFragment.Listener {
 
     companion object {
         const val RELOAD_DATA_KEY = "RELOAD_DATA_KEY"
@@ -50,12 +50,6 @@ class NotesFragment: Fragment() {
                     action.context = AddObservationFragment.Context.EditNote
                     action.id = newObservation.creationDate.time
                     findNavController().navigate(action)
-                }
-
-                override fun downloadForOfflinePressed() {
-                    DownloaderFragment().show(parentFragmentManager, null)
-                    this@apply.sections.deleteItem(0)
-                    this@apply.notifyItemRemoved(0)
                 }
 
                 override fun uploadNewObservation(newObservation: NewObservation) {
@@ -210,6 +204,22 @@ class NotesFragment: Fragment() {
 
 
     private fun setupViewModel() {
+        viewModel.event.observe(viewLifecycleOwner) {
+            when (it) {
+                NotesFragmentViewModel.Event.DownloadTaxon -> {
+                    val dialog = PromptFragment()
+                    dialog.setTargetFragment(this, 10)
+                    dialog.arguments = Bundle().apply {
+                        putString(PromptFragment.KEY_TITLE, getString(R.string.prompt_taxonData_title))
+                        putString(PromptFragment.KEY_MESSAGE, getString(R.string.prompt_taxonData_message))
+                        putString(PromptFragment.KEY_POSITIVE, getString(R.string.action_fetchData))
+                        putString(PromptFragment.KEY_NEGATIVE, getString(R.string.action_no))
+                    }
+                    dialog.show(parentFragmentManager, null)
+                }
+            }
+        }
+
         viewModel.notes.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is State.Items -> {
@@ -230,4 +240,10 @@ class NotesFragment: Fragment() {
 
         })
     }
+
+    override fun positiveButtonPressed() {
+        DownloaderFragment().show(parentFragmentManager, null)
+    }
+
+    override fun negativeButtonPressed() { }
 }

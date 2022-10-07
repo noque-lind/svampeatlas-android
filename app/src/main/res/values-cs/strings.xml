@@ -67,7 +67,7 @@
 <string name="common_upload">Nahrát</string>
 <string name="containedResultCell_genus">Rod: </string>
 <string name="creditationCell_ai">Systém rozpoznávání obrazu vyvinuli Milan Šulc a Jiří Matas z ČVUT v Praze a Lukáš Picek ze ZČU v Plzni a Danmarks Svampeatlas (Atlas hub).</string>
-<string name="creditationCell_aiNewObservation">Tyto návrhy jsou založeny na prvním obrázku, který jste přidali k pozorování. Systém rozpoznávání obrazu vyvinuli Milan Šulc a Jiří Matas z ČVUT v Praze a Lukáš Picek ze ZČU v Plzni a Danmarks Svampeatlas (Atlas hub).</string>
+<string name="creditationCell_aiNewObservation"></string>
 <string name="dataServiceError_decodingError_message">Přijatá data nelze přečíst</string>
 <string name="dataServiceError_decodingError_title">Chyba dekódování</string>
 <string name="dataServiceError_empty_message">Odpověď serveru neobsahuje žádná data</string>
@@ -255,6 +255,8 @@
 <string name="reloadCell_tryAgain">Zkusit znovu</string>
 <string name="resultsView_header_message">Upozornění: Pokud se chystáte konzumovat houby, které jste našli, nespoléhejte pouze na tuto navrhovanou identifikaci.</string>
 <string name="resultsView_header_title">Máme pro vás %d doporučení</string>
+<string name="resultsView_unpredictable_message"></string>
+<string name="resultsView_unpredictable_title"></string>
 <string name="searchBar_placeholder">Vyhledávání ...</string>
 <string name="searchCell_title">Zde vyhledejte hostitele ... 👇</string>
 <string name="searchVC_cancelButton">Zrušit</string>
@@ -317,5 +319,6 @@
 <string name="notificationCell_determinationApproved_1">Pozorování, které sledujete, bylo potvrzeno a schváleno jako:</string>
 <string name="notificationCell_commentAdded_2">jsou následující</string>
 <string name="notificationCell_determinationAdded_2">k pozorování, které sledujete.</string>
-<string name="whats_new_2_0">Právě jsme spustili novou verzi aplikace Svampeatlas (verze 2.0), tentokrát s poměrně výraznými změnami a vylepšeními. Nejdůležitější jsou:</string>
+<string name="whats_new_2_0">Právě jsme spustili novou verzi aplikace Svampeatlas (verze 2.0), tentokrát s poměrně výraznými změnami a vylepšeními. Nejdůležitější jsou:\n\n1) Changed reporting flow. \n2) It is possible to lock coordinates and localities.\n3) Simplification of the notebook functionality\n4) Bug fixes</string>
+<string name="whats_new_3_0"></string>
 </resources>

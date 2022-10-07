@@ -21,7 +21,7 @@ import android.view.View.*
 import androidx.navigation.*
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.ktx.Firebase
+import com.noque.svampeatlas.BuildConfig
 import com.noque.svampeatlas.fragments.TermsFragment
 import com.noque.svampeatlas.services.Analytics
 import com.noque.svampeatlas.services.FileManager
@@ -133,7 +133,7 @@ class BlankActivity : AppCompatActivity() {
             val dialog = TermsFragment()
             dialog.arguments = Bundle().apply { putSerializable(TermsFragment.KEY_TYPE, TermsFragment.Type.WHATSNEW) }
             dialog.show(supportFragmentManager, null)
-            SharedPreferences.lastDownloadOfTaxon = null
+            SharedPreferences.databaseShouldUpdate = true
         }
     }
 
@@ -151,7 +151,6 @@ class BlankActivity : AppCompatActivity() {
                         newGraph.setStartDestination(R.id.myPageFragment)
                         navigationView.setCheckedItem(R.id.myPageFragment)
                         navController.graph = newGraph
-//                        toolbar.setupWithNavController(navController, appBarConfiguration)
                     } else if (it.items != isLoggedIn && !it.items) {
                         val newGraph = navController.navInflater.inflate(R.navigation.nav_main)
                         newGraph.setStartDestination(R.id.mushroomFragment)
@@ -191,12 +190,12 @@ class BlankActivity : AppCompatActivity() {
 
     override fun onSupportNavigateUp(): Boolean {
         val sharedSet = mutableSetOf(R.id.loginFragment, R.id.myPageFragment, R.id.notesFragment, R.id.mushroomFragment, R.id.nearbyFragment, R.id.cameraFragment, R.id.settingsFragment, R.id.aboutFragment)
-       if (navController.currentDestination?.id == R.id.addObservationFragment && (navController.previousBackStackEntry?.destination?.id == R.id.mushroomDetailsFragment || navController.previousBackStackEntry?.destination?.id == R.id.notesFragment)) {
-           return navController.navigateUp(AppBarConfiguration(sharedSet, drawerLayout)) || super.onSupportNavigateUp()
-       } else  {
-           sharedSet.add(R.id.addObservationFragment)
-           return navController.navigateUp(AppBarConfiguration(sharedSet, drawerLayout)) || super.onSupportNavigateUp()
-       }
+        return if (navController.currentDestination?.id == R.id.addObservationFragment && (navController.previousBackStackEntry?.destination?.id == R.id.mushroomDetailsFragment || navController.previousBackStackEntry?.destination?.id == R.id.notesFragment)) {
+            navController.navigateUp(AppBarConfiguration(sharedSet, drawerLayout)) || super.onSupportNavigateUp()
+        } else  {
+            sharedSet.add(R.id.addObservationFragment)
+            navController.navigateUp(AppBarConfiguration(sharedSet, drawerLayout)) || super.onSupportNavigateUp()
+        }
     }
 
     override fun onBackPressed() {

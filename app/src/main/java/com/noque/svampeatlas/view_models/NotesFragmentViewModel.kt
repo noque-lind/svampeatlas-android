@@ -12,6 +12,7 @@ import com.noque.svampeatlas.models.UserObservation
 import com.noque.svampeatlas.services.DataService
 import com.noque.svampeatlas.services.RoomService
 import com.noque.svampeatlas.utilities.MyApplication
+import com.noque.svampeatlas.utilities.SharedPreferences
 import com.noque.svampeatlas.utilities.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,13 +21,19 @@ import java.io.File
 
 class NotesFragmentViewModel: ViewModel() {
 
+    sealed class Event {
+        object DownloadTaxon: Event()
+    }
+
     private val _notes by lazy { MutableLiveData<State<MutableList<NewObservation>>>(State.Empty()) }
     val notes: LiveData<State<MutableList<NewObservation>>> get() = _notes
 
+    val event by lazy { SingleLiveEvent<Event>() }
+
     init {
         getNotes()
+        if (SharedPreferences.databaseShouldUpdate) event.postValue(Event.DownloadTaxon)
     }
-
 
     fun getNotes() {
         _notes.postValue(State.Loading())

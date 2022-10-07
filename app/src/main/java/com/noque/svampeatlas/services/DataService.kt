@@ -322,84 +322,6 @@ class DataService private constructor(context: Context) {
         addToRequestQueue(request)
     }
 
-
-
-    fun uploadObservation(
-        tag: String,
-        token: String,
-        jsonObject: JSONObject,
-        completion: (Result<Int, Error>) -> Unit
-    ) {
-        val request = AppJSONObjectRequest(
-            API(APIType.Post.Observation()),
-            token,
-            jsonObject,
-            Response.Listener {
-                val id = it.getInt("_id")
-                completion(Result.Success(id))
-            },
-            Response.ErrorListener {
-                completion(Result.Error(it.toAppError()))
-            })
-
-        request.tag = tag
-        addToRequestQueue(request)
-
-    }
-
-    fun editObservation(
-        tag: String,
-        id: Int,
-        token: String,
-        jsonObject: JSONObject,
-        completion: (Result<Int, Error>) -> Unit
-    ) {
-        val request = AppJSONObjectRequest(
-            API(APIType.Put.Observation(id)),
-            token,
-            jsonObject,
-            Response.Listener {
-                completion(Result.Success(id))
-            },
-            Response.ErrorListener {
-                completion(Result.Error(it.toAppError()))
-            })
-
-        request.tag = tag
-        addToRequestQueue(request)
-
-    }
-
-    suspend fun uploadImages(
-        tag: String,
-        observationID: Int,
-        images: List<File>,
-        token: String,
-        completion: (Result<Int, Error>) -> Unit
-    ) {
-        var completedUploads = 0
-
-        val dispatchGroup = DispatchGroup("UploadImages")
-
-        images.forEach {
-            dispatchGroup.enter()
-
-            uploadImage(tag, observationID, it, token) {
-                when (it) {
-                    is Result.Success -> {
-                        completedUploads += 1
-                    }
-                    else -> {}
-                }
-                dispatchGroup.leave()
-            }
-        }
-
-        dispatchGroup.notify (Runnable {
-            completion(Result.Success(completedUploads))
-        })
-    }
-
     suspend fun deleteObservation(
         tag: String,
         id: Int,
@@ -500,7 +422,7 @@ class DataService private constructor(context: Context) {
             val jsonObject = JSONObject(mutableMap)
             val request = AppRequest<List<PredictionResult>>(
                 object : TypeToken<List<PredictionResult>>() {}.type,
-                API(APIType.Post.ImagePrediction()),
+                API(APIType.Post.ImagePrediction),
                 null,
                 jsonObject,
                 {
@@ -523,7 +445,7 @@ class DataService private constructor(context: Context) {
     }
 
     fun login(initials: String, password: String, completion: (Result<String, Error>) -> Unit) {
-        val api = API(APIType.Post.Login())
+        val api = API(APIType.Post.Login)
         val jsonObject = JSONObject()
         jsonObject.put("Initialer", initials)
         jsonObject.put("password", password)
@@ -609,11 +531,11 @@ class DataService private constructor(context: Context) {
             api,
             token,
             null,
-            Response.Listener {
+            {
                 Log.d(TAG, it.toString())
                 completion(Result.Success(it.results))
             },
-            Response.ErrorListener {
+            {
                 completion(Result.Error(it.toAppError()))
             }
         )
