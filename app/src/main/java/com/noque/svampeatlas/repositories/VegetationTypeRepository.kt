@@ -19,8 +19,8 @@ import kotlin.coroutines.suspendCoroutine
 
 class VegetationTypeRepository(private val requestQueue: RequestQueue) {
 
-    suspend fun getVegetationTypes(tag: String): Result<List<VegetationType>, DataService.Error> {
-        RoomService.vegetationTypes.getAll().onSuccess {
+    suspend fun getVegetationTypes(tag: String, freshDownload: Boolean = false): Result<List<VegetationType>, DataService.Error> {
+        if (!freshDownload) RoomService.vegetationTypes.getAll().onSuccess {
             return Result.Success(it)
         }
         return fetchVegetationTypes(tag).apply {
@@ -37,11 +37,11 @@ class VegetationTypeRepository(private val requestQueue: RequestQueue) {
             api,
             null,
             null,
-            Response.Listener {
+            {
                 cont.resume(Result.Success(it.sortedBy { it.id }))
             },
 
-            Response.ErrorListener {
+            {
                 cont.resume(Result.Error(it.toAppError()))
             }
         )

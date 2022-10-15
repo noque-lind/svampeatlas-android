@@ -20,10 +20,12 @@ import kotlin.coroutines.suspendCoroutine
 
 class SubstratesRepository(private val requestQueue: RequestQueue) {
 
-    suspend fun getSubstrateGroups(tag: String): Result<List<SubstrateGroup>, DataService.Error> {
-        RoomService.substrates.getSubstrates().onSuccess {
+    suspend fun getSubstrateGroups(tag: String, freshDownload: Boolean = false): Result<List<SubstrateGroup>, DataService.Error> {
+        if (!freshDownload) RoomService.substrates.getSubstrates().onSuccess {
             return Result.Success(SubstrateGroup.createFromSubstrates(it))
         }
+
+
 
         return fetchSubstrateGroups("SubstratesRepository").apply {
             onSuccess {
@@ -40,7 +42,7 @@ class SubstratesRepository(private val requestQueue: RequestQueue) {
             api,
             null,
             null,
-            Response.Listener {
+            {
                 if (it.firstOrNull() != null) {
                     cont.resume(Result.Success(SubstrateGroup.createFromSubstrates(it)))
                 } else {
@@ -49,7 +51,7 @@ class SubstratesRepository(private val requestQueue: RequestQueue) {
                     )))
                 }
             },
-            Response.ErrorListener {
+            {
                 cont.resume(Result.Error(it.toAppError()))
             }
         )
