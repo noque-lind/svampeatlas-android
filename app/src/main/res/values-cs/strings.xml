@@ -40,7 +40,7 @@
 <string name="addObservationVC_observationCategories_species">Druh</string>
 <string name="addObservationVC_successfullUpload_title">Vaše pozorování bylo vytvořeno</string>
 <string name="addObservationVC_title">Nové pozorování</string>
-<string name="addObservationVC_useImageMetadata_message">Zdá se, že přidaný obrázek byl pořízen více než 500 metrů od aktuálního umístění pozorování. Chcete použít informace o GPS a datu z obrázku?\n\nImage GPS-Precision: %s m.</string>
+<string name="addObservationVC_useImageMetadata_message">Zdá se, že přidaný obrázek nebyl pořízen v místě, kde se nacházíte. Chcete použít informace o GPS pořízené z obrázku?\n\nPřesnost GPS z obrázku je: %s m.</string>
 <string name="addObservationVC_useImageMetadata_negative">Ne</string>
 <string name="addObservationVC_useImageMetadata_positive">Ano, použijte metadata obrázku</string>
 <string name="addObservationVC_useImageMetadata_title">Návrh umístění</string>
@@ -67,7 +67,7 @@
 <string name="common_upload">Nahrát</string>
 <string name="containedResultCell_genus">Rod: </string>
 <string name="creditationCell_ai">Systém rozpoznávání obrazu vyvinuli Milan Šulc a Jiří Matas z ČVUT v Praze a Lukáš Picek ze ZČU v Plzni a Danmarks Svampeatlas (Atlas hub).</string>
-<string name="creditationCell_aiNewObservation"></string>
+<string name="creditationCell_aiNewObservation">Tyto návrhy názvů jsou založeny na obrázcích, které jste přidali k pozorování. Bere také v úvahu další metadata, jako je substrát, typ vegetace a měsíc.</string>
 <string name="dataServiceError_decodingError_message">Přijatá data nelze přečíst</string>
 <string name="dataServiceError_decodingError_title">Chyba dekódování</string>
 <string name="dataServiceError_empty_message">Odpověď serveru neobsahuje žádná data</string>
@@ -196,6 +196,7 @@
 <string name="newObservationError_noSubstrateGroup_message">Musíte zadat typ podkladu</string>
 <string name="newObservationError_noVegetationType_message">Musíte zadat typ vegetace</string>
 <string name="newObservationError_tooInaccurate">Přesnost umístění je: %0,2f m, což není přesné. Chcete místo toho použít svou aktuální polohu?</string>
+<string name="note_createdDate">Poznámka vytvořena: %s</string>
 <string name="notebook_message">Ještě nemáte žádné uložené poznámky. Tato funkce vám umožňuje ukládat vaše pozorování lokálně, aniž byste je museli nahrávat, než budou zcela připravena. Možná až budete mít lepší připojení k internetu.</string>
 <string name="notebook_title">Zápisník</string>
 <string name="notificationCell_determinationExpertApproved">schváleno odborníkem.</string>
@@ -255,8 +256,8 @@
 <string name="reloadCell_tryAgain">Zkusit znovu</string>
 <string name="resultsView_header_message">Upozornění: Pokud se chystáte konzumovat houby, které jste našli, nespoléhejte pouze na tuto navrhovanou identifikaci.</string>
 <string name="resultsView_header_title">Máme pro vás %d doporučení</string>
-<string name="resultsView_unpredictable_message"></string>
-<string name="resultsView_unpredictable_title"></string>
+<string name="resultsView_unpredictable_message">Nejsme schopni vám poskytnout návrh na stanovení s vysokou spolehlivostí – níže uvádíme náš nejlepší odhad.</string>
+<string name="resultsView_unpredictable_title">Žádné návrhy</string>
 <string name="searchBar_placeholder">Vyhledávání ...</string>
 <string name="searchCell_title">Zde vyhledejte hostitele ... 👇</string>
 <string name="searchVC_cancelButton">Zrušit</string>
@@ -320,5 +321,5 @@
 <string name="notificationCell_commentAdded_2">jsou následující</string>
 <string name="notificationCell_determinationAdded_2">k pozorování, které sledujete.</string>
 <string name="whats_new_2_0">Právě jsme spustili novou verzi aplikace Svampeatlas (verze 2.0), tentokrát s poměrně výraznými změnami a vylepšeními. Nejdůležitější jsou:\n\n1) Changed reporting flow. \n2) It is possible to lock coordinates and localities.\n3) Simplification of the notebook functionality\n4) Bug fixes</string>
-<string name="whats_new_3_0"></string>
+<string name="whats_new_3_0">Právě jsme spustili novou verzi aplikace Svampeatlas (verze 3.0), tentokrát s poměrně výraznými změnami a vylepšeními. Nejdůležitější jsou:\n\n1) Nová a vylepšená verze našeho rozpoznávání obrázků. Návrhy nyní vychází ze všech obrázků, které přidáte k pozorování – zahrne také další metadata, jako je substrát, typ vegetace a měsíc, aby poskytoval nejspolehlivější návrhy.\n2) Drobné opravy chyb\n\nPředchozí verze:\n2.0:\n1) Změněný tok hlášení. Změnili jsme pořadí při vytváření nového nálezu tak, že začínáte lokalitou, poté si zvolíte stanoviště, substrát a hostitele a nakonec zvolíte druh. Změna je způsobena především tím, že brzy uvedeme novou vylepšenou verzi naší umělé inteligence pro rozpoznávání obrazu, která bude poskytovat lepší návrhy druhů na základě údajů o stanovištích a substrátech. Pokud chcete v budoucnu začít s návrhem druhu, můžete stále použít funkci návrhu názvu v postranní nabídce\n\n2) Možnost uzamknout název místa a souřadnice. Umožnili jsme uzamknout název místa a případně také najít souřadnice, pokud nahlásíte mnoho nálezů ze stejného místa nebo z jednoho hotspotu. Tímto způsobem můžete ušetřit čas a baterii v terénu a zároveň získat konzistentnější názvy míst pro vaše nálezy. Funkci lze resetovat ručně nebo automaticky po jedné hodině.\n\n3) Zjednodušení funkce Poznámek. Nyní jsme aktualizovali funkci poznámkového bloku, můžete si ukládat svoje pozorování, můžete vybrat názvy druhů ze seznamu druhů, přidávat metadata, ale určování AI ​​se aktivuje pouze tehdy, když znovu otevřete nález z poznámkového bloku a upravíte jej před nahráním do atlasu hub. Účelem změny je úspora času a baterie v terénu, takže se můžete soustředit výhradně na vaše nálezy a vše doplnit k pozorování později. Souřadnice jsou buď propojeny s fotografiemi, které přidáte do poznámkového bloku, nebo s vaší polohou, když je vytvořena nová poznámka k nálezu bez fotografie. Nezapomeňte proto fotografovat nebo si dělat poznámky přímo tam, kde se vaše houba nachází.\n\nKromě toho byla implementována řada drobných vylepšení a oprav chyb. Druhy můžete opět vyhledávat pomocí 3 + 3 kódů (např. ama mus pro Amanita muscaria), stejně jako bylo vylepšeno zobrazování obrázků na prezentacích druhů.\n</string>
 </resources>

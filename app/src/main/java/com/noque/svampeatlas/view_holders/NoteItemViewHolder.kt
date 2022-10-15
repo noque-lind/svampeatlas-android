@@ -1,5 +1,6 @@
 package com.noque.svampeatlas.view_holders
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.view.View
@@ -21,6 +22,7 @@ class NoteItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val primaryLabel = itemView.newObservationItem_primaryLabel
     private val newObservationUploadButton = itemView.newObservationItem_uploadButton
 
+    @SuppressLint("SetTextI18n")
     fun configure(newObservation: NewObservation, onUploadButtonClick: (() -> Unit)) {
         newObservationUploadButton.setOnClickListener {
             onUploadButtonClick()
@@ -44,7 +46,10 @@ class NoteItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             imageViewLayout.visibility = View.GONE
         }
 
-        smallLabel.text = newObservation.creationDate.toTimeString() + ", " +  (newObservation.locality?.name ?: itemView.resources.getString(R.string.common_localityNotSelected))
+        smallLabel.text = itemView.resources.getString(R.string.observationDetailsScrollView_observationDate) + " " + newObservation.observationDate.toReadableDate(
+            recentFormatting = false,
+            ignoreTime = true
+        ) + ", " +  (newObservation.locality?.name ?: itemView.resources.getString(R.string.common_localityNotSelected))
         primaryLabel.text = newObservation.species?.localizedName ?: newObservation.species?.fullName ?: "-"
     }
 }

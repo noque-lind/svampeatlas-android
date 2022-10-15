@@ -196,6 +196,7 @@
 <string name="newObservationError_noSubstrateGroup_message">You need to specify a substrate</string>
 <string name="newObservationError_noVegetationType_message">You need to specify a vegetationtype</string>
 <string name="newObservationError_tooInaccurate">The location accuracy is: %0.2f m, which is too imprecise. Would you like to use your current location instead?</string>
+<string name="note_createdDate">Note created: %s</string>
 <string name="notebook_message">You do not yet have any saved notes. This functionality enables you to save your observations locally, without uploading it before you are ready. Perhaps once you have a better internet connection.</string>
 <string name="notebook_title">Notebook</string>
 <string name="notificationCell_determinationExpertApproved"> has been expert approved.</string>

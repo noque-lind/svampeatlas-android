@@ -57,7 +57,7 @@ class ListenableUserObservation(private val onChanged: (UserObservation) -> Unit
 
     // Page 2 properties
     val observationDate = Observable.observe(MutableLiveData<Date>()) {
-        userObservation.observationDate
+        userObservation.observationDate = it
     }
     val substrate = Observable.observe(MutableLiveData<Pair<Substrate, Boolean>?>()) {
         userObservation.substrate = it
@@ -338,7 +338,7 @@ class UserObservation(private val creationDate: Date = Date()) {
         val combinedImages = locallyStoredImages + newImages
         return NewObservation(
             creationDate,
-            observationDate ?: Date(),
+            observationDate,
             mushroom?.first,
             locality?.first,
             substrate?.first,
