@@ -196,6 +196,7 @@
 <string name="newObservationError_noSubstrateGroup_message">Du mangler at angive et substrat.</string>
 <string name="newObservationError_noVegetationType_message">Du mangler at angive en vegetationstype.</string>
 <string name="newObservationError_tooInaccurate">Den nuværende præcision er: %0.2f m, hvilket er for upræcist. Vil du bruge din nuværende placering i stedet for?</string>
+<string name="note_createdDate">Note oprettet: %s</string>
 <string name="notebook_message">Du har ingen gemte noter. Denne funktionalitet lader dig gemme observationer lokalt uden at indsende dem før du er klar. Det er smart hvis du tit har dårlig forbindelse når du er ude og finde svampe.</string>
 <string name="notebook_title">Notesbog</string>
 <string name="notificationCell_determinationExpertApproved"> er blevet ekspertgodkendt</string>

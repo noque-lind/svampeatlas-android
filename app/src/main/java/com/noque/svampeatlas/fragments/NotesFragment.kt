@@ -224,14 +224,17 @@ class NotesFragment: Fragment(), PromptFragment.Listener {
             when (it) {
                 is State.Items -> {
                     val dateSortedNotes = mutableMapOf<String, MutableList<NewObservation>>()
-                    it.items.forEach {
-                        if (dateSortedNotes.containsKey(it.creationDate.toDatabaseName())) {
-                            dateSortedNotes[it.creationDate.toDatabaseName()]?.add(it)
+                    it.items.forEach { note ->
+                        if (dateSortedNotes.containsKey(note.creationDate.toDatabaseName())) {
+                            dateSortedNotes[note.creationDate.toDatabaseName()]?.add(note)
                         } else {
-                            dateSortedNotes[it.creationDate.toDatabaseName()] = mutableListOf(it)
+                            dateSortedNotes[note.creationDate.toDatabaseName()] = mutableListOf(note)
                         }
                     }
-                    notebookAdapter.setSections(dateSortedNotes.map { Section(it.key.toDate().toReadableDate(true, true), State.Items<List<NotebookAdapter.Items>>(it.value.map { NotebookAdapter.Items.Note(it) }))})
+                    notebookAdapter.setSections(dateSortedNotes.map { Section(resources.getString(R.string.note_createdDate, it.key.toDate().toReadableDate(
+                        recentFormatting = true,
+                        ignoreTime = true
+                    )), State.Items(it.value.map { NotebookAdapter.Items.Note(it) }))})
                 }
                 is State.Empty -> notebookAdapter.setSections(listOf(Section(null, State.Empty())))
                 is State.Loading -> notebookAdapter.setSections(listOf(Section(null, State.Loading())))
