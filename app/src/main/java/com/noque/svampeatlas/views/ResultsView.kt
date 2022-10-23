@@ -51,9 +51,6 @@ class ResultsView(context: Context?, attrs: AttributeSet?) : LinearLayout(contex
     }
 
     fun showResults(results: List<Prediction>, predictable: Boolean) {
-       /* titleTextView.text = resources.getString(R.string.resultsView_header_title, results.count())
-        messageTextView.text = context.getString(R.string.resultsView_header_message).red()
-*/
         resultsAdapter.configure(results, predictable)
         recyclerView.scrollTo(0,0)
         recyclerView.layoutManager?.scrollToPosition(0)

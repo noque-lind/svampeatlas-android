@@ -199,7 +199,7 @@
 <string name="newObservationError_noMushroom_message">Musíte určit druh, který jste našli. Pokud si nejste jisti, můžete stisknout tlačítko „Neznámý druh“.</string>
 <string name="newObservationError_noSubstrateGroup_message">Musíte zadat typ podkladu</string>
 <string name="newObservationError_noVegetationType_message">Musíte zadat typ vegetace</string>
-<string name="newObservationError_tooInaccurate">Přesnost umístění je: %0,2f m, což není přesné. Chcete místo toho použít svou aktuální polohu?</string>
+<string name="newObservationError_tooInaccurate"></string>
 <string name="note_createdDate">Poznámka vytvořena: %s</string>
 <string name="notebook_message">Ještě nemáte žádné uložené poznámky. Tato funkce vám umožňuje ukládat vaše pozorování lokálně, aniž byste je museli nahrávat, než budou zcela připravena. Možná až budete mít lepší připojení k internetu.</string>
 <string name="notebook_title">Zápisník</string>
@@ -262,7 +262,7 @@
 <string name="reloadCell_showMore">Zobrazit více</string>
 <string name="reloadCell_tryAgain">Zkusit znovu</string>
 <string name="resultsView_header_message">Upozornění: Pokud se chystáte konzumovat houby, které jste našli, nespoléhejte pouze na tuto navrhovanou identifikaci.</string>
-<string name="resultsView_header_title">Máme pro vás %d doporučení</string>
+<string name="resultsView_header_title">Máme pro vás 10 doporučení</string>
 <string name="resultsView_unpredictable_message">Nejsme schopni vám poskytnout návrh na stanovení s vysokou spolehlivostí – níže uvádíme náš nejlepší odhad.</string>
 <string name="resultsView_unpredictable_title">Žádné návrhy</string>
 <string name="searchBar_placeholder">Vyhledávání ...</string>

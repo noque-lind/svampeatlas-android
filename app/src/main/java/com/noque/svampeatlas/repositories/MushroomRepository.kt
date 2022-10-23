@@ -25,27 +25,50 @@ class MushroomRepository(private val requestQueue: RequestQueue) {
 
     private val cache = LruCache<Int, Mushroom>(100)
 
-
-    suspend fun getMushroom(id: Int): Result<Mushroom, DataService.Error> {
-        cache.get(id)?.let {
-            return Result.Success(it)
-        }
-
-        RoomService.mushrooms.getMushroomWithID(id).onSuccess {
-            return Result.Success(it)
-        }
-
-        return fetchMushroom(id)
-    }
-
     suspend fun fetchMushrooms(predictionResults: RecognitionService.GetResultsRequestResult): List<Prediction> {
         val predictions = mutableListOf<Prediction>()
-            for (index in predictionResults.taxonIds.indices) {
-                getMushroom(predictionResults.taxonIds[index]).onSuccess {
-                    predictions.add(Prediction(it,predictionResults.conf[index]))
-                }
+        for (index in predictionResults.taxonIds.indices) {
+            getMushroom(predictionResults.taxonIds[index]).onSuccess {
+                predictions.add(Prediction(it,predictionResults.conf[index]))
             }
+        }
         return predictions
+    }
+
+    suspend fun getMushroom(id: Int, ignoreLocal: Boolean = false): Result<Mushroom, DataService.Error> {
+        fetchFromCache(id)?.let {
+            return Result.Success(it)
+        }
+        if (!ignoreLocal) {
+            fetchFromRepository(id)?.let {
+                return Result.Success(it)
+            }
+        }
+
+        return fetch(id)
+    }
+
+    private fun fetchFromCache(id: Int): Mushroom? {
+        cache.get(id)?.let {
+            return if (it.acceptedTaxon != null && it.acceptedTaxon.id != id) fetchFromCache(it.acceptedTaxon.id) else it
+        }
+        return null
+    }
+
+    private suspend fun fetchFromRepository(id: Int): Mushroom? {
+        RoomService.mushrooms.getMushroomWithID(id).onSuccess {
+            return if (it.acceptedTaxon != null && it.acceptedTaxon.id != id) fetchFromRepository(it.acceptedTaxon.id) else it
+        }
+    return null
+    }
+
+    private suspend fun fetch(id: Int): Result<Mushroom, DataService.Error> {
+        return when (val result = fetchMushroom(id)) {
+            is Result.Error -> result
+            is Result.Success -> {
+                if (result.value.acceptedTaxon != null && result.value.acceptedTaxon.id != id) fetchMushroom(result.value.acceptedTaxon.id) else result
+            }
+        }
     }
 
     private suspend fun fetchMushroom(id: Int): Result<Mushroom, DataService.Error> = suspendCoroutine { cont ->
@@ -55,15 +78,15 @@ class MushroomRepository(private val requestQueue: RequestQueue) {
             null,
             {
                 if (it.firstOrNull() != null) {
-                    cache.put(id, it.first())
-                    cont.resume(Result.Success(it.first()))
+                    val mushroom = it.first()
+                    cache.put(id, mushroom)
+                    cont.resume(Result.Success(mushroom))
                 } else {
                     cont.resume(Result.Error<Mushroom, DataService.Error>(DataService.Error.NotFound(applicationContext)))
                 }
             },
-
             {
-                cont.resume(Result.Error<Mushroom, DataService.Error>(it.toAppError()))
+                cont.resume(Result.Error(it.toAppError()))
             })
 
         requestQueue.add(request)

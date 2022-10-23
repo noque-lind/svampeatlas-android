@@ -1,5 +1,6 @@
 package com.noque.svampeatlas.models
 
+import androidx.room.Embedded
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.annotations.SerializedName
 import com.noque.svampeatlas.extensions.*
@@ -277,6 +278,8 @@ data class Taxon(
 data class AcceptedTaxon(
     @SerializedName("_id") val id: Int,
     @SerializedName("FullName") val fullName: String,
+
+    @Embedded(prefix = "vernacularName_DK_")
     @SerializedName("Vernacularname_DK") val vernacularNameDK: Vernacularname_DK?
 )
 

@@ -199,7 +199,7 @@
 <string name="newObservationError_noMushroom_message">You need to specify what you have found. If you are not sure, just press the \'Unkown species\' button.</string>
 <string name="newObservationError_noSubstrateGroup_message">You need to specify a substrate</string>
 <string name="newObservationError_noVegetationType_message">You need to specify a vegetationtype</string>
-<string name="newObservationError_tooInaccurate">The location accuracy is: %0.2f m, which is too imprecise. Would you like to use your current location instead?</string>
+<string name="newObservationError_tooInaccurate">The location accuracy is too imprecise, it has to be lower than 150m. Would you like to use your current location instead?</string>
 <string name="note_createdDate">Note created: %s</string>
 <string name="notebook_message">You do not yet have any saved notes. This functionality enables you to save your observations locally, without uploading it before you are ready. Perhaps once you have a better internet connection.</string>
 <string name="notebook_title">Notebook</string>
@@ -262,7 +262,7 @@
 <string name="reloadCell_showMore">Show more</string>
 <string name="reloadCell_tryAgain">Try again</string>
 <string name="resultsView_header_message">Be advised: Do not rely on these suggested identifications if you wish to eat the mushrooms you have found.</string>
-<string name="resultsView_header_title">We have %d suggestions for you</string>
+<string name="resultsView_header_title">We have 10 suggestions for you</string>
 <string name="resultsView_unpredictable_message">We were unable to provide you with a determination suggestion with any significant reliability score - below you can see our best guess.</string>
 <string name="resultsView_unpredictable_title">No suggestions</string>
 <string name="searchBar_placeholder">Search for a species here ...</string>

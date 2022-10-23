@@ -48,11 +48,10 @@ class ResultsAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             }
         }
 
-        var titleSection: Section<Item>
-        if (predictable) {
-            titleSection = Section(null, State.Items(listOf(Item.Title(R.string.resultsView_header_title, R.string.resultsView_header_message))))
+        val titleSection: Section<Item> = if (predictable) {
+            Section(null, State.Items(listOf(Item.Title(R.string.resultsView_header_title, R.string.resultsView_header_message))))
         } else {
-            titleSection = Section(null, State.Items(listOf(Item.Title(R.string.resultsView_unpredictable_title, R.string.resultsView_unpredictable_message))))
+            Section(null, State.Items(listOf(Item.Title(R.string.resultsView_unpredictable_title, R.string.resultsView_unpredictable_message))))
         }
 
         if (highestConfidence < 50.0) {

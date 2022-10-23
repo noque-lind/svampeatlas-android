@@ -19,6 +19,7 @@ sealed class NewObservationError(title: Int, message: Int) :
     object NoSubstrateError: NewObservationError(R.string.newObservationError_missingInformation, R.string.newObservationError_noSubstrateGroup_message)
     object NoVegetationTypeError: NewObservationError(R.string.newObservationError_missingInformation, R.string.newObservationError_noVegetationType_message)
     object NoLocationDataError: NewObservationError(R.string.newObservationError_noCoordinates_title, R.string.newObservationError_noCoordinates_message)
+    object LowAccuracy: NewObservationError(R.string.error_addObservationError_lowAccuracy, R.string.newObservationError_tooInaccurate)
 }
 
 @SuppressWarnings(RoomWarnings.PRIMARY_KEY_FROM_EMBEDDED_IS_DROPPED)
@@ -59,6 +60,7 @@ sealed class NewObservationError(title: Int, message: Int) :
         if (substrate == null) return Result.Error(NewObservationError.NoSubstrateError)
         if (vegetationType == null) return Result.Error(NewObservationError.NoVegetationTypeError)
         if (location == null || locality == null) return Result.Error(NewObservationError.NoLocationDataError)
+        if (location.accuracy >= 150) return Result.Error(NewObservationError.LowAccuracy)
             return Result.Success(JSONObject().apply {
                 put("observationDate", (observationDate.toDatabaseName()))
                 put("os", "Android")

@@ -194,12 +194,16 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder
             ): Int {
-                if (viewHolder is AddImageViewHolder) {
-                    return 0
-                } else if (viewHolder is AddedImageViewHolder) {
-                     if (viewHolder.isLocked) return 0 else return super.getSwipeDirs(recyclerView, viewHolder)
-                } else {
-                    return super.getSwipeDirs(recyclerView, viewHolder)
+                return when (viewHolder) {
+                    is AddImageViewHolder -> {
+                        0
+                    }
+                    is AddedImageViewHolder -> {
+                        if (!viewHolder.isLocked) super.getSwipeDirs(recyclerView, viewHolder) else 0
+                    }
+                    else -> {
+                        super.getSwipeDirs(recyclerView, viewHolder)
+                    }
                 }
             }
 
@@ -558,9 +562,8 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                             Category.SPECIES.ordinal
                         UserObservation.Error.NoSubstrateError, UserObservation.Error.NoVegetationTypeError -> viewPager.currentItem =
                             Category.DETAILS.ordinal
-                        UserObservation.Error.NoLocationDataError -> viewPager.currentItem =
+                        UserObservation.Error.NoLocationDataError, UserObservation.Error.NoLocalityDataError, UserObservation.Error.LowAccuracy -> viewPager.currentItem =
                             Category.LOCALITY.ordinal
-                        else -> {}
                     }
                     createToast(it.title, it.message, bitmap)
                 }
@@ -569,14 +572,14 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                 }
                 is NewObservationViewModel.Notification.UseImageMetadata -> {
                     PromptFragment().apply {
-                        setTargetFragment(this, 10)
-                       arguments = Bundle().apply {
+                        setTargetFragment(this@AddObservationFragment, 10)
+                        arguments = Bundle().apply {
                             putString(PromptFragment.KEY_TITLE, it.title)
                             putString(PromptFragment.KEY_MESSAGE, it.message)
                             putString(PromptFragment.KEY_POSITIVE, it.action?.first ?: "")
                             putString(PromptFragment.KEY_NEGATIVE, it.action?.second ?: "")
                         }
-                        show(parentFragmentManager, null)
+                        show(this@AddObservationFragment.parentFragmentManager, null)
                     }
                 }
             }

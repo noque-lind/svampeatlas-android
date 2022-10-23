@@ -57,7 +57,7 @@ data class API(val apiType: APIType) {
         when (request) {
             is APIType.Request.Mushrooms -> {
                 val queries = request.queries.toMutableList()
-
+                queries.add(SpeciesQueries.AcceptedTaxon)
                 builder.appendPath("taxa")
 
                 if (request.searchString != null) {

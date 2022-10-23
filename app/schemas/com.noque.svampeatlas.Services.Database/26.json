@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 26,
-    "identityHash": "c0e16f25305e5e2db0292cd00457d8fe",
+    "identityHash": "4307da6277706fe74e3d167b8c560fd0",
     "entities": [
       {
         "tableName": "user",
@@ -200,7 +200,7 @@
       },
       {
         "tableName": "mushrooms",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `fullName` TEXT NOT NULL, `taxonName` TEXT, `fullNameAuthor` TEXT, `updatedAt` TEXT, `probability` INTEGER, `_rankName` TEXT, `_redListData` TEXT, `images` TEXT, `isUserFavorite` INTEGER NOT NULL, `_vernacularNameDK` TEXT, `_source` TEXT, `diagnosis` TEXT, `diagnosisEn` TEXT, `edibility` TEXT, `similarities` TEXT, `ecology` TEXT, `validationTips` TEXT, `vernacularNameEn` TEXT, `vernacularNameCz` TEXT, `presentInDenmark` INTEGER, `acceptedCount` INTEGER, `lastAcceptedRecord` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `fullName` TEXT NOT NULL, `taxonName` TEXT, `fullNameAuthor` TEXT, `updatedAt` TEXT, `probability` INTEGER, `_rankName` TEXT, `_redListData` TEXT, `images` TEXT, `isUserFavorite` INTEGER NOT NULL, `acceptedTaxon_id` INTEGER, `acceptedTaxon_fullName` TEXT, `acceptedTaxon_vernacularName_DK_vernacularname_dk` TEXT, `_vernacularNameDK` TEXT, `_source` TEXT, `diagnosis` TEXT, `diagnosisEn` TEXT, `edibility` TEXT, `similarities` TEXT, `ecology` TEXT, `validationTips` TEXT, `vernacularNameEn` TEXT, `vernacularNameCz` TEXT, `presentInDenmark` INTEGER, `acceptedCount` INTEGER, `lastAcceptedRecord` TEXT, `firstAcceptedRecord` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -261,6 +261,24 @@
             "columnName": "isUserFavorite",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "acceptedTaxon.id",
+            "columnName": "acceptedTaxon_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "acceptedTaxon.fullName",
+            "columnName": "acceptedTaxon_fullName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "acceptedTaxon.vernacularNameDK.vernacularname_dk",
+            "columnName": "acceptedTaxon_vernacularName_DK_vernacularname_dk",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "_vernacularNameDK._vernacularNameDK",
@@ -339,6 +357,12 @@
             "columnName": "lastAcceptedRecord",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "statistics.firstAcceptedRecord",
+            "columnName": "firstAcceptedRecord",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -352,7 +376,7 @@
       },
       {
         "tableName": "notes",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`creationDate` INTEGER NOT NULL, `observationDate` INTEGER NOT NULL, `ecologyNote` TEXT, `note` TEXT, `confidence` TEXT, `determinationNotes` TEXT, `hostIDs` TEXT NOT NULL, `images` TEXT NOT NULL, `taxon_id` INTEGER, `taxon_fullName` TEXT, `taxon_taxonName` TEXT, `taxon_fullNameAuthor` TEXT, `taxon_updatedAt` TEXT, `taxon_probability` INTEGER, `taxon__rankName` TEXT, `taxon__redListData` TEXT, `taxon_images` TEXT, `taxon_isUserFavorite` INTEGER, `taxon__vernacularNameDK` TEXT, `taxon__source` TEXT, `taxon_diagnosis` TEXT, `taxon_diagnosisEn` TEXT, `taxon_edibility` TEXT, `taxon_similarities` TEXT, `taxon_ecology` TEXT, `taxon_validationTips` TEXT, `taxon_vernacularNameEn` TEXT, `taxon_vernacularNameCz` TEXT, `taxon_presentInDenmark` INTEGER, `taxon_acceptedCount` INTEGER, `taxon_lastAcceptedRecord` TEXT, `locality_id` INTEGER, `locality_name` TEXT, `locality_municipality` TEXT, `locality_latitude` REAL, `locality_longitude` REAL, `locality_geoname_geonameId` INTEGER, `locality_geoname_name` TEXT, `locality_geoname_countryName` TEXT, `locality_geoname_lat` TEXT, `locality_geoname_lng` TEXT, `locality_geoname_countryCode` TEXT, `locality_geoname_fcodeName` TEXT, `locality_geoname_fclName` TEXT, `locality_geoname_adminName1` TEXT, `substrate_id` INTEGER, `substrate_dkName` TEXT, `substrate_enName` TEXT, `substrate_czName` TEXT, `substrate_groupDkName` TEXT, `substrate_groupEnName` TEXT, `substrate_groupCzName` TEXT, `substrate_hide` INTEGER, `vegetation_type_id` INTEGER, `vegetation_type_dkName` TEXT, `vegetation_type_enName` TEXT, `vegetation_type_czName` TEXT, `coordinate_date` INTEGER, `coordinate_latLng` TEXT, `coordinate_accuracy` REAL, PRIMARY KEY(`creationDate`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`creationDate` INTEGER NOT NULL, `observationDate` INTEGER NOT NULL, `ecologyNote` TEXT, `note` TEXT, `confidence` TEXT, `determinationNotes` TEXT, `hostIDs` TEXT NOT NULL, `images` TEXT NOT NULL, `taxon_id` INTEGER, `taxon_fullName` TEXT, `taxon_taxonName` TEXT, `taxon_fullNameAuthor` TEXT, `taxon_updatedAt` TEXT, `taxon_probability` INTEGER, `taxon__rankName` TEXT, `taxon__redListData` TEXT, `taxon_images` TEXT, `taxon_isUserFavorite` INTEGER, `taxon_acceptedTaxon_id` INTEGER, `taxon_acceptedTaxon_fullName` TEXT, `taxon_acceptedTaxon_vernacularName_DK_vernacularname_dk` TEXT, `taxon__vernacularNameDK` TEXT, `taxon__source` TEXT, `taxon_diagnosis` TEXT, `taxon_diagnosisEn` TEXT, `taxon_edibility` TEXT, `taxon_similarities` TEXT, `taxon_ecology` TEXT, `taxon_validationTips` TEXT, `taxon_vernacularNameEn` TEXT, `taxon_vernacularNameCz` TEXT, `taxon_presentInDenmark` INTEGER, `taxon_acceptedCount` INTEGER, `taxon_lastAcceptedRecord` TEXT, `taxon_firstAcceptedRecord` TEXT, `locality_id` INTEGER, `locality_name` TEXT, `locality_municipality` TEXT, `locality_latitude` REAL, `locality_longitude` REAL, `locality_geoname_geonameId` INTEGER, `locality_geoname_name` TEXT, `locality_geoname_countryName` TEXT, `locality_geoname_lat` TEXT, `locality_geoname_lng` TEXT, `locality_geoname_countryCode` TEXT, `locality_geoname_fcodeName` TEXT, `locality_geoname_fclName` TEXT, `locality_geoname_adminName1` TEXT, `substrate_id` INTEGER, `substrate_dkName` TEXT, `substrate_enName` TEXT, `substrate_czName` TEXT, `substrate_groupDkName` TEXT, `substrate_groupEnName` TEXT, `substrate_groupCzName` TEXT, `substrate_hide` INTEGER, `vegetation_type_id` INTEGER, `vegetation_type_dkName` TEXT, `vegetation_type_enName` TEXT, `vegetation_type_czName` TEXT, `coordinate_date` INTEGER, `coordinate_latLng` TEXT, `coordinate_accuracy` REAL, PRIMARY KEY(`creationDate`))",
         "fields": [
           {
             "fieldPath": "creationDate",
@@ -463,6 +487,24 @@
             "notNull": false
           },
           {
+            "fieldPath": "species.acceptedTaxon.id",
+            "columnName": "taxon_acceptedTaxon_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.acceptedTaxon.fullName",
+            "columnName": "taxon_acceptedTaxon_fullName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.acceptedTaxon.vernacularNameDK.vernacularname_dk",
+            "columnName": "taxon_acceptedTaxon_vernacularName_DK_vernacularname_dk",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
             "fieldPath": "species._vernacularNameDK._vernacularNameDK",
             "columnName": "taxon__vernacularNameDK",
             "affinity": "TEXT",
@@ -537,6 +579,12 @@
           {
             "fieldPath": "species.statistics.lastAcceptedRecord",
             "columnName": "taxon_lastAcceptedRecord",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.statistics.firstAcceptedRecord",
+            "columnName": "taxon_firstAcceptedRecord",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -728,7 +776,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c0e16f25305e5e2db0292cd00457d8fe')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4307da6277706fe74e3d167b8c560fd0')"
     ]
   }
 }

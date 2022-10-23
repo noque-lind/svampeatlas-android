@@ -33,7 +33,7 @@ import kotlin.coroutines.suspendCoroutine
 
 class RecognitionService {
 
-    sealed class Error(title: Int, message: Int, recoveryAction: RecoveryAction?) :
+    sealed class Error(title: Int, message: Int, recoveryAction: RecoveryAction?)  :
         AppError2(title, message, recoveryAction) {
             object NotInitialized: Error(R.string.recognitionServiceError_title, 0, null)
             object ErrorAddingData: Error(R.string.recognitionServiceError_title, R.string.recognitionServiceError_addingDataError_message, null)
@@ -116,14 +116,14 @@ class RecognitionService {
 
    data class GetResultsRequestResult(@SerializedName("taxon_ids") val taxonIds: List<Int> = listOf(), val conf: List<Double> = listOf(), @SerializedName("reliable_preds") val reliablePrediction: Boolean)
 
-   suspend fun getResults(): GetResultsRequestResult? {
-        val id = currentRequest?.await() ?: return null
-        var result: GetResultsRequestResult?
+   suspend fun getResults(): Result<GetResultsRequestResult, Error> {
+        val id = currentRequest?.await() ?: return Result.Error(Error.NotInitialized)
+       var result: GetResultsRequestResult
        do {
             result = performGetResults(id)
             if (result.taxonIds.isEmpty()) delay(2000)
-        } while (result?.taxonIds.isNullOrEmpty())
-return result
+        } while (result.taxonIds.isNullOrEmpty())
+return Result.Success(result)
     }
 
     private suspend fun performGetResults(id: String): GetResultsRequestResult = suspendCoroutine { conf ->

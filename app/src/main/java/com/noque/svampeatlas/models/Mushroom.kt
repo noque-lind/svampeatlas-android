@@ -9,6 +9,7 @@ import com.google.gson.reflect.TypeToken
 import com.noque.svampeatlas.extensions.AppLanguage
 import com.noque.svampeatlas.extensions.appLanguage
 import com.noque.svampeatlas.extensions.capitalized
+import com.noque.svampeatlas.utilities.api.SpeciesQueries
 import java.util.Collections.emptyList
 
 @SuppressWarnings(RoomWarnings.PRIMARY_KEY_FROM_EMBEDDED_IS_DROPPED)
@@ -24,6 +25,9 @@ class Mushroom(
     @SerializedName("probability") val probability: Int?,
     @SerializedName("RankName") val _rankName: String?,
 
+    @Embedded(prefix = "acceptedTaxon_")
+    @SerializedName("acceptedTaxon") val acceptedTaxon: AcceptedTaxon?,
+
     @Embedded
     @SerializedName("Vernacularname_DK") val _vernacularNameDK: VernacularNameDK?,
 
@@ -38,7 +42,7 @@ class Mushroom(
     var isUserFavorite: Boolean = false
 ) {
 
-    constructor(id: Int, fullName: String, vernacularNameDK: VernacularNameDK?) : this(id, fullName, null, null, null, null, null, vernacularNameDK, null, null, null, null)
+    constructor(id: Int, fullName: String, vernacularNameDK: VernacularNameDK?) : this(id, fullName, null, null, null, null, null, null, vernacularNameDK, null, null, null, null)
 
     val localizedName: String? get() {
         return when (Locale.getDefault().appLanguage()) {

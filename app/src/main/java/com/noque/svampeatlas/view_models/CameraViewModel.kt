@@ -85,17 +85,28 @@ class CameraViewModel(private val type: CameraFragment.Context, application: App
            _predictionResultsState.postValue(State.Loading())
            recognitionService.addPhotoToRequest(imageFile)
            delay(2000)
-           val predictionResults = mutableListOf<Prediction>()
-           val result = recognitionService.getResults()
-           if (result != null) {
-               for (index in result.taxonIds.indices) {
-                   DataService.getInstance(MyApplication.applicationContext).mushroomsRepository.getMushroom(result.taxonIds[index]).onSuccess {
-                       predictionResults.add(Prediction(it,result.conf[index]))
-                   }
+           when (val result = recognitionService.getResults()) {
+               is Result.Error -> _predictionResultsState.postValue(
+                   State.Error(
+                       result.error.toAppError(
+                           MyApplication.resources
+                       )
+                   )
+               )
+               is Result.Success -> {
+                   val predictions =
+                       DataService.getInstance(MyApplication.applicationContext).mushroomsRepository.fetchMushrooms(
+                           result.value
+                       )
+                   _predictionResultsState.postValue(
+                       State.Items(
+                           Pair(
+                               predictions,
+                               result.value.reliablePrediction
+                           )
+                       )
+                   )
                }
-               _predictionResultsState.postValue(State.Items(Pair(predictionResults, result.reliablePrediction)))
-           } else {
-
            }
        } catch (error: Exception) {
            Log.d(TAG, error.toString())

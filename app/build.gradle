@@ -27,7 +27,7 @@ android {
         targetSdkVersion 33
         versionName '3.0'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        versionCode = 37
+        versionCode = 38
         signingConfig signingConfigs.signing
 
         javaCompileOptions {

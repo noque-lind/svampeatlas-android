@@ -44,11 +44,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
         class Deleted(resource: Resources): Notification("", "")
         class NewObservationError(val error: UserObservation.Error, resources: Resources): Notification(resources.getString(error.title), resources.getString(error.message))
         class Error(error: AppError): Notification(error.title, error.message)
-        class UseImageMetadata(resources: Resources, val imageLocation: Location): Notification(resources.getString(R.string.addObservationVC_useImageMetadata_title), resources. getString(R.string.addObservationVC_useImageMetadata_message, imageLocation.accuracy.toString()), Pair(resources.getString(R.string.addObservationVC_useImageMetadata_positive), resources.getString(R.string.addObservationVC_useImageMetadata_negative)))
-    }
-
-    sealed class Prompt(val title: String, val message: String, val yes: String, val no: String) {
-        class LowAccuraccy(resources: Resources): Prompt(resources.getString(R.string.error_addObservationError_lowAccuracy), resources.getString(R.string.newObservationError_tooInaccurate), resources.getString(R.string.action_findLocation), resources.getString(R.string.action_adjustSelf))
+        class UseImageMetadata(resources: Resources, val imageLocation: Location, val userLocation: Location?): Notification(resources.getString(R.string.addObservationVC_useImageMetadata_title), resources. getString(R.string.addObservationVC_useImageMetadata_message, imageLocation.accuracy.toString()), Pair(resources.getString(R.string.addObservationVC_useImageMetadata_positive), resources.getString(R.string.addObservationVC_useImageMetadata_negative)))
     }
 
     // If null during session - then we do not want to find predictions
@@ -111,7 +107,6 @@ class NewObservationViewModel(application: Application, val context: AddObservat
     val user: LiveData<User> get() = _user
 
     val showNotification by lazy { SingleLiveEvent<Notification>() }
-    val showPrompt by lazy { SingleLiveEvent<Prompt>() }
     val resetEvent by lazy { SingleLiveEvent<Void>() }
 
     init {
@@ -253,7 +248,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
                     is UserObservation.Image.New -> {
                         val imageLocation = image.file.getExifLocation()
                         if (imageLocation != null && SphericalUtil.computeDistanceBetween(imageLocation.latLng, state.items.latLng) > imageLocation.accuracy) {
-                            showNotification.postValue(Notification.UseImageMetadata(getApplication<MyApplication>().resources, imageLocation))
+                            showNotification.postValue(Notification.UseImageMetadata(getApplication<MyApplication>().resources, imageLocation, state.items))
                         } else {
                             setLocation(state.items)
                             if (state.item != null) userObservation.observationDate.value = state.item.date
@@ -325,7 +320,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
         imageFile.getExifLocation()?.let { imageLocation ->
             _coordinateState.value?.item?.first?.let { coordinateLocation ->
                 if (SphericalUtil.computeDistanceBetween(imageLocation.latLng, coordinateLocation.latLng) > imageLocation.accuracy) {
-                   showNotification.postValue(Notification.UseImageMetadata(getApplication<MyApplication>().resources, imageLocation))
+                   showNotification.postValue(Notification.UseImageMetadata(getApplication<MyApplication>().resources, imageLocation, null))
                 }
             }
         }
@@ -392,13 +387,8 @@ class NewObservationViewModel(application: Application, val context: AddObservat
     fun promptNegative() {
         when (val prompt = showNotification.value) {
             is Notification.UseImageMetadata -> {
-                when (_coordinateState.value) {
-                    is State.Empty, is State.Error<*>, is State.Loading  -> {
-                       /* _coordinateState.value = State.Items(Pair(prompt.userLocation, false))
-                        getLocalities(prompt.)*/
-                    }
-                    is State.Items -> { /* Do nothing */ }
-                    else -> {}
+                prompt.userLocation?.let {
+                    _coordinateState.value = State.Items(Pair(prompt.userLocation, false))
                 }
             }
             else -> {}
@@ -455,26 +445,35 @@ class NewObservationViewModel(application: Application, val context: AddObservat
 
     fun getPredictions() {
         getPredictionsJob?.cancel(null)
+        val recognitionService = recognitionService ?: return
         getPredictionsJob = viewModelScope.launch {
             val substrate = substrate.value?.first
             val vegetationType = vegetationType.value?.first
             try {
                 if (substrate != null && vegetationType != null) {
-                    recognitionService?.addMetadataToRequest(vegetationType, substrate, observationDate.value ?: Date())
+                    recognitionService.addMetadataToRequest(vegetationType, substrate, observationDate.value ?: Date())
                 }
 
                 _predictionResultsState.postValue(State.Loading())
-                val predictionResults = mutableListOf<Prediction>()
-                val result = recognitionService?.getResults()
-                if (result != null) {
-                    for (index in result.taxonIds.indices) {
-                        DataService.getInstance(MyApplication.applicationContext).mushroomsRepository.getMushroom(result.taxonIds[index]).onSuccess {
-                            predictionResults.add(Prediction(it,result.conf[index]))
-                        }
+                when (val result = recognitionService.getResults()) {
+                    is Result.Error -> _predictionResultsState.postValue(
+                        State.Error(
+                            result.error.toAppError(
+                                MyApplication.resources
+                            )
+                        )
+                    )
+                    is Result.Success -> {
+                        val predictions =
+                            DataService.getInstance(MyApplication.applicationContext).mushroomsRepository.fetchMushrooms(
+                                result.value
+                            )
+                        _predictionResultsState.postValue(
+                            State.Items(
+                                    predictions
+                            )
+                        )
                     }
-                    _predictionResultsState.postValue(State.Items(predictionResults))
-                } else {
-                    _predictionResultsState.postValue(State.Empty())
                 }
             } catch (error: Exception) {
                 _predictionResultsState.postValue(State.Empty())
