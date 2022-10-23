@@ -1,0 +1,734 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 26,
+    "identityHash": "c0e16f25305e5e2db0292cd00457d8fe",
+    "entities": [
+      {
+        "tableName": "user",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `content` TEXT NOT NULL, `initials` TEXT NOT NULL, `email` TEXT NOT NULL, `facebook_id` TEXT, `roles` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "content",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "initials",
+            "columnName": "initials",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "email",
+            "columnName": "email",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "facebookID",
+            "columnName": "facebook_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "roles",
+            "columnName": "roles",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "substrates",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `dkName` TEXT NOT NULL, `enName` TEXT NOT NULL, `czName` TEXT, `groupDkName` TEXT NOT NULL, `groupEnName` TEXT NOT NULL, `groupCzName` TEXT, `hide` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dkName",
+            "columnName": "dkName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "enName",
+            "columnName": "enName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "czName",
+            "columnName": "czName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "groupDkName",
+            "columnName": "groupDkName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "groupEnName",
+            "columnName": "groupEnName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "groupCzName",
+            "columnName": "groupCzName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "hide",
+            "columnName": "hide",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "vegetationType",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `dkName` TEXT NOT NULL, `enName` TEXT NOT NULL, `czName` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dkName",
+            "columnName": "dkName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "enName",
+            "columnName": "enName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "czName",
+            "columnName": "czName",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "hosts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `dkName` TEXT, `latinName` TEXT NOT NULL, `probability` INTEGER, `isUserSelected` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dkName",
+            "columnName": "dkName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "latinName",
+            "columnName": "latinName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "probability",
+            "columnName": "probability",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isUserSelected",
+            "columnName": "isUserSelected",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "mushrooms",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `fullName` TEXT NOT NULL, `taxonName` TEXT, `fullNameAuthor` TEXT, `updatedAt` TEXT, `probability` INTEGER, `_rankName` TEXT, `_redListData` TEXT, `images` TEXT, `isUserFavorite` INTEGER NOT NULL, `_vernacularNameDK` TEXT, `_source` TEXT, `diagnosis` TEXT, `diagnosisEn` TEXT, `edibility` TEXT, `similarities` TEXT, `ecology` TEXT, `validationTips` TEXT, `vernacularNameEn` TEXT, `vernacularNameCz` TEXT, `presentInDenmark` INTEGER, `acceptedCount` INTEGER, `lastAcceptedRecord` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fullName",
+            "columnName": "fullName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "taxonName",
+            "columnName": "taxonName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "fullNameAuthor",
+            "columnName": "fullNameAuthor",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "probability",
+            "columnName": "probability",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "_rankName",
+            "columnName": "_rankName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "_redListData",
+            "columnName": "_redListData",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "images",
+            "columnName": "images",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isUserFavorite",
+            "columnName": "isUserFavorite",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "_vernacularNameDK._vernacularNameDK",
+            "columnName": "_vernacularNameDK",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "_vernacularNameDK._source",
+            "columnName": "_source",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "attributes.diagnosis",
+            "columnName": "diagnosis",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "attributes.diagnosisEn",
+            "columnName": "diagnosisEn",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "attributes.edibility",
+            "columnName": "edibility",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "attributes.similarities",
+            "columnName": "similarities",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "attributes.ecology",
+            "columnName": "ecology",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "attributes.validationTips",
+            "columnName": "validationTips",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "attributes.vernacularNameEn",
+            "columnName": "vernacularNameEn",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "attributes.vernacularNameCz",
+            "columnName": "vernacularNameCz",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "attributes.presentInDenmark",
+            "columnName": "presentInDenmark",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "statistics.acceptedCount",
+            "columnName": "acceptedCount",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "statistics.lastAcceptedRecord",
+            "columnName": "lastAcceptedRecord",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "notes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`creationDate` INTEGER NOT NULL, `observationDate` INTEGER NOT NULL, `ecologyNote` TEXT, `note` TEXT, `confidence` TEXT, `determinationNotes` TEXT, `hostIDs` TEXT NOT NULL, `images` TEXT NOT NULL, `taxon_id` INTEGER, `taxon_fullName` TEXT, `taxon_taxonName` TEXT, `taxon_fullNameAuthor` TEXT, `taxon_updatedAt` TEXT, `taxon_probability` INTEGER, `taxon__rankName` TEXT, `taxon__redListData` TEXT, `taxon_images` TEXT, `taxon_isUserFavorite` INTEGER, `taxon__vernacularNameDK` TEXT, `taxon__source` TEXT, `taxon_diagnosis` TEXT, `taxon_diagnosisEn` TEXT, `taxon_edibility` TEXT, `taxon_similarities` TEXT, `taxon_ecology` TEXT, `taxon_validationTips` TEXT, `taxon_vernacularNameEn` TEXT, `taxon_vernacularNameCz` TEXT, `taxon_presentInDenmark` INTEGER, `taxon_acceptedCount` INTEGER, `taxon_lastAcceptedRecord` TEXT, `locality_id` INTEGER, `locality_name` TEXT, `locality_municipality` TEXT, `locality_latitude` REAL, `locality_longitude` REAL, `locality_geoname_geonameId` INTEGER, `locality_geoname_name` TEXT, `locality_geoname_countryName` TEXT, `locality_geoname_lat` TEXT, `locality_geoname_lng` TEXT, `locality_geoname_countryCode` TEXT, `locality_geoname_fcodeName` TEXT, `locality_geoname_fclName` TEXT, `locality_geoname_adminName1` TEXT, `substrate_id` INTEGER, `substrate_dkName` TEXT, `substrate_enName` TEXT, `substrate_czName` TEXT, `substrate_groupDkName` TEXT, `substrate_groupEnName` TEXT, `substrate_groupCzName` TEXT, `substrate_hide` INTEGER, `vegetation_type_id` INTEGER, `vegetation_type_dkName` TEXT, `vegetation_type_enName` TEXT, `vegetation_type_czName` TEXT, `coordinate_date` INTEGER, `coordinate_latLng` TEXT, `coordinate_accuracy` REAL, PRIMARY KEY(`creationDate`))",
+        "fields": [
+          {
+            "fieldPath": "creationDate",
+            "columnName": "creationDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "observationDate",
+            "columnName": "observationDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ecologyNote",
+            "columnName": "ecologyNote",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "confidence",
+            "columnName": "confidence",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "determinationNotes",
+            "columnName": "determinationNotes",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "hostIDs",
+            "columnName": "hostIDs",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "images",
+            "columnName": "images",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "species.id",
+            "columnName": "taxon_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.fullName",
+            "columnName": "taxon_fullName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.taxonName",
+            "columnName": "taxon_taxonName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.fullNameAuthor",
+            "columnName": "taxon_fullNameAuthor",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.updatedAt",
+            "columnName": "taxon_updatedAt",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.probability",
+            "columnName": "taxon_probability",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species._rankName",
+            "columnName": "taxon__rankName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species._redListData",
+            "columnName": "taxon__redListData",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.images",
+            "columnName": "taxon_images",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.isUserFavorite",
+            "columnName": "taxon_isUserFavorite",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species._vernacularNameDK._vernacularNameDK",
+            "columnName": "taxon__vernacularNameDK",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species._vernacularNameDK._source",
+            "columnName": "taxon__source",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.attributes.diagnosis",
+            "columnName": "taxon_diagnosis",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.attributes.diagnosisEn",
+            "columnName": "taxon_diagnosisEn",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.attributes.edibility",
+            "columnName": "taxon_edibility",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.attributes.similarities",
+            "columnName": "taxon_similarities",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.attributes.ecology",
+            "columnName": "taxon_ecology",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.attributes.validationTips",
+            "columnName": "taxon_validationTips",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.attributes.vernacularNameEn",
+            "columnName": "taxon_vernacularNameEn",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.attributes.vernacularNameCz",
+            "columnName": "taxon_vernacularNameCz",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.attributes.presentInDenmark",
+            "columnName": "taxon_presentInDenmark",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.statistics.acceptedCount",
+            "columnName": "taxon_acceptedCount",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "species.statistics.lastAcceptedRecord",
+            "columnName": "taxon_lastAcceptedRecord",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "locality.id",
+            "columnName": "locality_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "locality.name",
+            "columnName": "locality_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "locality.municipality",
+            "columnName": "locality_municipality",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "locality.latitude",
+            "columnName": "locality_latitude",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "locality.longitude",
+            "columnName": "locality_longitude",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "locality.geoName.geonameId",
+            "columnName": "locality_geoname_geonameId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "locality.geoName.name",
+            "columnName": "locality_geoname_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "locality.geoName.countryName",
+            "columnName": "locality_geoname_countryName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "locality.geoName.lat",
+            "columnName": "locality_geoname_lat",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "locality.geoName.lng",
+            "columnName": "locality_geoname_lng",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "locality.geoName.countryCode",
+            "columnName": "locality_geoname_countryCode",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "locality.geoName.fcodeName",
+            "columnName": "locality_geoname_fcodeName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "locality.geoName.fclName",
+            "columnName": "locality_geoname_fclName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "locality.geoName.adminName1",
+            "columnName": "locality_geoname_adminName1",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "substrate.id",
+            "columnName": "substrate_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "substrate.dkName",
+            "columnName": "substrate_dkName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "substrate.enName",
+            "columnName": "substrate_enName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "substrate.czName",
+            "columnName": "substrate_czName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "substrate.groupDkName",
+            "columnName": "substrate_groupDkName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "substrate.groupEnName",
+            "columnName": "substrate_groupEnName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "substrate.groupCzName",
+            "columnName": "substrate_groupCzName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "substrate.hide",
+            "columnName": "substrate_hide",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "vegetationType.id",
+            "columnName": "vegetation_type_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "vegetationType.dkName",
+            "columnName": "vegetation_type_dkName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "vegetationType.enName",
+            "columnName": "vegetation_type_enName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "vegetationType.czName",
+            "columnName": "vegetation_type_czName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "coordinate.date",
+            "columnName": "coordinate_date",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "coordinate.latLng",
+            "columnName": "coordinate_latLng",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "coordinate.accuracy",
+            "columnName": "coordinate_accuracy",
+            "affinity": "REAL",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "creationDate"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c0e16f25305e5e2db0292cd00457d8fe')"
+    ]
+  }
+}

@@ -10,6 +10,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
+import com.noque.svampeatlas.R
 import com.noque.svampeatlas.extensions.getBitmap
 import com.noque.svampeatlas.extensions.rotate
 import com.noque.svampeatlas.extensions.toJPEG
@@ -32,10 +33,12 @@ import kotlin.coroutines.suspendCoroutine
 
 class RecognitionService {
 
-    /*sealed class Error(title: Int, message: Int, recoveryAction: RecoveryAction?) :
+    sealed class Error(title: Int, message: Int, recoveryAction: RecoveryAction?) :
         AppError2(title, message, recoveryAction) {
-            object NoInput: Error()
-        }*/
+            object NotInitialized: Error(R.string.recognitionServiceError_title, 0, null)
+            object ErrorAddingData: Error(R.string.recognitionServiceError_title, R.string.recognitionServiceError_addingDataError_message, null)
+            object ErrorFetchingResults: Error(R.string.recognitionServiceError_title, R.string.recognitionServiceError_addingDataError_message, null)
+        }
 
     companion object {
         private val TAG = "RecognitionService"
@@ -53,14 +56,11 @@ class RecognitionService {
            result.onError { /*completion(Result.Error(it))*/ }
            result.onSuccess {
                val byteArray = it.rotate(image).toJPEG(0.6)
-               if (currentRequest == null) {
-                   currentRequest = async { performAddPhotoRequest(null, byteArray) }
-                   val id = currentRequest?.await() ?: "Empty ID"
-                   Log.d(TAG, "ID is: $id, after first picture uploaded")
+               currentRequest = if (currentRequest == null) {
+                   async { performAddPhotoRequest(null, byteArray) }
                } else {
                    val id = currentRequest?.await() ?: "Empty ID0"
-                   Log.d(TAG,  "ID is: $id, before uploading second image")
-                   currentRequest = async { performAddPhotoRequest(id, byteArray) }
+                   async { performAddPhotoRequest(id, byteArray) }
                }
            }
     }
@@ -107,7 +107,6 @@ class RecognitionService {
         val request = AppRequest<AddPhotoRequestResult>( object : TypeToken<AddPhotoRequestResult>() {}.type, API(APIType.Post.ImagePredictionAddMetaData(id)), null, json,
             {
                 cont.resume(it.observationId)
-                Log.d(TAG, "AddedMetadatatoRequest returned")
             },
             {
                 cont.resumeWithException(it)
@@ -118,13 +117,10 @@ class RecognitionService {
    data class GetResultsRequestResult(@SerializedName("taxon_ids") val taxonIds: List<Int> = listOf(), val conf: List<Double> = listOf(), @SerializedName("reliable_preds") val reliablePrediction: Boolean)
 
    suspend fun getResults(): GetResultsRequestResult? {
-       Log.d(TAG, "Get results called")
         val id = currentRequest?.await() ?: return null
-       Log.d(TAG, "Id is $id, getting result")
         var result: GetResultsRequestResult?
        do {
             result = performGetResults(id)
-           Log.d(TAG, "Results returned: ${result.toString()}")
             if (result.taxonIds.isEmpty()) delay(2000)
         } while (result?.taxonIds.isNullOrEmpty())
 return result

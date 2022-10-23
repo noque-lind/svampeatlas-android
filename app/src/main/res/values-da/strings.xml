@@ -176,6 +176,10 @@
 <string name="myPageScrollView_logout">Log ud</string>
 <string name="myPageScrollView_notificationsHeader">Notifikationer</string>
 <string name="myPageScrollView_observationsHeader">Observationer</string>
+<string name="myPage_changeDetails">Skift brugeroplysninger</string>
+<string name="myPage_confirmDeletion_message">Når du har sletter din profil, kan du ikke få den tilbage. Dine fund slettes ikke, men alt information knyttet til dig forsvinder.</string>
+<string name="myPage_confirmDeletion_title">Er du sikker?</string>
+<string name="myPage_deleteProfile">Slet profil</string>
 <string name="navigationItem_about">Om</string>
 <string name="navigationItem_cameraVC">Navneforslag</string>
 <string name="navigationItem_facebook">Facebook</string>
@@ -244,6 +248,9 @@
 <string name="precision">Præcision %.2f m.</string>
 <string name="prompt_taxonData_message">For at du kan bruge denne funktionalitet, skal du have data downloaded til offline brug. Hvis du allerede har hentet data, skal dataen opdateres. Gør kun dette hvis du har en god internet forbindelse. Er du klar?</string>
 <string name="prompt_taxonData_title">Vil du gerne hente data til offline brug?</string>
+<string name="recognitionServiceError_addingDataError_message">Der skete en fejl i forbindelse med at tilføje input til navneforslags servicen</string>
+<string name="recognitionServiceError_addingFetchingResults_message">Der skete en fejl i forbindelse med at hente forslag fra navneforslags servicen.</string>
+<string name="recognitionServiceError_title">Kunne ikke finde navneforslag</string>
 <string name="recoveryAction_activate">Aktivér</string>
 <string name="recoveryAction_login">Log ind</string>
 <string name="recoveryAction_openSettings">Åben indstillinger</string>

@@ -175,9 +175,7 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                     newObservationViewModel.getPredictions()
                 }
             }
-
         }
-
     }
 
     private val locationServiceListener = object : LocationService.Listener {
@@ -478,18 +476,6 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
             }
         }
 
-        newObservationViewModel.showPrompt.observe(viewLifecycleOwner) {
-            val dialog = PromptFragment()
-            dialog.setTargetFragment(this, 10)
-            dialog.arguments = Bundle().apply {
-                putString(PromptFragment.KEY_TITLE, it.title)
-                putString(PromptFragment.KEY_MESSAGE, it.message)
-                putString(PromptFragment.KEY_POSITIVE, it.yes)
-                putString(PromptFragment.KEY_NEGATIVE, it.no)
-            }
-            dialog.show(parentFragmentManager, null)
-        }
-
         newObservationViewModel.showNotification.observe(viewLifecycleOwner) {
             // Get appropiate bitmap
             val bitmap = when (it) {
@@ -580,6 +566,18 @@ class AddObservationFragment : Fragment(), ActivityCompat.OnRequestPermissionsRe
                 }
                 is NewObservationViewModel.Notification.Error -> {
                     createToast(it.title, it.message, bitmap)
+                }
+                is NewObservationViewModel.Notification.UseImageMetadata -> {
+                    PromptFragment().apply {
+                        setTargetFragment(this, 10)
+                       arguments = Bundle().apply {
+                            putString(PromptFragment.KEY_TITLE, it.title)
+                            putString(PromptFragment.KEY_MESSAGE, it.message)
+                            putString(PromptFragment.KEY_POSITIVE, it.action?.first ?: "")
+                            putString(PromptFragment.KEY_NEGATIVE, it.action?.second ?: "")
+                        }
+                        show(parentFragmentManager, null)
+                    }
                 }
             }
         }

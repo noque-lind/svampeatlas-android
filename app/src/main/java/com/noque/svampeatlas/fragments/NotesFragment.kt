@@ -28,6 +28,7 @@ import com.noque.svampeatlas.views.BackgroundView
 import com.noque.svampeatlas.views.BlankActivity
 import kotlinx.android.synthetic.main.action_view_add_notebook_button.view.*
 import kotlinx.android.synthetic.main.fragment_notebook.*
+import java.util.*
 
 class NotesFragment: Fragment(), PromptFragment.Listener {
 
@@ -223,18 +224,18 @@ class NotesFragment: Fragment(), PromptFragment.Listener {
         viewModel.notes.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is State.Items -> {
-                    val dateSortedNotes = mutableMapOf<String, MutableList<NewObservation>>()
+                    val dateSortedNotes = mutableMapOf<Date, MutableList<NewObservation>>()
                     it.items.forEach { note ->
-                        if (dateSortedNotes.containsKey(note.creationDate.toDatabaseName())) {
-                            dateSortedNotes[note.creationDate.toDatabaseName()]?.add(note)
+                        if (dateSortedNotes.containsKey(note.creationDate.removeTime())) {
+                            dateSortedNotes[note.creationDate.removeTime()]?.add(note)
                         } else {
-                            dateSortedNotes[note.creationDate.toDatabaseName()] = mutableListOf(note)
+                            dateSortedNotes[note.creationDate.removeTime()] = mutableListOf(note)
                         }
                     }
-                    notebookAdapter.setSections(dateSortedNotes.map { Section(resources.getString(R.string.note_createdDate, it.key.toDate().toReadableDate(
+                    notebookAdapter.setSections(dateSortedNotes.toSortedMap().map { Section<NotebookAdapter.Items>(resources.getString(R.string.note_createdDate, it.key.toReadableDate(
                         recentFormatting = true,
                         ignoreTime = true
-                    )), State.Items(it.value.map { NotebookAdapter.Items.Note(it) }))})
+                    )), State.Items(it.value.map { NotebookAdapter.Items.Note(it) }))}.reversed())
                 }
                 is State.Empty -> notebookAdapter.setSections(listOf(Section(null, State.Empty())))
                 is State.Loading -> notebookAdapter.setSections(listOf(Section(null, State.Loading())))

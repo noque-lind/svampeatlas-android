@@ -27,7 +27,7 @@ android {
         targetSdkVersion 33
         versionName '3.0'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        versionCode = 36
+        versionCode = 37
         signingConfig signingConfigs.signing
 
         javaCompileOptions {
@@ -75,8 +75,6 @@ dependencies {
     def coroutines_version = "1.6.1"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.google.firebase:firebase-analytics:21.1.1'
-    implementation 'com.google.firebase:firebase-common-ktx:20.1.2'
 
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation("androidx.activity:activity-ktx:1.6.0-rc02")
@@ -126,6 +124,7 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.38.1")
 
 
+    implementation 'com.logrocket:logrocket:1.7.1'
     implementation 'com.mindorks.android:prdownloader:0.6.0'
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'

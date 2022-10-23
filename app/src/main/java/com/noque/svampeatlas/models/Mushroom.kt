@@ -11,27 +11,6 @@ import com.noque.svampeatlas.extensions.appLanguage
 import com.noque.svampeatlas.extensions.capitalized
 import java.util.Collections.emptyList
 
-//data class RoomMushroom(
-//    @PrimaryKey
-//    @SerializedName("_id") val id: Int,
-//    @SerializedName("FullName") val fullName: String?,
-//    @SerializedName("Author") val author: String?,
-//
-//    var images: List<Image>? = null,
-//
-//    @Embedded
-//    @SerializedName("Vernacularname_DK") val _vernacularNameDK: VernacularNameDK?
-//) {
-//
-//
-//    val fullNameAuthor: String? get() {return author}
-//    val danishName: String?
-//        get() {
-//            return _vernacularNameDK?._vernacularNameDK
-//        }
-////    val getImages: List<Image> get() {return _images ?: listOf()}
-//}
-
 @SuppressWarnings(RoomWarnings.PRIMARY_KEY_FROM_EMBEDDED_IS_DROPPED)
 @Entity(tableName = "mushrooms")
 class Mushroom(

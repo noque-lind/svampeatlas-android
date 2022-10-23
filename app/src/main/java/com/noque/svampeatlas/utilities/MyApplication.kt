@@ -3,11 +3,11 @@ package com.noque.svampeatlas.utilities
 import android.app.Application
 import android.content.Context
 import android.content.res.Resources
-import android.util.Log
-import com.bumptech.glide.load.engine.Resource
 import com.downloader.PRDownloader
+import com.logrocket.core.Configuration
+import com.logrocket.core.SDK
 import com.noque.svampeatlas.services.FileManager
-import dagger.hilt.android.HiltAndroidApp
+
 
 class MyApplication: Application() {
 
@@ -18,6 +18,14 @@ class MyApplication: Application() {
             private set
     }
 
+
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+        SDK.init(
+            this,
+            base
+        ) { options: Configuration -> options.setAppID("nluvzb/svampeatlas-android"); options.setEnableViewScanning(false); options.setEnableIPCapture(false) }
+    }
 
     override fun onCreate() {
         MyApplication.applicationContext = applicationContext

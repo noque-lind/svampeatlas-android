@@ -1,24 +1,15 @@
 package com.noque.svampeatlas.repositories
 
 import android.os.Bundle
-import com.android.volley.DefaultRetryPolicy
 import com.android.volley.RequestQueue
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.noque.svampeatlas.extensions.getBitmap
-import com.noque.svampeatlas.extensions.rotate
 import com.noque.svampeatlas.extensions.toAppError
-import com.noque.svampeatlas.extensions.toJPEG
-import com.noque.svampeatlas.models.AppError
 import com.noque.svampeatlas.models.Result
-import com.noque.svampeatlas.services.Analytics
 import com.noque.svampeatlas.services.DataService
 import com.noque.svampeatlas.services.ImageService
-import com.noque.svampeatlas.utilities.MultipartFormImage
 import com.noque.svampeatlas.utilities.api.API
 import com.noque.svampeatlas.utilities.api.APIType
 import com.noque.svampeatlas.utilities.volleyRequests.AppEmptyRequest
 import com.noque.svampeatlas.utilities.volleyRequests.AppJSONObjectRequest
-import com.noque.svampeatlas.utilities.volleyRequests.AppMultipartPost
 import org.json.JSONObject
 import java.io.File
 import kotlin.coroutines.resume
@@ -34,12 +25,9 @@ class ObservationsRepository(private val requestQueue: RequestQueue) {
     }
 
     suspend fun uploadObservation(tag: String, token: String, jsonObject: JSONObject, imageFiles: List<File>?): Result<Pair<Int, Int>, DataService.Error> {
-       Analytics.logEvent("upload_observation", Bundle().apply { putString("object", jsonObject.toString()) })
-
         return when (val result = post(jsonObject, token)) {
            is Result.Success -> Result.Success(Pair(result.value,postImagesToObservation(result.value, imageFiles, token)))
            is Result.Error -> {
-               Analytics.logEvent("UPLOAD_ERROR", Bundle().apply { putString("TITLE", result.error.title); putString("MESSAGE", result.error.message) })
                Result.Error(result.error)
            }
        }

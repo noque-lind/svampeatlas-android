@@ -176,6 +176,10 @@
 <string name="myPageScrollView_logout">Log out</string>
 <string name="myPageScrollView_notificationsHeader">Notifications</string>
 <string name="myPageScrollView_observationsHeader">Observations</string>
+<string name="myPage_changeDetails">Change user information</string>
+<string name="myPage_confirmDeletion_message">When you delete your profile, it is not possible to reclaim access to it. Your observations will not be deleted, but all information related to you will be removed.</string>
+<string name="myPage_confirmDeletion_title">Are you sure?</string>
+<string name="myPage_deleteProfile">Delete profile</string>
 <string name="navigationItem_about">About</string>
 <string name="navigationItem_cameraVC">Name suggestions</string>
 <string name="navigationItem_facebook">Facebook</string>
@@ -244,6 +248,9 @@
 <string name="precision">Precision %.2f m.</string>
 <string name="prompt_taxonData_message">In order to use this functionality, you need to download data for offline usage. If you have already done so, you might be getting this notification because your downloaded data needs to be updated. Only do it if you have a good internet connection! Are you ready?</string>
 <string name="prompt_taxonData_title">Do you want to fetch data?</string>
+<string name="recognitionServiceError_addingDataError_message">Error while adding input to the name recognition service. </string>
+<string name="recognitionServiceError_addingFetchingResults_message">It was not possible to get any results from the name recognition service.</string>
+<string name="recognitionServiceError_title">Error fetching name suggestions</string>
 <string name="recoveryAction_activate">Activate</string>
 <string name="recoveryAction_login">Login</string>
 <string name="recoveryAction_openSettings">Open Settings</string>

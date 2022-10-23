@@ -5,6 +5,7 @@ import android.content.res.Resources
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.logrocket.core.SDK
 import com.noque.svampeatlas.R
 import com.noque.svampeatlas.models.*
 import com.noque.svampeatlas.services.DataService
@@ -117,8 +118,10 @@ object Session {
         this._user.postValue(user)
 
         if (token == null || user == null) {
+            SDK.identify("Anonymous")
             if (_loggedInState.value?.item != false) _loggedInState.postValue(State.Items(false))
         } else {
+            SDK.identify(user.initials)
             if (_loggedInState.value?.item != true) _loggedInState.postValue(State.Items(true))
         }
     }

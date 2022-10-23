@@ -34,7 +34,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
         private const val TAG = "NewObservationViewModel"
     }
 
-    sealed class Notification(val title: String, val message: String) {
+    sealed class Notification(val title: String, val message: String, val action: Pair<String, String>? = null) {
         class LocationInaccessible(resources: Resources, error: AppError): Notification(resources.getString(R.string.newObservationError_noCoordinates_title), error.message)
         class LocalityInaccessible(resources: Resources): Notification(resources.getString(R.string.newObservationError_noLocality_title), resources.getString(R.string.newObservationError_noLocality_message))
         class ObservationUploaded(resources: Resources, id: Int): Notification(resources.getString(R.string.addObservationVC_successfullUpload_title),
@@ -44,11 +44,11 @@ class NewObservationViewModel(application: Application, val context: AddObservat
         class Deleted(resource: Resources): Notification("", "")
         class NewObservationError(val error: UserObservation.Error, resources: Resources): Notification(resources.getString(error.title), resources.getString(error.message))
         class Error(error: AppError): Notification(error.title, error.message)
-        class RecognitionServiceError
+        class UseImageMetadata(resources: Resources, val imageLocation: Location): Notification(resources.getString(R.string.addObservationVC_useImageMetadata_title), resources. getString(R.string.addObservationVC_useImageMetadata_message, imageLocation.accuracy.toString()), Pair(resources.getString(R.string.addObservationVC_useImageMetadata_positive), resources.getString(R.string.addObservationVC_useImageMetadata_negative)))
     }
 
     sealed class Prompt(val title: String, val message: String, val yes: String, val no: String) {
-        class UseImageMetadata(resources: Resources, val imageLocation: Location, val userLocation: Location): Prompt(resources.getString(R.string.addObservationVC_useImageMetadata_title), resources. getString(R.string.addObservationVC_useImageMetadata_message, imageLocation.accuracy.toString()), resources.getString(R.string.addObservationVC_useImageMetadata_positive), resources.getString(R.string.addObservationVC_useImageMetadata_negative))
+        class LowAccuraccy(resources: Resources): Prompt(resources.getString(R.string.error_addObservationError_lowAccuracy), resources.getString(R.string.newObservationError_tooInaccurate), resources.getString(R.string.action_findLocation), resources.getString(R.string.action_adjustSelf))
     }
 
     // If null during session - then we do not want to find predictions
@@ -94,7 +94,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
             _predictionResultsState.value = State.Empty()
 
         viewModelScope.launch {
-            if (it.mushroom == null && it.images.isNotEmpty() && context == AddObservationFragment.Context.UploadNote) {
+            if (it.images.isNotEmpty() && context == AddObservationFragment.Context.UploadNote) {
                 it.images.forEach { when (it) {
                     is UserObservation.Image.LocallyStored -> {recognitionService?.addPhotoToRequest(it.file) }
                     is UserObservation.Image.New ->  {}
@@ -238,10 +238,6 @@ class NewObservationViewModel(application: Application, val context: AddObservat
             }
         }
 
-        fun promptToUseImageLocation(imageLocation: Location, userLocation: Location) {
-            showPrompt.postValue(Prompt.UseImageMetadata(getApplication<MyApplication>().resources, imageLocation, userLocation))
-        }
-
         when (state) {
             is State.Error -> {
                 if (isAwaitingCoordinatedBeforeSave) {
@@ -257,7 +253,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
                     is UserObservation.Image.New -> {
                         val imageLocation = image.file.getExifLocation()
                         if (imageLocation != null && SphericalUtil.computeDistanceBetween(imageLocation.latLng, state.items.latLng) > imageLocation.accuracy) {
-                            promptToUseImageLocation(imageLocation, state.items)
+                            showNotification.postValue(Notification.UseImageMetadata(getApplication<MyApplication>().resources, imageLocation))
                         } else {
                             setLocation(state.items)
                             if (state.item != null) userObservation.observationDate.value = state.item.date
@@ -329,7 +325,7 @@ class NewObservationViewModel(application: Application, val context: AddObservat
         imageFile.getExifLocation()?.let { imageLocation ->
             _coordinateState.value?.item?.first?.let { coordinateLocation ->
                 if (SphericalUtil.computeDistanceBetween(imageLocation.latLng, coordinateLocation.latLng) > imageLocation.accuracy) {
-                    showPrompt.postValue(Prompt.UseImageMetadata(getApplication<MyApplication>().resources, imageLocation, coordinateLocation))
+                   showNotification.postValue(Notification.UseImageMetadata(getApplication<MyApplication>().resources, imageLocation))
                 }
             }
         }
@@ -383,8 +379,8 @@ class NewObservationViewModel(application: Application, val context: AddObservat
     }
 
     fun promptPositive() {
-        when (val prompt = showPrompt.value) {
-            is Prompt.UseImageMetadata -> {
+        when (val prompt = showNotification.value) {
+            is Notification.UseImageMetadata -> {
                 userObservation.observationDate.value = prompt.imageLocation.date
                 _coordinateState.value = State.Items(Pair(prompt.imageLocation, false))
                 getLocalities(prompt.imageLocation)
@@ -394,18 +390,18 @@ class NewObservationViewModel(application: Application, val context: AddObservat
     }
 
     fun promptNegative() {
-        when (val prompt = showPrompt.value) {
-            is Prompt.UseImageMetadata -> {
+        when (val prompt = showNotification.value) {
+            is Notification.UseImageMetadata -> {
                 when (_coordinateState.value) {
                     is State.Empty, is State.Error<*>, is State.Loading  -> {
-                        _coordinateState.value = State.Items(Pair(prompt.userLocation, false))
-                        getLocalities(prompt.userLocation)
+                       /* _coordinateState.value = State.Items(Pair(prompt.userLocation, false))
+                        getLocalities(prompt.)*/
                     }
                     is State.Items -> { /* Do nothing */ }
                     else -> {}
                 }
             }
-            null -> {}
+            else -> {}
         }
     }
 

@@ -7,9 +7,12 @@ import com.google.gson.reflect.TypeToken
 import com.noque.svampeatlas.extensions.toAppError
 import com.noque.svampeatlas.models.AppError
 import com.noque.svampeatlas.models.Mushroom
+import com.noque.svampeatlas.models.Prediction
 import com.noque.svampeatlas.models.Result
 import com.noque.svampeatlas.services.DataService
+import com.noque.svampeatlas.services.RecognitionService
 import com.noque.svampeatlas.services.RoomService
+import com.noque.svampeatlas.utilities.MyApplication
 import com.noque.svampeatlas.utilities.MyApplication.Companion.applicationContext
 import com.noque.svampeatlas.utilities.api.API
 import com.noque.svampeatlas.utilities.api.APIType
@@ -33,6 +36,16 @@ class MushroomRepository(private val requestQueue: RequestQueue) {
         }
 
         return fetchMushroom(id)
+    }
+
+    suspend fun fetchMushrooms(predictionResults: RecognitionService.GetResultsRequestResult): List<Prediction> {
+        val predictions = mutableListOf<Prediction>()
+            for (index in predictionResults.taxonIds.indices) {
+                getMushroom(predictionResults.taxonIds[index]).onSuccess {
+                    predictions.add(Prediction(it,predictionResults.conf[index]))
+                }
+            }
+        return predictions
     }
 
     private suspend fun fetchMushroom(id: Int): Result<Mushroom, DataService.Error> = suspendCoroutine { cont ->

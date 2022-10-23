@@ -176,6 +176,10 @@
 <string name="myPageScrollView_logout">Odhlásit</string>
 <string name="myPageScrollView_notificationsHeader">Oznámení</string>
 <string name="myPageScrollView_observationsHeader">Pozorování</string>
+<string name="myPage_changeDetails"></string>
+<string name="myPage_confirmDeletion_message"></string>
+<string name="myPage_confirmDeletion_title"></string>
+<string name="myPage_deleteProfile"></string>
 <string name="navigationItem_about">O aplikaci</string>
 <string name="navigationItem_cameraVC">Rozpoznávání</string>
 <string name="navigationItem_facebook">Facebook</string>
@@ -244,6 +248,9 @@
 <string name="precision">Přesnost %.2f m.</string>
 <string name="prompt_taxonData_message">Abyste mohli tuto funkci používat, musíte si stáhnout data pro offline použití. Pokud jste tak již učinili, může se vám toto oznámení zobrazovat dokud neaktualizujete stažená data. Aktualizaci proveďte jakmile budete mít stabilní připojení k internetu. Připraven?</string>
 <string name="prompt_taxonData_title">Chcete stáhnout data?</string>
+<string name="recognitionServiceError_addingDataError_message"></string>
+<string name="recognitionServiceError_addingFetchingResults_message"></string>
+<string name="recognitionServiceError_title"></string>
 <string name="recoveryAction_activate">Spustit</string>
 <string name="recoveryAction_login">Přihlášení</string>
 <string name="recoveryAction_openSettings">Otevřít nastavení</string>

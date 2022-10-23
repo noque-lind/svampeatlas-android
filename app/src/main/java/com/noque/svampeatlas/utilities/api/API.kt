@@ -86,7 +86,8 @@ data class API(val apiType: APIType) {
                             SpeciesQueries.Attributes(null),
                             SpeciesQueries.RedlistData,
                             SpeciesQueries.Statistics,
-                            SpeciesQueries.DanishNames
+                            SpeciesQueries.DanishNames,
+                            SpeciesQueries.AcceptedTaxon
                         )
                     )
                 )

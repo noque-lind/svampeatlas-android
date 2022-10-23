@@ -40,6 +40,16 @@ fun String.toDate(): Date {
     return sf.parse(this)
 }
 
+fun Date.removeTime(): Date {
+    val cal = Calendar.getInstance()
+    cal.time = this
+    cal[Calendar.HOUR_OF_DAY] = 0
+    cal[Calendar.MINUTE] = 0
+    cal[Calendar.SECOND] = 0
+    cal[Calendar.MILLISECOND] = 0
+    return cal.time
+}
+
 
 fun Date.toISO8601(): String {
     val cm = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
