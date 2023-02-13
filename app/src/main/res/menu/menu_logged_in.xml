@@ -71,6 +71,13 @@
             android:checkable="false"
             />
 
+        <item
+            android:id="@+id/Version"
+            android:title="@string/v"
+            android:enabled="false"
+            android:checkable="false"
+            />
+
 
     </group>
 </menu>
